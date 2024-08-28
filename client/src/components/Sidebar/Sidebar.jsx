@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FaHome, FaUsers, FaChartLine, FaWarehouse, FaCog, FaArrowRight, FaArrowLeft, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { FaHome, FaUsers, FaChartLine, FaWarehouse, FaShoppingCart, FaCog, FaArrowRight, FaCalculator, FaArrowLeft, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import {BiSolidReport} from 'react-icons/bi';
 import { Link } from 'react-router-dom';
 import './sidebar.css';
@@ -26,7 +26,7 @@ function Sidebar() {
         {!collapsed ? (
           <h2 className="flex items-center text-base font-bold md:text-md lg:text-md xl:text-2xl">
             <img src={img} alt="Logo" className="w-8 h-8 mr-2" />
-            TORMENTA
+            La banda de Kchay
           </h2>
 
 
@@ -54,6 +54,8 @@ function Sidebar() {
                 { to: '/ventas/registro_venta', text: 'Nueva Venta' },
               ]
             },
+            { to: '/compras', icon: <FaShoppingCart className="text-xl" />, text: 'Compras' },
+
             { to: '/almacen', icon: <FaWarehouse className="text-xl" />, text: 'Almacén', subLinks: [
               { to: '/almacen/nota_ingreso', text: 'Nota de ingreso' },
               { to: '/almacen/guia_remision', text: 'Guia de remisión' },
@@ -61,9 +63,13 @@ function Sidebar() {
             ]
 
             },
+            {
+              to: '/contabilidad', icon: <FaCalculator className="text-xl" />, text: 'Contabilidad'
+            },
             { to: '/reportes', icon: <BiSolidReport className="text-xl" />, text: 'Reportes'
               
             },
+
             { icon: <FaCog className="text-xl" />, text: 'Configuración', subLinks: [
               { to: '/configuracion/usuarios', text: 'Usuarios' },
             ]},
