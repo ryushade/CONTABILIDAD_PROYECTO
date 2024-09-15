@@ -35,7 +35,7 @@ function Navbar() {
             Almacén
           </Link>
           <Link as={Link} color="primary" isBlock href="/empleados" className="block md:inline-block text-gray-600 px-2 py-2 ">
-            Empleados
+            Compras
           </Link>
           <Link as={Link} color="primary" isBlock href="/productos" className="block md:inline-block text-gray-600 px-2 py-2">
             Productos
