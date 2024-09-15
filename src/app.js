@@ -20,6 +20,7 @@ import subcategoriaRoutes from "./routes/subcategoria.routes";
 import reporteRoutes from "./routes/reporte.routes";
 import destinatarioRoutes from "./routes/destinatario.routes";
 
+
 const app = express();
 
 // Settings

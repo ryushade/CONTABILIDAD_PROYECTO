@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { FaHome, FaUsers, FaChartLine, FaWarehouse, FaShoppingCart, FaCog, FaArrowRight, FaCalculator, FaArrowLeft, FaChevronDown, FaChevronUp } from 'react-icons/fa';
-import {BiSolidReport} from 'react-icons/bi';
+import { FaHome, FaUsers, FaChartLine, FaWarehouse, FaUserTie, FaShoppingCart, FaCog, FaArrowRight, FaCalculator, FaArrowLeft, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { BiSolidReport } from 'react-icons/bi';
+import { RiPencilRuler2Line } from "react-icons/ri";
 import { Link } from 'react-router-dom';
 import './sidebar.css';
 import img from '@/assets/icono.ico';
@@ -28,8 +29,6 @@ function Sidebar() {
             <img src={img} alt="Logo" className="w-8 h-8 mr-2" />
             La banda de Kchay
           </h2>
-
-
         ) : (
           <img src={img} alt="Logo" className="w-8 h-8 m-auto" />
         )}
@@ -41,52 +40,72 @@ function Sidebar() {
         <ul className="space-y-2">
           {[
             { to: '/inicio', icon: <FaHome className="text-xl" />, text: 'Inicio' },
-            { to: '/productos', icon: <FaChartLine className="text-xl" />, text: 'Productos' , subLinks: [
-              { to: '/productos/marcas', text: 'Marcas' },
-              { to: '/productos/categorias', text: 'Categorias'},
-              { to: '/productos/subcategorias', text: 'Subcategorias'},
-
-            ]},
-            
+            {
+              to: '/productos', icon: <FaChartLine className="text-xl" />, text: 'Productos', subLinks: [
+                { to: '/productos/marcas', text: 'Marcas' },
+                { to: '/productos/categorias', text: 'Categorias' },
+                { to: '/productos/subcategorias', text: 'Subcategorias' },
+              ]
+            },
             { to: '/empleados', icon: <FaUsers className="text-xl" />, text: 'Empleados' },
+            { to: '/proveedores', icon: <FaUserTie className="text-xl" />, text: 'Proveedores' },
             {
               to: '/ventas', icon: <FaChartLine className="text-xl" />, text: 'Ventas', subLinks: [
                 { to: '/ventas/registro_venta', text: 'Nueva Venta' },
               ]
             },
-            { to: '/compras', icon: <FaShoppingCart className="text-xl" />, text: 'Compras' },
-
-            { to: '/almacen', icon: <FaWarehouse className="text-xl" />, text: 'Almacén', subLinks: [
-              { to: '/almacen/nota_ingreso', text: 'Nota de ingreso' },
-              { to: '/almacen/guia_remision', text: 'Guia de remisión' },
-              { to: '/almacen/nota_salida', text: 'Nota de salida' }
-            ]
-
+            {
+              to: '/compras', icon: <FaShoppingCart className="text-xl" />, text: 'Compras', subLinks: [
+                { to: '/compras/registro_compra', text: 'Nueva Compra' },
+              ]
             },
             {
-              to: '/contabilidad', icon: <FaCalculator className="text-xl" />, text: 'Contabilidad'
+              to: '/almacen', icon: <FaWarehouse className="text-xl" />, text: 'Almacén', subLinks: [
+                { to: '/almacen/nota_ingreso', text: 'Nota de ingreso' },
+                { to: '/almacen/guia_remision', text: 'Guia de remisión' },
+                { to: '/almacen/nota_salida', text: 'Nota de salida' },
+              ]
             },
-            { to: '/reportes', icon: <BiSolidReport className="text-xl" />, text: 'Reportes'
-              
+            {
+              to: '/contabilidad', icon: <FaCalculator className="text-xl" />, text: 'Contabilidad', subLinks: [
+                { to: '/contabilidad/cuentas', text: 'Listado de cuentas' },
+                { to: '/contabilidad/asientos', text: 'Asientos contables' },
+                { to: '/contabilidad/ldiario', text: 'Libro diario' },
+              ]
             },
+            
+            { to: '/reportes', icon: <BiSolidReport className="text-xl" />, text: 'Reportes' },
+            {
+              to: '/mantenimiento', icon: <RiPencilRuler2Line className="text-xl" />, text: 'Mantenimiento', subLinks: [
 
-            { icon: <FaCog className="text-xl" />, text: 'Configuración', subLinks: [
-              { to: '/configuracion/usuarios', text: 'Usuarios' },
-            ]},
+              ]
+            },
+            {
+              icon: <FaCog className="text-xl" />, text: 'Configuración', subLinks: [
+                { to: '/configuracion/usuarios', text: 'Usuarios' },
+                { to: '/configuracion/reglas', text: 'Reglas contables' },
+              ]
+            },
           ].map(({ to, icon, text, subLinks }) => (
-            <div key={to}>
+            <div key={to || text}>
               <li className={`flex items-center ${collapsed ? 'justify-center' : 'pl-4'} py-2 px-2 w-full`}>
-                <Link to={to} className={`flex items-center ${collapsed ? 'justify-center' : 'w-full'}`}>
-                  {icon}
-                  {!collapsed && <span className="ml-4">{text}</span>}
-                </Link>
+                {to ? (
+                  <Link to={to} className={`flex items-center ${collapsed ? 'justify-center' : 'w-full'}`}>
+                    {icon}
+                    {!collapsed && <span className="ml-4">{text}</span>}
+                  </Link>
+                ) : (
+                  <div className={`flex items-center ${collapsed ? 'justify-center' : 'w-full'}`}>
+                    {icon}
+                    {!collapsed && <span className="ml-4">{text}</span>}
+                  </div>
+                )}
                 {!collapsed && subLinks && (
                   <button onClick={() => toggleLink(to)} className="ml-auto">
                     {expandedLinks[to] ? <FaChevronUp /> : <FaChevronDown />}
                   </button>
                 )}
               </li>
-
 
               {!collapsed && expandedLinks[to] && subLinks && (
                 <ul className="mt-2 ml-10 space-y-2">
