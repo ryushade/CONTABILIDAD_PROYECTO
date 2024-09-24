@@ -19,6 +19,8 @@ import RegistroGuia from '@/pages/Almacen/Guia_Remision/Registro_Guia/Registro_G
 import Historico from '@/pages/Almacen/Kardex/Historico/Historico';
 import Marcas from '@/pages/Marcas/Marcas';
 import ReporteVentas from '@/pages/ReporteVentas/ReporteVentas';
+import Cuentas from '@/pages/Contabilidad/Cuentas/Cuentas';
+import Contabilidad from '@/pages/Contabilidad/Cuentas/Contabilidad';
 import { Toaster } from "react-hot-toast";
 
 // Contexts
@@ -27,7 +29,7 @@ import { SubcategoriaContextProvider } from "@/context/Subcategoria/Subcategoria
 import { MarcaContextProvider } from "@/context/Marca/MarcaProvider";
 
 // Rutas protegidas por rol
-import {RouteProtectedRol} from '../../routes';
+import { RouteProtectedRol } from '../../routes';
 
 function Dashboard() {
 
@@ -88,6 +90,17 @@ function Dashboard() {
                   <Route path="/productos/subcategorias" element={
                     <RouteProtectedRol allowedRoles={[ADMIN_ROL]}>
                       <Subcategorias />
+                    </RouteProtectedRol>
+                  } />
+
+                  <Route path="/contabilidad" element={
+                    <RouteProtectedRol allowedRoles={[ADMIN_ROL]}>
+                      <Contabilidad />
+                    </RouteProtectedRol>
+                  } />
+                  <Route path="/contabilidad/cuentas" element={
+                    <RouteProtectedRol allowedRoles={[ADMIN_ROL]}>
+                      <Cuentas />
                     </RouteProtectedRol>
                   } />
                   <Route path="/almacen" element={
