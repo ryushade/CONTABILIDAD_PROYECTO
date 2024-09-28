@@ -1,4 +1,6 @@
 
+
+# Variables de entorno
 SECRET_KEY=tormentasecreto
 SQLALCHEMY_DATABASE_URI=mysql+pymysql://root:tucontraseña@localhost/db_tormenta
 
