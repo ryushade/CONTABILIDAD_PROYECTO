@@ -1,0 +1,12 @@
+.login-container {
+    margin-top: 40%;
+    margin-right: 20%;
+    margin-bottom: 10%;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.iniciar {
+    justify-items: center;
+}
+

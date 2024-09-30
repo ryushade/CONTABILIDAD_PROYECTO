@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
 
@@ -19,4 +19,9 @@ def create_app():
     from app.controllers.contable import accounting_bp
     app.register_blueprint(accounting_bp, url_prefix='/contable')
 
+    
+    @app.route('/')
+    def index():
+        return redirect(url_for('contable.login'))
+        
     return app
