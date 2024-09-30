@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Mi Proyecto{% endblock %}</title>
     <!-- CSS de Bootstrap -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
     <!-- CSS personalizado -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='img/icono.ico') }}">
 </head>
+
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="#">TORMENTA</a>
@@ -21,14 +25,57 @@
                     <a class="nav-link" href="{{ url_for('contable.index') }}">Contable</a>
                 </li>
             </ul>
+            <div class="form-inline my-2 my-lg-2 ml-3">
+                <div class="input-group rounded">
+                    <input type="search" class="form-control rounded" placeholder="Buscar" aria-label="Search"
+                        aria-describedby="search-addon" />
+                    <span class="input-group-text border-0" id="search-addon">
+                        <i class="fas fa-search"></i>
+                    </span>
+                </div>
+            </div>
+            <!-- User Dropdown -->
+            {% if user %}
+            <div class="dropdown">
+                <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button" id="userDropdown"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-user-circle" style="font-size: 20px; color: gray;"></i>
+                    <span class="ml-2">
+                        {{ user.usua }} - <!-- Mostrar nombre de usuario -->
+                        <!-- Comparar el nombre del rol como cadena -->
+                        {% if user.rol.nom_rol == "ADMIN" %}
+                        Administrador
+                        {% elif user.rol.nom_rol == "EMPLEADO" %}
+                        Empleado
+                        {% else %}
+                        Rol desconocido
+                        {% endif %}
+
+                    </span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+                    <a class="dropdown-item text-danger" href="{{ url_for('contable.logout') }}">Cerrar sesión</a>
+                </div>
+            </div>
+            {% else %}
+            <!-- Mostrar opción de iniciar sesión si el usuario no está autenticado -->
+            <a href="{{ url_for('contable.login') }}" class="btn btn-outline-primary">Iniciar Sesión</a>
+            {% endif %}
+
+
+            <!-- Buscar -->
+
         </div>
     </nav>
+
     <div class="container">
         {% block content %}{% endblock %}
     </div>
+
     <!-- JS de Bootstrap -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
+
 </html>
