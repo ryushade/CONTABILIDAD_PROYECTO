@@ -62,3 +62,32 @@
         display: flex; /* Visible en pantallas grandes */
     }
 }
+
+
+/* styles.css */
+.card {
+    transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.text-purple {
+    color: #6f42c1; /* Custom color for purple */
+}
+
+.bg-light {
+    background-color: #f8f9fa;
+}
+
+h1.text-5xl {
+    font-size: 2.5rem;
+}
+
+.title-Inicio {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #343a40;
+    margin-bottom: 20px;
+}
