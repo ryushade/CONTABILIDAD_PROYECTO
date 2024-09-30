@@ -1,12 +1,64 @@
+/* Estilo del contenedor de fondo */
+.background-container {
+    background-color: #a07ce9;
+    min-height: 100vh;
+    position: relative;
+}
+
+/* Fondos decorativos */
+.bg-circle-top-left {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 300px;
+    height: 300px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    z-index: 0;
+}
+
+.bg-circle-top-right {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 150px;
+    height: 150px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    z-index: 0;
+}
+
+/* Contenedor del formulario de login */
 .login-container {
-    margin-top: 40%;
-    margin-right: 20%;
-    margin-bottom: 10%;
-    justify-content: center;
+    display: flex;
+    width: 70vw;
+    height: 70vh;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+}
+
+/* Panel del formulario de inicio de sesión */
+.login-form {
+    background-color: #ffffff;
+    flex: 1;
+    padding: 20px;
+    display: flex;
     flex-direction: column;
+    justify-content: center;
 }
 
-.iniciar {
-    justify-items: center;
+/* Panel de la imagen */
+.login-image-container {
+    flex: 1;
+    background-color: #ffffff;
+    border-left: 2px solid #e7e4e4;
+    display: none; /* Escondido en pantallas pequeñas */
 }
 
+@media (min-width: 992px) {
+    .login-image-container {
+        display: flex; /* Visible en pantallas grandes */
+    }
+}
