@@ -114,3 +114,14 @@ h1.text-5xl {
     text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2);
     transform: scale(1);
 }
+
+.btn{
+    background-color: #00bdd6;
+    border: none;
+    height: 50px;
+}
+
+.btn:hover{
+    background-color: #00bdd6;
+
+}
