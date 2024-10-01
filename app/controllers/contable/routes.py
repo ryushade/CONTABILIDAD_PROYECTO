@@ -31,3 +31,5 @@ def logout():
     session.pop('user_id', None)
     flash('Logout exitoso', 'success')
     return redirect(url_for('contable.login'))
+
+
