@@ -152,8 +152,12 @@
                                 <i class="fas fa-folder text-success" style="font-size: 24px;"></i>
                             </div>
                             <div>
-                                <h5 class="card-title">Módulo de Cuentas PCGE</h5>
-                                <p class="card-text text-muted">Gestiona las cuentas del PCGE actualizado.</p>
+                                <h5 class="card-title" onclick="window.location.href='{{ url_for('contable.index') }}'">
+                                    Módulo de Cuentas PCGE</h5>
+                                <p class="card-text text-muted"
+                                    onclick="window.location.href='{{ url_for('contable.index') }}'">
+                                    Gestiona las cuentas del PCGE actualizado.
+                                </p>
                                 <p class="card-text text-muted"><strong>Roles Autorizados:</strong> Contador</p>
                             </div>
                         </div>
