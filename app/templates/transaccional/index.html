@@ -24,7 +24,7 @@
         <!-- Sistema Transaccional -->
         <div class="tab-pane fade show active" id="sistrans">
             <!-- Detalles -->
-            <div class="mb-4">
+            <div class="mb-2">
                 <hr>
                 <p class="text-muted" style="font-size: 14px;">
                     Podrás visualizar los módulos de ventas, compras, almacén de acuerdo al rol del usuario.
@@ -58,10 +58,10 @@
                                 <i class="fas fa-box-open text-success" style="font-size: 24px;"></i>
                             </div>
                             <div>
-                                <h5 class="card-title">Módulo de Productos</h5>
-                                <p class="card-text text-muted">Administra el catálogo de productos y sus
+                                <h5 class="card-title"  onclick="window.location.href='{{ url_for('transaccional.productos') }}'">Módulo de Productos </h5>
+                                <p class="card-text text-muted" onclick="window.location.href='{{ url_for('transaccional.productos') }}'">Administra el catálogo de productos y sus
                                     características.</p>
-                                <p class="card-text text-muted"><strong>Roles Autorizados:</strong> Administrador</p>
+                                <p class="card-text text-muted" onclick="window.location.href='{{ url_for('transaccional.productos') }}'"><strong>Roles Autorizados:</strong> Administrador</p>
                             </div>
                         </div>
                     </div>
@@ -152,13 +152,13 @@
                                 <i class="fas fa-folder text-success" style="font-size: 24px;"></i>
                             </div>
                             <div>
-                                <h5 class="card-title" onclick="window.location.href='{{ url_for('contable.index') }}'">
+                                <h5 class="card-title" onclick="window.location.href='{{ url_for('contable.cuentas') }}'">
                                     Módulo de Cuentas PCGE</h5>
                                 <p class="card-text text-muted"
-                                    onclick="window.location.href='{{ url_for('contable.index') }}'">
+                                    onclick="window.location.href='{{ url_for('contable.cuentas') }}'">
                                     Gestiona las cuentas del PCGE actualizado.
                                 </p>
-                                <p class="card-text text-muted"><strong>Roles Autorizados:</strong> Contador</p>
+                                <p class="card-text text-muted" onclick="window.location.href='{{ url_for('contable.cuentas') }}'"><strong>Roles Autorizados:</strong> Contador</p>
                             </div>
                         </div>
                     </div>

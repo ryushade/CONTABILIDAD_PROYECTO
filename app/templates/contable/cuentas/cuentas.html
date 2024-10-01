@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Tormenta{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb (Migas de Pan) -->
+<div class="pcge">
+<nav aria-label="breadcrumb" class="mb-2">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/inicio">Inicio</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Plan de Cuentas</li>
+    </ol>
+</nav>
+
+<hr class="mb-4" />
+<h1 class="font-weight-bold display-8 text-left">Plan de Cuentas</h1>
+
+<!-- Lista de Productos -->
+<div class="d-flex justify-content-start align-items-center mt-5 mb-4">
+    <!-- Escáner de Código de Barras -->
+    <div id="barcode-scanner" class="barcode-scanner"></div>
+
+    <!-- Título de Listado -->
+</div>
+
+{% endblock %}

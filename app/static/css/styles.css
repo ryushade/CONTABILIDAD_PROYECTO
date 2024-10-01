@@ -115,10 +115,11 @@ h1.text-5xl {
     transform: scale(1);
 }
 
-.btn{
+.btn-login{
     background-color: #00bdd6;
     border: none;
-    height: 50px;
+    height: 45px;
+    border-radius: 5px;
 }
 
 .btn:hover{
