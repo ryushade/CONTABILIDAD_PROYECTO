@@ -8,3 +8,8 @@ def index():
 @transactional_bp.route('/almacen')
 def almacen():
     return render_template('transaccional/almacen/almacen.html')
+
+@transactional_bp.route('/compras')
+def compras():
+    return render_template('transaccional/compras/almacen.html')
+
