@@ -11,5 +11,5 @@ def almacen():
 
 @transactional_bp.route('/compras')
 def compras():
-    return render_template('transaccional/compras/almacen.html')
+    return render_template('transaccional/compras/compras.html')
 
