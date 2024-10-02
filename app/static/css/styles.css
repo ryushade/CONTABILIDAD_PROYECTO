@@ -48,7 +48,6 @@ body {
     }
 }
 
-
 /* styles.css */
 .card {
     transition: box-shadow 0.3s ease;
@@ -73,9 +72,7 @@ h1.text-5xl {
 
 .title-Inicio {
     font-size: 50px;
-    /* Puede omitir esta propiedad si usa Tailwind CSS */
     font-weight: bold;
-    /* Puede omitir esta propiedad si usa Tailwind CSS */
     color: rgba(0, 0, 0, 0.8);
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
     letter-spacing: 2px;
@@ -90,6 +87,98 @@ h1.text-5xl {
     color: rgba(0, 0, 0, 1);
     text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2);
     transform: scale(1);
+}
+
+<<<<<<< HEAD
+/* --------------------- Nuevo CSS para Módulo de Compras --------------------- */
+
+/* Contenedor del módulo de compras */
+.module-compras {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.module-compras h1 {
+    font-size: 2.5rem;
+    color: #4a4a4a;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+/* Estilo para los formularios */
+.module-compras .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.module-compras .form-control {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.module-compras .form-control:focus {
+    border-color: #a07ce9;
+    box-shadow: 0 0 5px rgba(160, 124, 233, 0.5);
+}
+
+.module-compras .btn-success,
+.module-compras .btn-danger {
+    font-size: 16px;
+    padding: 10px 20px;
+    margin-right: 10px;
+    border-radius: 4px;
+}
+
+/* Estilo para la tabla de productos */
+.module-compras .table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+    background-color: #f8f9fa;
+}
+
+.module-compras .table th,
+.module-compras .table td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.module-compras .table th {
+    background-color: #a07ce9;
+    color: #fff;
+    font-weight: bold;
+}
+
+.module-compras .table tbody tr:hover {
+    background-color: rgba(160, 124, 233, 0.1);
+}
+
+/* Botones para incrementar y disminuir cantidad */
+.module-compras .btn-light {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+}
+
+.module-compras .btn-light:hover {
+    background-color: #e0e0e0;
+}
+
+/* Estilo para el total */
+.module-compras .totals {
+    text-align: right;
+    margin-top: 20px;
+    font-size: 18px;
+    color: #333;
+}
+
+.module-compras .totals p {
+    margin-bottom: 10px;
+    font-weight: bold;
 }
 
 .btn-login {
@@ -144,6 +233,7 @@ h1.text-5xl {
 
 
 /* Y así sucesivamente */
+<<<<<<< HEAD
 
 .eye i {
     color: blue;
@@ -203,3 +293,6 @@ h1.text-5xl {
     height: 16px;
     margin-right: 0.25rem;
 }
+=======
+>>>>>>> c8e2c5f3fae80a54f753fb36e015c855d46df380
+>>>>>>> f293b938d2269b25c17ff86195976c63d579be5f

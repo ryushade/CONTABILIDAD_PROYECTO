@@ -144,22 +144,25 @@
 </style>
 <!-- Breadcrumb (Migas de Pan) -->
 {{ breadcrumb([
-    {'label': 'Inicio', 'url': url_for('transaccional.index'), 'icon': 'M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z'},
-    {'label': 'Contabilidad', 'url': url_for('transaccional.index')},
-    {'label': 'Plan de cuentas'}
+{'label': 'Inicio', 'url': url_for('transaccional.index'), 'icon': 'M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414
+1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1
+0 001.414-1.414l-7-7z'},
+{'label': 'Contabilidad', 'url': url_for('transaccional.index')},
+{'label': 'Plan de cuentas'}
 ]) }}
 
 <hr class="mb-4" />
 <h1 class="font-weight-bold display-8 text-left" style="font-size: 26px;">Plan Contable General Empresarial</h1>
 
 <!-- Contenedor de la Tabla de Contabilidad -->
-<div class="table-container" style="margin-top: 20px; margin-left: ;">
+<div class="table-container" style="margin-top: 20px; margin-right: 10%; width: 100%;">
     <table>
         <thead>
             <tr>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Acciones</th>
+                <th class="text-center">NOMBRE</th>
+                <th class="text-center">DESCRIPCIÓN</th>
+                <th class="text-center">ESTADO</th>
+                <th class="text-center">ACCIONES</th>
             </tr>
         </thead>
         <tbody>
@@ -169,6 +172,7 @@
                     <span class="account-name">Activo</span>
                 </td>
                 <td class="description">Bajo esta categoría se encuentran las cuentas del activo</td>
+                <td></td>
                 <td class="actions">
                     <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
                     <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
@@ -180,8 +184,11 @@
                 <td>
                     <span class="icon"><i class="fas fa-caret-down"></i></span>
                     <span class="account-name">Pasivo</span>
+
                 </td>
                 <td class="description">Bajo esta categoría se encuentran las cuentas del pasivo</td>
+                <td></td>
+
                 <td class="actions">
                     <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
                     <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
@@ -194,7 +201,10 @@
                     <span class="icon"><i class="fas fa-caret-down"></i></span>
                     <span class="account-name">Patrimonio</span>
                 </td>
+
                 <td class="description">Bajo esta categoría se encuentra las cuentas del patrimonio</td>
+                <td></td>
+
                 <td class="actions">
                     <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
                     <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
@@ -207,7 +217,10 @@
                     <span class="icon"><i class="fas fa-caret-down"></i></span>
                     <span class="account-name">Gastos</span>
                 </td>
+
                 <td class="description">Bajo esta categoría se encuentran las cuentas de gastos</td>
+                <td></td>
+
                 <td class="actions">
                     <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
                     <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
@@ -220,8 +233,12 @@
                     <span class="icon"><i class="fas fa-caret-down"></i></span>
                     <span class="account-name">Ingresos</span>
                 </td>
+
                 <td class="description">Bajo esta categoría se encuentran las cuentas de Ingresos</td>
+                <td></td>
+
                 <td class="actions">
+
                     <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
                     <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
                     <span class="action-button secondary edit"><i class="fas fa-edit"></i></span>
@@ -233,7 +250,10 @@
                     <span class="icon"><i class="fas fa-caret-down"></i></span>
                     <span class="account-name">Saldos</span>
                 </td>
+
                 <td class="description">Bajo esta categoría se encuentran las cuentas de Saldos</td>
+                <td></td>
+
                 <td class="actions">
                     <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
                     <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>

@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}Tormenta   {% endblock %}
+
+{% block content %}
+<div class="container bg-white mt-2 p-4">
+    <header class="mb-4">
+        <h1 class="text-4xl font-bold tracking-wide text-gray-700">MÓDULO COMPRAS</h1>
+    </header>
+
+    <div class="row">
+        <!-- Left Section (Proveedor, Comprobante) -->
+        <div class="col-md-4">
+            <form>
+                <div class="form-group">
+                    <label for="provider">Proveedor</label>
+                    <select class="form-control" id="provider">
+                        <option>CORPORACION P.C E.I.R.L</option>
+                    </select>
+                    <small class="text-success">Correcto.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="type">Tipo Comprobante</label>
+                    <select class="form-control" id="type">
+                        <option>BOLETA</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="receipt-number">No. Comprobante</label>
+                    <input type="text" class="form-control" id="receipt-number" value="04508">
+                </div>
+
+                <div class="form-group">
+                    <label for="payment-type">Forma de Pago</label>
+                    <select class="form-control" id="payment-type">
+                        <option>CONTADO</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="date">Fecha Comprobante</label>
+                    <input type="date" class="form-control" id="date">
+                </div>
+
+                <div class="form-group">
+                    <label for="branch">Sucursal</label>
+                    <select class="form-control" id="branch">
+                        <option>TIENDA PRINCIPAL</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="warehouse">Almacén</label>
+                    <select class="form-control" id="warehouse">
+                        <option>PRINCIPAL</option>
+                    </select>
+                </div>
+
+                <button class="btn btn-success">Guardar Compra</button>
+                <button class="btn btn-danger">Cancelar Compra</button>
+            </form>
+        </div>
+
+        <!-- Right Section (Detalle de Compra) -->
+        <div class="col-md-8">
+            <div class="search-product mb-3">
+                <input type="text" class="form-control" placeholder="Busque un producto aquí...">
+            </div>
+
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cant.</th>
+                        <th>Precio</th>
+                        <th>Exonerado</th>
+                        <th>Importe</th>
+                        <th>Quitar</th>
+                        <th>Vence</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>SUAVE DOBLE HOJA X2 UND</td>
+                        <td>
+                            <button class="btn btn-light">-</button>
+                            <input type="text" value="1.00" class="form-control-inline">
+                            <button class="btn btn-light">+</button>
+                        </td>
+                        <td>1.70</td>
+                        <td>0.00</td>
+                        <td>1.70</td>
+                        <td><button class="btn btn-danger">Quitar</button></td>
+                        <td>/</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="totals">
+                <p>Sumas: 1.44</p>
+                <p>Subtotal: 1.70</p>
+                <p>IGV %: 0.26</p>
+                <p>Total: 1.70</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
