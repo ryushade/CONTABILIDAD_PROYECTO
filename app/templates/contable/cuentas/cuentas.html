@@ -153,157 +153,101 @@
 ]) }}
 
 <hr class="mb-4" />
-<h1 class="font-weight-bold display-8 text-left" style="font-size: 26px;">PLAN CONTABLE GENERAL EMPRESARIAL (PCGE)</h1>
+<h1 class="font-weight-bold display-8 text-left" style="font-size: 26px;">PLAN CONTABLE GENERAL EMPRESARIAL</h1>
 
-<!-- Contenedor de la Tabla de Contabilidad -->
 <div class="table-container" style="margin-top: 20px; margin-right: 10%; width: 100%;">
     <table>
         <thead>
             <tr>
                 <th class="text-center">CÓDIGO</th>
                 <th class="text-center">NOMBRE</th>
-                <th class="text-center">TIPO</th>
+                <th class="text-center">NATURALEZA</th>
                 <th class="text-center">ESTADO</th>
                 <th class="text-center">ACCIONES</th>
             </tr>
         </thead>
         <tbody>
+            {% for cuenta in cuentas %}
             <tr>
-                <td>
-                    <span class="icon"><i class="fas fa-caret-down"></i></span>
-                    <span class="account-name">Activo</span>
+                <td class="text-center">{{ cuenta.codigo_cuenta }}</td>
+                <td class="text-center">{{ cuenta.nombre_cuenta }}</td>
+                <td class="text-center">{{ cuenta.naturaleza }}</td>
+                <td class="text-center">
+                    {% if cuenta.estado_cuenta == 1 %}
+                    Activo
+                    {% else %}
+                    Inactivo
+                    {% endif %}
                 </td>
-                <td class="description">Bajo esta categoría se encuentran las cuentas del activo</td>
-                <td></td>
-                <td></td>
-                <td class="actions" style="margin-left: 12px;">
+                <td class="text-center actions">
                     <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
                     <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
                     <span class="action-button secondary edit"><i class="fas fa-edit"></i></span>
                     <span class="action-button secondary trash"><i class="fas fa-trash"></i></span>
                 </td>
             </tr>
-            <tr>
-                <td>
-                    <span class="icon"><i class="fas fa-caret-down"></i></span>
-                    <span class="account-name">Pasivo</span>
-
-                </td>
-                <td class="description">Bajo esta categoría se encuentran las cuentas del pasivo</td>
-                <td></td>
-                <td></td>
-
-                <td class="actions" style="margin-left: 12px;">
-                    <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
-                    <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
-                    <span class="action-button secondary edit"><i class="fas fa-edit"></i></span>
-                    <span class="action-button secondary trash"><i class="fas fa-trash"></i></span>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <span class="icon"><i class="fas fa-caret-down"></i></span>
-                    <span class="account-name">Patrimonio</span>
-                </td>
-
-                <td class="description">Bajo esta categoría se encuentra las cuentas del patrimonio</td>
-                <td></td>
-                <td></td>
-
-
-                <td class="actions" style="margin-left: 12px;">
-                    <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
-                    <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
-                    <span class="action-button secondary edit"><i class="fas fa-edit"></i></span>
-                    <span class="action-button secondary trash"><i class="fas fa-trash"></i></span>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <span class="icon"><i class="fas fa-caret-down"></i></span>
-                    <span class="account-name">Gastos</span>
-                </td>
-
-                <td class="description">Bajo esta categoría se encuentran las cuentas de gastos</td>
-                <td></td>
-                <td></td>
-
-                <td class="actions" style="margin-left: 12px;">
-                    <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
-                    <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
-                    <span class="action-button secondary edit"><i class="fas fa-edit"></i></span>
-                    <span class="action-button secondary trash"><i class="fas fa-trash"></i></span>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <span class="icon"><i class="fas fa-caret-down"></i></span>
-                    <span class="account-name">Ingresos</span>
-                </td>
-
-                <td class="description">Bajo esta categoría se encuentran las cuentas de Ingresos</td>
-                <td></td>
-                <td></td>
-
-                <td class="actions" style="margin-left: 12px;">
-
-                    <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
-                    <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
-                    <span class="action-button secondary edit"><i class="fas fa-edit"></i></span>
-                    <span class="action-button secondary trash"><i class="fas fa-trash"></i></span>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <span class="icon"><i class="fas fa-caret-down"></i></span>
-                    <span class="account-name">Saldos</span>
-                </td>
-
-                <td class="description">Bajo esta categoría se encuentran las cuentas de Saldos</td>
-                <td></td>
-                <td></td>
-
-                <td class="actions" style="margin-left: 12px;">
-                    <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
-                    <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
-                    <span class="action-button secondary edit"><i class="fas fa-edit"></i></span>
-                    <span class="action-button secondary trash"><i class="fas fa-trash"></i></span>
-                </td>
-            </tr>
-
+            {% endfor %}
         </tbody>
     </table>
 </div>
 
+<!-- Paginación y selector de resultados -->
 <div class="pagination-select-container mt-4 d-flex justify-content-between align-items-center">
     <!-- Paginación -->
     <nav aria-label="Pagination" class="pagination-nav">
+        <!-- Botón Primero -->
+        {% if page > 1 %}
+        <a href="{{ url_for('contable.cuentas', page=1, per_page=per_page) }}" class="pagination-btn"
+            aria-label="Primera Página">
+            Primero
+        </a>
+        {% endif %}
+
         <!-- Botón Anterior -->
-        <a href="#" class="pagination-btn pagination-btn-prev disabled" aria-label="Página Anterior">
+        {% if page > 1 %}
+        <a href="{{ url_for('contable.cuentas', page=page - 1, per_page=per_page) }}"
+            class="pagination-btn pagination-btn-prev" aria-label="Página Anterior">
             <i class="fas fa-chevron-left"></i>
         </a>
+        {% endif %}
 
         <!-- Números de Página -->
-        <a href="#" class="pagination-number active" aria-label="Página 1">1</a>
-        <a href="#" class="pagination-number" aria-label="Página 2">2</a>
-        <a href="#" class="pagination-number" aria-label="Página 3">3</a>
-        <a href="#" class="pagination-number" aria-label="Página 4">4</a>
-        <a href="#" class="pagination-number" aria-label="Página 5">5</a>
+        {% set start_page = max(1, page - 2) %}
+        {% set end_page = min(total_pages, page + 2) %}
+        {% for p in range(start_page, end_page + 1) %}
+        <a href="{{ url_for('contable.cuentas', page=p, per_page=per_page) }}"
+            class="pagination-number {% if p == page %}active{% endif %}" aria-label="Página {{ p }}">{{ p }}</a>
+        {% endfor %}
 
         <!-- Botón Siguiente -->
-        <a href="#" class="pagination-btn pagination-btn-next" aria-label="Página Siguiente">
+        {% if page < total_pages %} <a href="{{ url_for('contable.cuentas', page=page + 1, per_page=per_page) }}"
+            class="pagination-btn pagination-btn-next" aria-label="Página Siguiente">
             <i class="fas fa-chevron-right"></i>
-        </a>
+            </a>
+            {% endif %}
+
+            <!-- Botón Final -->
+            {% if page < total_pages %} <a href="{{ url_for('contable.cuentas', page=total_pages, per_page=per_page) }}"
+                class="pagination-btn" aria-label="Última Página">
+                Final
+                </a>
+                {% endif %}
     </nav>
 
     <!-- Selector de Cantidad -->
-    <select class="pagination-select pr-4 w-30 border-gray-300 rounded-lg bg-gray-50" style="height: 35px; border-bottom: solid;" >
-        <option value="5">5</option>
-        <option value="10">10</option>
-        <option value="20">20</option>
-        <option value="100000">Todos</option>
+    <select class="pagination-select pr-4 w-30 border-gray-300 rounded-lg bg-gray-50"
+        style="height: 35px; border-bottom: solid;" onchange="location = this.value;">
+        <option value="{{ url_for('contable.cuentas', page=page, per_page=5) }}" {% if per_page==5 %}selected{% endif
+            %}>5</option>
+        <option value="{{ url_for('contable.cuentas', page=page, per_page=10) }}" {% if per_page==10 %}selected{% endif
+            %}>10</option>
+        <option value="{{ url_for('contable.cuentas', page=page, per_page=20) }}" {% if per_page==20 %}selected{% endif
+            %}>20</option>
+        <option value="{{ url_for('contable.cuentas', page=page, per_page=100000) }}" {% if per_page==100000
+            %}selected{% endif %}>Todos</option>
     </select>
 </div>
+
 
 
 </div>
