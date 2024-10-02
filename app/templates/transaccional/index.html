@@ -86,18 +86,21 @@
 
                 <!-- Módulo de Almacén -->
                 <div class="col-md-6 mb-4">
-                    <div class="card shadow-sm h-100" style="cursor: pointer;">
-                        <div class="card-body d-flex align-items-center">
-                            <div class="bg-light p-3 rounded-circle mr-3">
-                                <i class="fas fa-warehouse text-purple" style="font-size: 24px;"></i>
-                            </div>
-                            <div>
-                                <h5 class="card-title">Módulo de Almacén</h5>
-                                <p class="card-text text-muted">Controla el inventario y la logística de almacén.</p>
-                                <p class="card-text text-muted"><strong>Roles Autorizados:</strong> Administrador</p>
+                    <a href="{{ url_for('transaccional.almacen') }}" class="card shadow-sm h-100" style="text-decoration: none; color: inherit;">
+                        <div class="card shadow-sm h-100" style="cursor: pointer;">
+                            <div class="card-body d-flex align-items-center">
+                                <div class="bg-light p-3 rounded-circle mr-3">
+                                    <i class="fas fa-warehouse text-purple" style="font-size: 24px;"></i>
+                                </div>
+                                <div>
+                                    <h5 class="card-title">Módulo de Almacén</h5>
+                                    <p class="card-text text-muted">Controla el inventario y la logística de almacén.</p>
+                                    <p class="card-text text-muted"><strong>Roles Autorizados:</strong> Administrador</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
+                    
                 </div>
             </div>
         </div>
