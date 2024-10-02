@@ -26,7 +26,8 @@
     }
 
     .table-container {
-        max-width: 1000px;
+        width: 100%;
+        /* Ajusta el ancho al 100% del contenedor */
         margin: 0 auto;
         background-color: white;
         border-radius: 8px;
@@ -152,15 +153,16 @@
 ]) }}
 
 <hr class="mb-4" />
-<h1 class="font-weight-bold display-8 text-left" style="font-size: 26px;">Plan Contable General Empresarial</h1>
+<h1 class="font-weight-bold display-8 text-left" style="font-size: 26px;">PLAN CONTABLE GENERAL EMPRESARIAL (PCGE)</h1>
 
 <!-- Contenedor de la Tabla de Contabilidad -->
 <div class="table-container" style="margin-top: 20px; margin-right: 10%; width: 100%;">
     <table>
         <thead>
             <tr>
+                <th class="text-center">CÓDIGO</th>
                 <th class="text-center">NOMBRE</th>
-                <th class="text-center">DESCRIPCIÓN</th>
+                <th class="text-center">TIPO</th>
                 <th class="text-center">ESTADO</th>
                 <th class="text-center">ACCIONES</th>
             </tr>
@@ -173,7 +175,8 @@
                 </td>
                 <td class="description">Bajo esta categoría se encuentran las cuentas del activo</td>
                 <td></td>
-                <td class="actions">
+                <td></td>
+                <td class="actions" style="margin-left: 12px;">
                     <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
                     <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
                     <span class="action-button secondary edit"><i class="fas fa-edit"></i></span>
@@ -188,8 +191,9 @@
                 </td>
                 <td class="description">Bajo esta categoría se encuentran las cuentas del pasivo</td>
                 <td></td>
+                <td></td>
 
-                <td class="actions">
+                <td class="actions" style="margin-left: 12px;">
                     <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
                     <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
                     <span class="action-button secondary edit"><i class="fas fa-edit"></i></span>
@@ -204,8 +208,10 @@
 
                 <td class="description">Bajo esta categoría se encuentra las cuentas del patrimonio</td>
                 <td></td>
+                <td></td>
 
-                <td class="actions">
+
+                <td class="actions" style="margin-left: 12px;">
                     <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
                     <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
                     <span class="action-button secondary edit"><i class="fas fa-edit"></i></span>
@@ -220,8 +226,9 @@
 
                 <td class="description">Bajo esta categoría se encuentran las cuentas de gastos</td>
                 <td></td>
+                <td></td>
 
-                <td class="actions">
+                <td class="actions" style="margin-left: 12px;">
                     <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
                     <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
                     <span class="action-button secondary edit"><i class="fas fa-edit"></i></span>
@@ -236,8 +243,9 @@
 
                 <td class="description">Bajo esta categoría se encuentran las cuentas de Ingresos</td>
                 <td></td>
+                <td></td>
 
-                <td class="actions">
+                <td class="actions" style="margin-left: 12px;">
 
                     <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
                     <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
@@ -253,8 +261,9 @@
 
                 <td class="description">Bajo esta categoría se encuentran las cuentas de Saldos</td>
                 <td></td>
+                <td></td>
 
-                <td class="actions">
+                <td class="actions" style="margin-left: 12px;">
                     <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
                     <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
                     <span class="action-button secondary edit"><i class="fas fa-edit"></i></span>
@@ -265,6 +274,38 @@
         </tbody>
     </table>
 </div>
+
+<div class="pagination-select-container mt-4 d-flex justify-content-between align-items-center">
+    <!-- Paginación -->
+    <nav aria-label="Pagination" class="pagination-nav">
+        <!-- Botón Anterior -->
+        <a href="#" class="pagination-btn pagination-btn-prev disabled" aria-label="Página Anterior">
+            <i class="fas fa-chevron-left"></i>
+        </a>
+
+        <!-- Números de Página -->
+        <a href="#" class="pagination-number active" aria-label="Página 1">1</a>
+        <a href="#" class="pagination-number" aria-label="Página 2">2</a>
+        <a href="#" class="pagination-number" aria-label="Página 3">3</a>
+        <a href="#" class="pagination-number" aria-label="Página 4">4</a>
+        <a href="#" class="pagination-number" aria-label="Página 5">5</a>
+
+        <!-- Botón Siguiente -->
+        <a href="#" class="pagination-btn pagination-btn-next" aria-label="Página Siguiente">
+            <i class="fas fa-chevron-right"></i>
+        </a>
+    </nav>
+
+    <!-- Selector de Cantidad -->
+    <select class="pagination-select pr-4 w-30 border-gray-300 rounded-lg bg-gray-50" style="height: 35px; border-bottom: solid;" >
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="100000">Todos</option>
+    </select>
+</div>
+
+
 </div>
 
 {% endblock %}

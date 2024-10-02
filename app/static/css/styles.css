@@ -6,7 +6,8 @@ body {
 }
 
 .navbar {
-    border-bottom: 0.1px solid #ccc; /* Cambia el color y el grosor según tus necesidades */
+    border-bottom: 0.1px solid #ccc;
+    /* Cambia el color y el grosor según tus necesidades */
 }
 
 /* Estilos para el login */
@@ -188,7 +189,7 @@ h1.text-5xl {
     border-radius: 5px;
 }
 
-.btn-login:hover{
+.btn-login:hover {
     background-color: #00bdd6;
 
 }
@@ -233,9 +234,7 @@ h1.text-5xl {
 
 
 /* Y así sucesivamente */
-<<<<<<< HEAD
-
-.eye i {
+<<<<<<< HEAD .eye i {
     color: blue;
 }
 
@@ -261,16 +260,19 @@ h1.text-5xl {
     border-radius: 9999px;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
+
 .breadcrumb-item {
     display: flex;
     align-items: center;
 }
+
 .breadcrumb-item:not(:last-child)::after {
     content: '›';
     margin: 0 0.75rem;
     color: #9ca3af;
     font-size: 1.2em;
 }
+
 .breadcrumb-link {
     color: #4b5563;
     text-decoration: none;
@@ -279,20 +281,80 @@ h1.text-5xl {
     transition: all 0.3s ease;
     font-size: 0.875rem;
 }
+
 .breadcrumb-link:hover {
     color: #2563eb;
     background-color: rgba(37, 99, 235, 0.1);
 }
+
 .breadcrumb-item:last-child .breadcrumb-link {
     color: #2563eb;
     font-weight: 600;
     pointer-events: none;
 }
+
 .breadcrumb-icon {
     width: 16px;
     height: 16px;
     margin-right: 0.25rem;
 }
-=======
->>>>>>> c8e2c5f3fae80a54f753fb36e015c855d46df380
->>>>>>> f293b938d2269b25c17ff86195976c63d579be5f
+
+.pagination-select-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+}
+
+.pagination-nav {
+    display: flex;
+    list-style: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.pagination-btn,
+.pagination-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    margin: 0 0.25rem;
+    background-color: #ffffff;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    text-decoration: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.pagination-btn.disabled,
+.pagination-number.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.pagination-btn:hover,
+.pagination-number:hover {
+    background-color: var(--hover-color);
+}
+
+.pagination-number.active {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.pagination-select {
+    padding-right: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.pagination-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
