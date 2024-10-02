@@ -4,3 +4,6 @@ Flask_Migrate
 Flask_Bootstrap
 python-dotenv
 PyMySQL
+pandas
+openpyxl
+pdfkit

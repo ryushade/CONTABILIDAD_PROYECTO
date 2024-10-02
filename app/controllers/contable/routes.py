@@ -32,4 +32,7 @@ def logout():
     flash('Logout exitoso', 'success')
     return redirect(url_for('contable.login'))
 
+@accounting_bp.route('/cuentas')
+def cuentas():
+    return render_template('contable/cuentas/cuentas.html')
 
