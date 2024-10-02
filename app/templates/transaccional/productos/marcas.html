@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% block title %}Tormenta{% endblock %}
+{% from 'breadcrumb.html' import breadcrumb %}
+{% block content %}
+<header class="mb-4">
+    {{ breadcrumb([
+    {'label': 'Inicio', 'url': url_for('transaccional.index'), 'icon': 'M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0
+    001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0
+    001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z'},
+    {'label': 'Productos', 'url': url_for('transaccional.index')}
+
+    ]) }}
+
+</header>
+<style>
+    .table-container {
+        width: 100%;
+        /* Ajusta el ancho al 100% del contenedor */
+        margin: 0 auto;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    th,
+    td {
+        padding: 16px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f9fafb;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        color: #6b7280;
+    }
+
+    tr:not(:last-child) {
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    tr:hover {
+        background-color: var(--hover-color);
+    }
+
+    .icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 4px;
+        margin-right: 12px;
+        font-size: 0.75rem;
+    }
+
+    .icon-secondary {
+        background-color: transparent;
+        color: var(--primary-color);
+    }
+
+    .account-name {
+        font-weight: 500;
+        color: var(--text-color);
+    }
+
+    .description {
+        color: #6b7280;
+        max-width: 400px;
+    }
+
+    .actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .action-button {
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .action-button.primary {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .action-button.secondary {
+        background-color: #e5e7eb;
+        color: var(--text-color);
+    }
+
+    .action-button:hover {
+        opacity: 0.9;
+    }
+
+    .help-icon {
+        color: #9ca3af;
+        font-size: 0.875rem;
+        margin-left: 4px;
+    }
+
+    .options-icon {
+        color: #9ca3af;
+        cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+
+        th,
+        td {
+            padding: 12px;
+        }
+
+        .description {
+            max-width: 200px;
+        }
+    }
+</style>
+<!-- Tabs de Reporte -->
+<div class="mb-4">
+    <div class="nav nav-tabs">
+        <a class="nav-item nav-link active" href="{{url_for('transaccional.productos')}}" data-toggle="tab">
+            <i class="fas fa-box-open"></i> Productos
+        </a>
+        <a class="nav-item nav-link" href="{{url_for('transaccional.marcas')}}" data-toggle="tab">
+            <i class="fas fa-tags"></i> Marcas
+        </a>
+        <a class="nav-item nav-link" href="{{url_for('transaccional.categorias')}}" data-toggle="tab">
+            <i class="fas fa-th-large"></i> Categorias
+        </a>
+        <a class="nav-item nav-link" href="{{url_for('transaccional.subcategorias')}}" data-toggle="tab">
+            <i class="fas fa-th-list"></i> Subcategorias
+        </a>
+    </div>
+</div>
+<div class="tab-content">
+    <!-- Sistema Transaccional -->
+    <div class="tab-pane fade show active" id="sistrans">
+        <!-- Detalles -->
+        <div class="mb-4">
+            <hr>
+            <h1 class="font-weight-bold display-8 text-left" style="font-size: 28px;">Listado de Marccas
+            </h1>
+
+        </div>
+    </div>
+    <!-- Sistema Contable -->
+    <div class="table-container" style="margin-top: 20px; ">
+        <table>
+            <thead>
+                <tr>
+                    <th class="text-center">DESCRIPCIÓN</th>
+                    <th class="text-center">LÍNEA</th>
+                    <th class="text-center">SUB-LÍNEA</th>
+                    <th class="text-center">PRECIO (S/.)</th>
+                    <th class="text-center">COD BARRAS</th>
+                    <th class="text-center">ESTADO</th>
+                    <th class="text-center">ACCIONES</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos %}
+                <tr>
+                    <td class="text-center">{{ cuenta.codigo_cuenta }}</td>
+                    <td class="text-align">{{ cuenta.nombre_cuenta }}</td>
+                    <td class="text-center">{{ cuenta.naturaleza }}</td>
+                    <td class="text-center">
+                        <span class="
+                                inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-medium font-normal 
+                                {% if cuenta.estado_cuenta == 1 %}
+                                    bg-green-200 text-green-700
+                                {% else %}
+                                    bg-red-100 text-red-600
+                                {% endif %}
+                            ">
+                            {% if cuenta.estado_cuenta == 1 %}
+                            Activo
+                            {% else %}
+                            Inactivo
+                            {% endif %}
+                        </span>
+                    </td>
+
+                    <td class="text-center actions">
+                        <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
+                        <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
+                        <span class="action-button secondary edit"><i class="fas fa-edit"></i></span>
+                        <span class="action-button secondary trash"><i class="fas fa-trash"></i></span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+{% endblock %}

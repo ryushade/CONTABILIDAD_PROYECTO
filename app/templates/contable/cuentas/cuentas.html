@@ -155,7 +155,7 @@
 <hr class="mb-4" />
 <h1 class="font-weight-bold display-8 text-left" style="font-size: 26px;">PLAN CONTABLE GENERAL EMPRESARIAL</h1>
 
-<div class="table-container" style="margin-top: 20px; margin-right: 10%; width: 100%;">
+<div class="table-container" style="margin-top: 20px; ">
     <table>
         <thead>
             <tr>
@@ -170,15 +170,25 @@
             {% for cuenta in cuentas %}
             <tr>
                 <td class="text-center">{{ cuenta.codigo_cuenta }}</td>
-                <td class="text-center">{{ cuenta.nombre_cuenta }}</td>
+                <td class="text-align">{{ cuenta.nombre_cuenta }}</td>
                 <td class="text-center">{{ cuenta.naturaleza }}</td>
                 <td class="text-center">
-                    {% if cuenta.estado_cuenta == 1 %}
-                    Activo
-                    {% else %}
-                    Inactivo
-                    {% endif %}
+                    <span class="
+                            inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-medium font-normal 
+                            {% if cuenta.estado_cuenta == 1 %}
+                                bg-green-200 text-green-700
+                            {% else %}
+                                bg-red-100 text-red-600
+                            {% endif %}
+                        ">
+                        {% if cuenta.estado_cuenta == 1 %}
+                        Activo
+                        {% else %}
+                        Inactivo
+                        {% endif %}
+                    </span>
                 </td>
+
                 <td class="text-center actions">
                     <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
                     <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
