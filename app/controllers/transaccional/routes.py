@@ -12,3 +12,7 @@ def almacen():
 @transactional_bp.route('/productos')
 def productos():
     return render_template('transaccional/productos/productos.html')
+
+@transactional_bp.route('/ventas')
+def ventas():
+    return render_template('transaccional/ventas/ventas.html')
