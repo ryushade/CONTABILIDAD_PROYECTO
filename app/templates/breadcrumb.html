@@ -1,0 +1,24 @@
+
+{% macro breadcrumb(items) %}
+<nav aria-label="Breadcrumb" style="margin-top: 10px;">
+    <ol class="breadcrumb">
+        {% for item in items %}
+            <li class="breadcrumb-item">
+                {% if item.url %}
+                    <a href="{{ item.url }}" class="breadcrumb-link">
+                        {% if item.icon %}
+                            <svg class="breadcrumb-icon" fill="currentColor" viewBox="0 0 20 20"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path d="{{ item.icon }}"></path>
+                            </svg>
+                        {% endif %}
+                        {{ item.label }}
+                    </a>
+                {% else %}
+                    <span class="breadcrumb-link">{{ item.label }}</span>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ol>
+</nav>
+{% endmacro %}

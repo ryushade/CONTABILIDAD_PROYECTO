@@ -144,3 +144,62 @@ h1.text-5xl {
 
 
 /* Y así sucesivamente */
+
+.eye i {
+    color: blue;
+}
+
+.plus i {
+    color: green;
+}
+
+.edit i {
+    color: orange;
+}
+
+.trash i {
+    color: red;
+}
+
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 9999px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+.breadcrumb-item {
+    display: flex;
+    align-items: center;
+}
+.breadcrumb-item:not(:last-child)::after {
+    content: '›';
+    margin: 0 0.75rem;
+    color: #9ca3af;
+    font-size: 1.2em;
+}
+.breadcrumb-link {
+    color: #4b5563;
+    text-decoration: none;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    transition: all 0.3s ease;
+    font-size: 0.875rem;
+}
+.breadcrumb-link:hover {
+    color: #2563eb;
+    background-color: rgba(37, 99, 235, 0.1);
+}
+.breadcrumb-item:last-child .breadcrumb-link {
+    color: #2563eb;
+    font-weight: 600;
+    pointer-events: none;
+}
+.breadcrumb-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 0.25rem;
+}

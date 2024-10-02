@@ -2,6 +2,8 @@
 
 {% block title %}Tormenta{% endblock %}
 
+{% from 'breadcrumb.html' import breadcrumb %}
+
 {% block content %}
 
 <style>
@@ -141,109 +143,108 @@
     }
 </style>
 <!-- Breadcrumb (Migas de Pan) -->
-<div class="pcge">
-    <nav aria-label="breadcrumb" class="mb-2">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/inicio">Inicio</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Plan de Cuentas</li>
-        </ol>
-    </nav>
+{{ breadcrumb([
+    {'label': 'Inicio', 'url': url_for('transaccional.index'), 'icon': 'M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z'},
+    {'label': 'Contabilidad', 'url': url_for('transaccional.index')},
+    {'label': 'Plan de cuentas'}
+]) }}
 
-    <hr class="mb-4" />
-    <h1 class="font-weight-bold display-8 text-left" style="font-size: 26px;">Plan Contable General Empresarial</h1>
+<hr class="mb-4" />
+<h1 class="font-weight-bold display-8 text-left" style="font-size: 26px;">Plan Contable General Empresarial</h1>
 
-    <!-- Contenedor de la Tabla de Contabilidad -->
-    <div class="table-container" style="margin-top: 20px; margin-left: ;"> 
-        <table>
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Descripción</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <span class="icon"><i class="fas fa-plus"></i></span>
-                        <span class="account-name">Activos</span>
-                    </td>
-                    <td class="description">Bajo esta categoría se encuentran los activos que tiene la empresa</td>
-                    <td class="actions">
-                        <span class="action-button primary">Editar</span>
-                        <span class="action-button secondary">Ver</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <span class="icon"><i class="fas fa-plus"></i></span>
-                        <span class="account-name">Pasivos</span>
-                    </td>
-                    <td class="description">Bajo esta categoría se encuentran los pasivos de la empresa</td>
-                    <td class="actions">
-                        <span class="action-button primary">Editar</span>
-                        <span class="action-button secondary">Ver</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <span class="icon"><i class="fas fa-plus"></i></span>
-                        <span class="account-name">Patrimonio</span>
-                    </td>
-                    <td class="description">Bajo esta categoría se encuentra el patrimonio de la empresa</td>
-                    <td class="actions">
-                        <span class="action-button primary">Editar</span>
-                        <span class="action-button secondary">Ver</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <span class="icon"><i class="fas fa-plus"></i></span>
-                        <span class="account-name">Ingresos</span>
-                    </td>
-                    <td class="description">Bajo esta categoría se encuentran todos los tipos de ingresos</td>
-                    <td class="actions">
-                        <span class="action-button primary">Editar</span>
-                        <span class="action-button secondary">Ver</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <span class="icon"><i class="fas fa-plus"></i></span>
-                        <span class="account-name">Costos</span>
-                    </td>
-                    <td class="description">Bajo esta categoría se encuentran todos los tipos de costos</td>
-                    <td class="actions">
-                        <span class="action-button primary">Editar</span>
-                        <span class="action-button secondary">Ver</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <span class="icon"><i class="fas fa-plus"></i></span>
-                        <span class="account-name">Gastos</span>
-                    </td>
-                    <td class="description">Bajo esta categoría se encuentran todos los tipos de gastos</td>
-                    <td class="actions">
-                        <span class="action-button primary">Editar</span>
-                        <span class="action-button secondary">Ver</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <span class="icon icon-secondary"><i class="fas fa-exchange-alt"></i></span>
-                        <span class="account-name">Transferencias bancarias</span>
-                    </td>
-                    <td class="description">Bajo esta categoría se ubican todas las transferencias que se hagan entre
-                        bancos de la empresa</td>
-                    <td class="actions">
-                        <span class="action-button primary">Editar</span>
-                        <span class="action-button secondary">Ver</span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+<!-- Contenedor de la Tabla de Contabilidad -->
+<div class="table-container" style="margin-top: 20px; margin-left: ;">
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <span class="icon"><i class="fas fa-caret-down"></i></span>
+                    <span class="account-name">Activo</span>
+                </td>
+                <td class="description">Bajo esta categoría se encuentran las cuentas del activo</td>
+                <td class="actions">
+                    <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
+                    <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
+                    <span class="action-button secondary edit"><i class="fas fa-edit"></i></span>
+                    <span class="action-button secondary trash"><i class="fas fa-trash"></i></span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="icon"><i class="fas fa-caret-down"></i></span>
+                    <span class="account-name">Pasivo</span>
+                </td>
+                <td class="description">Bajo esta categoría se encuentran las cuentas del pasivo</td>
+                <td class="actions">
+                    <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
+                    <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
+                    <span class="action-button secondary edit"><i class="fas fa-edit"></i></span>
+                    <span class="action-button secondary trash"><i class="fas fa-trash"></i></span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="icon"><i class="fas fa-caret-down"></i></span>
+                    <span class="account-name">Patrimonio</span>
+                </td>
+                <td class="description">Bajo esta categoría se encuentra las cuentas del patrimonio</td>
+                <td class="actions">
+                    <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
+                    <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
+                    <span class="action-button secondary edit"><i class="fas fa-edit"></i></span>
+                    <span class="action-button secondary trash"><i class="fas fa-trash"></i></span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="icon"><i class="fas fa-caret-down"></i></span>
+                    <span class="account-name">Gastos</span>
+                </td>
+                <td class="description">Bajo esta categoría se encuentran las cuentas de gastos</td>
+                <td class="actions">
+                    <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
+                    <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
+                    <span class="action-button secondary edit"><i class="fas fa-edit"></i></span>
+                    <span class="action-button secondary trash"><i class="fas fa-trash"></i></span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="icon"><i class="fas fa-caret-down"></i></span>
+                    <span class="account-name">Ingresos</span>
+                </td>
+                <td class="description">Bajo esta categoría se encuentran las cuentas de Ingresos</td>
+                <td class="actions">
+                    <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
+                    <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
+                    <span class="action-button secondary edit"><i class="fas fa-edit"></i></span>
+                    <span class="action-button secondary trash"><i class="fas fa-trash"></i></span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="icon"><i class="fas fa-caret-down"></i></span>
+                    <span class="account-name">Saldos</span>
+                </td>
+                <td class="description">Bajo esta categoría se encuentran las cuentas de Saldos</td>
+                <td class="actions">
+                    <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
+                    <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
+                    <span class="action-button secondary edit"><i class="fas fa-edit"></i></span>
+                    <span class="action-button secondary trash"><i class="fas fa-trash"></i></span>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
 </div>
 
 {% endblock %}
