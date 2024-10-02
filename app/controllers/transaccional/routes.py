@@ -16,3 +16,7 @@ def productos():
 @transactional_bp.route('/ventas')
 def ventas():
     return render_template('transaccional/ventas/ventas.html')
+
+@transactional_bp.route('/compras')
+def compras():
+    return render_template('transaccional/compras/compras.html')
