@@ -134,23 +134,23 @@
 <!-- Tabs de Reporte -->
 <div class="mb-4">
     <div class="nav nav-tabs">
-        <a class="nav-item nav-link active" href="{{url_for('transaccional.productos')}}" data-toggle="tab">
+        <a class="nav-item nav-link active" href="#productos" data-toggle="tab">
             <i class="fas fa-box-open"></i> Productos
         </a>
-        <a class="nav-item nav-link" href="{{ url_for('transaccional.marcas') }}" data-toggle="tab">
+        <a class="nav-item nav-link" href="#marcas" data-toggle="tab">
             <i class="fas fa-tags"></i> Marcas
         </a>
-        <a class="nav-item nav-link" href="{{ url_for('transaccional.categorias') }}" data-toggle="tab">
+        <a class="nav-item nav-link" href="#categorias" data-toggle="tab">
             <i class="fas fa-th-large"></i> Categorias
         </a>
-        <a class="nav-item nav-link" href="{{ url_for('transaccional.subcategorias') }}" data-toggle="tab">
+        <a class="nav-item nav-link" href="#subcategorias" data-toggle="tab">
             <i class="fas fa-th-list"></i> Subcategorias
         </a>
     </div>
 </div>
 <div class="tab-content">
     <!-- Sistema Transaccional -->
-    <div class="tab-pane fade show active" id="sistrans">
+    <div class="tab-pane fade show active" id="productos">
         <!-- Detalles -->
         <div class="mb-4">
             <hr>
@@ -175,39 +175,111 @@
                 </tr>
             </thead>
             <tbody>
-                {% for producto in productos %}
                 <tr>
-                    <td class="text-center">{{ cuenta.codigo_cuenta }}</td>
-                    <td class="text-align">{{ cuenta.nombre_cuenta }}</td>
-                    <td class="text-center">{{ cuenta.naturaleza }}</td>
+                    <td class="text-center"></td>
+                    <td class="text-align"></td>
+                    <td class="text-center"></td>
                     <td class="text-center">
-                        <span class="
-                                inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-medium font-normal 
-                                {% if cuenta.estado_cuenta == 1 %}
-                                    bg-green-200 text-green-700
-                                {% else %}
-                                    bg-red-100 text-red-600
-                                {% endif %}
-                            ">
-                            {% if cuenta.estado_cuenta == 1 %}
-                            Activo
-                            {% else %}
-                            Inactivo
-                            {% endif %}
-                        </span>
+
                     </td>
 
+                    <td class="text-center actions">
+
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="tab-pane fade" id="marcas">
+        <div class="mb-4">
+            <hr>
+            <h1 class="font-weight-bold display-8 text-left" style="font-size: 28px;">LISTADO DE MARCAS
+            </h1>
+
+        </div>
+    </div>
+    <!-- Sistema Contable -->
+    <div class="table-container" style="margin-top: 20px; ">
+        <table>
+            <thead>
+                <tr>
+                    <th class="text-center">DESCRIPCIÓN</th>
+                    <th class="text-center">LÍNEA</th>
+                    <th class="text-center">SUB-LÍNEA</th>
+                    <th class="text-center">PRECIO (S/.)</th>
+                    <th class="text-center">COD BARRAS</th>
+                    <th class="text-center">ESTADO</th>
+                    <th class="text-center">ACCIONES</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center"></td>
+                    <td class="text-align"></td>
+                    <td class="text-center"></td>
+                    <td class="text-center">
+
+                        </span>
+                    </td>
+                    <!-- 
                     <td class="text-center actions">
                         <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
                         <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
                         <span class="action-button secondary edit"><i class="fas fa-edit"></i></span>
                         <span class="action-button secondary trash"><i class="fas fa-trash"></i></span>
-                    </td>
+                    </td> -->
                 </tr>
-                {% endfor %}
             </tbody>
         </table>
     </div>
+</div>
+<div class="tab-pane fade" id="marcas">
+    <div class="mb-4">
+        <hr>
+        <h1 class="font-weight-bold display-8 text-left" style="font-size: 28px;">LISTADO DE MARCAS
+        </h1>
+
+    </div>
+</div>
+<!-- Sistema Contable -->
+<div class="table-container" style="margin-top: 20px; ">
+    <table>
+        <thead>
+            <tr>
+                <th class="text-center">DESCRIPCIÓN</th>
+                <th class="text-center">LÍNEA</th>
+                <th class="text-center">SUB-LÍNEA</th>
+                <th class="text-center">PRECIO (S/.)</th>
+                <th class="text-center">COD BARRAS</th>
+                <th class="text-center">ESTADO</th>
+                <th class="text-center">ACCIONES</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="text-center"></td>
+                <td class="text-align"></td>
+                <td class="text-center"></td>
+                <td class="text-center">
+
+                    </span>
+                </td>
+                <!-- 
+                <td class="text-center actions">
+                    <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
+                    <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
+                    <span class="action-button secondary edit"><i class="fas fa-edit"></i></span>
+                    <span class="action-button secondary trash"><i class="fas fa-trash"></i></span>
+                </td> -->
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+</div>
 </div>
 </div>
 {% endblock %}

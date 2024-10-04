@@ -90,7 +90,6 @@ h1.text-5xl {
     transform: scale(1);
 }
 
-<<<<<<< HEAD
 /* --------------------- Nuevo CSS para Módulo de Compras --------------------- */
 
 /* Contenedor del módulo de compras */
@@ -234,7 +233,7 @@ h1.text-5xl {
 
 
 /* Y así sucesivamente */
-<<<<<<< HEAD .eye i {
+.eye i {
     color: blue;
 }
 
@@ -382,7 +381,7 @@ table {
 
 th,
 td {
-    padding: 16px;
+    padding: 12px;
     text-align: left;
 }
 
@@ -428,20 +427,23 @@ tr:hover {
 
 .description {
     color: #6b7280;
-    max-width: 400px;
+    max-width: 100px;
 }
+
 
 .actions {
     display: flex;
-    gap: 8px;
+    gap: 2px;
+    margin-left: 30px;
 }
 
 .action-button {
-    padding: 6px 12px;
+    padding: 4px 12px;
     border-radius: 4px;
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
+
     transition: background-color 0.2s;
 }
 
@@ -450,10 +452,7 @@ tr:hover {
     color: white;
 }
 
-.action-button.secondary {
-    background-color: #e5e7eb;
-    color: var(--text-color);
-}
+
 
 .action-button:hover {
     opacity: 0.9;
@@ -481,3 +480,171 @@ tr:hover {
         max-width: 200px;
     }
 }
+
+
+
+/* Overlay que cubre toda la pantalla cuando el modal está activo */
+.alert-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  /* Contenedor del modal */
+  .alert-modal {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); 
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    position: relative;
+    animation: fadeIn 0.3s ease-in-out; 
+  }
+  
+  /* Título del modal */
+  .alert-modal-title {
+    font-size: 1.75rem;
+    margin-bottom: 15px;
+    color: #e74c3c; 
+    font-weight: 700;
+  }
+  
+  /* Mensaje del modal */
+  .alert-modal-message {
+    font-size: 1.125rem;
+    margin-bottom: 25px;
+    color: #555;
+  }
+  
+  /* Botón para cerrar el modal */
+  .alert-modal-button {
+    background: #e74c3c; 
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s ease; 
+  }
+
+  /* Efecto hover en el botón */
+  .alert-modal-button:hover {
+    background: #c0392b;
+  }
+  
+  /* Animación de entrada del modal */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+
+
+  /* Overlay que cubre toda la pantalla cuando el modal está activo */
+.confirmation-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000; 
+  }
+  
+  /* Contenedor del modal */
+  .confirmation-modal {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); 
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    position: relative;
+    animation: fadeIn 0.3s ease-in-out; 
+  }
+  
+  /* Título del modal */
+  .confirmation-modal-title {
+    font-size: 1.75rem;
+    margin-bottom: 15px;
+    color: #4a90e2; 
+    font-weight: 700;
+  }
+  
+  /* Mensaje del modal */
+  .confirmation-modal-message {
+    font-size: 1.125rem;
+    margin-bottom: 25px;
+    color: #555;
+  }
+  
+  /* Contenedor de botones */
+  .confirmation-modal-buttons {
+    display: flex;
+    justify-content: center;
+  }
+  
+  /* Estilos comunes para los botones */
+  .confirmation-modal-button {
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: background 0.3s ease; 
+    margin: 0 10px;
+    cursor: pointer;
+  }
+  
+  /* Estilo para el botón de Cerrar */
+  .confirmation-modal-close {
+    background: #e74c3c; 
+    color: #fff;
+    border: none;
+  }
+  
+  .confirmation-modal-close:hover {
+    background: #c0392b;
+  }
+  
+  /* Estilo para el botón de Confirmar */
+  .confirmation-modal-confirm {
+    background: #4caf50; 
+    color: #fff;
+    border: none;
+  }
+  
+  .confirmation-modal-confirm:hover {
+    background: #388e3c;
+  }
+  
+  /* Animación de entrada del modal */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
