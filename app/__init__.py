@@ -14,7 +14,7 @@ def create_app():
 
     # Registrar Blueprints (Controladores)
     from app.controllers.transaccional import transactional_bp
-    app.register_blueprint(transactional_bp, url_prefix='/transaccional')
+    app.register_blueprint(transactional_bp, url_prefix='/inicio')
 
     from app.controllers.contable import accounting_bp
     app.register_blueprint(accounting_bp, url_prefix='/contable')

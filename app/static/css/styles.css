@@ -90,7 +90,6 @@ h1.text-5xl {
     transform: scale(1);
 }
 
-<<<<<<< HEAD
 /* --------------------- Nuevo CSS para Módulo de Compras --------------------- */
 
 /* Contenedor del módulo de compras */
@@ -234,7 +233,7 @@ h1.text-5xl {
 
 
 /* Y así sucesivamente */
-<<<<<<< HEAD .eye i {
+.eye i {
     color: blue;
 }
 
@@ -382,7 +381,7 @@ table {
 
 th,
 td {
-    padding: 16px;
+    padding: 12px;
     text-align: left;
 }
 
@@ -428,20 +427,23 @@ tr:hover {
 
 .description {
     color: #6b7280;
-    max-width: 400px;
+    max-width: 100px;
 }
+
 
 .actions {
     display: flex;
-    gap: 8px;
+    gap: 2px;
+    margin-left: 30px;
 }
 
 .action-button {
-    padding: 6px 12px;
+    padding: 4px 12px;
     border-radius: 4px;
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
+
     transition: background-color 0.2s;
 }
 
@@ -450,10 +452,7 @@ tr:hover {
     color: white;
 }
 
-.action-button.secondary {
-    background-color: #e5e7eb;
-    color: var(--text-color);
-}
+
 
 .action-button:hover {
     opacity: 0.9;
