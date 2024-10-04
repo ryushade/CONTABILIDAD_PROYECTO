@@ -42,7 +42,7 @@
                             </div>
                             <div>
                                 <h5 class="card-title">Módulo de Ventas</h5>
-                                <p class="card-text text-muted">Gestiona las ventas, facturación y seguimiento de
+                                <p class="card-text text-muted"  onclick="window.location.href='{{ url_for('transaccional.ventas') }}'">Gestiona las ventas, facturación y seguimiento de
                                     clientes.</p>
                                 <p class="card-text text-muted"><strong>Roles Autorizados:</strong> Vendedor</p>
                             </div>
@@ -58,7 +58,7 @@
                                 <i class="fas fa-box-open text-success" style="font-size: 24px;"></i>
                             </div>
                             <div>
-                                <h5 class="card-title">Módulo de Productos</h5>
+                                <h5 class="card-title"  onclick="window.location.href='{{ url_for('transaccional.productos') }}'">Módulo de Productos</h5>
                                 <p class="card-text text-muted">Administra el catálogo de productos y sus
                                     características.</p>
                                 <p class="card-text text-muted"><strong>Roles Autorizados:</strong> Administrador</p>
@@ -76,7 +76,7 @@
                             </div>
                             <div>
                                 <h5 class="card-title">Módulo de Compras</h5>
-                                <p class="card-text text-muted">Gestiona las órdenes de compra y relación con
+                                <p class="card-text text-muted" >Gestiona las órdenes de compra y relación con
                                     proveedores.</p>
                                 <p class="card-text text-muted"><strong>Roles Autorizados:</strong> Administrador</p>
                             </div>
@@ -93,9 +93,9 @@
                                     <i class="fas fa-warehouse text-purple" style="font-size: 24px;"></i>
                                 </div>
                                 <div>
-                                    <h5 class="card-title">Módulo de Almacén</h5>
-                                    <p class="card-text text-muted">Controla el inventario y la logística de almacén.</p>
-                                    <p class="card-text text-muted"><strong>Roles Autorizados:</strong> Administrador</p>
+                                    <h5 class="card-title"  onclick="window.location.href='{{ url_for('transaccional.almacen') }}'">Módulo de Almacén</h5>
+                                    <p class="card-text text-muted"  onclick="window.location.href='{{ url_for('transaccional.almacen') }}'">Controla el inventario y la logística de almacén.</p>
+                                    <p class="card-text text-muted"  onclick="window.location.href='{{ url_for('transaccional.almacen') }}'"><strong>Roles Autorizados:</strong> Administrador</p>
                                 </div>
                             </div>
                         </div>
@@ -141,8 +141,8 @@
                                 <i class="fas fa-file-invoice-dollar text-success" style="font-size: 24px;"></i>
                             </div>
                             <div>
-                                <h5 class="card-title">Módulo de Reportes Contables</h5>
-                                <p class="card-text text-muted">Visualiza los estados financieros de la empresa.</p>
+                                <h5 class="card-title" >Módulo de Reportes Contables</h5>
+                                <p class="card-text text-muted" >Visualiza los estados financieros de la empresa.</p>
                                 <p class="card-text text-muted"><strong>Roles Autorizados:</strong> Contador</p>
                             </div>
                         </div>

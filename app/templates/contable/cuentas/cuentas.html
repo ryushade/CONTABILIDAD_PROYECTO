@@ -24,124 +24,6 @@
         margin: 0;
         padding: 20px;
     }
-
-    .table-container {
-        width: 100%;
-        /* Ajusta el ancho al 100% del contenedor */
-        margin: 0 auto;
-        background-color: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-    }
-
-    th,
-    td {
-        padding: 16px;
-        text-align: left;
-    }
-
-    th {
-        background-color: #f9fafb;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.05em;
-        color: #6b7280;
-    }
-
-    tr:not(:last-child) {
-        border-bottom: 1px solid var(--border-color);
-    }
-
-    tr:hover {
-        background-color: var(--hover-color);
-    }
-
-    .icon {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 24px;
-        height: 24px;
-        background-color: var(--primary-color);
-        color: white;
-        border-radius: 4px;
-        margin-right: 12px;
-        font-size: 0.75rem;
-    }
-
-    .icon-secondary {
-        background-color: transparent;
-        color: var(--primary-color);
-    }
-
-    .account-name {
-        font-weight: 500;
-        color: var(--text-color);
-    }
-
-    .description {
-        color: #6b7280;
-        max-width: 400px;
-    }
-
-    .actions {
-        display: flex;
-        gap: 8px;
-    }
-
-    .action-button {
-        padding: 6px 12px;
-        border-radius: 4px;
-        font-size: 0.875rem;
-        font-weight: 500;
-        cursor: pointer;
-        transition: background-color 0.2s;
-    }
-
-    .action-button.primary {
-        background-color: var(--primary-color);
-        color: white;
-    }
-
-    .action-button.secondary {
-        background-color: #e5e7eb;
-        color: var(--text-color);
-    }
-
-    .action-button:hover {
-        opacity: 0.9;
-    }
-
-    .help-icon {
-        color: #9ca3af;
-        font-size: 0.875rem;
-        margin-left: 4px;
-    }
-
-    .options-icon {
-        color: #9ca3af;
-        cursor: pointer;
-    }
-
-    @media (max-width: 768px) {
-
-        th,
-        td {
-            padding: 12px;
-        }
-
-        .description {
-            max-width: 200px;
-        }
-    }
 </style>
 <!-- Breadcrumb (Migas de Pan) -->
 {{ breadcrumb([
@@ -155,7 +37,7 @@
 <hr class="mb-4" />
 <h1 class="font-weight-bold display-8 text-left" style="font-size: 26px;">PLAN CONTABLE GENERAL EMPRESARIAL</h1>
 
-<div class="table-container" style="margin-top: 20px; margin-right: 10%; width: 100%;">
+<div class="table-container" style="margin-top: 20px; ">
     <table>
         <thead>
             <tr>
@@ -170,15 +52,25 @@
             {% for cuenta in cuentas %}
             <tr>
                 <td class="text-center">{{ cuenta.codigo_cuenta }}</td>
-                <td class="text-center">{{ cuenta.nombre_cuenta }}</td>
+                <td class="text-align">{{ cuenta.nombre_cuenta }}</td>
                 <td class="text-center">{{ cuenta.naturaleza }}</td>
                 <td class="text-center">
-                    {% if cuenta.estado_cuenta == 1 %}
-                    Activo
-                    {% else %}
-                    Inactivo
-                    {% endif %}
+                    <span class="
+                            inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-medium font-normal 
+                            {% if cuenta.estado_cuenta == 1 %}
+                                bg-green-200 text-green-700
+                            {% else %}
+                                bg-red-100 text-red-600
+                            {% endif %}
+                        ">
+                        {% if cuenta.estado_cuenta == 1 %}
+                        Activo
+                        {% else %}
+                        Inactivo
+                        {% endif %}
+                    </span>
                 </td>
+
                 <td class="text-center actions">
                     <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
                     <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
