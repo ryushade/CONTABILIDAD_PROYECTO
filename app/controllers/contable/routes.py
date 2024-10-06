@@ -29,6 +29,10 @@ def logout():
     flash('Logout exitoso', 'success')
     return redirect(url_for('contable.login'))
 
+@accounting_bp.route('/reportes')
+def reportes():
+    return render_template('contable/reportes/reportes.html')
+
 @accounting_bp.route('/cuentas', methods=['GET'])
 def cuentas():
     page = request.args.get('page', 1, type=int)
