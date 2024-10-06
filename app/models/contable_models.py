@@ -82,3 +82,33 @@ def obtener_cuentas(page, per_page):
         return cuentas
     finally:
         conexion.close()
+
+
+
+def obtener_cuenta_por_id(cuenta_id):
+    connection = obtener_conexion()
+    try:
+        with connection.cursor() as cursor:
+            sql = "SELECT * FROM cuenta WHERE id_cuenta = %s"
+            cursor.execute(sql, (cuenta_id,))
+            cuenta = cursor.fetchone()
+            return cuenta
+    finally:
+        connection.close()
+
+def actualizar_cuenta(cuenta_id, codigo_cuenta, nombre_cuenta, naturaleza, estado_cuenta):
+    connection = obtener_conexion()
+    try:
+        with connection.cursor() as cursor:
+            sql = """
+                UPDATE cuenta SET
+                    codigo_cuenta = %s,
+                    nombre_cuenta = %s,
+                    naturaleza = %s,
+                    estado_cuenta = %s
+                WHERE id_cuenta = %s
+            """
+            cursor.execute(sql, (codigo_cuenta, nombre_cuenta, naturaleza, estado_cuenta, cuenta_id))
+            connection.commit()
+    finally:
+        connection.close()

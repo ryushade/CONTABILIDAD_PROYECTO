@@ -74,7 +74,8 @@
                 <td class="text-center actions">
                     <span class="action-button secondary eye"><i class="fas fa-eye"></i></span>
                     <span class="action-button secondary plus"><i class="fas fa-plus"></i></span>
-                    <span class="action-button secondary edit"><i class="fas fa-edit"></i></span>
+                    <span class="action-button secondary edit" data-cuenta-id="{{ cuenta.id_cuenta }}"><i
+                            class="fas fa-edit"></i></span>
                     <span class="action-button secondary trash"><i class="fas fa-trash"></i></span>
                 </td>
             </tr>
@@ -140,8 +141,68 @@
     </select>
 </div>
 
+<!-- Edit Modal -->
+<form method="POST" id="editCuentaModal" class="edit-form">
+    <div class="modal-overlay" style="display: none;">
+        <div class="content-modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Editar Cuenta</h3>
+                <button type="button" class="modal-close" onclick="closeModal()">
+                    &times;
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="w-full text-start mb-5">
+                    <!-- Campo de código de la cuenta -->
+                    <label for="codigo_cuenta" class="text-sm font-bold text-black mt-4 block">
+                        Código:
+                    </label>
+                    <input type="text" id="codigo_cuenta" name="codigo_cuenta" value=""
+                        class="w-full bg-gray-50 border-gray-300 text-gray-900 rounded-lg border p-2 text-sm"
+                        placeholder="Código de la cuenta" required />
+
+                    <!-- Campo de nombre de la cuenta -->
+                    <label for="nombre_cuenta" class="text-sm font-bold text-black mt-4 block">
+                        Nombre:
+                    </label>
+                    <input type="text" id="nombre_cuenta" name="nombre_cuenta" value=""
+                        class="w-full bg-gray-50 border-gray-300 text-gray-900 rounded-lg border p-2 text-sm"
+                        placeholder="Nombre de la cuenta" required />
+
+                    <!-- Campo para naturaleza de la cuenta -->
+                    <label for="naturaleza" class="text-sm font-bold text-black mt-4 block">
+                        Naturaleza:
+                    </label>
+                    <select id="naturaleza" name="naturaleza"
+                        class="w-full text-sm bg-gray-50 border-gray-300 text-gray-900 rounded-lg border p-2" required>
+                        <option value="Deudora">Deudora</option>
+                        <option value="Acreedora">Acreedora</option>
+                    </select>
+
+                    <!-- Campo para estado de la cuenta -->
+                    <label for="estado_cuenta" class="text-sm font-bold text-black mt-4 block">
+                        Estado de la cuenta:
+                    </label>
+                    <select id="estado_cuenta" name="estado_cuenta"
+                        class="w-full text-sm bg-gray-50 border-gray-300 text-gray-900 rounded-lg border p-2" required>
+                        <option value="1">Activo</option>
+                        <option value="0">Inactivo</option>
+                    </select>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="modal-buttons flex justify-between">
+                    <button type="button" onclick="closeModal()" class="btn-close">Cerrar</button>
+                    <button type="submit" class="btn-save">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
 
 
 </div>
+
+
 
 {% endblock %}
