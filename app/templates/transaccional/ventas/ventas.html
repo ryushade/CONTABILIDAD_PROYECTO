@@ -2,10 +2,147 @@
 
 {% block title %}Tormenta{% endblock %}
 
+{% from 'breadcrumb.html' import breadcrumb %}
+
 {% block content %}
+<header class="mb-4">
+    {{ breadcrumb([
+    {'label': 'Inicio', 'url': url_for('transaccional.index'), 'icon': 'M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0
+    001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0
+    001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z'},
+    {'label': 'Ventas', 'url': url_for('transaccional.index')}
+    ]) }}
+    <h1 class="text-8xl font-bold tracking-wide text-gray-700 title-Inicio">MÓDULO VENTAS - POS</h1>
+</header>
 
+<style>
+    table {
+        border-collapse: separate;
+        border-spacing: 0 8px;
+        width: 100%;
+        height: 100%;
+    }
 
+    table th,
+    table td {
+        font-weight: normal;
+        color: #6c757d;
+        border-bottom: 1px solid #dee2e6;
+        padding: 30px 20px;
+        vertical-align: middle;
+    }
 
+    table td {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid white;
+    }
 
+    table tbody tr {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+    }
+
+    /* Botón desplegable */
+    .dropdown-toggle {
+        border-radius: 8px;
+        padding: 5px 10px;
+        background-color: #e7f1ff;
+        color: #007bff;
+        border: 1px solid #007bff;
+    }
+
+    .dropdown-toggle:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    }
+
+    .estado-activo {
+        background-color: #eafff0;
+        color: #28a745;
+        padding: 5px 15px;
+        border-radius: 12px;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    /* Alineación de acciones */
+    .accion-dropdown {
+        text-align: center;
+    }
+
+    .centrar {
+        text-align: center;
+    }
+</style>
+
+<!-- Tabs de Reporte -->
+<div class="mb-4">
+    <div class="nav nav-tabs">
+
+        <a class="nav-item nav-link active" href="#lisventas" data-toggle="tab">
+            <i class="fas fa-shopping-cart"></i> Lista de ventas
+        </a>
+        <a class="nav-item nav-link" href="#newventa" data-toggle="tab">
+            <i class="fas fa-shopping-cart"></i> Nueva venta
+        </a>
+    </div>
+</div>
+
+<div class="tab-content">
+    <!-- Inventario -->
+    <div class="tab-pane fade" id="lisventas">
+        <!-- Detalles -->
+        <div class="mb-4">
+            <hr>
+            <p class="text-muted" style="font-size: 14px;">
+                Consulta las ventas realizadas en el sistema.
+            </p>
+        </div>
+    </div>
+
+    <!-- Lista de Ventas -->
+    <div class="tab-pane fade show active" id="lisventas">
+        <!-- Detalles -->
+        <div class="mb-4">
+            <hr>
+            <p class="text-muted" style="font-size: 14px;">
+                Podrás visualizar y registrar las notas de ingreso de los productos comprados.
+            </p>
+        </div>
+        <div class="flex justify-between mt-5 mb-4">
+            <div class='w-full mb-3 rounded-lg'>
+                <table class='w-full text-sm divide-gray-200 rounded-lg table-auto border-collapse'>
+                    <tbody class="bg-gray-50">
+                        <tr class='text-center'>
+                            <td class='border-r-2 border-t-0'>
+                                <strong>Cant. Ventas:</strong> <span><!-- ventas.length --></span>
+                            </td>
+                            <td class='border-l-2 border-r-2 border-t-0'>
+                                <strong>Total Efectivo: S/.</strong> <span><!-- totalEfectivo --></span>
+                            </td>
+                            <td class='border-l-2 border-r-2 border-t-0'>
+                                <strong>Total Pago Electr: S/.</strong> <span><!-- totalPagoElectronico --></span>
+                            </td>
+                            <td class='border-l border-t-0'>
+                                <strong>Total General: S/.</strong> <!-- totalRecaudado --><span></span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nueva Venta -->
+    <div class="tab-pane fade" id="newventa">
+        <!-- Detalles -->
+        <div class="mb-4">
+            <hr>
+            <p class="text-muted" style="font-size: 14px;">
+                Aquí puedes registrar una nueva venta.
+            </p>
+        </div>
+    </div>
+</div>
 
 {% endblock %}

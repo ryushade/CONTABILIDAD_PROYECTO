@@ -1,6 +1,9 @@
 
 
 # Variables de entorno (Para acceder a la base de datos)
+FLASK_APP=app
+FLASK_DEBUG=1
+TEMPLATES_AUTO_RELOAD=True
 FLASK_ENV=development
 DATABASE_HOST=localhost
 DATABASE_PORT=3306

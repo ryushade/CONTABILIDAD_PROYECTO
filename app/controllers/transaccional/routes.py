@@ -1,4 +1,5 @@
 from flask import render_template
+from app.models.transaccional_models import obtener_productos, obtener_marcas
 from . import transactional_bp
 
 # Modulo de inicio
@@ -14,9 +15,7 @@ def almacen():
 #----------------------------------------------
 
 # Modulo de productos
-@transactional_bp.route('/productos')
-def productos():
-    return render_template('transaccional/productos/productos.html')
+
 
 @transactional_bp.route('/marcas')
 def marcas():
@@ -32,6 +31,12 @@ def subcategorias():
 
 #----------------------------------------------
 
+
+@transactional_bp.route('/productos', methods=['GET'])
+def productos():
+    productos = obtener_productos()
+    marcas = obtener_marcas()
+    return render_template('transaccional/productos/productos.html', productos=productos, marcas=marcas)
 
 # Modulo de ventas
 @transactional_bp.route('/ventas')

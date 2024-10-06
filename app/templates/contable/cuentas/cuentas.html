@@ -53,22 +53,38 @@
             <tr>
                 <td class="text-center">{{ cuenta.codigo_cuenta }}</td>
                 <td class="text-align">{{ cuenta.nombre_cuenta }}</td>
-                <td class="text-center">{{ cuenta.naturaleza }}</td>
+                <td class="text-center">
+                    <span class="estado 
+                    {% if cuenta.naturaleza == 'Deudora' %}
+                        deudora
+                    {% else %}
+                        acreedora
+                    {% endif %}
+                    ">
+                        {% if cuenta.naturaleza == 'Deudora' %}
+                        Deudora
+                        {% else %}
+                        Acreedora
+                        {% endif %}
+
+                    </span>
+                </td>
                 <td class="text-center">
                     <span class="
-                            inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-medium font-normal 
-                            {% if cuenta.estado_cuenta == 1 %}
-                                bg-green-200 text-green-700
-                            {% else %}
-                                bg-red-100 text-red-600
-                            {% endif %}
-                        ">
+                    status 
+                    {% if cuenta.estado_cuenta == 1 %}
+                        active
+                    {% else %}
+                        inactive
+                    {% endif %}
+                ">
                         {% if cuenta.estado_cuenta == 1 %}
                         Activo
                         {% else %}
                         Inactivo
                         {% endif %}
                     </span>
+
                 </td>
 
                 <td class="text-center actions">
@@ -218,8 +234,7 @@
         <h2 class="confirmation-modal-title">Confirmación</h2>
         <p class="confirmation-modal-message">¿Estas seguro que deseas eliminar esta cuenta?</p>
         <div class="confirmation-modal-buttons">
-            <button class="confirmation-modal-button confirmation-modal-close"
-                onclick="closeModal()">Cancelar</button>
+            <button class="confirmation-modal-button confirmation-modal-close" onclick="closeModal()">Cancelar</button>
             <button class="confirmation-modal-button confirmation-modal-confirm"
                 onclick="deleteCuenta()">Confirmar</button>
         </div>
