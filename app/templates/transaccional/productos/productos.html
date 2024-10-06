@@ -177,7 +177,7 @@
                         <td class="text-center"><span class="
                             status 
                             {% if producto.estado_producto == 1 %}
-                                active
+                                active-c                            
                             {% else %}
                                 inactive
                             {% endif %}
@@ -266,14 +266,30 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% for categoria in categorias %}
+
                     <tr>
-                        <td class="text-center"></td>
-                        <td class="text-align"></td>
-                        <td class="text-center"></td>
+                        <td class="text-center">{{categoria.id_categoria}}</td>
+                        <td class="text-center">{{categoria.nom_categoria}}</td>
+                        <td class="text-center">
+                            <span class="status
+                                {% if categoria.estado_categoria == 1 %}
+                                    active-c
+                                {% else %}
+                                    inactive
+                                {% endif %}
+                            ">
+                                {% if categoria.estado_categoria == 1 %}
+                                Activo
+                                {% else %}
+                                Inactivo
+                                {% endif %}
+                        </td>
                         <td class="text-center actions">
 
                         </td>
                     </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>

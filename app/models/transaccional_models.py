@@ -22,10 +22,10 @@ def obtener_productos():
                     'descripcion': producto['descripcion'],
                     'nom_subcat': producto['nom_subcat'],
                     'nom_marca': producto['nom_marca'],
+                    'estado_producto': producto['estado'],
                     'undm': producto['undm'],
                     'precio': producto['precio'],
                     'cod_barras': producto['cod_barras'],
-                    'estado': producto['estado']
                 }
             ) 
             return productos
@@ -39,7 +39,7 @@ def obtener_marcas():
     try:
         with conexion.cursor() as cursor:
             sql = """
-            SELECT id_marca, nom_marca
+            SELECT id_marca, nom_marca, estado_marca
             FROM marca
             ORDER BY nom_marca
             """
@@ -49,10 +49,38 @@ def obtener_marcas():
             for marca in resultado:
                 marcas.append({
                     'id_marca': marca['id_marca'],
-                    'nom_marca': marca['nom_marca']
+                    'nom_marca': marca['nom_marca'],
+                    'estado_marca': marca['estado_marca']
                 }
             ) 
             return marcas
     
     finally:
         conexion.close()
+
+
+
+def obtener_categorias():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            sql = """
+            SELECT id_categoria, nom_categoria, estado_categoria
+            FROM categoria
+            """
+            cursor.execute(sql)
+            resultado = cursor.fetchall()
+            categorias = []
+            for categoria in resultado:
+                categorias.append({
+                    'id_categoria': categoria['id_categoria'],
+                    'nom_categoria': categoria['nom_categoria'],
+                    'estado_categoria': categoria['estado_categoria']
+                }
+            ) 
+            return categorias
+    
+    finally:
+        conexion.close()
+
+  

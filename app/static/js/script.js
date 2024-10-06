@@ -1,8 +1,8 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   const editButtons = document.querySelectorAll('.action-button.edit');
 
   editButtons.forEach(button => {
-    button.addEventListener('click', function() {
+    button.addEventListener('click', function () {
       const cuentaId = this.dataset.cuentaId;
       openEditModal(cuentaId);
     });
@@ -34,4 +34,29 @@ function openEditModal(cuentaId) {
 
 function closeModal() {
   document.querySelector('.modal-overlay').style.display = 'none';
+}
+
+
+let ascending = true;
+
+function sortTable(columnIndex) {
+  const table = document.querySelector("table");
+  const tbody = table.tBodies[0];
+  const rows = Array.from(tbody.rows);
+
+  rows.sort((a, b) => {
+    const cellA = a.cells[columnIndex].textContent.trim();
+    const cellB = b.cells[columnIndex].textContent.trim();
+
+    if (ascending) {
+      return cellA.localeCompare(cellB);
+    } else {
+      return cellB.localeCompare(cellA);
+    }
+  });
+
+  rows.forEach(row => tbody.appendChild(row));
+
+  ascending = !ascending;
+  document.getElementById("arrow").innerHTML = ascending ? "&#9650;" : "&#9660;";
 }
