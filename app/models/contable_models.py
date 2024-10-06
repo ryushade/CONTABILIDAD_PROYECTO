@@ -1,52 +1,84 @@
-from app import db
+from app.models.conexion import obtener_conexion
 
-class Rol(db.Model):
-    __tablename__ = 'rol'
-    
-    id_rol = db.Column(db.Integer, primary_key=True)
-    nom_rol = db.Column(db.String(20), nullable=False)
-    estado_rol = db.Column(db.Boolean, nullable=False)
+# Obtener un usuario por nombre
+def obtener_usuario_por_nombre(username):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            sql = """
+                SELECT u.*, r.nom_rol, r.estado_rol
+                FROM usuario u
+                JOIN rol r ON u.id_rol = r.id_rol
+                WHERE u.usua = %s
+            """
+            cursor.execute(sql, (username,))
+            resultado = cursor.fetchone()
+            if resultado:
+                user = {
+                    'id_usuario': resultado['id_usuario'],
+                    'usua': resultado['usua'],
+                    'contra': resultado['contra'],
+                    'estado_usuario': resultado['estado_usuario'],
+                    'id_rol': resultado['id_rol'],
+                    'rol': {
+                        'id_rol': resultado['id_rol'],
+                        'nom_rol': resultado['nom_rol'],
+                        'estado_rol': resultado['estado_rol']
+                    }
+                }
+                return user
+            else:
+                return None
+    finally:
+        conexion.close()
 
-    # Relación con usuarios
-    usuarios = db.relationship('Usuario', backref='rol', lazy=True)
 
-class Usuario(db.Model):
-    __tablename__ = 'usuario'
+def obtener_usuario_por_id(user_id):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            # Consulta que une la tabla usuario con rol
+            sql = """
+                SELECT u.*, r.nom_rol, r.estado_rol
+                FROM usuario u
+                JOIN rol r ON u.id_rol = r.id_rol
+                WHERE u.id_usuario = %s
+            """
+            cursor.execute(sql, (user_id,))
+            resultado = cursor.fetchone()
+            if resultado:
+                # Estructurar el resultado para incluir el rol como un diccionario
+                user = {
+                    'id_usuario': resultado['id_usuario'],
+                    'usua': resultado['usua'],
+                    'contra': resultado['contra'],
+                    'estado_usuario': resultado['estado_usuario'],
+                    'id_rol': resultado['id_rol'],
+                    'rol': {
+                        'id_rol': resultado['id_rol'],
+                        'nom_rol': resultado['nom_rol'],
+                        'estado_rol': resultado['estado_rol']
+                    }
+                }
+                return user
+            else:
+                return None
+    finally:
+        conexion.close()
 
-    id_usuario = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    id_rol = db.Column(db.Integer, db.ForeignKey('rol.id_rol'), nullable=False)  # Clave foránea aquí
-    usua = db.Column(db.String(10), unique=True, nullable=False)
-    contra = db.Column(db.String(10), nullable=False)
-    estado_usuario = db.Column(db.Boolean, nullable=False)
-    
-    def __init__(self, usua, contra, id_rol, estado_usuario=True):
-        self.usua = usua
-        self.contra = contra
-        self.id_rol = id_rol
-        self.estado_usuario = estado_usuario
+# Verificar la contraseña
+def verificar_contraseña(usuario, password):
+    return usuario['contra'] == password
 
-    def verify_password(self, password):
-        return self.contra == password
-
-
-
-class Cuenta(db.Model):
-    __tablename__ = 'cuenta'
-
-    id_cuenta = db.Column(db.Integer, primary_key=True)
-    codigo_cuenta = db.Column(db.String(20), unique=True, nullable=False)
-    nombre_cuenta = db.Column(db.String(255), nullable=False)
-    tipo_cuenta = db.Column(db.String(50), nullable=False)
-    naturaleza = db.Column(db.String(10), nullable=False)
-    estado_cuenta = db.Column(db.Boolean, nullable=False, default=True)
-    cuenta_padre = db.Column(db.Integer, db.ForeignKey('cuenta.id_cuenta'), nullable=True)
-    nivel = db.Column(db.Integer, nullable=False)
-
-    def __init__(self, codigo_cuenta, nombre_cuenta, tipo_cuenta, naturaleza, estado_cuenta=True, cuenta_padre=None, nivel=1):
-        self.codigo_cuenta = codigo_cuenta
-        self.nombre_cuenta = nombre_cuenta
-        self.tipo_cuenta = tipo_cuenta
-        self.naturaleza = naturaleza
-        self.estado_cuenta = estado_cuenta
-        self.cuenta_padre = cuenta_padre
-        self.nivel = nivel
+# Obtener cuentas paginadas
+def obtener_cuentas(page, per_page):
+    conexion = obtener_conexion()
+    offset = (page - 1) * per_page
+    try:
+        with conexion.cursor() as cursor:
+            sql = "SELECT * FROM cuenta LIMIT %s OFFSET %s"
+            cursor.execute(sql, (per_page, offset))
+            cuentas = cursor.fetchall()
+        return cuentas
+    finally:
+        conexion.close()

@@ -1,7 +1,8 @@
 from flask import request, redirect, url_for, flash, session, jsonify, render_template
-from app.models.contable_models import Usuario, Cuenta
+from app.models.contable_models import obtener_usuario_por_nombre, verificar_contraseña, obtener_cuentas, obtener_usuario_por_id
 from . import accounting_bp
-from app import db
+
+# routes.py
 
 @accounting_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -10,21 +11,17 @@ def login():
         password = request.form['password']
 
         # Consulta el usuario por nombre
-        user = Usuario.query.filter_by(usua=username).first()
+        user = obtener_usuario_por_nombre(username)
 
         # Verifica si el usuario existe y la contraseña es correcta
-        if user and user.verify_password(password):
-            session['user_id'] = user.id_usuario
+        if user and verificar_contraseña(user, password):
+            session['user_id'] = user['id_usuario']
             flash('Login exitoso', 'success')
             return redirect(url_for('transaccional.index'))
+        else:
+            flash('Usuario o contraseña incorrectos', 'danger')
 
-    return render_template('contable/login.html')  
-
-
-@accounting_bp.route('/' , methods=['GET']) 
-def index():
-    return render_template('contable/index.html')
-    
+    return render_template('contable/login.html')
 
 @accounting_bp.route('/logout')
 def logout():
@@ -37,7 +34,14 @@ def cuentas():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 50, type=int)
 
-    
-    cuentas = Cuenta.query.paginate(page=page, per_page=per_page)
-    return render_template('contable/cuentas/cuentas.html', cuentas=cuentas.items, page=page, total_pages = cuentas.pages, per_page=per_page, max=max, min=min) 
+    cuentas = obtener_cuentas(page, per_page)  
 
+    
+    total_pages = (len(cuentas) + per_page - 1) // per_page  
+
+    
+    start = (page - 1) * per_page
+    end = start + per_page
+    cuentas_paginadas = cuentas[start:end]
+
+    return render_template('contable/cuentas/cuentas.html', cuentas=cuentas_paginadas, page=page, total_pages=total_pages, per_page=per_page, max=max, min=min)

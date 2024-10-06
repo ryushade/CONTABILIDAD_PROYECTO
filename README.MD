@@ -1,12 +1,13 @@
 
 
 # Variables de entorno (Para acceder a la base de datos)
-SECRET_KEY=tormentasecreto
-SQLALCHEMY_DATABASE_URI=mysql+pymysql://tu_usuario:tu_contraseña@localhost/db_tormenta
 FLASK_ENV=development
-FLASK_DEBUG=1
-
-
+DATABASE_HOST=localhost
+DATABASE_PORT=3306
+SECRET_KEY=tormentasecreto
+DATABASE_USER=root
+DATABASE_PASSWORD=tucontraseña
+DATABASE_NAME=db_tormenta
 
 
 # Creas el venv

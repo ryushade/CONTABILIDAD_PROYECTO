@@ -6,4 +6,5 @@ python-dotenv
 PyMySQL
 pandas
 openpyxl
+cryptography
 pdfkit

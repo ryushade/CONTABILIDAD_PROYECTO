@@ -55,9 +55,9 @@
                     <span class="ml-2">
                         {{ user.usua }} - <!-- Mostrar nombre de usuario -->
                         <!-- Comparar el nombre del rol como cadena -->
-                        {% if user.rol.nom_rol == "ADMIN" %}
+                        {% if user and user['rol']['nom_rol'] == "ADMIN" %}
                         Administrador
-                        {% elif user.rol.nom_rol == "EMPLEADO" %}
+                        {% elif user['rol']['nom_rol'] == "EMPLEADO" %}
                         Empleado
                         {% else %}
                         Rol desconocido
