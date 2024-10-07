@@ -1,5 +1,5 @@
 from flask import request, redirect, url_for, flash, session, jsonify, render_template
-from app.models.contable_models import obtener_usuario_por_nombre, verificar_contraseña, obtener_cuentas, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta
+from app.models.contable_models import obtener_usuario_por_nombre, verificar_contraseña, obtener_cuentas, obtener_total_cuentas, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta
 from . import accounting_bp
 
 # routes.py
@@ -38,17 +38,12 @@ def cuentas():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 50, type=int)
 
-    cuentas = obtener_cuentas(page, per_page)  
+    cuentas = obtener_cuentas(page, per_page)
+    total_cuentas = obtener_total_cuentas()
 
-    
-    total_pages = (len(cuentas) + per_page - 1) // per_page  
+    total_pages = (total_cuentas + per_page - 1) // per_page
 
-    
-    start = (page - 1) * per_page
-    end = start + per_page
-    cuentas_paginadas = cuentas[start:end]
-
-    return render_template('contable/cuentas/cuentas.html', cuentas=cuentas_paginadas, page=page, total_pages=total_pages, per_page=per_page, max=max, min=min)
+    return render_template('contable/cuentas/cuentas.html', cuentas=cuentas, page=page, total_pages=total_pages, per_page=per_page, max=max, min=min)
 
 # routes.py
 

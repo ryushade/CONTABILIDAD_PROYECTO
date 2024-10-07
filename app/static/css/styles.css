@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
 
+
 body {
     font-family: 'Inter', sans-serif;
     background-color: #F4F5FB;
@@ -982,3 +983,10 @@ tr:hover {
     border-radius: 8px;
     border: 2px solid var(--background-color);
 }
+
+.result-text {
+    font-size: 16px; 
+    font-weight: 400; 
+    color: #000; 
+    margin: 0;
+    padding: 0; 

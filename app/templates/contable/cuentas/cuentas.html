@@ -66,7 +66,9 @@
         {% set end_page = min(total_pages, page + 2) %}
         {% for p in range(start_page, end_page + 1) %}
         <a href="{{ url_for('contable.cuentas', page=p, per_page=per_page) }}"
-            class="pagination-number {% if p == page %}active{% endif %}" aria-label="Página {{ p }}">{{ p }}</a>
+            class="pagination-number {% if p == page %}active{% endif %}" aria-label="Página {{ p }}">
+            {{ p }}
+        </a>
         {% endfor %}
 
         <!-- Botón Siguiente -->
@@ -84,21 +86,23 @@
                 {% endif %}
     </nav>
 
+
     <!-- Selector de Cantidad -->
     <div class="pagination">
-        <p>Filas por pagina</p>
-        <select class=" pagination-select pr-4 w-30 border-gray-300 rounded-lg bg-gray-50"
-            style="height: 35px; border: 0.2px solid;" onchange="location = this.value;">
-
-            <option value="{{ url_for('contable.cuentas', page=page, per_page=5) }}" {% if per_page==5 %}selected{%
-                endif %}>5</option>
-            <option value="{{ url_for('contable.cuentas', page=page, per_page=10) }}" {% if per_page==10 %}selected{%
-                endif %}>10</option>
-            <option value="{{ url_for('contable.cuentas', page=page, per_page=20) }}" {% if per_page==20 %}selected{%
-                endif %}>20</option>
-            <option value="{{ url_for('contable.cuentas', page=page, per_page=100000) }}" {% if per_page==100000
-                %}selected{% endif %}>Todos</option>
-        </select>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <p class="result-text" style="margin: 0;">Resultados por página</p>
+            <select class="pagination-select pr-4 w-30 border-gray-300 rounded-lg bg-gray-50" style="height: 35px;"
+                onchange="location = this.value;">
+                <option value="{{ url_for('contable.cuentas', page=page, per_page=5) }}" {% if per_page==5 %}selected{%
+                    endif %}>5</option>
+                <option value="{{ url_for('contable.cuentas', page=page, per_page=10) }}" {% if per_page==10
+                    %}selected{% endif %}>10</option>
+                <option value="{{ url_for('contable.cuentas', page=page, per_page=20) }}" {% if per_page==20
+                    %}selected{% endif %}>20</option>
+                <option value="{{ url_for('contable.cuentas', page=page, per_page=100000) }}" {% if per_page==100000
+                    %}selected{% endif %}>Todos</option>
+            </select>
+        </div>
     </div>
 </div>
 <div class="table-container" style="margin-top: 30px; ">

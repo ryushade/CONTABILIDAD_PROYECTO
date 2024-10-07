@@ -83,6 +83,20 @@ def obtener_cuentas(page, per_page):
     finally:
         conexion.close()
 
+def obtener_total_cuentas():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            sql = "SELECT COUNT(*) AS total FROM cuenta"
+            cursor.execute(sql)
+            result = cursor.fetchone()
+            total_cuentas = result['total']
+        return total_cuentas
+    finally:
+        conexion.close()
+
+
+
 
 
 def obtener_cuenta_por_id(cuenta_id):
