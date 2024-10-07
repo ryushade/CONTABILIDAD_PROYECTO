@@ -39,11 +39,21 @@ def cuentas():
     per_page = request.args.get('per_page', 50, type=int)
 
     cuentas = obtener_cuentas(page, per_page)
+    
     total_cuentas = obtener_total_cuentas()
 
     total_pages = (total_cuentas + per_page - 1) // per_page
 
-    return render_template('contable/cuentas/cuentas.html', cuentas=cuentas, page=page, total_pages=total_pages, per_page=per_page, max=max, min=min)
+    return render_template(
+        'contable/cuentas/cuentas.html',
+        cuentas=cuentas,
+        page=page,
+        total_pages=total_pages,
+        per_page=per_page,
+        total_results=total_cuentas, 
+        max=max,
+        min=min
+    )
 
 # routes.py
 

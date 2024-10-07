@@ -28,8 +28,60 @@
     .sortable:hover {
         cursor: pointer;
     }
+
+
+    /* Estilos responsivos */
+    @media (max-width: 768px) {
+        .table-scroll {
+            min-width: 100%;
+        }
+
+        .acciones {
+            min-width: auto;
+        }
+
+        .dropdown-menu {
+            width: 100%;
+        }
+    }
+
+    /* Estilos del modal */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal {
+        background: white;
+        padding: 20px;
+        border-radius: 5px;
+        width: 90%;
+        max-width: 500px;
+    }
+
+    /* Estilos del dropdown */
+    .dropdown-menu {
+        width: 100%;
+    }
+
+    .dropdown-toggle::after {
+        margin-left: .255em;
+    }
+
+    /* Estilos para alinear botones */
+    .align-end {
+        display: flex;
+        justify-content: flex-end;
+    }
 </style>
-<!-- Breadcrumb (Migas de Pan) -->
+
 {{ breadcrumb([
 {'label': 'Inicio', 'url': url_for('transaccional.index'), 'icon': 'M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414
 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1
@@ -39,73 +91,88 @@
 ]) }}
 
 <hr class="mb-4" />
-<h1 class="font-weight-bold display-8 text-left" style="font-size: 26px;">PLAN CONTABLE GENERAL EMPRESARIAL</h1>
-<h6 style="font-size: 18px; font-weight: bold; margin-top: 20px;">Lista de Cuentas</h6>
-<!-- Paginación y selector de resultados -->
-<div class="pagination-select-container mt-4 d-flex justify-content-between align-items-center">
-    <!-- Paginación -->
-    <nav aria-label="Pagination" class="pagination-nav">
-        <!-- Botón Primero -->
-        {% if page > 1 %}
-        <a href="{{ url_for('contable.cuentas', page=1, per_page=per_page) }}" class="pagination-btn"
-            aria-label="Primera Página">
-            Primero
-        </a>
-        {% endif %}
 
-        <!-- Botón Anterior -->
-        {% if page > 1 %}
-        <a href="{{ url_for('contable.cuentas', page=page - 1, per_page=per_page) }}"
-            class="pagination-btn pagination-btn-prev" aria-label="Página Anterior">
-            <i class="fas fa-chevron-left"></i>
-        </a>
-        {% endif %}
+<div class="row align-items-center mt-2 mb-5">
+    <!-- Título principal -->
+    <div class="col-md-8">
+        <h1 class="font-weight-bold display-8 text-left fs-3">PLAN CONTABLE GENERAL EMPRESARIAL</h1>
+        <!-- Texto debajo del título -->
+        <p class="fs-6 fw-light">Este plan contiene la estructura contable para empresas según la normativa vigente.</p>
+    </div>
 
-        <!-- Números de Página -->
-        {% set start_page = max(1, page - 2) %}
-        {% set end_page = min(total_pages, page + 2) %}
-        {% for p in range(start_page, end_page + 1) %}
-        <a href="{{ url_for('contable.cuentas', page=p, per_page=per_page) }}"
-            class="pagination-number {% if p == page %}active{% endif %}" aria-label="Página {{ p }}">
-            {{ p }}
-        </a>
-        {% endfor %}
-
-        <!-- Botón Siguiente -->
-        {% if page < total_pages %} <a href="{{ url_for('contable.cuentas', page=page + 1, per_page=per_page) }}"
-            class="pagination-btn pagination-btn-next" aria-label="Página Siguiente">
-            <i class="fas fa-chevron-right"></i>
-            </a>
-            {% endif %}
-
-            <!-- Botón Final -->
-            {% if page < total_pages %} <a href="{{ url_for('contable.cuentas', page=total_pages, per_page=per_page) }}"
-                class="pagination-btn" aria-label="Última Página">
-                Final
+    <!-- Acciones y Agregar Cuenta -->
+    <div class="col-md-4 d-flex justify-content-end align-items-center mt-2 mt-md-0">
+        <!-- Dropdown de Más acciones -->
+        <div class="dropdown me-2">
+            <button class="btn btn-light border dropdown-toggle" type="button" id="dropdownMenuButton"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Más acciones
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item d-flex flex-column" href="#">
+                    <span class="d-flex align-items-center">
+                        <i class="fa fa-file-excel mr-2"></i>
+                        <strong>Exportar a Excel</strong>
+                    </span>
+                    <small class="text-muted">Exporta el listado de cuentas del PCGE</small>
                 </a>
-                {% endif %}
-    </nav>
-
-
-    <!-- Selector de Cantidad -->
-    <div class="pagination">
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <p class="result-text" style="margin: 0;">Resultados por página</p>
-            <select class="pagination-select pr-4 w-30 border-gray-300 rounded-lg bg-gray-50" style="height: 35px;"
-                onchange="location = this.value;">
-                <option value="{{ url_for('contable.cuentas', page=page, per_page=5) }}" {% if per_page==5 %}selected{%
-                    endif %}>5</option>
-                <option value="{{ url_for('contable.cuentas', page=page, per_page=10) }}" {% if per_page==10
-                    %}selected{% endif %}>10</option>
-                <option value="{{ url_for('contable.cuentas', page=page, per_page=20) }}" {% if per_page==20
-                    %}selected{% endif %}>20</option>
-                <option value="{{ url_for('contable.cuentas', page=page, per_page=100000) }}" {% if per_page==100000
-                    %}selected{% endif %}>Todos</option>
-            </select>
+                <a class="dropdown-item d-flex flex-column" href="#">
+                    <span class="d-flex align-items-center">
+                        <i class="fa fa-file-pdf mr-2" style="color: red;"></i>
+                        <strong>Exportar a PDF</strong>
+                    </span>
+                    <small class="text-muted">Exporta el listado de cuentas del PCGE</small>
+                </a>
+            </div>
         </div>
     </div>
 </div>
-<div class="table-container" style="margin-top: 30px; ">
+
+<div class="row align-items-center mt-2 mb-4">
+    <div class="col-md-12 d-flex flex-wrap align-items-center">
+        <div class="input-group me-2 mb-2" style="flex: 1; max-width: 400px;">
+            <input type="text" class="form-control" placeholder="Buscar por nombre o num. de cuenta"
+                aria-label="Buscar">
+            <div class="input-group-append">
+                <span class="input-group-text"><i class="fa fa-search"></i></span>
+            </div>
+        </div>
+
+        <div class="dropdown me-2 mb-2">
+            <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="dropdown1"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                Tipo de cuenta
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown1">
+                <li><a class="dropdown-item" href="#">Activos</a></li>
+                <li><a class="dropdown-item" href="#">Pasivos</a></li>
+                <li><a class="dropdown-item" href="#">Patrimonio</a></li>
+                <li><a class="dropdown-item" href="#">Ingresos</a></li>
+                <li><a class="dropdown-item" href="#">Costos</a></li>
+                <li><a class="dropdown-item" href="#">Gastos</a></li>
+            </ul>
+        </div>
+
+        <div class="dropdown me-2 mb-2">
+            <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="dropdown2"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                Naturaleza
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown2">
+                <li><a class="dropdown-item" href="#">Deudora</a></li>
+                <li><a class="dropdown-item" href="#">Acreedora</a></li>
+            </ul>
+        </div>
+
+        <!-- Botón Agregar Cuenta alineado al mismo nivel -->
+        <a href="{{ url_for('contable.cuentas') }}" class="btn btn-primary mb-2" style="margin-left: auto;">
+            <i class="fa fa-plus"></i> Agregar Cuenta
+        </a>
+    </div>
+</div>
+
+
+<div class="table-container mt-4">
     <div class="table-scroll">
         <table>
             <thead>
@@ -171,93 +238,159 @@
     </div>
 </div>
 
+<div class="row mt-4 align-items-center">
+    <!-- Paginación -->
+    <nav aria-label="Pagination" class="col-md-8">
+        <ul class="pagination">
+            <!-- Botón Primero -->
+            {% if page > 1 %}
+            <li class="page-item">
+                <a href="{{ url_for('contable.cuentas', page=1, per_page=per_page) }}" class="page-link"
+                    aria-label="Primera Página">
+                    &laquo;&laquo;
+                </a>
+            </li>
+            {% endif %}
 
+            <!-- Botón Anterior -->
+            {% if page > 1 %}
+            <li class="page-item">
+                <a href="{{ url_for('contable.cuentas', page=page - 1, per_page=per_page) }}" class="page-link"
+                    aria-label="Página Anterior">
+                    &laquo;
+                </a>
+            </li>
+            {% endif %}
+
+            <!-- Números de Página -->
+            {% set start_page = max(1, page - 2) %}
+            {% set end_page = min(total_pages, page + 2) %}
+            {% for p in range(start_page, end_page + 1) %}
+            <li class="page-item {% if p == page %}active{% endif %}">
+                <a href="{{ url_for('contable.cuentas', page=p, per_page=per_page) }}" class="page-link"
+                    aria-label="Página {{ p }}">
+                    {{ p }}
+                </a>
+            </li>
+            {% endfor %}
+
+            <!-- Botón Siguiente -->
+            {% if page < total_pages %} <li class="page-item">
+                <a href="{{ url_for('contable.cuentas', page=page + 1, per_page=per_page) }}" class="page-link"
+                    aria-label="Página Siguiente">
+                    &raquo;
+                </a>
+                </li>
+                {% endif %}
+
+                <!-- Botón Final -->
+                {% if page < total_pages %} <li class="page-item">
+                    <a href="{{ url_for('contable.cuentas', page=total_pages, per_page=per_page) }}" class="page-link"
+                        aria-label="Última Página">
+                        &raquo;&raquo;
+                    </a>
+                    </li>
+                    {% endif %}
+        </ul>
+    </nav>
+
+    <!-- Selector de Cantidad -->
+    <div class="col-md-4 text-end mt-3 mt-md-0">
+        <select class="form-select w-auto d-inline" onchange="location = this.value;">
+            <option value="{{ url_for('contable.cuentas', page=page, per_page=50) }}" {% if per_page==50 %}selected{%
+                endif %}>50</option>
+            <option value="{{ url_for('contable.cuentas', page=page, per_page=100) }}" {% if per_page==100 %}selected{%
+                endif %}>100</option>
+            <option value="{{ url_for('contable.cuentas', page=page, per_page=200) }}" {% if per_page==200 %}selected{%
+                endif %}>200</option>
+            <option value="{{ url_for('contable.cuentas', page=page, per_page=100000) }}" {% if per_page==100000
+                %}selected{% endif %}>Todos</option>
+        </select>
+    </div>
+</div>
+
+<!-- Rango de resultados -->
+<div class="mt-2 text-center">
+    {% set start_result = (page - 1) * per_page + 1 %}
+    {% set end_result = min(page * per_page, total_results) %}
+    <p><strong>{{ start_result }}-{{ end_result }}</strong> de <strong>{{ total_results }}</strong> resultados</p>
+</div>
 
 <!-- Edit Modal -->
 <form method="POST" id="editCuentaModal" class="edit-form">
     <div class="modal-overlay" style="display: none;">
-        <div className="modal w-96 h-auto">
+        <div class="content-modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Editar Cuenta</h3>
+                <button type="button" class="modal-close" onclick="closeModal()"
+                    style="border: none; color: black; background-color: white; width: 15px; font-weight: bold;">
+                    &times;
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="w-full text-start mb-5">
+                    <!-- Campo de código de la cuenta -->
+                    <label for="codigo_cuenta" class="text-sm font-bold text-black mt-4 block">
+                        Código:
+                    </label>
+                    <input type="text" id="codigo_cuenta" name="codigo_cuenta" value=""
+                        class="w-100 bg-gray-50 border-gray-300 text-gray-900 rounded-lg border p-2 text-sm"
+                        placeholder="Código de la cuenta" required />
 
-            <div class="content-modal">
-                <div class="modal-header">
-                    <h3 class="modal-title">Editar Cuenta</h3>
-                    <button type="button" class="modal-close" onclick="closeModal()"
-                        style="border: none; color: black; background-color: white; width: 15px; font-weight: bold;">
-                        &times;
-                    </button>
+                    <!-- Campo de nombre de la cuenta -->
+                    <label for="nombre_cuenta" class="text-sm font-bold text-black mt-4 block">
+                        Nombre:
+                    </label>
+                    <input type="text" id="nombre_cuenta" name="nombre_cuenta" value=""
+                        class="w-100 bg-gray-50 border-gray-300 text-gray-900 rounded-lg border p-2 text-sm"
+                        placeholder="Nombre de la cuenta" required />
+
+                    <!-- Campo para naturaleza de la cuenta -->
+                    <label for="naturaleza" class="text-sm font-bold text-black mt-4 block">
+                        Naturaleza:
+                    </label>
+                    <select id="naturaleza" name="naturaleza"
+                        class="w-100 text-sm bg-gray-50 border-gray-300 text-gray-900 rounded-lg border p-2" required>
+                        <option value="Deudora">Deudora</option>
+                        <option value="Acreedora">Acreedora</option>
+                    </select>
+
+                    <!-- Campo para estado de la cuenta -->
+                    <label for="estado_cuenta" class="text-sm font-bold text-black mt-4 block">
+                        Estado de la cuenta:
+                    </label>
+                    <select id="estado_cuenta" name="estado_cuenta"
+                        class="w-100 text-sm bg-gray-50 border-gray-300 text-gray-900 rounded-lg border p-2" required>
+                        <option value="1">Activo</option>
+                        <option value="0">Inactivo</option>
+                    </select>
                 </div>
-                <div class="modal-body">
-                    <div class="w-full text-start mb-5">
-                        <!-- Campo de código de la cuenta -->
-                        <label for="codigo_cuenta" class="text-sm font-bold text-black mt-4 block">
-                            Código:
-                        </label>
-                        <input type="text" id="codigo_cuenta" name="codigo_cuenta" value=""
-                            class="w-full bg-gray-50 border-gray-300 text-gray-900 rounded-lg border p-2 text-sm"
-                            placeholder="Código de la cuenta" required />
 
-                        <!-- Campo de nombre de la cuenta -->
-                        <label for="nombre_cuenta" class="text-sm font-bold text-black mt-4 block">
-                            Nombre:
-                        </label>
-                        <input type="text" id="nombre_cuenta" name="nombre_cuenta" value=""
-                            class="w-full bg-gray-50 border-gray-300 text-gray-900 rounded-lg border p-2 text-sm"
-                            placeholder="Nombre de la cuenta" required />
-
-                        <!-- Campo para naturaleza de la cuenta -->
-                        <label for="naturaleza" class="text-sm font-bold text-black mt-4 block">
-                            Naturaleza:
-                        </label>
-                        <select id="naturaleza" name="naturaleza"
-                            class="w-full text-sm bg-gray-50 border-gray-300 text-gray-900 rounded-lg border p-2"
-                            required>
-                            <option value="Deudora">Deudora</option>
-                            <option value="Acreedora">Acreedora</option>
-                        </select>
-
-                        <!-- Campo para estado de la cuenta -->
-                        <label for="estado_cuenta" class="text-sm font-bold text-black mt-4 block">
-                            Estado de la cuenta:
-                        </label>
-                        <select id="estado_cuenta" name="estado_cuenta"
-                            class="w-full text-sm bg-gray-50 border-gray-300 text-gray-900 rounded-lg border p-2"
-                            required>
-                            <option value="1">Activo</option>
-                            <option value="0">Inactivo</option>
-                        </select>
-                    </div>
-
-                    <!-- Botones de acción -->
-                    <div class="modal-buttons flex">
-                        <button type="button" onclick="closeModal()" class="btn-c">
-                            <i class="fas fa-times "></i> Cancelar
-                        </button>
-                        <button type="submit" class="btn-save">
-                            <i class="fas fa-save"></i> Guardar
-                        </button>
-                    </div>
+                <!-- Botones de acción -->
+                <div class="modal-buttons d-flex justify-content-end">
+                    <button type="button" onclick="closeModal()" class="btn btn-secondary me-2">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
                 </div>
             </div>
         </div>
     </div>
+    </div>
 </form>
 
-<!--DeleteModal-->
-
+<!-- Delete Modal -->
 <div class="confirmation-modal-overlay" style="display: none;">
     <div class="confirmation-modal">
         <h2 class="confirmation-modal-title">Confirmación</h2>
-        <p class="confirmation-modal-message">¿Estas seguro que deseas eliminar esta cuenta?</p>
+        <p class="confirmation-modal-message">¿Estás seguro que deseas eliminar esta cuenta?</p>
         <div class="confirmation-modal-buttons">
-            <button class="confirmation-modal-button confirmation-modal-close" onclick="closeModal()">Cancelar</button>
-            <button class="confirmation-modal-button confirmation-modal-confirm"
-                onclick="deleteCuenta()">Confirmar</button>
+            <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+            <button class="btn btn-danger" onclick="deleteCuenta()">Confirmar</button>
         </div>
     </div>
 </div>
-
-</div>
-
-
 
 {% endblock %}
