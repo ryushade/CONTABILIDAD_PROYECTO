@@ -266,3 +266,39 @@ def obtener_productos():
 
     except Exception as e:
         return jsonify({'code': 0, 'message': str(e)}), 500
+
+'''
+Consultas Nota de Salida
+'''
+def obtener_nota_salida():
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            sql = """
+            SELECT 
+                N.fecha,
+                C.num_comprobante,
+                COALESCE(NULLIF(D.razon_social, ''), CONCAT(D.nombres, ' ', D.apellidos)) AS nombre_o_razon_social,
+                N.glosa,
+                CASE 
+                    WHEN N.estado_nota = 0 THEN 'Activo' 
+                    WHEN N.estado_nota = 1 THEN 'Inactivo' 
+                    ELSE 'Desconocido' 
+                END AS estado,
+                U.usua
+            FROM nota N 
+            INNER JOIN tipo_nota TN ON TN.id_tiponota = N.id_tiponota
+            INNER JOIN comprobante C ON N.id_comprobante = C.id_comprobante
+            INNER JOIN destinatario D ON D.id_destinatario = N.id_destinatario
+            INNER JOIN usuario U ON U.id_usuario = N.id_usuario
+            WHERE N.id_tiponota = 2;
+            """
+
+            cursor.execute(sql)
+            return cursor.fetchall()  # Asegúrate de retornar solo los datos
+    except Exception as e:
+        print(f"Error: {e}")
+        return []
+    except Exception as e:
+        return jsonify({'code': 0, 'message': str(e)}), 500
+    
