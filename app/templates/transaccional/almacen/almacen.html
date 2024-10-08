@@ -236,20 +236,21 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for dato in datos_almacen %}
                         <tr>
-                            <td class="centrar">2024-08-16</td>
-                            <td class="centrar">I400-00000001</td>
-                            <td class="centrar">Karhy Urtecho</td>
-                            <td class="centrar">COMPRA EN EL PAIS</td>
-                            <td class="centrar">ALM CENTRAL 52-53</td>
-                            <td class="centrar"><span class="estado-activo">Activo</span></td>
-                            <td class="centrar">marco</td>
+                            <td class="centrar">{{ dato.fecha }}</td>
+                            <td class="centrar">{{ dato.documento }}</td>
+                            <td class="centrar">{{ dato.proveedor }}</td>
+                            <td class="centrar">{{ dato.concepto }}</td>
+                            <td class="centrar">{{ dato.almacen_D }}</td> <!-- Cambié a almacen_D -->
+                            <td class="centrar"><span class="estado-activo">{{ dato.estado }}</span></td>
+                            <td class="centrar">{{ dato.usuario }}</td>
                             <td class="accion-dropdown">
                                 <div class="dropdown">
-                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton{{ loop.index }}" data-bs-toggle="dropdown" aria-expanded="false">
                                         ...
                                     </button>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ loop.index }}">
                                         <li><a class="dropdown-item" href="#">Ver</a></li>
                                         <li><a class="dropdown-item" href="#">Editar</a></li>
                                         <li><a class="dropdown-item" href="#">Eliminar</a></li>
@@ -257,27 +258,7 @@
                                 </div>
                             </td>
                         </tr>
-                        <tr>
-                            <td class="centrar">2024-08-16</td>
-                            <td class="centrar">I400-00000002</td>
-                            <td class="centrar">Juan Perez</td>
-                            <td class="centrar">COMPRA EN EL PAIS</td>
-                            <td class="centrar">ALM BALTA 7-8</td>
-                            <td class="centrar"><span class="estado-activo">Activo</span></td>
-                            <td class="centrar">marco</td>
-                            <td class="accion-dropdown">
-                                <div class="dropdown">
-                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
-                                        ...
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-                                        <li><a class="dropdown-item" href="#">Ver</a></li>
-                                        <li><a class="dropdown-item" href="#">Editar</a></li>
-                                        <li><a class="dropdown-item" href="#">Eliminar</a></li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
         
@@ -297,6 +278,8 @@
                 </nav>
             </div>
         </div>
+        
+        
     </div>
 
     <!-- Sistema Contable -->
