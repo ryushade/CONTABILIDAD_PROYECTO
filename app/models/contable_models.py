@@ -68,7 +68,7 @@ def obtener_usuario_por_id(user_id):
 
 # Verificar la contraseña
 def verificar_contraseña(usuario, password):
-    return usuario['contra'] == password
+    return usuario['contra'] == password    
 
 # Obtener cuentas paginadas
 def obtener_cuentas(page, per_page):
@@ -76,7 +76,7 @@ def obtener_cuentas(page, per_page):
     offset = (page - 1) * per_page
     try:
         with conexion.cursor() as cursor:
-            sql = "SELECT * FROM cuenta LIMIT %s OFFSET %s"
+            sql = "SELECT * FROM cuenta ORDER BY codigo_cuenta LIMIT %s OFFSET %s"
             cursor.execute(sql, (per_page, offset))
             cuentas = cursor.fetchall()
         return cuentas
@@ -95,6 +95,15 @@ def obtener_total_cuentas():
     finally:
         conexion.close()
 
+def eliminar_cuenta(cuenta_id):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            sql = "DELETE FROM cuenta WHERE id_cuenta = %s"
+            cursor.execute(sql, (cuenta_id,))
+            conexion.commit()
+    finally:
+        conexion.close()
 
 
 

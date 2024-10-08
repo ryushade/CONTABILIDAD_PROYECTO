@@ -1,5 +1,5 @@
 from flask import request, redirect, url_for, flash, session, jsonify, render_template
-from app.models.contable_models import obtener_usuario_por_nombre, verificar_contraseña, obtener_cuentas, obtener_total_cuentas, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta
+from app.models.contable_models import obtener_usuario_por_nombre, verificar_contraseña, obtener_cuentas, obtener_total_cuentas, eliminar_cuenta,obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta
 from . import accounting_bp
 
 # routes.py
@@ -75,4 +75,9 @@ def editar_cuenta(cuenta_id):
     actualizar_cuenta(cuenta_id, codigo_cuenta, nombre_cuenta, naturaleza, estado_cuenta)
 
     flash('Cuenta actualizada correctamente', 'success')
+    return redirect(url_for('contable.cuentas'))
+
+@accounting_bp.route('/cuentas/eliminar/<int:cuenta_id>', methods=['POST'])
+def eliminar_cuenta(cuenta_id):
+    eliminar_cuenta(cuenta_id)
     return redirect(url_for('contable.cuentas'))

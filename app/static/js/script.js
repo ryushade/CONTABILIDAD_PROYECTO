@@ -25,6 +25,7 @@ function openEditModal(cuentaId) {
 
         // Mostrar el modal
         document.querySelector('.modal-overlay').style.display = 'flex'; // Usa 'flex' si usas flexbox
+
       }
     })
     .catch(error => {
@@ -60,3 +61,54 @@ function sortTable(columnIndex) {
   ascending = !ascending;
   document.getElementById("arrow").innerHTML = ascending ? "&#9650;" : "&#9660;";
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+  const searchInput = document.getElementById('searchInput');
+  const tableRows = document.querySelectorAll('table tbody tr');
+
+  searchInput.addEventListener('keyup', function () {
+    const searchTerm = searchInput.value.toLowerCase();
+
+    tableRows.forEach(row => {
+      const codigoCuenta = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+      const nombreCuenta = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+
+      // Check if the search term matches either 'codigoCuenta' or 'nombreCuenta'
+      if (codigoCuenta.includes(searchTerm) || nombreCuenta.includes(searchTerm)) {
+        row.style.display = ''; // Show row
+      } else {
+        row.style.display = 'none'; // Hide row
+      }
+    });
+  });
+});
+
+
+
+function openModalDelete(cuentaId) {
+  document.getElementById('deleteCuentaModal').style.display = 'flex';
+  document.getElementById('deleteCuentaModal').action = '/contable/cuentas/eliminar/' + cuentaId;
+}
+
+function closeModalDelete() {
+  document.getElementById('deleteCuentaModal').style.display = 'none';
+}
+
+function openModalAdd() {
+  document.getElementById('addAccountModal').style.display = 'flex';
+}
+
+function closeModalAdd() {
+  document.getElementById('addAccountModal').style.display = 'none';
+}
+
+document.getElementById('codigo_cuenta').addEventListener('input', function () {
+  var nivelCuenta = this.value.length;
+  var cuentaPadreContainer = document.getElementById('cuenta_padre_container');
+
+  if (nivelCuenta > 1) {
+    cuentaPadreContainer.style.display = 'block';
+  } else {
+    cuentaPadreContainer.style.display = 'none';
+  }
+});
