@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Tormenta{% endblock %}
+{% block title %}Tormenta - Libro Diario{% endblock %}
 
 {% from 'breadcrumb.html' import breadcrumb %}
 
@@ -8,324 +8,144 @@
 <header class="mb-4">
     {{ breadcrumb([
     {'label': 'Inicio', 'url': url_for('transaccional.index'), 'icon': 'M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0
-    001.414
-    1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0
-    001-1v-6.586l.293.293a1 1
-    0 001.414-1.414l-7-7z'},
+    001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0
+    001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z'},
     {'label': 'Contabilidad', 'url': url_for('transaccional.index')},
     {'label': 'Reportes Contables'}
     ]) }}
     <h1 class="text-8xl font-bold tracking-wide text-gray-700 title-Inicio">MÓDULO REPORTES CONTABLES</h1>
 </header>
-
 <style>
-    table {
-        border-collapse: separate;
-        border-spacing: 0 8px;
-        width: 100%;
-        height: 100%;
-    }
 
-    table th,
-    table td {
-        font-weight: normal;
-        color: #6c757d;
-        border-bottom: 1px solid #dee2e6;
-        padding: 30px 20px;
-        vertical-align: middle;
-    }
-
-    table td {
-        background-color: #f8f9fa;
-        border-bottom: 2px solid white;
-    }
-
-    table tbody tr {
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        border-radius: 12px;
-    }
-
-    /* Botón desplegable */
-    .dropdown-toggle {
-        border-radius: 8px;
-        padding: 5px 10px;
-        background-color: #e7f1ff;
-        color: #007bff;
-        border: 1px solid #007bff;
-    }
-
-    .dropdown-toggle:focus {
-        outline: none;
-        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-    }
-
-    .estado-activo {
-        background-color: #eafff0;
-        color: #28a745;
-        padding: 5px 15px;
-        border-radius: 12px;
-        font-weight: bold;
-        text-align: center;
-    }
-
-    /* Alineación de acciones */
-    .accion-dropdown {
-        text-align: center;
-    }
-
-    .centrar {
-        text-align: center;
-    }
 </style>
-
 <!-- Tabs de Reporte -->
 <div class="mb-4">
     <div class="nav nav-tabs">
-        <a class="nav-item nav-link active" href="#sisinv" data-toggle="tab">
+        <a class="nav-item nav-link active" href="#libro-diario" data-toggle="tab">
             <i class="fas fa-book"></i> Libro Diario
         </a>
-        <a class="nav-item nav-link " href="#sistrans" data-toggle="tab">
+        <a class="nav-item nav-link" href="#libro-mayor" data-toggle="tab">
             <i class="fas fa-door-open"></i> Libro Mayor
         </a>
-        <a class="nav-item nav-link" href="#siscon" data-toggle="tab">
+        <a class="nav-item nav-link" href="#estado-resultados" data-toggle="tab">
             <i class="fas fa-door-closed"></i> Estado de Resultados
         </a>
     </div>
 </div>
 
 <div class="tab-content">
-    <!-- Inventario -->
-    <div class="tab-pane fade show active" id="sisinv">
-        <!-- Detalles -->
-        <div class="mb-4">
-            <hr>
-            <p class="text-muted" style="font-size: 14px;">
-                Consulta los asientos contables de tu empresa en el periodo de tiempo que elijas.
+    <!-- Tab: Libro Diario -->
+    <div class="tab-pane fade show active" id="libro-diario">
+        <div class="container py-2" style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+            <div class="bg-white rounded custom-shadow p-4">
+                <header class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="h4 mb-0 d-flex align-items-center" style="font-weight: bold;">
+                        <span></span>
+                        LIBRO DIARIO
+                    </h1>
 
-            </p>
-        </div>
-    </div>
+                    <button class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-download me-1"></i>
+                        Más acciones
+                    </button>
+
+                </header>
 
 
-    <!-- Sistema Transaccional -->
-    <div class="tab-pane fade" id="sistrans">
-        <!-- Detalles -->
-        <div class="mb-4">
-            <hr>
-            <p class="text-muted" style="font-size: 14px;">
-                Podrás visualizar y registrar las notas de ingreso de los productos comprados.
-            </p>
-        </div>
-        <div class="row">
-            <div class="col-lg-3">
-                <div class="row">
-                    <div class="col-lg-2">
-                        <h6 class="mt-2"><b>Almacén:</b></h6>
-                    </div>
-                    <div class="col-lg-10">
-                        <select class="form-select form-select-md" aria-label="Default select example"
-                            style="margin-left: 30px;">
-                            <option selected>Seleccione...</option>
-                            <option value="1">ALM CENTRAL ESCALERA</option>
-                            <option value="2">ALMACEN CENTRAL 22</option>
-                            <option value="3">ALM CENTRAL 52-53</option>
-                            <option value="3">PRODUCCION</option>
-                            <option value="3">ALM BALTA 7-8</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3">
-                <div class="input-group mb-3 ms-3">
-                    <div class="input-group input-group-md ms-3">
-                        <span class="input-group-text" id="basic-addon1"><i
-                                class="fa-solid fa-magnifying-glass"></i></span>
-                        <input type="text" class="form-control" placeholder="Nombre o razón social"
-                            aria-label="razonsosial" aria-describedby="basic-addon1">
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3">
-                <div class="row">
-                    <div class="col-lg-5">
-                        <h6 class="mt-2 ms-3"><b>Comprobante:</b></h6>
-                    </div>
-                    <div class="col-lg-7">
-                        <div class="input-group input-group-md">
-                            <span class="input-group-text" id="basic-addon1"><i
-                                    class="fa-solid fa-magnifying-glass"></i></span>
-                            <input type="text" class="form-control" placeholder="I400-00000000" aria-label="razonsosial"
-                                aria-describedby="basic-addon1">
+                <p class="text-muted small mb-4">Consulta los asientos contables de tu empresa en el período de tiempo
+                    que elijas.</p>
+                <div class="container">
+
+                    <form class="row g-3 mb-3 align-items-end">
+                        <div class="col-md-3">
+                            <style>
+                                .required-asterisk {
+                                    color: red;
+                                }
+                            </style>
+
+                            <label for="daterange" class="form-label" style="font-size: 14px;">
+                                Período <span class="required-asterisk">*</span>
+                            </label>
+                            <div class="input-group" style="width: auto;">
+                                <input class="form-control"  type="text" id="daterange"
+                                    placeholder="Selecciona un rango de fecha">
+                                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3">
-                <div class="row">
-                    <div class="col-lg-2">
-                        <h6 class="mt-2 ms-3"><b>Fecha:</b></h6>
-                    </div>
-                    <div class="col-lg-9">
-                        <div class="input-group input-group-md ms-4">
-                            <input class="input-group-text" type="text" id="daterange"
-                                placeholder="01/4/2024 - 8/04/2028" style="width: 100%;">
+                        <div class="col-md-3">
+                            <label for="tipo-registro" style="font-size: 14px;" class="form-label">Tipo de
+                                registro</label>
+                            <select class="form-select" id="tipo-registro">
+                                <option selected>Todas</option>
+                            </select>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-lg-2">
-                <div class="row">
-                    <div class="col-lg-3">
-                        <h6 class="mt-2"><b>Estado:</b></h6>
-                    </div>
-                    <div class="col-lg-9">
-                        <select class="form-select form-select-md" aria-label="Default select example"
-                            style="margin-left: 30px;">
-                            <option selected style="text-align: center;">...</option>
-                            <option value="1">Activo</option>
-                            <option value="2">Inactivo</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-2">
-
-            </div>
-            <div class="col-lg-3">
-                <div class="row">
-                    <div class="col-lg-3">
-                        <h6 class="mt-2 ms-3"><b>Usuario:</b></h6>
-                    </div>
-                    <div class="col-lg-9">
-                        <div class="input-group input-group-md ms-3">
-                            <span class="input-group-text" id="basic-addon1"><i
-                                    class="fa-solid fa-magnifying-glass"></i></span>
-                            <input type="text" class="form-control" placeholder="Ej: tormenta" aria-label="razonsosial"
-                                aria-describedby="basic-addon1">
+                        <div class="col-lg-2 d-flex justify-content-end" style="margin-left: auto;">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-calendar-alt"></i> Generar Reporte
+                            </button>
                         </div>
-                    </div>
+                    </form>
+
                 </div>
-            </div>
-            <div class="col-lg-2">
 
-            </div>
-            <div class="col-lg-3">
-                <div class="row">
-                    <div class="col-lg-4">
-                        <select class="form-select form-select-md" aria-label="Default select example"
-                            style="margin-left: 30px;">
-                            <option selected style="text-align: center;">...</option>
-                            <option value="1">Guardar PDF</option>
-                        </select>
-                    </div>
-                    <div class="col-lg-1">
 
-                    </div>
-                    <div class="col-lg-7">
-                        <div class="input-group input-group-md">
-                            <button type="button" class="btn btn-primary" style="width: 100%;"><i
-                                    class="fa-solid fa-plus me-2"></i>Nota de Ingreso</button>
-                        </div>
-                    </div>
+
+                <div class="table-responsive mb-4">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>CÓDIGO DE LA OPERACIÓN</th>
+                                <th>FECHA DE LA OPERACIÓN</th>
+                                <th>GLOSA O DESCRIPCIÓN</th>
+                                <th>NUM. DOCUMENTO</th>
+                                <th>CUENTA CONTABLE</th>
+                                <th>DEBE</th>
+                                <th>HABER</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="9" class="text-center text-muted py-5">¡No tienes asientos contables en
+                                    este
+                                    período!</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-        </div>
 
-        <div class="row" style="margin-bottom: 7%;">
-            <div class="container mt-5">
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th class="centrar">Fecha</th>
-                            <th class="centrar">Documento</th>
-                            <th class="centrar">Proveedor</th>
-                            <th class="centrar">Concepto</th>
-                            <th class="centrar">Almacén Destino</th>
-                            <th class="centrar">Estado</th>
-                            <th class="centrar">Usuario</th>
-                            <th class="centrar">Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="centrar">2024-08-16</td>
-                            <td class="centrar">I400-00000001</td>
-                            <td class="centrar">Karhy Urtecho</td>
-                            <td class="centrar">COMPRA EN EL PAIS</td>
-                            <td class="centrar">ALM CENTRAL 52-53</td>
-                            <td class="centrar"><span class="estado-activo">Activo</span></td>
-                            <td class="centrar">marco</td>
-                            <td class="accion-dropdown">
-                                <div class="dropdown">
-                                    <button class="btn btn-secondary dropdown-toggle" type="button"
-                                        id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                                        ...
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                        <li><a class="dropdown-item" href="#">Ver</a></li>
-                                        <li><a class="dropdown-item" href="#">Editar</a></li>
-                                        <li><a class="dropdown-item" href="#">Eliminar</a></li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="centrar">2024-08-16</td>
-                            <td class="centrar">I400-00000002</td>
-                            <td class="centrar">Juan Perez</td>
-                            <td class="centrar">COMPRA EN EL PAIS</td>
-                            <td class="centrar">ALM BALTA 7-8</td>
-                            <td class="centrar"><span class="estado-activo">Activo</span></td>
-                            <td class="centrar">marco</td>
-                            <td class="accion-dropdown">
-                                <div class="dropdown">
-                                    <button class="btn btn-secondary dropdown-toggle" type="button"
-                                        id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
-                                        ...
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-                                        <li><a class="dropdown-item" href="#">Ver</a></li>
-                                        <li><a class="dropdown-item" href="#">Editar</a></li>
-                                        <li><a class="dropdown-item" href="#">Eliminar</a></li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <!-- Paginación -->
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination">
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&lt;</a>
-                        </li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">&gt;</a>
-                        </li>
+                <nav aria-label="Navegación de páginas" class="d-flex justify-content-between align-items-center">
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
+                                aria-disabled="true">&laquo;</a></li>
+                        <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
+                                aria-disabled="true">&lsaquo;</a></li>
+                        <li class="page-item active" aria-current="page"><span class="page-link">1</span></li>
+                        <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
+                                aria-disabled="true">&rsaquo;</a></li>
+                        <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
+                                aria-disabled="true">&raquo;</a></li>
                     </ul>
+                    <div class="d-flex align-items-center">
+                        <span class="text-muted small me-2">Mostrando 1-10 De 10</span>
+                        <select class="form-select form-select-sm" style="width: auto;">
+                            <option>10</option>
+                        </select>
+                    </div>
                 </nav>
             </div>
         </div>
     </div>
 
-    <!-- Sistema Contable -->
-    <div class="tab-pane fade" id="siscon">
-        <!-- Detalles -->
-        <div class="mb-4">
-            <hr>
-            <p class="text-muted" style="font-size: 14px;">
-                Podrás visualizar y registrar las notas de salidas.
-            </p>
-        </div>
+    <!-- Tab: Libro Mayor -->
+    <div class="tab-pane fade" id="libro-mayor">
+        <p class="text-gray-600 mb-6">Aquí va el contenido del Libro Mayor.</p>
     </div>
-</div>
+
+    <!-- Tab: Estado de Resultados -->
+    <div class="tab-pane fade" id="estado-resultados">
+        <p class="text-gray-600 mb-6">Aquí va el contenido del Estado de Resultados.</p>
+    </div>
 </div>
 
 {% endblock %}
