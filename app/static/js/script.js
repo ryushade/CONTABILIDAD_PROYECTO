@@ -25,6 +25,7 @@ function openEditModal(cuentaId) {
 
         // Mostrar el modal
         document.querySelector('.modal-overlay').style.display = 'flex'; // Usa 'flex' si usas flexbox
+
       }
     })
     .catch(error => {
@@ -60,3 +61,87 @@ function sortTable(columnIndex) {
   ascending = !ascending;
   document.getElementById("arrow").innerHTML = ascending ? "&#9650;" : "&#9660;";
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+  const searchInput = document.getElementById('searchInput');
+  const tableRows = document.querySelectorAll('table tbody tr');
+
+  searchInput.addEventListener('keyup', function () {
+    const searchTerm = searchInput.value.toLowerCase();
+
+    tableRows.forEach(row => {
+      const codigoCuenta = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+      const nombreCuenta = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+
+      // Check if the search term matches either 'codigoCuenta' or 'nombreCuenta'
+      if (codigoCuenta.includes(searchTerm) || nombreCuenta.includes(searchTerm)) {
+        row.style.display = ''; // Show row
+      } else {
+        row.style.display = 'none'; // Hide row
+      }
+    });
+  });
+});
+
+
+
+function openModalDelete(cuentaId, codigoCuenta, nombreCuenta) {
+  // Mostrar el modal
+  document.getElementById('deleteCuentaModal').style.display = 'flex';
+
+  // Guardar el ID de la cuenta en un campo oculto
+  document.getElementById('deleteCuentaId').value = cuentaId;
+
+  // Actualizar el texto con la información de la cuenta
+  document.getElementById('deleteCuentaInfo').innerText = `"${codigoCuenta} - ${nombreCuenta}"`;
+}
+
+function closeModalDelete() {
+  document.getElementById('deleteCuentaModal').style.display = 'none';
+}
+
+function deleteCuenta() {
+  var cuentaId = document.getElementById('deleteCuentaId').value;
+  // Crear un formulario para enviar la solicitud POST
+  var form = document.createElement('form');
+  form.method = 'POST';
+  form.action = '/contable/cuentas/eliminar/' + cuentaId;
+  document.body.appendChild(form);
+  form.submit();
+}
+
+
+function openModalAdd() {
+  document.getElementById('addAccountModal').style.display = 'flex';
+}
+
+function openModalVer(codigo_cuenta, nombre_cuenta, naturaleza, nivel, estado_cuenta) {
+  document.getElementById('verCuentaModal').style.display = 'flex';
+  document.getElementById('codigo_cuenta').textContent = codigo_cuenta;
+  document.getElementById('nombre_cuenta').textContent = nombre_cuenta;
+  document.getElementById('naturaleza').textContent = naturaleza;
+  document.getElementById('nivel_cuenta').textContent = nivel ==1 ? 'Elemento' : nivel == 2 ? 'Cuenta' : nivel == 3 ? 'Subcuenta' : 'Divisionaria ? Subdivisionaria';
+  document.getElementById('estado_cuenta').textContent = estado_cuenta == 1 ? 'Activo' : 'Inactivo';
+}
+
+
+
+function closeModalView() {
+  document.getElementById('verCuentaModal').style.display = 'none';
+}
+
+
+function closeModalAdd() {
+  document.getElementById('addAccountModal').style.display = 'none';
+}
+
+document.getElementById('codigo_cuenta').addEventListener('input', function () {
+  var nivelCuenta = this.value.length;
+  var cuentaPadreContainer = document.getElementById('cuenta_padre_container');
+
+  if (nivelCuenta > 1) {
+    cuentaPadreContainer.style.display = 'block';
+  } else {
+    cuentaPadreContainer.style.display = 'none';
+  }
+});

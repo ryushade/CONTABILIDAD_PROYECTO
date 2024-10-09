@@ -50,3 +50,5 @@ pip-log.txt
 *.tar.gz
 *.whl
 *.zip
+
+config.py

@@ -1,8 +1,7 @@
 from flask import request, redirect, url_for, flash, session, jsonify, render_template
-from app.models.contable_models import obtener_usuario_por_nombre, verificar_contraseña, obtener_cuentas, obtener_total_cuentas, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta
-from . import accounting_bp
+from app.models.contable_models import obtener_usuario_por_nombre, verificar_contraseña, obtener_cuentas, obtener_total_cuentas, eliminar_cuenta,obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta
+from . import accounting_bp# routes.py
 
-# routes.py
 
 @accounting_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -37,11 +36,11 @@ def reportes():
 def cuentas():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 50, type=int)
+    tipo_cuenta = request.args.get('tipo_cuenta')
+    naturaleza = request.args.get('naturaleza')
 
-    cuentas = obtener_cuentas(page, per_page)
-    
-    total_cuentas = obtener_total_cuentas()
-
+    cuentas = obtener_cuentas(page, per_page, tipo_cuenta=tipo_cuenta, naturaleza=naturaleza)
+    total_cuentas = obtener_total_cuentas(tipo_cuenta=tipo_cuenta, naturaleza=naturaleza)
     total_pages = (total_cuentas + per_page - 1) // per_page
 
     return render_template(
@@ -50,10 +49,13 @@ def cuentas():
         page=page,
         total_pages=total_pages,
         per_page=per_page,
-        total_results=total_cuentas, 
+        total_results=total_cuentas,
+        tipo_cuenta=tipo_cuenta,
+        naturaleza=naturaleza,
         max=max,
         min=min
     )
+
 
 # routes.py
 
@@ -75,4 +77,9 @@ def editar_cuenta(cuenta_id):
     actualizar_cuenta(cuenta_id, codigo_cuenta, nombre_cuenta, naturaleza, estado_cuenta)
 
     flash('Cuenta actualizada correctamente', 'success')
+    return redirect(url_for('contable.cuentas'))
+
+@accounting_bp.route('/cuentas/eliminar/<int:cuenta_id>', methods=['POST'])
+def eliminar_cuenta(cuenta_id):
+    eliminar_cuenta(cuenta_id)
     return redirect(url_for('contable.cuentas'))

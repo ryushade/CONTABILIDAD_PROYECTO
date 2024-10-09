@@ -1,4 +1,5 @@
 from app.models.conexion import obtener_conexion
+import pymysql
 
 # Obtener un usuario por nombre
 def obtener_usuario_por_nombre(username):
@@ -68,33 +69,70 @@ def obtener_usuario_por_id(user_id):
 
 # Verificar la contraseña
 def verificar_contraseña(usuario, password):
-    return usuario['contra'] == password
+    return usuario['contra'] == password    
 
 # Obtener cuentas paginadas
-def obtener_cuentas(page, per_page):
+def obtener_cuentas(page, per_page, tipo_cuenta=None, naturaleza=None):
     conexion = obtener_conexion()
     offset = (page - 1) * per_page
     try:
-        with conexion.cursor() as cursor:
-            sql = "SELECT * FROM cuenta LIMIT %s OFFSET %s"
-            cursor.execute(sql, (per_page, offset))
+        with conexion.cursor(pymysql.cursors.DictCursor) as cursor:
+            sql = "SELECT * FROM cuenta"
+            filters = []
+            params = []
+            if tipo_cuenta:
+                filters.append("tipo_cuenta = %s")
+                params.append(tipo_cuenta)
+            if naturaleza:
+                filters.append("naturaleza = %s")
+                params.append(naturaleza)
+            if filters:
+                sql += " WHERE " + " AND ".join(filters)
+            sql += " ORDER BY codigo_cuenta LIMIT %s OFFSET %s"
+            params.extend([per_page, offset])
+            cursor.execute(sql, params)
             cuentas = cursor.fetchall()
         return cuentas
     finally:
         conexion.close()
 
-def obtener_total_cuentas():
+
+
+
+def obtener_total_cuentas(tipo_cuenta=None, naturaleza=None):
     conexion = obtener_conexion()
     try:
-        with conexion.cursor() as cursor:
+        with conexion.cursor(pymysql.cursors.DictCursor) as cursor:
             sql = "SELECT COUNT(*) AS total FROM cuenta"
-            cursor.execute(sql)
+            filters = []
+            params = []
+            if tipo_cuenta:
+                filters.append("tipo_cuenta = %s")
+                params.append(tipo_cuenta)
+            if naturaleza:
+                filters.append("naturaleza = %s")
+                params.append(naturaleza)
+            if filters:
+                sql += " WHERE " + " AND ".join(filters)
+            cursor.execute(sql, params)
             result = cursor.fetchone()
             total_cuentas = result['total']
         return total_cuentas
     finally:
         conexion.close()
 
+
+
+
+def eliminar_cuenta(cuenta_id):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            sql = "DELETE FROM cuenta WHERE id_cuenta = %s"
+            cursor.execute(sql, (cuenta_id,))
+            conexion.commit()
+    finally:
+        conexion.close()
 
 
 

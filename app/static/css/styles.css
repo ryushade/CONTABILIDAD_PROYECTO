@@ -494,6 +494,7 @@ tr:hover {
   z-index: 1000;
 }
 
+
 .content-modal {
   background: #fff;
   padding: 35px;
@@ -515,15 +516,22 @@ tr:hover {
 }
 
 .modal-title {
-  font-size: 2.3rem;
+  font-size: 2.1rem;
   font-weight: bold;
   color: black;
 }
 
 .modal-close {
   cursor: pointer;
-  color: #6d6d6d !important;
+  color: #000000 !important;
   padding: 0 !important;
+  font-size: 24px;
+  /* Adjust the size as needed */
+}
+
+.modal-icon {
+  color: #ff4d4f;
+  margin-bottom: 16px;
 }
 
 .modal-body {
@@ -533,7 +541,7 @@ tr:hover {
 
 .modal-buttons {
   display: flex;
-  gap: 40px;
+  gap: 15px;
   justify-content: flex-end;
 
 }
@@ -1036,3 +1044,4 @@ tr:hover {
   background-color: #f8f9fa;
   text-decoration: none;
 }
+
