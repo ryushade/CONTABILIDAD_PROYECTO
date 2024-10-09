@@ -2,9 +2,17 @@
 
 {% block title %}Tormenta {% endblock %}
 
+{% from 'breadcrumb.html' import breadcrumb %}
+
 {% block content %}
 <header class="mb-4">
-    <h1 class="text-8xl font-bold tracking-wide text-gray-700 title-Inicio">MÓDULO COMPRAS 2</h1>
+    {{ breadcrumb([
+        {'label': 'Inicio', 'url': url_for('transaccional.index'), 'icon': 'M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0
+        001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0
+        001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z'},
+        {'label': 'Compras', 'url': url_for('transaccional.index')}
+        ]) }}
+    <h1 class="text-8xl font-bold tracking-wide text-gray-700 title-Inicio">MÓDULO COMPRAS</h1>
 </header>
 
 <style>
@@ -68,21 +76,36 @@
 </style>
 
 <!-- Tabs de Reporte -->
-<!-- <div class="mb-4">
+<div class="mb-4">
     <div class="nav nav-tabs">
-        <a class="nav-item nav-link active" href="#sisinv" data-toggle="tab">
-            <i class="fas fa-door-closed"></i> Inventario
-        </a>
-        <a class="nav-item nav-link " href="#sistrans" data-toggle="tab">
-            <i class="fas fa-door-open"></i> Nota de ingreso
-        </a>
-        <a class="nav-item nav-link" href="#siscon" data-toggle="tab">
-            <i class="fas fa-door-closed"></i> Nota de salida
+        <a class="nav-item nav-link active" href="#compra" data-toggle="tab">
+            <i class="fas fa-door-closed"></i> Compra productos
         </a>
     </div>
-</div> -->
+</div>
 
 <div class="tab-content">
+    <!-- Inventario -->
+    <div class="tab-pane fade" id="compra">
+        <!-- Detalles -->
+        <div class="mb-4">
+            <hr>
+            <p class="text-muted" style="font-size: 14px;">
+                Consulta las ventas realizadas en el sistema.
+            </p>
+        </div>
+    </div>
+
+    <div class="tab-pane fade show active" id="compra">
+        <div class="mb-4">
+            <hr>
+            <p class="text-muted" style="font-size: 14px;">
+                Podrás visualizar y registrar los productos comprados por proveedor.
+            </p>
+        </div>
+
+    </div>
+
     <form>
         <div class="row align-items-center">
             <div class="col-lg-3">
