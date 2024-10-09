@@ -1,39 +1,5 @@
 from app.models.conexion import obtener_conexion
-from flask import Blueprint, request, jsonify
-
-
-def obtener_productos():
-    conexion = obtener_conexion()
-    try:
-        with conexion.cursor() as cursor:
-            sql = """
-            SELECT PR.id_producto, PR.descripcion, CA.nom_subcat, MA.nom_marca, PR.undm, 
-                CAST(PR.precio AS DECIMAL(10, 2)) AS precio, PR.cod_barras, PR.estado_producto as estado
-                FROM producto PR
-                INNER JOIN marca MA ON MA.id_marca = PR.id_marca
-                INNER JOIN sub_categoria CA ON CA.id_subcategoria = PR.id_subcategoria
-                ORDER BY PR.id_producto DESC
-            """
-            cursor.execute(sql)
-            resultado = cursor.fetchall()
-            productos = []
-            for producto in resultado:
-                productos.append({
-                    'id_producto': producto['id_producto'],
-                    'descripcion': producto['descripcion'],
-                    'nom_subcat': producto['nom_subcat'],
-                    'nom_marca': producto['nom_marca'],
-                    'estado_producto': producto['estado'],
-                    'undm': producto['undm'],
-                    'precio': producto['precio'],
-                    'cod_barras': producto['cod_barras'],
-                }
-            ) 
-            return productos
-    
-    finally:
-        conexion.close()
-        
+from flask import Blueprint, request, jsonify       
 
 def obtener_marcas():
     conexion = obtener_conexion()
@@ -84,9 +50,6 @@ def obtener_categorias():
     finally:
         conexion.close()
 
-
-
-# Controlador de las notas de ingreso
 
 # Controlador de las notas de ingreso
 def obtener_ingresos():
@@ -302,3 +265,25 @@ def obtener_nota_salida():
     except Exception as e:
         return jsonify({'code': 0, 'message': str(e)}), 500
     
+
+
+'''
+Consultas Productos
+'''
+#Obtener todos los productos
+def obtener_inventario():
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            sql = """
+            SELECT PR.id_producto, PR.descripcion as descripcion, CA.nom_subcat as nom_marca, MA.nom_marca as nom_subcat, PR.undm as undm, 
+                CAST(PR.precio AS DECIMAL(10, 2)) AS precio, PR.cod_barras as cod_barras, PR.estado_producto AS estado
+            FROM producto PR INNER JOIN marca MA ON MA.id_marca = PR.id_marca
+            INNER JOIN sub_categoria CA ON CA.id_subcategoria = PR.id_subcategoria
+            ORDER BY PR.id_producto DESC;"""
+            cursor.execute(sql)
+            return cursor.fetchall()
+    except Exception as e:
+        print(f"Error: {e}")
+        return []
+

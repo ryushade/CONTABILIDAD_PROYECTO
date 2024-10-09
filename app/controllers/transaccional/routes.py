@@ -1,5 +1,5 @@
 from flask import render_template
-from app.models.transaccional_models import obtener_productos, obtener_marcas, obtener_categorias, obtener_ingresos, obtener_nota_salida
+from app.models.transaccional_models import obtener_productos, obtener_marcas, obtener_categorias, obtener_ingresos, obtener_nota_salida, obtener_inventario
 from . import transactional_bp
 
 # Modulo de inicio
@@ -13,8 +13,9 @@ def index():
 def almacen():
     datos_almacen_entrada = obtener_ingresos()
     datos_almacen_salida = obtener_nota_salida()
-    
-    return render_template('transaccional/almacen/almacen.html', datos_almacen_entrada=datos_almacen_entrada, datos_almacen_salida=datos_almacen_salida)
+    datos_inventario = obtener_inventario()
+    print(datos_inventario)
+    return render_template('transaccional/almacen/almacen.html', datos_almacen_entrada=datos_almacen_entrada, datos_almacen_salida=datos_almacen_salida, datos_inventario=datos_inventario)
 #----------------------------------------------
 
 # Modulo de productos
