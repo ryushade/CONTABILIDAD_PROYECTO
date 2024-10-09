@@ -1,5 +1,6 @@
-from flask import render_template
+from flask import render_template, send_file
 from app.models.transaccional_models import obtener_productos, obtener_marcas, obtener_categorias, obtener_ingresos, obtener_nota_salida, obtener_inventario
+from app.models.transaccional_models import generate_barcode
 from . import transactional_bp
 
 # Modulo de inicio
@@ -14,8 +15,17 @@ def almacen():
     datos_almacen_entrada = obtener_ingresos()
     datos_almacen_salida = obtener_nota_salida()
     datos_inventario = obtener_inventario()
-    print(datos_inventario)
     return render_template('transaccional/almacen/almacen.html', datos_almacen_entrada=datos_almacen_entrada, datos_almacen_salida=datos_almacen_salida, datos_inventario=datos_inventario)
+
+@transactional_bp.route('/barcode/<string:code>', methods=['GET'])
+def barcode(code):
+    response = generate_barcode(code)
+    
+    if response is None:
+        return "Error generando el código de barras", 500
+
+    return response
+
 #----------------------------------------------
 
 # Modulo de productos

@@ -1,5 +1,9 @@
+from barcode.writer import ImageWriter
 from app.models.conexion import obtener_conexion
-from flask import Blueprint, request, jsonify       
+from flask import Blueprint, request, jsonify, send_file
+import barcode
+import io
+from barcode.writer import ImageWriter
 
 def obtener_marcas():
     conexion = obtener_conexion()
@@ -276,14 +280,30 @@ def obtener_inventario():
         conexion = obtener_conexion()
         with conexion.cursor() as cursor:
             sql = """
-            SELECT PR.id_producto, PR.descripcion as descripcion, CA.nom_subcat as nom_marca, MA.nom_marca as nom_subcat, PR.undm as undm, 
+            SELECT PR.id_producto, PR.descripcion as descripcion, CA.nom_subcat as nom_marca, MA.nom_marca as nom_subcat, PR.undm as undm,          
                 CAST(PR.precio AS DECIMAL(10, 2)) AS precio, PR.cod_barras as cod_barras, PR.estado_producto AS estado
             FROM producto PR INNER JOIN marca MA ON MA.id_marca = PR.id_marca
             INNER JOIN sub_categoria CA ON CA.id_subcategoria = PR.id_subcategoria
             ORDER BY PR.id_producto DESC;"""
             cursor.execute(sql)
-            return cursor.fetchall()
+            resultados = cursor.fetchall()
+            print("Resultados de inventario:", resultados)  # Para depurar
+            return resultados
     except Exception as e:
         print(f"Error: {e}")
         return []
 
+
+def generate_barcode(code):
+    try:
+        barcode_class = barcode.get_barcode_class('code128')
+        bar_code = barcode_class(code, writer=ImageWriter())
+        
+        buffer = io.BytesIO()
+        bar_code.write(buffer)
+        buffer.seek(0)
+
+        return send_file(buffer, mimetype='image/png')
+    except Exception as e:
+        print(f"Error generando código de barras: {e}")
+        return None
