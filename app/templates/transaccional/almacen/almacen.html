@@ -19,7 +19,7 @@
 <style>
     table {
         border-collapse: separate;
-        border-spacing: 0 8px;
+        border-spacing: 0 6px;
         width: 100%;
         height: 100%;
     }
@@ -86,6 +86,9 @@
         text-align: center;
     }
     
+    .modal-dialog {
+        max-width: 40%;
+    }
 </style>
 
 <!-- Tabs de Reporte -->
@@ -113,7 +116,34 @@
                     Podrás visualizar el inventario de productos.
                 </p>
             </div>
+
             <div class="row">
+                <div class="col-lg-3">
+                    <h4 class="mt-1"><b>Lista de Productos</b></h4>
+                </div>
+                <div class="col-lg-6">
+                    <div class="input-group me-2 mb-2" style="flex: 1;">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Ingrese un producto"
+                            aria-label="Buscar">
+                        <div class="input-group-append">
+                            <span class="input-group-text"><i class="fa fa-search"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-1">
+
+                </div>
+                <div class="col-lg-2">
+                    <!-- Botón para abrir el modal -->
+                    <div class="input-group input-group-md">
+                        <button type="button" class="btn btn-primary" style="width: 100%;" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                            <i class="fa-solid fa-plus me-2"></i>Agregar producto
+                        </button>
+                    </div>                 
+                </div>
+            </div>
+
+            <div class="row mt-4">
                 <div class="container">
                     <div class="table-container">
                         <table class="table-scroll">
@@ -184,6 +214,112 @@
                     </nav>
                 </div>
             </div>
+
+        <!-- Modal para agregar producto -->
+        <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <!-- Encabezado del modal -->
+                    <div class="modal-header">
+                        <h5 class="modal-title mt-3 ms-4 mb-3" id="addProductModalLabel">Nuevo producto</h5>
+                    </div>
+                    <!-- Cuerpo del modal -->
+                    <div class="modal-body">
+                        <form id="addProductForm">
+
+                            <!-- Descripcion del producto -->                            
+                            <div class="row ms-2 me-2 mb-3">
+                                <label for="productDescription" class="form-label">Descripción:</label>
+                                <input type="text" class="form-control" id="productDescription" required>
+                            </div>
+
+                            <!-- Categoría y Sub-Categoría -->
+                            <div class="row ms-2 me-2 mb-3">
+                                <div class="col-lg-6">
+                                    <div class="row">
+                                        <label for="productDescription" class="form-label">Categoría:</label>
+                                    </div>
+                                    <div class="row me-1">
+                                        <select class="form-select form-select-md" aria-label="Seleccione...">
+                                            <option selected>Seleccione...</option>
+                                            <option value="1">Prueba</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="row">
+                                        <label for="productDescription" class="form-label">Sub-Categoría:</label>
+                                    </div>
+                                    <div class="row">
+                                        <select class="form-select form-select-md" aria-label="Seleccione...">
+                                            <option selected>Seleccione...</option>
+                                            <option value="1">Prueba</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Marca y Precio -->
+                            <div class="row ms-2 me-2 mb-3">
+                                <div class="col-lg-6">
+                                    <div class="row">
+                                        <label for="productDescription" class="form-label">Marca:</label>
+                                    </div>
+                                    <div class="row me-1">
+                                        <select class="form-select form-select-md" aria-label="Seleccione...">
+                                            <option selected>Seleccione...</option>
+                                            <option value="1">TORMENTA</option>
+                                            <option value="2">DASHIR</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="row">
+                                        <label for="productDescription" class="form-label">Precio:</label>
+                                    </div>
+                                    <div class="row">
+                                        <input type="number" class="form-control" id="numero" placeholder="89.99" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Unidad de medida y Estado -->
+                            <div class="row ms-2 me-2 mb-3">
+                                <div class="col-lg-6">
+                                    <div class="row">
+                                        <label for="productDescription" class="form-label">Und. Medida:</label>
+                                    </div>
+                                    <div class="row me-1">
+                                        <select class="form-select form-select-md" aria-label="Seleccione...">
+                                            <option selected>Seleccione...</option>
+                                            <option value="1">KGM</option>
+                                            <option value="2">NIU</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="row">
+                                        <label for="productDescription" class="form-label">Precio:</label>
+                                    </div>
+                                    <div class="row">
+                                        <select class="form-select form-select-md" aria-label="Seleccione...">
+                                            <option selected>Seleccione...</option>
+                                            <option value="1">Activo</option>
+                                            <option value="2">Inactivo</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- Pie de página del modal -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="background-color: #8f95a0;">Cerrar</button>
+                        <button type="submit" class="btn btn-primary" form="addProductForm" style="background-color: #389ae6;">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
 
@@ -544,5 +680,21 @@
     </div>
 </div>
 </div>
+
+<script>
+    document.getElementById('searchInput').addEventListener('input', function() {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll('table tbody tr');
+
+        rows.forEach(row => {
+            let descripcion = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+            if (descripcion.includes(filter)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script>
 
 {% endblock %}
