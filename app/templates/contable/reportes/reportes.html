@@ -21,13 +21,13 @@
 <!-- Tabs de Reporte -->
 <div class="mb-4">
     <div class="nav nav-tabs">
-        <a class="nav-item nav-link active" href="#libro-diario" data-toggle="tab">
+        <a class="nav-item nav-link active" href="#libro-diario" data-bs-toggle="tab">
             <i class="fas fa-book"></i> Libro Diario
         </a>
-        <a class="nav-item nav-link" href="#libro-mayor" data-toggle="tab">
+        <a class="nav-item nav-link" href="#libro-mayor" data-bs-toggle="tab">
             <i class="fas fa-door-open"></i> Libro Mayor
         </a>
-        <a class="nav-item nav-link" href="#estado-resultados" data-toggle="tab">
+        <a class="nav-item nav-link" href="#estado-resultados" data-bs-toggle="tab">
             <i class="fas fa-door-closed"></i> Estado de Resultados
         </a>
     </div>
@@ -44,10 +44,26 @@
                         LIBRO DIARIO
                     </h1>
 
-                    <button class="btn btn-outline-secondary btn-sm">
-                        <i class="bi bi-download me-1"></i>
-                        Más acciones
-                    </button>
+                    <div class="dropdown me-2">
+                        <button class="btn btn-light border dropdown-toggle" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Más acciones
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item d-flex flex-column" href="#">
+                                <span class="d-flex align-items-center">
+                                    <i class="fa fa-file-excel mr-2"></i>
+                                    <strong>Exportar a Excel</strong>
+                                </span>
+                            </a>
+                            <a class="dropdown-item d-flex flex-column" href="#">
+                                <span class="d-flex align-items-center">
+                                    <i class="fa fa-file-pdf mr-2" style="color: red;"></i>
+                                    <strong>Exportar a PDF</strong>
+                                </span>
+                            </a>
+                        </div>
+                    </div>
 
                 </header>
 
@@ -68,7 +84,7 @@
                                 Período <span class="required-asterisk">*</span>
                             </label>
                             <div class="input-group" style="width: auto;">
-                                <input class="form-control"  type="text" id="daterange"
+                                <input class="form-control" type="text" id="daterange"
                                     placeholder="Selecciona un rango de fecha">
                                 <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
                             </div>

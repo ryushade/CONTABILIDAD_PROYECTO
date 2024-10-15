@@ -65,23 +65,33 @@ function sortTable(columnIndex) {
 document.addEventListener('DOMContentLoaded', function () {
   const searchInput = document.getElementById('searchInput');
   const tableRows = document.querySelectorAll('table tbody tr');
+  const noResultsMessage = document.createElement('tr');
+  
+  noResultsMessage.innerHTML = '<td colspan="5" style="text-align: center;">No se encontraron resultados..</td>';
+  noResultsMessage.style.display = 'none';
+  
+  tableRows[0].parentNode.appendChild(noResultsMessage);
 
   searchInput.addEventListener('keyup', function () {
     const searchTerm = searchInput.value.toLowerCase();
+    let found = false;
 
     tableRows.forEach(row => {
       const codigoCuenta = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
       const nombreCuenta = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
 
-      // Check if the search term matches either 'codigoCuenta' or 'nombreCuenta'
       if (codigoCuenta.includes(searchTerm) || nombreCuenta.includes(searchTerm)) {
-        row.style.display = ''; // Show row
+        row.style.display = ''; // mostrar
+        found = true;
       } else {
-        row.style.display = 'none'; // Hide row
+        row.style.display = 'none'; // ocultar
       }
     });
+
+    noResultsMessage.style.display = found ? 'none' : '';
   });
 });
+
 
 
 
@@ -120,7 +130,7 @@ function openModalVer(codigo_cuenta, nombre_cuenta, naturaleza, nivel, estado_cu
   document.getElementById('codigo_cuenta').textContent = codigo_cuenta;
   document.getElementById('nombre_cuenta').textContent = nombre_cuenta;
   document.getElementById('naturaleza').textContent = naturaleza;
-  document.getElementById('nivel_cuenta').textContent = nivel ==1 ? 'Elemento' : nivel == 2 ? 'Cuenta' : nivel == 3 ? 'Subcuenta' : 'Divisionaria ? Subdivisionaria';
+  document.getElementById('nivel_cuenta').textContent = nivel == 1 ? 'Elemento' : nivel == 2 ? 'Cuenta' : nivel == 3 ? 'Subcuenta' : 'Divisionaria ? Subdivisionaria';
   document.getElementById('estado_cuenta').textContent = estado_cuenta == 1 ? 'Activo' : 'Inactivo';
 }
 

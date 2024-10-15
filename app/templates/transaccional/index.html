@@ -3,18 +3,18 @@
 {% block title %}Tormenta{% endblock %}
 
 {% block content %}
-<div class="container  mt-2 p-2">
+<div class="container-fluid mt-2 p-2">
     <header class="mb-4">
         <h1 class="text-8xl font-bold tracking-wide text-gray-700 title-Inicio">MÓDULOS DEL SISTEMA</h1>
     </header>
-
+  
     <!-- Tabs de Reporte -->
     <div class="mb-4">
         <div class="nav nav-tabs">
-            <a class="nav-item nav-link active" href="#sistrans" data-toggle="tab">
+            <a class="nav-item nav-link active" href="#sistrans" data-bs-toggle="tab">
                 <i class="fas fa-credit-card"></i> Sistema Transaccional
             </a>
-            <a class="nav-item nav-link" href="#siscon" data-toggle="tab">
+            <a class="nav-item nav-link" href="#siscon" data-bs-toggle="tab">
                 <i class="fas fa-calculator"></i> Sistema Contable
             </a>
         </div>
@@ -35,72 +35,83 @@
             <div class="row">
                 <!-- Módulo de Ventas -->
                 <div class="col-md-6 mb-4">
-                    <div class="card shadow-sm h-100" style="cursor: pointer;">
-                        <div class="card-body d-flex align-items-center">
-                            <div class="bg-light p-3 rounded-circle mr-3">
-                                <i class="fas fa-cash-register text-primary" style="font-size: 24px;"></i>
-                            </div>
-                            <div>
-                                <h5 class="card-title">Módulo de Ventas</h5>
-                                <p class="card-text text-muted"  onclick="window.location.href='{{ url_for('transaccional.ventas') }}'">Gestiona las ventas, facturación y seguimiento de
-                                    clientes.</p>
-                                <p class="card-text text-muted"><strong>Roles Autorizados:</strong> Vendedor</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Módulo de Productos -->
-                <div class="col-md-6 mb-4">
-                    <div class="card shadow-sm h-100" style="cursor: pointer;">
-                        <div class="card-body d-flex align-items-center">
-                            <div class="bg-light p-3 rounded-circle mr-3">
-                                <i class="fas fa-box-open text-success" style="font-size: 24px;"></i>
-                            </div>
-                            <div>
-                                <h5 class="card-title"  onclick="window.location.href='{{ url_for('transaccional.productos') }}'">Módulo de Productos</h5>
-                                <p class="card-text text-muted">Administra el catálogo de productos y sus
-                                    características.</p>
-                                <p class="card-text text-muted"><strong>Roles Autorizados:</strong> Administrador</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Módulo de Compras -->
-                <div class="col-md-6 mb-4">
-                    <div class="card shadow-sm h-100" style="cursor: pointer;">
-                        <div class="card-body d-flex align-items-center">
-                            <div class="bg-light p-3 rounded-circle mr-3">
-                                <i class="fas fa-shopping-cart text-warning" style="font-size: 24px;"></i>
-                            </div>
-                            <div>
-                                <h5 class="card-title">Módulo de Compras</h5>
-                                <p class="card-text text-muted" >Gestiona las órdenes de compra y relación con
-                                    proveedores.</p>
-                                <p class="card-text text-muted"><strong>Roles Autorizados:</strong> Administrador</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Módulo de Almacén -->
-                <div class="col-md-6 mb-4">
-                    <a href="{{ url_for('transaccional.almacen') }}" class="card shadow-sm h-100" style="text-decoration: none; color: inherit;">
-                        <div class="card shadow-sm h-100" style="cursor: pointer;">
+                    <a href="{{ url_for('transaccional.ventas') }}" class="text-decoration-none text-dark">
+                        <div class="card">
                             <div class="card-body d-flex align-items-center">
-                                <div class="bg-light p-3 rounded-circle mr-3">
-                                    <i class="fas fa-warehouse text-purple" style="font-size: 24px;"></i>
+                                <div class="bg-light p-3 rounded-circle me-3">
+                                    <i class="fas fa-cash-register text-primary" style="font-size: 24px;"></i>
                                 </div>
                                 <div>
-                                    <h5 class="card-title"  onclick="window.location.href='{{ url_for('transaccional.almacen') }}'">Módulo de Almacén</h5>
-                                    <p class="card-text text-muted"  onclick="window.location.href='{{ url_for('transaccional.almacen') }}'">Controla el inventario y la logística de almacén.</p>
-                                    <p class="card-text text-muted"  onclick="window.location.href='{{ url_for('transaccional.almacen') }}'"><strong>Roles Autorizados:</strong> Administrador</p>
+                                    <h5 class="card-title text-gray-500" style="font-size: 14px;">Módulo de Ventas</h5>
+                                    <p class="card-text text-muted text-sm text-gray-500">Gestiona las ventas,
+                                        facturación y seguimiento de clientes.</p>
+                                    <p class="card-text text-muted " style="font-size: 14px;"><strong>Roles
+                                            Autorizados:</strong> Vendedor</p>
                                 </div>
                             </div>
                         </div>
                     </a>
-                    
+                </div>
+
+                <!-- Módulo de Productos -->
+                <div class="col-md-6 mb-4">
+                    <a href="{{ url_for('transaccional.productos') }}" class="text-decoration-none text-dark">
+                        <div class="card">
+                            <div class="card-body d-flex align-items-center">
+                                <div class="bg-light p-3 rounded-circle me-3">
+                                    <i class="fas fa-box-open text-success" style="font-size: 24px;"></i>
+                                </div>
+                                <div>
+                                    <h5 class="card-title text-gray-500" style="font-size: 14px;">Módulo de Productos
+                                    </h5>
+                                    <p class="card-text text-muted text-sm text-gray-500">Administra el catálogo de
+                                        productos y sus características.</p>
+                                    <p class="card-text text-muted" style="font-size: 14px;"><strong>Roles
+                                            Autorizados:</strong> Administrador</p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Módulo de Compras -->
+                <div class="col-md-6 mb-4">
+                    <a href="{{ url_for('transaccional.compras') }}" class="text-decoration-none text-dark">
+                        <div class="card">
+                            <div class="card-body d-flex align-items-center">
+                                <div class="bg-light p-3 rounded-circle me-3">
+                                    <i class="fas fa-shopping-cart text-warning" style="font-size: 24px;"></i>
+                                </div>
+                                <div>
+                                    <h5 class="card-title text-gray-500" style="font-size: 14px;">Módulo de Compras</h5>
+                                    <p class="card-text text-muted text-sm text-gray-500">Gestiona las órdenes de compra
+                                        y relación con proveedores.</p>
+                                    <p class="card-text text-muted" style="font-size: 14px;"><strong>Roles
+                                            Autorizados:</strong> Administrador</p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Módulo de Almacén -->
+                <div class="col-md-6 mb-4">
+                    <a href="{{ url_for('transaccional.almacen') }}" class="text-decoration-none text-dark">
+                        <div class="card">
+                            <div class="card-body d-flex align-items-center">
+                                <div class="bg-light p-3 rounded-circle me-3">
+                                    <i class="fas fa-warehouse text-purple" style="font-size: 24px;"></i>
+                                </div>
+                                <div>
+                                    <h5 class="card-title text-gray-500" style="font-size: 14px;">Módulo de Almacén</h5>
+                                    <p class="card-text text-muted text-sm text-gray-500">Controla el inventario y la
+                                        logística de almacén.</p>
+                                    <p class="card-text text-muted" style="font-size: 14px;"><strong>Roles
+                                            Autorizados:</strong> Administrador</p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
                 </div>
             </div>
         </div>
@@ -119,52 +130,65 @@
             <div class="row">
                 <!-- Módulo de Contabilidad -->
                 <div class="col-md-6 mb-4">
-                    <div class="card shadow-sm h-100" style="cursor: pointer;">
-                        <div class="card-body d-flex align-items-center">
-                            <div class="bg-light p-3 rounded-circle mr-3">
-                                <i class="fas fa-book text-primary" style="font-size: 24px;"></i>
-                            </div>
-                            <div>
-                                <h5 class="card-title">Módulo de Asientos Contables</h5>
-                                <p class="card-text text-muted">Visualiza los asientos contables generados.</p>
-                                <p class="card-text text-muted"><strong>Roles Autorizados:</strong> Contador</p>
+                    <a href="{{ url_for('contable.cuentas') }}" class="text-decoration-none text-dark">
+                        <div class="card">
+                            <div class="card-body d-flex align-items-center">
+                                <div class="bg-light p-3 rounded-circle me-3">
+                                    <i class="fas fa-book text-primary" style="font-size: 24px;"></i>
+                                </div>
+                                <div>
+                                    <h5 class="card-title text-gray-500" style="font-size: 14px;">Módulo de Asientos
+                                        Contables</h5>
+                                    <p class="card-text text-muted text-sm text-gray-500">Visualiza los asientos
+                                        contables generados.</p>
+                                    <p class="card-text text-muted" style="font-size: 14px;"><strong>Roles
+                                            Autorizados:</strong> Contador</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
 
-                <!-- Módulo de Facturación -->
+                <!-- Módulo de Reportes Contables -->
                 <div class="col-md-6 mb-4">
-                    <div class="card shadow-sm h-100" style="cursor: pointer;">
-                        <div class="card-body d-flex align-items-center">
-                            <div class="bg-light p-3 rounded-circle mr-3">
-                                <i class="fas fa-file-invoice-dollar text-success" style="font-size: 24px;"></i>
-                            </div>
-                            <div>
-                                <h5 class="card-title" onclick="window.location.href='{{ url_for('contable.reportes') }}'">Módulo de Reportes Contables</h5>
-                                <p class="card-text text-muted" >Visualiza los estados financieros de la empresa.</p>
-                                <p class="card-text text-muted"><strong>Roles Autorizados:</strong> Contador</p>
+                    <a href="{{ url_for('contable.reportes') }}" class="text-decoration-none text-dark">
+                        <div class="card">
+                            <div class="card-body d-flex align-items-center">
+                                <div class="bg-light p-3 rounded-circle me-3">
+                                    <i class="fas fa-file-invoice-dollar text-success" style="font-size: 24px;"></i>
+                                </div>
+                                <div>
+                                    <h5 class="card-title text-gray-500" style="font-size: 14px;">Módulo de Reportes
+                                        Contables</h5>
+                                    <p class="card-text text-muted text-sm text-gray-500">Visualiza los estados
+                                        financieros de la empresa.</p>
+                                    <p class="card-text text-muted" style="font-size: 14px;"><strong>Roles
+                                            Autorizados:</strong> Contador</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
+
+                <!-- Módulo de Cuentas PCGE -->
                 <div class="col-md-6 mb-4 mx-auto">
-                    <div class="card shadow-sm h-100" style="cursor: pointer;">
-                        <div class="card-body d-flex align-items-center">
-                            <div class="bg-light p-3 rounded-circle mr-3">
-                                <i class="fas fa-folder text-success" style="font-size: 24px;"></i>
-                            </div>
-                            <div>
-                                <h5 class="card-title" onclick="window.location.href='{{ url_for('contable.cuentas') }}'">
-                                    Módulo de Cuentas PCGE</h5>
-                                <p class="card-text text-muted"
-                                    onclick="window.location.href='{{ url_for('contable.cuentas') }}'">
-                                    Gestiona las cuentas del PCGE actualizado.
-                                </p>
-                                <p class="card-text text-muted"><strong>Roles Autorizados:</strong> Contador</p>
+                    <a href="{{ url_for('contable.cuentas') }}" class="text-decoration-none text-dark">
+                        <div class="card">
+                            <div class="card-body d-flex align-items-center">
+                                <div class="bg-light p-3 rounded-circle me-3">
+                                    <i class="fas fa-folder text-success" style="font-size: 24px;"></i>
+                                </div>
+                                <div>
+                                    <h5 class="card-title text-gray-500" style="font-size: 14px;">Módulo de Cuentas PCGE
+                                    </h5>
+                                    <p class="card-text text-muted text-sm text-gray-500">Gestiona las cuentas del PCGE
+                                        actualizado.</p>
+                                    <p class="card-text text-muted" style="font-size: 14px;"><strong>Roles
+                                            Autorizados:</strong> Contador</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>
