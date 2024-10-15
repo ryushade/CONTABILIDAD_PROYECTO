@@ -110,9 +110,9 @@
         .nav-item {
             display: flex;
             align-items: center;
-            padding: 0.7rem 1rem;
+            padding: 0.7rem 0.4rem;
             cursor: pointer;
-            transition: background-color 0.5s;
+            transition: background-color 0.7s;
         }
 
         .nav-item:hover {
@@ -133,7 +133,7 @@
         .subnav {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.3s ease-out;
+            transition: max-height 0.5s ease-out;
         }
 
         .subnav.expanded {
@@ -202,12 +202,13 @@
                     <i class="fas fa-arrow-left"></i>
                 </button>
             </div>
-            <nav class="sidebar-nav">
+            <div class="sidebar-nav">
                 <div class="nav-item">
                     <i class="fas fa-home"></i>
                     <span class="nav-text">Inicio</span>
                 </div>
 
+                {% if '/contable' not in request.path %}
                 <div class="nav-item has-subnav">
                     <i class="fas fa-chart-line"></i>
                     <span class="nav-text">Ventas</span>
@@ -224,6 +225,7 @@
                 <div class="subnav">
                     <div class="subnav-item">Nueva Compra</div>
                 </div>
+
                 <div class="nav-item has-subnav">
                     <i class="fas fa-warehouse"></i>
                     <span class="nav-text">Almacén</span>
@@ -234,6 +236,10 @@
                     <div class="subnav-item">Guía de remisión</div>
                     <div class="subnav-item">Nota de salida</div>
                 </div>
+                {% endif %}
+
+                
+
                 <div class="nav-item has-subnav">
                     <i class="fas fa-calculator"></i>
                     <span class="nav-text">Contabilidad</span>
@@ -244,6 +250,7 @@
                     <div class="subnav-item">Asientos contables</div>
                     <div class="subnav-item">Libro diario</div>
                 </div>
+
                 <div class="nav-item has-subnav">
                     <i class="fas fa-cog"></i>
                     <span class="nav-text">Configuración</span>
@@ -253,19 +260,19 @@
                     <div class="subnav-item">Usuarios</div>
                     <div class="subnav-item">Reglas contables</div>
                 </div>
-            </nav>
+            </div>
+
         </aside>
 
         <!-- Contenido principal -->
         <div class="main-content flex-grow-1">
             <!-- Navbar -->
-            <nav class="navbar navbar-expand-lg navbar-light bg-white">
-                <a class="navbar-brand title-Inicio ms-3 me-3" style="font-size: 20px;">TORMENTA</a>
+            <nav class="navbar navbar-expand-lg navbar-light">
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="collapse navbar-collapse ms-3 me-3" id="navbarSupportedContent">
+                <div class="collapse navbar-collapse ms-1 me-1" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('transaccional.ventas') }}">Ventas</a>
@@ -280,15 +287,7 @@
                             <a class="nav-link" href="{{ url_for('contable.cuentas') }}">Contabilidad</a>
                         </li>
                     </ul>
-                    <div class="d-flex align-items-center ms-3">
-                        <div class="input-group rounded">
-                            <input type="search" class="form-control rounded" placeholder="Buscar" aria-label="Search"
-                                aria-describedby="search-addon" />
-                            <span class="input-group-text border-0" id="search-addon">
-                                <i class="fas fa-search"></i>
-                            </span>
-                        </div>
-                    </div>
+
                     <!-- User Dropdown -->
                     {% if user %}
                     <div class="dropdown">

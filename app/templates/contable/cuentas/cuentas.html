@@ -4,6 +4,7 @@
 
 {% from 'breadcrumb.html' import breadcrumb %}
 
+
 {% block content %}
 
 <style>
@@ -20,9 +21,8 @@
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
         line-height: 1.5;
         color: var(--text-color);
-        background-color: var(--background-color);
         margin: 0;
-        padding: 20px;
+        padding: 0;
     }
 
     .sortable:hover {
@@ -90,26 +90,16 @@
 
 
 
-{{ breadcrumb([
-{'label': 'Inicio', 'url': url_for('transaccional.index'), 'icon': 'M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414
-1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1
-0 001.414-1.414l-7-7z'},
-{'label': 'Contabilidad', 'url': url_for('transaccional.index')},
-{'label': 'Plan de cuentas'}
-]) }}
-
-
-
-<hr class="mb-4" />
-
 
 
 <div class="row align-items-center mt-2 mb-5">
     <!-- Título principal -->
     <div class="col-md-8">
-        <h1 class="font-weight-bold display-8 text-left fs-3">PLAN CONTABLE GENERAL EMPRESARIAL</h1>
+        <h1 class="font-weight-bold display-8 text-left fs-3" style="font-weight: bold;">PLAN CONTABLE GENERAL
+            EMPRESARIAL</h1>
         <!-- Texto debajo del título -->
-        <p class="fs-6 fw-light">Este plan contiene la estructura contable jerárquica basada en digitos para empresas
+        <p class="fs-6 text-gray-500">Este plan contiene la estructura contable jerárquica basada en digitos para
+            empresas
             según la normativa vigente.</p>
     </div>
 
@@ -118,11 +108,11 @@
         <!-- Dropdown de Más acciones -->
         <div class="dropdown me-2">
             <button class="btn btn-light border dropdown-toggle" type="button" id="dropdownMenuButton"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Más acciones
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item d-flex flex-column" href="#">
+                <a class="dropdown-item d-flex flex-column" href="{{url_for('contable.exportar_excel')}}">
                     <span class="d-flex align-items-center">
                         <i class="fa fa-file-excel mr-2"></i>
                         <strong>Exportar a Excel</strong>
@@ -144,9 +134,6 @@
         <div class="input-group me-2 mb-2" style="flex: 1; max-width: 400px;">
             <input type="text" id="searchInput" class="form-control" placeholder="Buscar por nombre o num. de cuenta"
                 aria-label="Buscar">
-            <div class="input-group-append">
-                <span class="input-group-text"><i class="fa fa-search"></i></span>
-            </div>
         </div>
 
 
@@ -197,6 +184,8 @@
             </button>
             <ul class="dropdown-menu" aria-labelledby="dropdown2">
                 <li><a class="dropdown-item"
+                        href="{{ url_for('contable.cuentas', naturaleza=None, tipo_cuenta=tipo_cuenta, page=1, per_page=per_page) }}">---</a>
+                <li><a class="dropdown-item"
                         href="{{ url_for('contable.cuentas', naturaleza='Deudora', tipo_cuenta=tipo_cuenta, page=1, per_page=per_page) }}">Deudora</a>
                 </li>
                 <li><a class="dropdown-item"
@@ -209,9 +198,8 @@
         </div>
 
 
-        <!-- Botón Agregar Cuenta alineado al mismo nivel -->
         <a class="btn btn-primary mb-2" style="margin-left: auto;" onclick="openModalAdd()">
-            <i class="fa fa-plus"></i> Agregar Cuenta
+            <i class="fa fa-plus"></i> Agregar cuenta
         </a>
     </div>
 </div>
@@ -222,7 +210,7 @@
         <table>
             <thead>
                 <tr>
-                    <th class="text-center" style="font-weight: bolder; width: ;">CÓDIGO</th>
+                    <th class="text-center" style="font-weight: bolder;">CÓDIGO</th>
                     <th class="text-center sortable" style="font-weight: bolder;" onclick="sortTable(0)">NOMBRE</th>
                     <th class="text-center" style="font-weight: bolder;">NATURALEZA</th>
                     <th class="text-center" style="font-weight: bolder;">ESTADO</th>
@@ -364,15 +352,17 @@
         </select>
     </div>
 
+
+    <!-- Rango de resultados -->
+    <div class="mt-1 text-center">
+        {% set start_result = (page - 1) * per_page + 1 %}
+        {% set end_result = min(page * per_page, total_results) %}
+        <p><strong>{{ start_result }}-{{ end_result }}</strong> de <strong>{{ total_results }}</strong> resultados</p>
+    </div>
 </div>
 
 
-<!-- Rango de resultados -->
-<div class="mt-2 text-center">
-    {% set start_result = (page - 1) * per_page + 1 %}
-    {% set end_result = min(page * per_page, total_results) %}
-    <p><strong>{{ start_result }}-{{ end_result }}</strong> de <strong>{{ total_results }}</strong> resultados</p>
-</div>
+
 
 
 <!-- Edit Modal -->
@@ -380,7 +370,7 @@
     <div class="modal-overlay" style="display: none;">
         <div class="content-modal">
             <div class="modal-header">
-                <h3 class="modal-title">Editar Cuenta</h3>
+                <h3 class="modal-title">EDITAR CUENTA</h3>
                 <button type="button" class="modal-close" onclick="closeModal()"
                     style="border: none; color: black; background-color: white; width: 15px; font-weight: bold;">
                     &times;
@@ -480,7 +470,7 @@
             <p id="estado_cuenta" class="w-100 bg-gray-50 border-gray-300 text-gray-900 rounded-lg p-2 text-sm"></p>
         </div>
     </div>
-</div> 
+</div>
 
 
 <!-- Add Account Modal-->
@@ -488,7 +478,7 @@
 <div id="addAccountModal" class="modal-overlay" style="display: none;">
     <div class="content-modal">
         <div class="modal-header">
-            <h3 class="modal-title">Agregar Nueva Cuenta</h3>
+            <h3 class="modal-title">AGREGAR NUEVA CUENTA</h3>
             <button type="button" class="modal-close" onclick="closeModalAdd()"
                 style="border: none; color: black; background-color: white; width: 15px; font-weight: bold;">
                 &times;
@@ -579,7 +569,7 @@
                 <line x1="12" y1="17" x2="12.01" y2="17"></line>
             </svg>
         </div>
-        <h2 class="confirmation-modal-title" style="color: rgb(30, 30, 30);">Eliminar Cuenta</h2>
+        <h2 class="confirmation-modal-title" style="color: rgb(30, 30, 30);">ELIMINAR CUENTA</h2>
         <p class="confirmation-modal-message">¿Estás seguro que deseas eliminar esta cuenta?</p>
         <input type="hidden" id="deleteCuentaId" value="">
         <p id="deleteCuentaInfo" class="confirmation-modal-message"

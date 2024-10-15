@@ -62,6 +62,11 @@ function sortTable(columnIndex) {
   document.getElementById("arrow").innerHTML = ascending ? "&#9650;" : "&#9660;";
 }
 
+function navigateToInicio() {
+  const url = document.getElementById('navigateInicio').getAttribute('data-url');
+  window.location.href = url;
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   const searchInput = document.getElementById('searchInput');
   const tableRows = document.querySelectorAll('table tbody tr');
