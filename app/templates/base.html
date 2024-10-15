@@ -196,9 +196,9 @@
             <div class="sidebar-header">
                 <h2 class="sidebar-title">
                     <img src="{{ url_for('static', filename='img/icono.ico') }}" alt="Logo" class="sidebar-logo">
-                    <span>La banda de Kchay</span>
+                    <span style="width: 120px;">La banda de Kchay</span>
                 </h2>
-                <button class="toggle-button">
+                <button class="toggle-button" style="margin-right: 23px;">
                     <i class="fas fa-arrow-left"></i>
                 </button>
             </div>
@@ -317,7 +317,7 @@
             </nav>
 
             <!-- Contenido de la página -->
-            <div class="container-fluid">
+            <div class="ms-5 me-5 mt-2">
                 {% block content %}{% endblock %}
             </div>
         </div>
