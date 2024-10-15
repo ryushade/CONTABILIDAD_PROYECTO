@@ -203,124 +203,137 @@
                 </button>
             </div>
             <div class="sidebar-nav">
-                <div class="nav-item">
-                    <i class="fas fa-home"></i>
-                    <span class="nav-text">Inicio</span>
-                </div>
+                <a href="{{url_for('transaccional.index')}}" style="text-decoration: none; color: inherit;">
+                    <div class="nav-item">
+                        <i class="fas fa-home"></i>
+                        <span class="nav-text">Inicio</span>
+                </a>
+            </div>
 
-                {% if '/contable' not in request.path %}
-                <div class="nav-item has-subnav">
+            {% if '/contable' not in request.path %}
+            <div class="nav-item has-subnav">
+                <a href="{{url_for('transaccional.ventas')}}" style="text-decoration: none; color: inherit;">
+
                     <i class="fas fa-chart-line"></i>
                     <span class="nav-text">Ventas</span>
                     <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="subnav">
-                    <div class="subnav-item">Nueva Venta</div>
-                </div>
-                <div class="nav-item has-subnav">
-                    <i class="fas fa-shopping-cart"></i>
+                </a>
+
+            </div>
+            <div class="subnav">
+                <div class="subnav-item">Nueva Venta</div>
+            </div>
+            <div class="nav-item has-subnav">
+                <i class="fas fa-shopping-cart"></i>
+                <a href="{{url_for('transaccional.compras')}}" style="text-decoration: none; color: inherit;">
+
                     <span class="nav-text">Compras</span>
                     <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="subnav">
-                    <div class="subnav-item">Nueva Compra</div>
-                </div>
+                </a>
+            </div>
+            <div class="subnav">
+                <div class="subnav-item">Nueva Compra</div>
+            </div>
 
-                <div class="nav-item has-subnav">
-                    <i class="fas fa-warehouse"></i>
+            <div class="nav-item has-subnav">
+                <i class="fas fa-warehouse"></i>
+                <a href="{{url_for('transaccional.almacen')}}" style="text-decoration: none; color: inherit;">
+
                     <span class="nav-text">Almacén</span>
                     <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="subnav">
-                    <div class="subnav-item">Nota de ingreso</div>
-                    <div class="subnav-item">Guía de remisión</div>
-                    <div class="subnav-item">Nota de salida</div>
-                </div>
-                {% endif %}
+                </a>
+            </div>
+            <div class="subnav">
+                <div class="subnav-item">Nota de ingreso</div>
+                <div class="subnav-item">Guía de remisión</div>
+                <div class="subnav-item">Nota de salida</div>
+            </div>
+            {% endif %}
 
+
+
+            <div class="nav-item has-subnav">
+                <i class="fas fa-calculator"></i>
                 
-
-                <div class="nav-item has-subnav">
-                    <i class="fas fa-calculator"></i>
-                    <span class="nav-text">Contabilidad</span>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="subnav">
-                    <div class="subnav-item">Listado de cuentas</div>
-                    <div class="subnav-item">Asientos contables</div>
-                    <div class="subnav-item">Libro diario</div>
-                </div>
-
-                <div class="nav-item has-subnav">
-                    <i class="fas fa-cog"></i>
-                    <span class="nav-text">Configuración</span>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="subnav">
-                    <div class="subnav-item">Usuarios</div>
-                    <div class="subnav-item">Reglas contables</div>
-                </div>
+                <span class="nav-text">Contabilidad</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="subnav">
+                <div class="subnav-item">Listado de cuentas</div>
+                <div class="subnav-item">Asientos contables</div>
+                <div class="subnav-item">Libro diario</div>
             </div>
 
-        </aside>
+            <div class="nav-item has-subnav">
+                <i class="fas fa-cog"></i>
+                <span class="nav-text">Configuración</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="subnav">
+                <div class="subnav-item">Usuarios</div>
+                <div class="subnav-item">Reglas contables</div>
+            </div>
+    </div>
 
-        <!-- Contenido principal -->
-        <div class="main-content flex-grow-1">
-            <!-- Navbar -->
-            <nav class="navbar navbar-expand-lg navbar-light">
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse ms-1 me-1" id="navbarSupportedContent">
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('transaccional.ventas') }}">Ventas</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('transaccional.compras') }}">Compras</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('transaccional.almacen') }}">Almacén</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('contable.cuentas') }}">Contabilidad</a>
-                        </li>
-                    </ul>
+    </aside>
 
-                    <!-- User Dropdown -->
-                    {% if user %}
-                    <div class="dropdown">
-                        <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button"
-                            id="userDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-user-circle" style="font-size: 20px; color: gray;"></i>
-                            <span class="ms-2">
-                                {{ user.usua }} -
-                                {% if user and user['rol']['nom_rol'] == "ADMIN" %}
-                                Administrador
-                                {% elif user['rol']['nom_rol'] == "EMPLEADO" %}
-                                Empleado
-                                {% else %}
-                                Rol desconocido
-                                {% endif %}
-                            </span>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                            <a class="dropdown-item text-danger" href="{{ url_for('contable.logout') }}">Cerrar
-                                sesión</a>
-                        </div>
+    <!-- Contenido principal -->
+    <div class="main-content flex-grow-1">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse ms-1 me-1" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('transaccional.ventas') }}">Ventas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('transaccional.compras') }}">Compras</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('transaccional.almacen') }}">Almacén</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('contable.cuentas') }}">Contabilidad</a>
+                    </li>
+                </ul>
+
+                <!-- User Dropdown -->
+                {% if user %}
+                <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button"
+                        id="userDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-user-circle" style="font-size: 20px; color: gray;"></i>
+                        <span class="ms-2">
+                            {{ user.usua }} -
+                            {% if user and user['rol']['nom_rol'] == "ADMIN" %}
+                            Administrador
+                            {% elif user['rol']['nom_rol'] == "EMPLEADO" %}
+                            Empleado
+                            {% else %}
+                            Rol desconocido
+                            {% endif %}
+                        </span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <a class="dropdown-item text-danger" href="{{ url_for('contable.logout') }}">Cerrar
+                            sesión</a>
                     </div>
-                    {% else %}
-                    <a href="{{ url_for('contable.login') }}" class="btn btn-outline-primary">Iniciar Sesión</a>
-                    {% endif %}
                 </div>
-            </nav>
-
-            <!-- Contenido de la página -->
-            <div class="container-fluid">
-                {% block content %}{% endblock %}
+                {% else %}
+                <a href="{{ url_for('contable.login') }}" class="btn btn-outline-primary">Iniciar Sesión</a>
+                {% endif %}
             </div>
+        </nav>
+
+        <!-- Contenido de la página -->
+        <div class="container-fluid">
+            {% block content %}{% endblock %}
         </div>
+    </div>
     </div>
 
     <!-- JS de Bootstrap y scripts personalizados -->
