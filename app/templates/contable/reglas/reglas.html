@@ -6,143 +6,26 @@
 
 {% block content %}
 
-<style>
-    :root {
-        --primary-color: #3b82f6;
-        --secondary-color: #1e40af;
-        --background-color: #f3f4f6;
-        --text-color: #1f2937;
-        --border-color: #e5e7eb;
-        --hover-color: #eff6ff;
-    }
-
-    body {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-        line-height: 1.5;
-        color: var(--text-color);
-        margin: 0;
-        padding: 0;
-    }
-
-    .sortable:hover {
-        cursor: pointer;
-    }
-
-
-    /* Estilos responsivos */
-    @media (max-width: 768px) {
-        .table-scroll {
-            min-width: 100%;
-        }
-
-        .acciones {
-            min-width: auto;
-        }
-
-        .dropdown-menu {
-            width: 100%;
-        }
-    }
-
-    /* Estilos del modal */
-    .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .modal {
-        background: white;
-        padding: 20px;
-        border-radius: 5px;
-        width: 90%;
-        max-width: 500px;
-    }
-
-    /* Estilos del dropdown */
-    .dropdown-menu {
-        width: 100%;
-    }
-
-    .dropdown-toggle::after {
-        margin-left: .255em;
-    }
-
-    /* Estilos para alinear botones */
-    .align-end {
-        display: flex;
-        justify-content: flex-end;
-    }
-
-    .table-scroll thead th {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-    }
-</style>
 <div class="container mx-auto py-10">
 
-    <h1 class="font-weight-bold display-8 text-left fs-3" style="font-weight: bold;">GESTIÓN DE USUARIOS</h1>
-    <p class="fs-6 text-gray-500">Este apartado permite crear, editar y eliminar usuarios, asimismo, asignar permisos
-    </p>
+    <h1 class="font-weight-bold display-8 text-left fs-3" style="font-weight: bold;">GESTIÓN DE REGLAS CONTABLES</h1>
+    <p class="fs-6 text-gray-500">Este apartado permite crear, editar y eliminar reglas para la generación de asientos
+        contables</p>
 </div>
 <a class="btn btn-primary mb-2" style="margin-left: auto;" onclick="openModalAdd()">
-    <i class="fa fa-plus" style="font-size: 14px;"></i> Agregar usuario
+    <i class="fa fa-plus" style="font-size: 14px;"></i> Agregar regla
 </a>
 <div class="table-container mt-4">
     <table>
         <thead>
             <tr>
-                <th class="text-center" style="font-weight: bolder;">rol</th>
-                <th class="text-center" style="font-weight: bolder;">usuario</th>
-                <th class="text-center" style="font-weight: bolder;">contraseña</th>
-                <th class="text-center" style="font-weight: bolder;">estado</th>
+                <th class="text-center" style="font-weight: bolder;">Nombre</th>
+                <th class="text-center" style="font-weight: bolder;">Tipo de transacción</th>
+                <th class="text-center" style="font-weight: bolder;">cuenta débito</th>
+                <th class="text-center" style="font-weight: bolder;">cuenta crédito</th>
                 <th class="text-center" style="font-weight: bolder;">ACCIONES</th>
             </tr>
         </thead>
-        <tbody>
-            {% for usuario in usuarios %}
-            <tr>
-                <td class="text-center">{{ usuario.nom_rol }}</td>
-                <td class="text-center">{{ usuario.usua }}</td>
-                <td class="text-center">{{ usuario.contra }}</td>
-                <td class="text-center">
-                    <span style="font-size: 14px;" class="
-                status 
-                {% if usuario.estado_usuario == 1 %}
-                    active-c
-                {% else %}
-                    inactive
-                {% endif %}
-            ">
-                        {% if usuario.estado_usuario == 1 %}
-                        Activo
-                        {% else %}
-                        Inactivo
-                        {% endif %}
-                    </span>
-
-                </td>
-                <td class="text-center" style="font-size: 14px;">
-                   
-                    <span style="font-size: 14px;" class="action-button secondary edit"
-                        data-cuenta-id="{{ usuario.id_usuario }}"><i class="fas fa-edit"></i></span>
-                    <span style="font-size: 14px;" class="action-button secondary trash"
-                        onclick='openModalDelete({{ usuario.id_usuario }}'>
-                        <i class="fas fa-trash"></i>
-                    </span>
-
-
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
     </table>
 </div>
 
