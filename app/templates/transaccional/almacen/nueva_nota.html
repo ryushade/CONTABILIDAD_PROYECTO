@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Tormenta{% endblock %}
+
+{% from 'breadcrumb.html' import breadcrumb %}
+
+{% block content %}
+<header class="mb-4">
+    {{ breadcrumb([
+    {'label': 'Inicio', 'url': url_for('transaccional.index'), 'icon': 'M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0
+    001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0
+    001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z'},
+    {'label': 'Almacen', 'url': url_for('transaccional.index')},
+    {'label': 'Nota de Salida - Nueva nota', 'url': url_for('transaccional.index')}
+    ]) }}
+    <h1 class="text-8xl font-bold tracking-wide text-gray-700 title-Inicio">Nueva nota</h1>
+</header>
+
+<style>
+    table {
+        border-collapse: separate;
+        border-spacing: 0 8px;
+        width: 100%;
+        height: 100%;
+    }
+
+    table th, table td {
+        font-weight: normal;
+        color: #6c757d;
+        border-bottom: 1px solid #dee2e6;
+        padding: 30px 20px;
+        vertical-align: middle;
+    }
+
+    table td {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid white;
+    }
+
+    table tbody tr {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+    }
+
+    /* Botón desplegable */
+    .dropdown-toggle {
+        border-radius: 8px;
+        padding: 5px 10px;
+        background-color: #e7f1ff;
+        color: #007bff;
+        border: 1px solid #007bff;
+    }
+
+    .dropdown-toggle:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    }
+
+    .estado-activo {
+        background-color: #eafff0;
+        color: #28a745;
+        padding: 5px 15px;
+        border-radius: 12px;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    /* Alineación de acciones */
+    .accion-dropdown {
+        text-align: center;
+    }
+
+    .centrar{
+        text-align: center;
+    }
+    
+</style>
+
+<!-- Tabs de Reporte -->
+
+<div class="container border border-danger">
+    <!-- Inventario -->
+     <div class="row">
+        <div class="col">
+            
+        </div>
+        <div class="col"></div>
+     </div>
+     <div class="row"></div>
+</div>
+
+{% endblock %}

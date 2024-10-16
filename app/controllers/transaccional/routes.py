@@ -15,6 +15,12 @@ def almacen():
     datos_almacen_salida = obtener_nota_salida()
     
     return render_template('transaccional/almacen/almacen.html', datos_almacen_entrada=datos_almacen_entrada, datos_almacen_salida=datos_almacen_salida)
+
+@transactional_bp.route('/almacen/registrar/nota')
+def registrar_nota():
+    
+    
+    return render_template('transaccional/almacen/nueva_nota.html')
 #----------------------------------------------
 
 # Modulo de productos
