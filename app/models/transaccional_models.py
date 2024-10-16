@@ -3,6 +3,7 @@ from app.models.conexion import obtener_conexion
 from flask import Blueprint, request, jsonify, send_file
 import barcode
 import io
+import random
 from barcode.writer import ImageWriter
 
 def obtener_marcas():
@@ -51,6 +52,29 @@ def obtener_categorias():
             ) 
             return categorias
     
+    finally:
+        conexion.close()
+
+
+def obtener_subcategorias_por_categoria(categoria_id):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            sql = """
+            SELECT id_subcategoria, nom_subcat
+            FROM sub_categoria
+            WHERE id_categoria = %s AND estado_subcat = 1
+            """
+            cursor.execute(sql, (categoria_id,))
+            resultado = cursor.fetchall()
+            subcategorias = [
+                {
+                    'id_subcategoria': subcat['id_subcategoria'],
+                    'nom_subcat': subcat['nom_subcat']
+                }
+                for subcat in resultado
+            ]
+            return subcategorias
     finally:
         conexion.close()
 
@@ -220,43 +244,36 @@ def generate_barcode(code):
         print(f"Error generando código de barras: {e}")
         return None
 
+def generate_barcode_value(id_producto):
+    prefix = "P0000000"  # Prefijo para el código de barras
+    barcode_value = f"{prefix}{id_producto:04}"  # El ID de producto con ceros iniciales hasta alcanzar 4 dígitos
+    return barcode_value
 
-def add_producto():
+def agregar_producto(id_marca, id_subcategoria, descripcion, undm, precio, cod_barras, estado_producto):
+    conexion = obtener_conexion()
     try:
-        # Obtener los datos del request
-        data = request.get_json()
-        id_marca = data.get('id_marca')
-        id_subcategoria = data.get('id_subcategoria')
-        descripcion = data.get('descripcion')
-        undm = data.get('undm')
-        precio = data.get('precio')
-        cod_barras = data.get('cod_barras')
-        estado_producto = data.get('estado_producto')
-
-        # Verificar que todos los campos estén presentes
-        if None in [id_marca, id_subcategoria, descripcion, undm, precio, cod_barras, estado_producto]:
-            return jsonify({'code': 0, 'message': 'Bad Request. Please fill all fields.'}), 400
-
-        # Crear el diccionario del producto
-        producto = {
-            'id_marca': id_marca,
-            'id_subcategoria': id_subcategoria,
-            'descripcion': descripcion,
-            'undm': undm,
-            'precio': precio,
-            'cod_barras': cod_barras,
-            'estado_producto': estado_producto
-        }
-
-        # Conexión a la base de datos
-        conexion = obtener_conexion()
+        # Inserta el producto y recupera el ID generado
         with conexion.cursor() as cursor:
-            # Consulta SQL para insertar el producto
-            sql = "INSERT INTO producto SET ?"
-            cursor.execute(sql, (producto,))  # Se pasa el diccionario del producto como parámetro
+            sql_insert = """
+            INSERT INTO producto (id_marca, id_subcategoria, descripcion, undm, precio, estado_producto)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            """
+            cursor.execute(sql_insert, (id_marca, id_subcategoria, descripcion, undm, precio, estado_producto))
+            id_producto = cursor.lastrowid  # Obtener el ID autogenerado por la BD
+            
+            # Generar el código de barras con el ID del producto
+            cod_barras = generate_barcode_value(id_producto)
+            
+            # Actualizar el producto con el código de barras generado
+            sql_update = "UPDATE producto SET cod_barras = %s WHERE id_producto = %s"
+            cursor.execute(sql_update, (cod_barras, id_producto))
+            
             conexion.commit()
-
-        return jsonify({'code': 1, 'message': 'Producto añadido'}), 201
-
+        
+        return {'code': 1, 'message': 'Producto añadido', 'cod_barras': cod_barras}
     except Exception as e:
-        return jsonify({'code': 0, 'message': str(e)}), 500
+        print(f"Error al agregar producto: {e}")
+        return {'code': 0, 'message': str(e)}
+    finally:
+        conexion.close()
+
