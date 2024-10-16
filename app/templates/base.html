@@ -187,7 +187,6 @@
 <body>
     <div class="d-flex {% if 'transaccional' in request.path or 'contable' in request.path %}with-sidebar{% endif %}">
         {% if 'transaccional' in request.path or 'contable' in request.path %}
-        <!-- Sidebar solo aparece si la URL contiene "transaccional" o "contable" -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h2 class="sidebar-title">
@@ -281,7 +280,7 @@
                     data-bs-target="#navbarSupportedContent">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="collapse navbar-collapse ms-1 me-1" id="navbarSupportedContent">
+                <div class="collapse navbar-collapse ms-4 me-4" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('transaccional.ventas') }}">Ventas</a>
@@ -326,7 +325,7 @@
             </nav>
 
             <!-- Contenido de la página -->
-            <div class="me-5 mt-2 {% if 'transaccional' in request.path or 'contable' in request.path %}ms-5{% endif %}">
+            <div class="me-5 {% if 'transaccional' in request.path or 'contable' in request.path %}ms-5{% endif %}">
                 {% block content %}{% endblock %}
             </div>
         </div>
