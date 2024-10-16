@@ -96,24 +96,26 @@
     <i class="fa fa-plus" style="font-size: 14px;"></i> Agregar usuario
 </a>
 <div class="table-container mt-4">
-    <table>
-        <thead>
-            <tr>
-                <th class="text-center" style="font-weight: bolder;">rol</th>
-                <th class="text-center" style="font-weight: bolder;">usuario</th>
-                <th class="text-center" style="font-weight: bolder;">contraseña</th>
-                <th class="text-center" style="font-weight: bolder;">estado</th>
-                <th class="text-center" style="font-weight: bolder;">ACCIONES</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for usuario in usuarios %}
-            <tr>
-                <td class="text-center">{{ usuario.nom_rol }}</td>
-                <td class="text-center">{{ usuario.usua }}</td>
-                <td class="text-center">{{ usuario.contra }}</td>
-                <td class="text-center">
-                    <span style="font-size: 14px;" class="
+    <div class="table-scroll">
+
+        <table>
+            <thead>
+                <tr>
+                    <th class="text-center" style="font-weight: bolder;">rol</th>
+                    <th class="text-center" style="font-weight: bolder;">usuario</th>
+                    <th class="text-center" style="font-weight: bolder;">contraseña</th>
+                    <th class="text-center" style="font-weight: bolder;">estado</th>
+                    <th class="text-center" style="font-weight: bolder;">ACCIONES</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for usuario in usuarios %}
+                <tr>
+                    <td class="text-center" style="padding: 20px;">{{ usuario.nom_rol }}</td>
+                    <td class="text-center">{{ usuario.usua }}</td>
+                    <td class="text-center">{{ usuario.contra }}</td>
+                    <td class="text-center">
+                        <span style="font-size: 14px;" class="
                 status 
                 {% if usuario.estado_usuario == 1 %}
                     active-c
@@ -121,29 +123,30 @@
                     inactive
                 {% endif %}
             ">
-                        {% if usuario.estado_usuario == 1 %}
-                        Activo
-                        {% else %}
-                        Inactivo
-                        {% endif %}
-                    </span>
+                            {% if usuario.estado_usuario == 1 %}
+                            Activo
+                            {% else %}
+                            Inactivo
+                            {% endif %}
+                        </span>
 
-                </td>
-                <td class="text-center" style="font-size: 14px;">
-                   
-                    <span style="font-size: 14px;" class="action-button secondary edit"
-                        data-cuenta-id="{{ usuario.id_usuario }}"><i class="fas fa-edit"></i></span>
-                    <span style="font-size: 14px;" class="action-button secondary trash"
-                        onclick='openModalDelete({{ usuario.id_usuario }}'>
-                        <i class="fas fa-trash"></i>
-                    </span>
+                    </td>
+                    <td class="text-center" style="font-size: 14px;">
+
+                        <span style="font-size: 14px;" class="action-button secondary edit"
+                            data-cuenta-id="{{ usuario.id_usuario }}"><i class="fas fa-edit"></i></span>
+                        <span style="font-size: 14px;" class="action-button secondary trash"
+                            onclick='openModalDelete({{ usuario.id_usuario }}'>
+                            <i class="fas fa-trash"></i>
+                        </span>
 
 
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 

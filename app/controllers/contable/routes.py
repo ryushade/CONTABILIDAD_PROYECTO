@@ -20,7 +20,7 @@ def login():
         if user and verificar_contraseña(user, password):
             session['user_id'] = user['id_usuario']
             flash('Login exitoso', 'success')
-            return redirect(url_for('transaccional.index'))
+            return redirect(url_for('inicio'))  # Redirige a la ruta /inicio
         else:
             flash('Usuario o contraseña incorrectos', 'danger')
 

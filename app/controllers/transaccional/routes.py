@@ -3,11 +3,6 @@ from app.models.transaccional_models import obtener_productos, obtener_marcas, o
 from app.models.transaccional_models import generate_barcode
 from . import transactional_bp
 
-# Modulo de inicio
-@transactional_bp.route('/')
-def index():
-    return render_template('transaccional/index.html')
-#----------------------------------------------
 
 # Modulo de almacen
 @transactional_bp.route('/almacen')
