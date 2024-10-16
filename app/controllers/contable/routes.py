@@ -19,17 +19,13 @@ def login():
         # Verifica si el usuario existe y la contraseña es correcta
         if user and verificar_contraseña(user, password):
             session['user_id'] = user['id_usuario']
-            flash('Login exitoso', 'success')
             return redirect(url_for('inicio'))  # Redirige a la ruta /inicio
-        else:
-            flash('Usuario o contraseña incorrectos', 'danger')
 
     return render_template('contable/login.html')
 
 @accounting_bp.route('/logout')
 def logout():
     session.pop('user_id', None)
-    flash('Logout exitoso', 'success')
     return redirect(url_for('contable.login'))
 
 @accounting_bp.route('/reportes')
@@ -123,7 +119,6 @@ def editar_cuenta(cuenta_id):
 
     actualizar_cuenta(cuenta_id, codigo_cuenta, nombre_cuenta, naturaleza, estado_cuenta)
 
-    flash('Cuenta actualizada correctamente', 'success')
     return redirect(url_for('contable.cuentas'))
 
 @accounting_bp.route('/reglas')
