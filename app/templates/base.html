@@ -21,7 +21,8 @@
             overflow-y: auto;
             overflow-x: hidden;
             transition: width 0.3s;
-            position: fixed; /* Mantiene el sidebar fijo */
+            position: fixed;
+            /* Mantiene el sidebar fijo */
             top: 0;
             left: 0;
             height: 100vh;
@@ -33,17 +34,20 @@
         }
 
         .main-content {
-            margin-left: 0; /* Sin margen por defecto */
+            margin-left: 0;
+            /* Sin margen por defecto */
             transition: margin-left 0.3s ease;
             width: 100%;
         }
 
-        .sidebar + .main-content {
-            margin-left: 13rem; /* Ancho del sidebar */
+        .sidebar+.main-content {
+            margin-left: 13rem;
+            /* Ancho del sidebar */
         }
 
-        .sidebar.collapsed + .main-content {
-            margin-left: 55px; /* Ancho cuando colapsado */
+        .sidebar.collapsed+.main-content {
+            margin-left: 55px;
+            /* Ancho cuando colapsado */
         }
 
         .sidebar-header {
@@ -163,11 +167,11 @@
                 width: 64px;
             }
 
-            .sidebar + .main-content {
+            .sidebar+.main-content {
                 margin-left: 64px;
             }
 
-            .sidebar.collapsed + .main-content {
+            .sidebar.collapsed+.main-content {
                 margin-left: 64px;
             }
 
@@ -282,6 +286,8 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse ms-1 me-1" id="navbarSupportedContent">
+                    <h4 class="text-6xl font-bold tracking-wide text-gray-700"
+                        style="color: #1D4ED8; font-weight: 700;">TORMENTA</h3>
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('transaccional.ventas') }}">Ventas</a>
@@ -326,7 +332,8 @@
             </nav>
 
             <!-- Contenido de la página -->
-            <div class="me-5 mt-2 {% if 'transaccional' in request.path or 'contable' in request.path %}ms-5{% endif %}">
+            <div
+                class="me-5 mt-2 {% if 'transaccional' in request.path or 'contable' in request.path %}ms-5{% endif %}">
                 {% block content %}{% endblock %}
             </div>
         </div>
