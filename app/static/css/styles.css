@@ -1,9 +1,20 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
 
-
-body {
+* {
   font-family: 'Inter', sans-serif;
-  background-color: #F4F5FB;
+  
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Inter', sans-serif;
+}
+
+p {
+  font-family: 'Inter', sans-serif;
+}
+
+.button {
+  font-family: 'Inter', sans-serif;
 }
 
 .navbar {
@@ -48,6 +59,14 @@ body {
     display: flex;
     /* Visible en pantallas grandes */
   }
+}
+
+.text-sm {
+  font-size: 0.875rem; /* 14px */
+}
+
+.text-gray-500 {
+  color: #6b7280; /* Gray color */
 }
 
 /* styles.css */
@@ -255,10 +274,6 @@ h1.text-5xl {
   display: flex;
   align-items: center;
   padding: 0.5rem 1rem;
-  background-color: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  border-radius: 9999px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
 
 .breadcrumb-item {
@@ -382,7 +397,7 @@ table {
 
 th,
 td {
-  padding: 12px;
+  padding: 5px;
   text-align: left;
 }
 
@@ -1044,4 +1059,5 @@ tr:hover {
   background-color: #f8f9fa;
   text-decoration: none;
 }
+
 

@@ -1,110 +1,313 @@
 {% extends 'base.html' %}
 
-{% block title %}Tormenta   {% endblock %}
+{% block title %}Tormenta {% endblock %}
+
+{% from 'breadcrumb.html' import breadcrumb %}
 
 {% block content %}
-<div class="container bg-white mt-2 p-4">
-    <header class="mb-4">
-        <h1 class="text-4xl font-bold tracking-wide text-gray-700">MÓDULO COMPRAS</h1>
-    </header>
+<header class="mb-4">
+    {{ breadcrumb([
+        {'label': 'Inicio', 'url': url_for('inicio'), 'icon': 'M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0
+        001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0
+        001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z'},
+        {'label': 'Compras', 'url': url_for('transaccional.compras')}
+        ]) }}
+    <h1 class="text-8xl font-bold tracking-wide text-gray-700 title-Inicio">MÓDULO COMPRAS</h1>
+</header>
 
-    <div class="row">
-        <!-- Left Section (Proveedor, Comprobante) -->
-        <div class="col-md-4">
-            <form>
-                <div class="form-group">
-                    <label for="provider">Proveedor</label>
-                    <select class="form-control" id="provider">
-                        <option>CORPORACION P.C E.I.R.L</option>
-                    </select>
-                    <small class="text-success">Correcto.</small>
-                </div>
+<style>
+    table {
+        border-collapse: separate;
+        border-spacing: 0 8px;
+        width: 100%;
+        height: 100%;
+    }
 
-                <div class="form-group">
-                    <label for="type">Tipo Comprobante</label>
-                    <select class="form-control" id="type">
-                        <option>BOLETA</option>
-                    </select>
-                </div>
+    table th,
+    table td {
+        font-weight: normal;
+        color: #6c757d;
+        border-bottom: 1px solid #dee2e6;
+        padding: 30px 20px;
+        vertical-align: middle;
+    }
 
-                <div class="form-group">
-                    <label for="receipt-number">No. Comprobante</label>
-                    <input type="text" class="form-control" id="receipt-number" value="04508">
-                </div>
+    table td {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid white;
+    }
 
-                <div class="form-group">
-                    <label for="payment-type">Forma de Pago</label>
-                    <select class="form-control" id="payment-type">
-                        <option>CONTADO</option>
-                    </select>
-                </div>
+    table tbody tr {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+    }
 
-                <div class="form-group">
-                    <label for="date">Fecha Comprobante</label>
-                    <input type="date" class="form-control" id="date">
-                </div>
+    /* Botón desplegable */
+    .dropdown-toggle {
+        border-radius: 8px;
+        padding: 5px 10px;
+        background-color: #e7f1ff;
+        color: #007bff;
+        border: 1px solid #007bff;
+    }
 
-                <div class="form-group">
-                    <label for="branch">Sucursal</label>
-                    <select class="form-control" id="branch">
-                        <option>TIENDA PRINCIPAL</option>
-                    </select>
-                </div>
+    .dropdown-toggle:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    }
 
-                <div class="form-group">
-                    <label for="warehouse">Almacén</label>
-                    <select class="form-control" id="warehouse">
-                        <option>PRINCIPAL</option>
-                    </select>
-                </div>
+    .estado-activo {
+        background-color: #eafff0;
+        color: #28a745;
+        padding: 5px 15px;
+        border-radius: 12px;
+        font-weight: bold;
+        text-align: center;
+    }
 
-                <button class="btn btn-success">Guardar Compra</button>
-                <button class="btn btn-danger">Cancelar Compra</button>
-            </form>
+    /* Alineación de acciones */
+    .accion-dropdown {
+        text-align: center;
+    }
+
+    .centrar {
+        text-align: center;
+    }
+</style>
+
+<!-- Tabs de Reporte -->
+<div class="mb-4">
+    <div class="nav nav-tabs">
+        <a class="nav-item nav-link active" href="#compra" data-toggle="tab">
+            <i class="fas fa-door-closed"></i> Compra productos
+        </a>
+    </div>
+</div>
+
+<div class="tab-content">
+    <!-- Inventario -->
+    <div class="tab-pane fade" id="compra">
+        <!-- Detalles -->
+        <div class="mb-4">
+            <hr>
+            <p class="text-muted" style="font-size: 14px;">
+                Consulta las ventas realizadas en el sistema.
+            </p>
+        </div>
+    </div>
+
+    <div class="tab-pane fade show active" id="compra">
+        <div class="mb-4">
+            <hr>
+            <p class="text-muted" style="font-size: 14px;">
+                Podrás visualizar y registrar los productos comprados por proveedor.
+            </p>
         </div>
 
-        <!-- Right Section (Detalle de Compra) -->
-        <div class="col-md-8">
-            <div class="search-product mb-3">
-                <input type="text" class="form-control" placeholder="Busque un producto aquí...">
+    </div>
+
+    <form>
+        <div class="row align-items-center">
+            <div class="col-lg-3">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <h6 class="mt-2"><b>Proveedor:</b></h6>
+                    </div>
+                    <div class="col-lg-8">
+                        <select class="form-control" aria-label="Default select example" id="provider">
+                            <option selected>Seleccione...</option>
+                            <option value="1">CORPORACION 1</option>
+                            <option value="2">CORPORACION 2</option>
+                            <option value="3">CORPORACION 3</option>
+                            <option value="4">CORPORACION 4</option>
+                            <option value="5">CORPORACION 5</option>
+                        </select>
+                    </div>
+                </div>
             </div>
 
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Producto</th>
-                        <th>Cant.</th>
-                        <th>Precio</th>
-                        <th>Exonerado</th>
-                        <th>Importe</th>
-                        <th>Quitar</th>
-                        <th>Vence</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>SUAVE DOBLE HOJA X2 UND</td>
-                        <td>
-                            <button class="btn btn-light">-</button>
-                            <input type="text" value="1.00" class="form-control-inline">
-                            <button class="btn btn-light">+</button>
-                        </td>
-                        <td>1.70</td>
-                        <td>0.00</td>
-                        <td>1.70</td>
-                        <td><button class="btn btn-danger">Quitar</button></td>
-                        <td>/</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="totals">
-                <p>Sumas: 1.44</p>
-                <p>Subtotal: 1.70</p>
-                <p>IGV %: 0.26</p>
-                <p>Total: 1.70</p>
+            <div class="col-lg-5">
+                <div class="row align-items-center">
+                    <div class="col-lg-4">
+                        <h6 class="mt-2"><b>Tipo Comprobante:</b></h6>
+                    </div>
+                    <div class="col-lg-8">
+                        <select class="form-control" aria-label="Default select example" id="tipoComprobante">
+                            <option selected>BOLETA</option>
+                            <option value="1">FACTURA</option>
+                            <option value="2">???</option>
+                            <!-- <option value="3">CORPORACION 3</option>
+                            <option value="4">CORPORACION 4</option>
+                            <option value="5">CORPORACION 5</option> -->
+                        </select>
+                    </div>
+                </div>
             </div>
+            <div class="col-lg-4">
+                <div class="row align-items-center">
+                    <div class="col-lg-6">
+                        <h6 class="mt-2"><b>Nro. Comprobante:</b></h6>
+                    </div>
+                    <div class="col-lg-6">
+                        <div>
+                            <!-- <span class="input-group-text" id="basic-addon1"><i class="fa-solid fa-magnifying-glass"></i></span> -->
+                            <input type="text" class="form-control" placeholder="B000-000000" aria-label="razonsosial"
+                                aria-describedby="basic-addon1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row align-items-center" style="margin-top: 10px;">
+            <div class="col-lg-3">
+                <div class="row align-items-center">
+                    <div class="col-lg-4">
+                        <h6 class="mt-2"><b>Forma de Pago:</b></h6>
+                    </div>
+                    <div class="col-lg-8">
+                        <select class="form-control" aria-label="Default select example" id="formaPago">
+                            <option selected>CONTADO</option>
+                            <option value="1">???</option>
+                            <option value="2">???</option>
+                            <!-- <option value="3">CORPORACION 3</option>
+                        <option value="4">CORPORACION 4</option>
+                        <option value="5">CORPORACION 5</option> -->
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="row align-items-center">
+                    <div class="col-lg-4">
+                        <h6 class="mt-2"><b>Sucursal:</b></h6>
+                    </div>
+                    <div class="col-lg-8">
+                        <select class="form-control" aria-label="Default select example" id="sucursal">
+                            <option selected>TIENDA PRINCIPAL</option>
+                            <option value="1">???</option>
+                            <option value="2">???</option>
+                            <!-- <option value="3">CORPORACION 3</option>
+                            <option value="4">CORPORACION 4</option>
+                            <option value="5">CORPORACION 5</option> -->
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <h6 class="mt-2"><b>Almacen:</b></h6>
+                    </div>
+                    <div class="col-lg-8">
+                        <select class="form-control" aria-label="Default select example" id="almacen">
+                            <option selected>PRINCIPAL</option>
+                            <option value="1">???</option>
+                            <option value="2">???</option>
+                            <!-- <option value="3">CORPORACION 3</option>
+                            <option value="4">CORPORACION 4</option>
+                            <option value="5">CORPORACION 5</option> -->
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="row align-items-center">
+                    <div class="col-lg-3">
+                        <h6 class="mt-2"><b>Fecha:</b></h6>
+                    </div>
+                    <div class="col-lg-9">
+                        <div class="input-group input-group-md">
+                            <input type="date" class="form-control" id="date">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!------------------------------------------------------------------------------------------------>
+        <div class="row" style="margin-bottom: 7%;">
+            <div class="container mt-4">
+                <div class="d-flex align-items-center me-2 mb-2">
+                    <div class="input-group flex-grow-1" style="max-width: 50%;">
+                        <input type="text" class="form-control" placeholder="Buscar un producto aquí..."
+                            aria-label="Buscar">
+                    </div>
+                    <a href="" class="btn btn-primary mb-2 ms-2 mt-2">
+                        <i class="fa fa-plus"></i> Agregar Producto
+                    </a>
+                </div>
+                <div class="table-container mt-4">
+                    <div class="table-scroll">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="text-center">PRODUCTO</th>
+                                    <th class="text-center">CANTIDAD</th>
+                                    <th class="text-center">PRECIO</th>
+                                    <th class="text-center">EXONERADO</th>
+                                    <th class="text-center">IMPORTE</th>
+                                    <th class="text-center">ELIMINAR</th>
+                                    <th class="text-center">VENCE</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-center">SUAVE DOBLE HOJA X2 UND</td>
+                                    <td class="text-center">
+                                        <div class="input-group justify-content-center" style="max-width: 150px; margin: auto;">
+                                            <button class="btn btn-light" type="button">-</button>
+                                            <input type="text" class="form-control" value="1.00" style="max-width: 80px; text-align: center;">
+                                            <button class="btn btn-light" type="button">+</button>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">1.70</td>
+                                    <td class="text-center">0.00</td>
+                                    <td class="text-center">1.70</td>
+                                    <td class="text-center"><button class="btn btn-danger">Quitar</button></td>
+                                    <td class="text-center">/</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div>
+                    <div class="row">
+                        <div class="col-lg-10">
+                        </div>
+                        <div class="col-lg-2 mt-4 text-end">
+                            <button class="btn btn-success" style="width: 100%;">Guardar Compra</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Paginación -->
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination mt-3">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&lt;</a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">&gt;</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </form>
+
+    <!-- Sistema Contable -->
+    <div class="tab-pane fade" id="siscon">
+        <!-- Detalles -->
+        <div class="mb-4">
+            <hr>
+            <p class="text-muted" style="font-size: 14px;">
+                Podrás visualizar y registrar las notas de salidas.
+            </p>
         </div>
     </div>
 </div>
+</div>
+
 {% endblock %}

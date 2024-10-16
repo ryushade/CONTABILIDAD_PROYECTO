@@ -1,39 +1,9 @@
+from barcode.writer import ImageWriter
 from app.models.conexion import obtener_conexion
-from flask import Blueprint, request, jsonify
-
-
-def obtener_productos():
-    conexion = obtener_conexion()
-    try:
-        with conexion.cursor() as cursor:
-            sql = """
-            SELECT PR.id_producto, PR.descripcion, CA.nom_subcat, MA.nom_marca, PR.undm, 
-                CAST(PR.precio AS DECIMAL(10, 2)) AS precio, PR.cod_barras, PR.estado_producto as estado
-                FROM producto PR
-                INNER JOIN marca MA ON MA.id_marca = PR.id_marca
-                INNER JOIN sub_categoria CA ON CA.id_subcategoria = PR.id_subcategoria
-                ORDER BY PR.id_producto DESC
-            """
-            cursor.execute(sql)
-            resultado = cursor.fetchall()
-            productos = []
-            for producto in resultado:
-                productos.append({
-                    'id_producto': producto['id_producto'],
-                    'descripcion': producto['descripcion'],
-                    'nom_subcat': producto['nom_subcat'],
-                    'nom_marca': producto['nom_marca'],
-                    'estado_producto': producto['estado'],
-                    'undm': producto['undm'],
-                    'precio': producto['precio'],
-                    'cod_barras': producto['cod_barras'],
-                }
-            ) 
-            return productos
-    
-    finally:
-        conexion.close()
-        
+from flask import Blueprint, request, jsonify, send_file
+import barcode
+import io
+from barcode.writer import ImageWriter
 
 def obtener_marcas():
     conexion = obtener_conexion()
@@ -47,7 +17,7 @@ def obtener_marcas():
             cursor.execute(sql)
             resultado = cursor.fetchall()
             marcas = []
-            for marca in resultado:
+            for marca in resultado: 
                 marcas.append({
                     'id_marca': marca['id_marca'],
                     'nom_marca': marca['nom_marca'],
@@ -85,9 +55,6 @@ def obtener_categorias():
         conexion.close()
 
 
-
-# Controlador de las notas de ingreso
-
 # Controlador de las notas de ingreso
 def obtener_ingresos():
     try:
@@ -123,94 +90,6 @@ def obtener_ingresos():
     except Exception as e:
         print(f"Error: {e}")
         return []
-
-
-# def obtener_ingresos():
-#     fecha_i = request.args.get('fecha_i', '2022-01-01')
-#     fecha_e = request.args.get('fecha_e', '2027-12-27')
-#     razon_social = request.args.get('razon_social', '')
-#     almacen = request.args.get('almacen', '%')
-#     usuario = request.args.get('usuario', '')
-#     documento = request.args.get('documento', '')
-#     estado = request.args.get('estado', '%')
-
-#     try:
-#         conexion = obtener_conexion()
-#         with conexion.cursor() as cursor:
-#             sql = """
-#             SELECT 
-#                 n.id_nota AS id,
-#                 DATE_FORMAT(n.fecha, '%Y-%m-%d') AS fecha,
-#                 c.num_comprobante AS documento,
-#                 ao.nom_almacen AS almacen_O,
-#                 COALESCE(ad.nom_almacen,'Almacen externo') AS almacen_D,
-#                 COALESCE(d.razon_social, CONCAT(d.nombres, ' ', d.apellidos)) AS proveedor,
-#                 n.glosa AS concepto,
-#                 n.estado_nota AS estado,
-#                 ROUND(IFNULL(SUM(dn.total), 0), 2) AS total_nota,
-#                 COALESCE(u.usua, '') as usuario
-#             FROM 
-#                 nota n
-#             LEFT JOIN 
-#                 destinatario d ON n.id_destinatario = d.id_destinatario
-#             LEFT JOIN comprobante c ON n.id_comprobante = c.id_comprobante
-#             LEFT JOIN almacen ao ON n.id_almacenO = ao.id_almacen
-#             LEFT JOIN almacen ad ON n.id_almacenD = ad.id_almacen
-#             LEFT JOIN detalle_nota dn ON n.id_nota = dn.id_nota
-#             LEFT JOIN usuario u ON n.id_usuario = u.id_usuario
-#             WHERE 
-#                 n.id_tiponota = 1
-#                 AND c.num_comprobante LIKE %s
-#                 AND DATE_FORMAT(n.fecha, '%%Y-%%m-%%d') >= %s
-#                 AND DATE_FORMAT(n.fecha, '%%Y-%%m-%%d') <= %s
-#                 AND (d.razon_social LIKE %s OR CONCAT(d.nombres, ' ', d.apellidos) LIKE %s)
-#                 {}
-#                 {}
-#                 {}
-#             GROUP BY 
-#                 id, n.fecha, documento, almacen_O, almacen_D, proveedor, concepto, estado
-#             ORDER BY 
-#                 n.fecha, documento;
-#             """.format(
-#                 "AND n.id_almacenD = %s" if almacen != '%' else "",
-#                 "AND n.estado_nota LIKE %s" if estado != '%' else "",
-#                 "AND (u.usua LIKE %s OR u.usua IS NULL)" if usuario else ""
-#             )
-            
-#             params = [
-#                 f"%{documento}%", fecha_i, fecha_e, f"%{razon_social}%", f"%{razon_social}%",
-#                 *( [almacen] if almacen != '%' else [] ),
-#                 *( [f"%{estado}%"] if estado != '%' else [] ),
-#                 *( [f"%{usuario}%"] if usuario else [] )
-#             ]
-            
-#             cursor.execute(sql, params)
-#             ingresos_result = cursor.fetchall()
-
-        # Obtener detalles de cada ingreso
-        ingresos = []
-        for ingreso in ingresos_result:
-            with conexion.cursor() as cursor:
-                sql_detalles = """
-                SELECT p.id_producto AS codigo, m.nom_marca AS marca, sc.nom_subcat AS categoria, 
-                    p.descripcion AS descripcion, dn.cantidad AS cantidad, p.undm AS unidad, 
-                    dn.precio AS precio, dn.total AS total
-                FROM producto p 
-                INNER JOIN marca m ON p.id_marca = m.id_marca
-                INNER JOIN sub_categoria sc ON p.id_subcategoria = sc.id_subcategoria
-                INNER JOIN detalle_nota dn ON p.id_producto = dn.id_producto
-                WHERE dn.id_nota = %s
-                """
-                cursor.execute(sql_detalles, (ingreso['id'],))
-                detalles = cursor.fetchall()
-                ingreso['detalles'] = detalles
-                ingresos.append(ingreso)
-
-        return jsonify({'code': 1, 'data': ingresos})
-
-    except Exception as e:
-        return jsonify({'code': 0, 'message': str(e)}), 500
-    
 
 # Obtener almacenes
 
@@ -302,3 +181,82 @@ def obtener_nota_salida():
     except Exception as e:
         return jsonify({'code': 0, 'message': str(e)}), 500
     
+
+
+'''
+Consultas Productos
+'''
+#Obtener todos los productos
+def obtener_inventario():
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            sql = """
+            SELECT PR.id_producto, PR.descripcion as descripcion, CA.nom_subcat as nom_marca, MA.nom_marca as nom_subcat, PR.undm as undm,          
+                CAST(PR.precio AS DECIMAL(10, 2)) AS precio, PR.cod_barras as cod_barras, PR.estado_producto AS estado
+            FROM producto PR INNER JOIN marca MA ON MA.id_marca = PR.id_marca
+            INNER JOIN sub_categoria CA ON CA.id_subcategoria = PR.id_subcategoria
+            ORDER BY PR.id_producto DESC;"""
+            cursor.execute(sql)
+            resultados = cursor.fetchall()
+            print("Resultados de inventario:", resultados)  # Para depurar
+            return resultados
+    except Exception as e:
+        print(f"Error: {e}")
+        return []
+
+
+def generate_barcode(code):
+    try:
+        barcode_class = barcode.get_barcode_class('code128')
+        bar_code = barcode_class(code, writer=ImageWriter())
+        
+        buffer = io.BytesIO()
+        bar_code.write(buffer)
+        buffer.seek(0)
+
+        return send_file(buffer, mimetype='image/png')
+    except Exception as e:
+        print(f"Error generando código de barras: {e}")
+        return None
+
+
+def add_producto():
+    try:
+        # Obtener los datos del request
+        data = request.get_json()
+        id_marca = data.get('id_marca')
+        id_subcategoria = data.get('id_subcategoria')
+        descripcion = data.get('descripcion')
+        undm = data.get('undm')
+        precio = data.get('precio')
+        cod_barras = data.get('cod_barras')
+        estado_producto = data.get('estado_producto')
+
+        # Verificar que todos los campos estén presentes
+        if None in [id_marca, id_subcategoria, descripcion, undm, precio, cod_barras, estado_producto]:
+            return jsonify({'code': 0, 'message': 'Bad Request. Please fill all fields.'}), 400
+
+        # Crear el diccionario del producto
+        producto = {
+            'id_marca': id_marca,
+            'id_subcategoria': id_subcategoria,
+            'descripcion': descripcion,
+            'undm': undm,
+            'precio': precio,
+            'cod_barras': cod_barras,
+            'estado_producto': estado_producto
+        }
+
+        # Conexión a la base de datos
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            # Consulta SQL para insertar el producto
+            sql = "INSERT INTO producto SET ?"
+            cursor.execute(sql, (producto,))  # Se pasa el diccionario del producto como parámetro
+            conexion.commit()
+
+        return jsonify({'code': 1, 'message': 'Producto añadido'}), 201
+
+    except Exception as e:
+        return jsonify({'code': 0, 'message': str(e)}), 500

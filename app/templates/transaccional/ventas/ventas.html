@@ -7,10 +7,10 @@
 {% block content %}
 <header class="mb-4">
     {{ breadcrumb([
-    {'label': 'Inicio', 'url': url_for('transaccional.index'), 'icon': 'M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0
+    {'label': 'Inicio', 'url': url_for('inicio'), 'icon': 'M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0
     001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0
     001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z'},
-    {'label': 'Ventas', 'url': url_for('transaccional.index')}
+    {'label': 'Ventas', 'url': url_for('transaccional.ventas')}
     ]) }}
     <h1 class="text-8xl font-bold tracking-wide text-gray-700 title-Inicio">MÓDULO VENTAS - POS</h1>
 </header>
@@ -79,10 +79,10 @@
 <div class="mb-4">
     <div class="nav nav-tabs">
 
-        <a class="nav-item nav-link active" href="#lisventas" data-toggle="tab">
+        <a class="nav-item nav-link active" href="#lisventas" data-bs-toggle="tab">
             <i class="fas fa-shopping-cart"></i> Lista de ventas
         </a>
-        <a class="nav-item nav-link" href="#newventa" data-toggle="tab">
+        <a class="nav-item nav-link" href="#newventa" data-bs-toggle="tab">
             <i class="fas fa-shopping-cart"></i> Nueva venta
         </a>
     </div>
@@ -141,6 +141,23 @@
             <p class="text-muted" style="font-size: 14px;">
                 Aquí puedes registrar una nueva venta.
             </p>
+        </div>
+        <div class="row align-items-center">
+            <div lass="col-lg-4">
+                
+                    <h6 class="mt-2"><b>Nro.de Venta:</b></h6>
+                    <input type="text" class="form-control" placeholder="******" aria-label="razonsosial"
+                                aria-describedby="basic-addon1">
+              
+
+            </div>
+            <div lass="col-lg-4">
+
+            </div>
+            <div lass="col-lg-4">
+
+            </div>
+
         </div>
     </div>
 </div>

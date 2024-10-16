@@ -7,10 +7,10 @@
 {% block content %}
 <header class="mb-4">
     {{ breadcrumb([
-    {'label': 'Inicio', 'url': url_for('transaccional.index'), 'icon': 'M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0
+    {'label': 'Inicio', 'url': url_for('inicio'), 'icon': 'M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0
     001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0
     001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z'},
-    {'label': 'Almacen', 'url': url_for('transaccional.index')}
+    {'label': 'Almacen', 'url': url_for('transaccional.almacen')}
 
     ]) }}
     <h1 class="text-8xl font-bold tracking-wide text-gray-700 title-Inicio">MÓDULO ALMACEN</h1>
@@ -19,12 +19,14 @@
 <style>
     table {
         border-collapse: separate;
-        border-spacing: 0 8px;
+        border-spacing: 0 6px;
         width: 100%;
         height: 100%;
     }
 
-    table th, table td {
+
+    table th,
+    table td {
         font-weight: normal;
         color: #6c757d;
         border-bottom: 1px solid #dee2e6;
@@ -32,8 +34,18 @@
         vertical-align: middle;
     }
 
+    table th{
+        font-weight: bold;
+    }
+
     table td {
-        background-color: #f8f9fa;
+        background-color: white;
+        border-bottom: 2px solid white;
+    }
+
+    
+    table thead {
+        background-color: black;
         border-bottom: 2px solid white;
     }
 
@@ -74,18 +86,21 @@
         text-align: center;
     }
     
+    .modal-dialog {
+        max-width: 40%;
+    }
 </style>
 
 <!-- Tabs de Reporte -->
 <div class="mb-4">
     <div class="nav nav-tabs">
-        <a class="nav-item nav-link active" href="#sisinv" data-toggle="tab">
+        <a class="nav-item nav-link active" href="#sisinv" data-bs-toggle="tab">
             <i class="fas fa-door-closed"></i> Inventario
         </a>
-        <a class="nav-item nav-link " href="#sistrans" data-toggle="tab">
+        <a class="nav-item nav-link " href="#sistrans" data-bs-toggle="tab">
             <i class="fas fa-door-open"></i> Nota de ingreso
         </a>
-        <a class="nav-item nav-link" href="#siscon" data-toggle="tab">
+        <a class="nav-item nav-link" href="#siscon" data-bs-toggle="tab">
             <i class="fas fa-door-closed"></i> Nota de salida
         </a>
     </div>
@@ -101,6 +116,210 @@
                     Podrás visualizar el inventario de productos.
                 </p>
             </div>
+
+            <div class="row">
+                <div class="col-lg-3">
+                    <h4 class="mt-1"><b>Lista de Productos</b></h4>
+                </div>
+                <div class="col-lg-6">
+                    <div class="input-group me-2 mb-2" style="flex: 1;">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Ingrese un producto"
+                            aria-label="Buscar">
+                        <div class="input-group-append">
+                            <span class="input-group-text"><i class="fa fa-search"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-1">
+
+                </div>
+                <div class="col-lg-2">
+                    <!-- Botón para abrir el modal -->
+                    <div class="input-group input-group-md">
+                        <button type="button" class="btn btn-primary" style="width: 100%;" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                            <i class="fa-solid fa-plus me-2"></i>Agregar producto
+                        </button>
+                    </div>                 
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="container">
+                    <div class="table-container">
+                        <table class="table-scroll">
+                            <thead>
+                                <tr>
+                                    <th class="centrar">DESCRIPCIÓN</th>
+                                    <th class="centrar">LÍNEA</th>
+                                    <th class="centrar">SUB-LÍNEA</th>
+                                    <th class="centrar">UND. MED.</th>
+                                    <th class="centrar">PRECIO (S/.)</th>
+                                    <th class="centrar">COD. BARRAS</th>
+                                    <th class="centrar">ESTADO</th>
+                                    <th class="centrar">ACCIONES</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dato in datos_inventario %}
+                                <tr>
+                                    <td class="centrar">{{ dato.descripcion }}</td>
+                                    <td class="centrar">{{ dato.nom_marca }}</td>
+                                    <td class="centrar">{{ dato.nom_subcat }}</td>
+                                    <td class="centrar">{{ dato.undm }}</td>
+                                    <td class="centrar">{{ dato.precio }}</td>
+                                    <td class="centrar">
+                                        {% if dato.cod_barras != '-' %}
+                                            <img src="{{ url_for('transaccional.barcode', code=dato.cod_barras) }}" alt="Código de barras" width="150" height="50">
+                                        {% else %}
+                                            {{ dato.cod_barras }}  <!-- Si no hay código de barras, muestra el número -->
+                                        {% endif %}
+                                    </td>
+                                    <td class="centrar">
+                                        {% if dato.estado == 1 %}
+                                        <span class="estado-activo">Activo</span>
+                                        {% else %}
+                                        <span class="estado-inactivo">Inactivo</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="accion-dropdown">
+                                        <div class="dropdown">
+                                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton{{ loop.index }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                                ...
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ loop.index }}">
+                                                <li><a class="dropdown-item" href="#">Ver</a></li>
+                                                <li><a class="dropdown-item" href="#">Editar</a></li>
+                                                <li><a class="dropdown-item" href="#">Eliminar</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Paginación -->
+                    <nav aria-label="Page navigation example" class="mt-4">
+                        <ul class="pagination">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&lt;</a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">&gt;</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+        <!-- Modal para agregar producto -->
+        <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <!-- Encabezado del modal -->
+                    <div class="modal-header">
+                        <h5 class="modal-title mt-3 ms-4 mb-3" id="addProductModalLabel">Nuevo producto</h5>
+                    </div>
+                    <!-- Cuerpo del modal -->
+                    <div class="modal-body">
+                        <form id="addProductForm">
+
+                            <!-- Descripcion del producto -->                            
+                            <div class="row ms-2 me-2 mb-3">
+                                <label for="productDescription" class="form-label">Descripción:</label>
+                                <input type="text" class="form-control" id="productDescription" required>
+                            </div>
+
+                            <!-- Categoría y Sub-Categoría -->
+                            <div class="row ms-2 me-2 mb-3">
+                                <div class="col-lg-6">
+                                    <div class="row">
+                                        <label for="productDescription" class="form-label">Categoría:</label>
+                                    </div>
+                                    <div class="row me-1">
+                                        <select class="form-select form-select-md" aria-label="Seleccione...">
+                                            <option selected>Seleccione...</option>
+                                            <option value="1">Prueba</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="row">
+                                        <label for="productDescription" class="form-label">Sub-Categoría:</label>
+                                    </div>
+                                    <div class="row">
+                                        <select class="form-select form-select-md" aria-label="Seleccione...">
+                                            <option selected>Seleccione...</option>
+                                            <option value="1">Prueba</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Marca y Precio -->
+                            <div class="row ms-2 me-2 mb-3">
+                                <div class="col-lg-6">
+                                    <div class="row">
+                                        <label for="productDescription" class="form-label">Marca:</label>
+                                    </div>
+                                    <div class="row me-1">
+                                        <select class="form-select form-select-md" aria-label="Seleccione...">
+                                            <option selected>Seleccione...</option>
+                                            <option value="1">TORMENTA</option>
+                                            <option value="2">DASHIR</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="row">
+                                        <label for="productDescription" class="form-label">Precio:</label>
+                                    </div>
+                                    <div class="row">
+                                        <input type="number" class="form-control" id="numero" placeholder="89.99" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Unidad de medida y Estado -->
+                            <div class="row ms-2 me-2 mb-3">
+                                <div class="col-lg-6">
+                                    <div class="row">
+                                        <label for="productDescription" class="form-label">Und. Medida:</label>
+                                    </div>
+                                    <div class="row me-1">
+                                        <select class="form-select form-select-md" aria-label="Seleccione...">
+                                            <option selected>Seleccione...</option>
+                                            <option value="1">KGM</option>
+                                            <option value="2">NIU</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="row">
+                                        <label for="productDescription" class="form-label">Precio:</label>
+                                    </div>
+                                    <div class="row">
+                                        <select class="form-select form-select-md" aria-label="Seleccione...">
+                                            <option selected>Seleccione...</option>
+                                            <option value="1">Activo</option>
+                                            <option value="2">Inactivo</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- Pie de página del modal -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="background-color: #8f95a0;">Cerrar</button>
+                        <button type="submit" class="btn btn-primary" form="addProductForm" style="background-color: #389ae6;">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
 
@@ -222,48 +441,50 @@
 
         <div class="row" style="margin-bottom: 7%;">
             <div class="container mt-5">
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th class="centrar">Fecha</th>
-                            <th class="centrar">Documento</th>
-                            <th class="centrar">Proveedor</th>
-                            <th class="centrar">Concepto</th>
-                            <th class="centrar">Almacén Destino</th>
-                            <th class="centrar">Estado</th>
-                            <th class="centrar">Usuario</th>
-                            <th class="centrar">Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for dato in datos_almacen_entrada %}
-                        <tr>
-                            <td class="centrar">{{ dato.fecha }}</td>
-                            <td class="centrar">{{ dato.documento }}</td>
-                            <td class="centrar">{{ dato.proveedor }}</td>
-                            <td class="centrar">{{ dato.concepto }}</td>
-                            <td class="centrar">{{ dato.almacen_D }}</td> <!-- Cambié a almacen_D -->
-                            <td class="centrar"><span class="estado-activo">{{ dato.estado }}</span></td>
-                            <td class="centrar">{{ dato.usuario }}</td>
-                            <td class="accion-dropdown">
-                                <div class="dropdown">
-                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton{{ loop.index }}" data-bs-toggle="dropdown" aria-expanded="false">
-                                        ...
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ loop.index }}">
-                                        <li><a class="dropdown-item" href="#">Ver</a></li>
-                                        <li><a class="dropdown-item" href="#">Editar</a></li>
-                                        <li><a class="dropdown-item" href="#">Eliminar</a></li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div class="table-container">
+                    <table class="table-scroll">
+                        <thead>
+                            <tr>
+                                <th class="centrar">Fecha</th>
+                                <th class="centrar">Documento</th>
+                                <th class="centrar">Proveedor</th>
+                                <th class="centrar">Concepto</th>
+                                <th class="centrar">Almacén Destino</th>
+                                <th class="centrar">Estado</th>
+                                <th class="centrar">Usuario</th>
+                                <th class="centrar">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for dato in datos_almacen_entrada %}
+                            <tr>
+                                <td class="centrar">{{ dato.fecha }}</td>
+                                <td class="centrar">{{ dato.documento }}</td>
+                                <td class="centrar">{{ dato.proveedor }}</td>
+                                <td class="centrar">{{ dato.concepto }}</td>
+                                <td class="centrar">{{ dato.almacen_D }}</td> <!-- Cambié a almacen_D -->
+                                <td class="centrar"><span class="estado-activo">{{ dato.estado }}</span></td>
+                                <td class="centrar">{{ dato.usuario }}</td>
+                                <td class="accion-dropdown">
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton{{ loop.index }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                            ...
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ loop.index }}">
+                                            <li><a class="dropdown-item" href="#">Ver</a></li>
+                                            <li><a class="dropdown-item" href="#">Editar</a></li>
+                                            <li><a class="dropdown-item" href="#">Eliminar</a></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
         
                 <!-- Paginación -->
-                <nav aria-label="Page navigation example">
+                <nav aria-label="Page navigation example" class="mt-4">
                     <ul class="pagination">
                         <li class="page-item disabled">
                             <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&lt;</a>
@@ -400,46 +621,48 @@
 
         <div class="row" style="margin-bottom: 7%;">
             <div class="container mt-5">
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th class="centrar">Fecha</th>
-                            <th class="centrar">Documento</th>
-                            <th class="centrar">Destinatario</th>
-                            <th class="centrar">Concepto</th>
-                            <th class="centrar">Estado</th>
-                            <th class="centrar">Usuario</th>
-                            <th class="centrar">Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for dato in datos_almacen_salida %}
-                        <tr>
-                            <td class="centrar">{{ dato.fecha }}</td>
-                            <td class="centrar">{{ dato.num_comprobante }}</td>
-                            <td class="centrar">{{ dato.nombre_o_razon_social }}</td>
-                            <td class="centrar">{{ dato.glosa }}</td>
-                            <td class="centrar"><span class="estado-activo">{{ dato.estado }}</span></td>
-                            <td class="centrar">{{ dato.usua }}</td>
-                            <td class="accion-dropdown">
-                                <div class="dropdown">
-                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton{{ loop.index }}" data-bs-toggle="dropdown" aria-expanded="false">
-                                        ...
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ loop.index }}">
-                                        <li><a class="dropdown-item" href="#">Ver</a></li>
-                                        <li><a class="dropdown-item" href="#">Editar</a></li>
-                                        <li><a class="dropdown-item" href="#">Eliminar</a></li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-        
+                <div class="table-container">
+                    <table class="table-scroll">
+                        <thead>
+                            <tr>
+                                <th class="centrar">Fecha</th>
+                                <th class="centrar">Documento</th>
+                                <th class="centrar">Destinatario</th>
+                                <th class="centrar">Concepto</th>
+                                <th class="centrar">Estado</th>
+                                <th class="centrar">Usuario</th>
+                                <th class="centrar">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for dato in datos_almacen_salida %}
+                            <tr>
+                                <td class="centrar">{{ dato.fecha }}</td>
+                                <td class="centrar">{{ dato.num_comprobante }}</td>
+                                <td class="centrar">{{ dato.nombre_o_razon_social }}</td>
+                                <td class="centrar">{{ dato.glosa }}</td>
+                                <td class="centrar"><span class="estado-activo">{{ dato.estado }}</span></td>
+                                <td class="centrar">{{ dato.usua }}</td>
+                                <td class="accion-dropdown">
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton{{ loop.index }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                            ...
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ loop.index }}">
+                                            <li><a class="dropdown-item" href="#">Ver</a></li>
+                                            <li><a class="dropdown-item" href="#">Editar</a></li>
+                                            <li><a class="dropdown-item" href="#">Eliminar</a></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+            
+                </div>
                 <!-- Paginación -->
-                <nav aria-label="Page navigation example">
+                <nav aria-label="Page navigation example" class="mt-4">
                     <ul class="pagination">
                         <li class="page-item disabled">
                             <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&lt;</a>
@@ -457,5 +680,21 @@
     </div>
 </div>
 </div>
+
+<script>
+    document.getElementById('searchInput').addEventListener('input', function() {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll('table tbody tr');
+
+        rows.forEach(row => {
+            let descripcion = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+            if (descripcion.includes(filter)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script>
 
 {% endblock %}
