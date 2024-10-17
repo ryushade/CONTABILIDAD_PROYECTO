@@ -33,7 +33,6 @@ def obtener_subcategorias():
 
 @transactional_bp.route('/add_producto', methods=['POST'])
 def add_producto():
-    # Obtén los datos del formulario
     id_marca = request.form.get('marca')
     id_subcategoria = request.form.get('sub_categoria_id')
     descripcion = request.form.get('descripcion')
@@ -41,15 +40,12 @@ def add_producto():
     precio = request.form.get('precio')
     estado_producto = request.form.get('estado')
 
-    # Verifica que los campos requeridos no estén vacíos
     if not all([id_marca, id_subcategoria, descripcion, undm, precio, estado_producto]):
         flash('Todos los campos son obligatorios.', 'error')
         return redirect(url_for('transaccional.almacen'))
 
-    # Llama a la función de modelo para agregar el producto
     resultado = agregar_producto(id_marca, id_subcategoria, descripcion, undm, precio, None, estado_producto)
     
-    # Redirige a la página de almacen si el producto se agregó correctamente
     if resultado['code'] == 1:
         flash('Producto agregado correctamente.', 'success')
     else:
@@ -67,6 +63,9 @@ def barcode(code):
 
     return response
 
+@transactional_bp.route('/nueva_nota', methods=['GET'])
+def nueva_nota():
+    return render_template('transaccional/almacen/nueva_nota.html')
 #----------------------------------------------
 
 # Modulo de productos

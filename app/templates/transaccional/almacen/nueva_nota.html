@@ -7,13 +7,13 @@
 {% block content %}
 <header class="mb-4">
     {{ breadcrumb([
-    {'label': 'Inicio', 'url': url_for('transaccional.index'), 'icon': 'M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0
+    {'label': 'Inicio', 'url': url_for('inicio'), 'icon': 'M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0
     001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0
     001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z'},
-    {'label': 'Almacen', 'url': url_for('transaccional.index')},
-    {'label': 'Nota de Salida - Nueva nota', 'url': url_for('transaccional.index')}
+    {'label': 'Almacen', 'url': url_for('transaccional.almacen')}
+
     ]) }}
-    <h1 class="text-8xl font-bold tracking-wide text-gray-700 title-Inicio">Nueva nota</h1>
+    <h1 class="text-8xl font-bold tracking-wide text-gray-700 title-Inicio">Nota de Ingreso</h1>
 </header>
 
 <style>
@@ -78,15 +78,154 @@
 
 <!-- Tabs de Reporte -->
 
-<div class="container border border-danger">
-    <!-- Inventario -->
-     <div class="row">
-        <div class="col">
-            
+    <div class="container border mb-5" style="background-color: #f7f7f7; border-radius: 10px;">
+        <div>
+            <div class="row mb-5 mt-4">
+                <div class="col-lg-3">
+                    <div class="row ms-2 me-2">
+                        <label for="almacenorigen" class="form-label" style="font-weight: bold;">Almacén origen:</label>
+                    </div>
+                    <div class="row me-3">
+                        <select class="form-select form-select-md" aria-label="Default select example" style="margin-left: 30px;">
+                            <option selected>Seleccione...</option>
+                            <option value="1">ALM CENTRAL ESCALERA</option>
+                            <option value="2">ALMACEN CENTRAL 22</option>
+                            <option value="3">ALM CENTRAL 52-53</option>
+                            <option value="3">PRODUCCION</option>
+                            <option value="3">ALM BALTA 7-8</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="row ms-2">
+                        <label for="almacendestino" class="form-label" style="font-weight: bold;">Almacén destino:</label>
+                    </div>
+                    <div class="row me-4">
+                        <select class="form-select form-select-md" aria-label="Default select example" style="margin-left: 30px;">
+                            <option selected>Seleccione...</option>
+                            <option value="1">ALM CENTRAL ESCALERA</option>
+                            <option value="2">ALMACEN CENTRAL 22</option>
+                            <option value="3">ALM CENTRAL 52-53</option>
+                            <option value="3">PRODUCCION</option>
+                            <option value="3">ALM BALTA 7-8</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="row ms-1">
+                        <label for="numero" class="form-label ms-2" style="font-weight: bold;">Número:</label>
+                    </div>
+                    <div class="row ms-2 me-2">
+                        <div class="input-group input-group-md">
+                            <input type="text" class="form-control" placeholder="I400-00000003" aria-label="numero" aria-describedby="basic-addon1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-5">
+                <div class="col-lg-3">
+                    <div class="row ms-2 me-2">
+                        <label for="destinatario" class="form-label" style="font-weight: bold;">Destinatario:</label>
+                    </div>
+                    <div class="row me-3">
+                        <select class="form-select form-select-md" aria-label="Default select example" style="margin-left: 30px;">
+                            <option selected>Seleccionar</option>
+                            <option value="1">select * from destinatario</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="row ms-2">
+                        <label for="ruc" class="form-label" style="font-weight: bold;">Ruc:</label>
+                    </div>
+                    <div class="row ms-2">
+                        <div class="input-group input-group-md">
+                            <input type="text" class="form-control" aria-label="ruc" aria-describedby="basic-addon1">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="row ms-3">
+                        <label for="glosa" class="form-label" style="font-weight: bold;">Glosa:</label>
+                    </div>
+                    <div class="row ms-4 me-3">
+                        <select id="glosa" class="form-select form-select-md" aria-label="Default select example">
+                            <option selected>Seleccione...</option>
+                            <option value="COMPRA EN EL PAIS">COMPRA EN EL PAIS</option>
+                            <option value="COMPRA EN EL EXTERIOR">COMPRA EN EL EXTERIOR</option>
+                            <option value="RESERVADO">RESERVADO</option>
+                            <option value="TRANSFERENCIA ENTRE ESTABLECIMIENTO">TRANSFERENCIA ENTRE ESTABLECIMIENTO</option>
+                            <option value="DEVOLUCION">DEVOLUCION</option>
+                            <option value="CLIENTE">CLIENTE</option>
+                            <option value="MERCAD DEVOLUCIÓN (PRUEBA)">MERCAD DEVOLUCIÓN</option>
+                            <option value="PROD.DESVOLUCIÓN (M.P.)">PROD.DESVOLUCIÓN (M.P.)</option>
+                            <option value="ING. PRODUCCIÓN(P.T.)">ING. PRODUCCIÓN(P.T.)</option>
+                            <option value="AJUSTE INVENTARIO">AJUSTE INVENTARIO</option>
+                            <option value="OTROS INGRESOS">OTROS INGRESOS</option>
+                            <option value="DESARROLLO CONSUMO INTERNO">DESARROLLO CONSUMO INTERNO</option>
+                            <option value="INGRESO DIFERIDO">INGRESO DIFERIDO</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-5">
+                <div class="col-lg-6">
+                    <div class="row mb-4">
+                        <div class="col-lg-6">
+                            <div class="row ms-2">
+                                <label for="nombrenota" class="form-label" style="font-weight: bold;">Nombre de la nota:</label>
+                            </div>
+                            <div class="row ms-2">
+                                <div class="input-group input-group-md">
+                                    <input type="text" class="form-control" aria-label="nombrenota" aria-describedby="basic-addon1">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row ms-2">
+                                <label for="fechadocu" class="form-label" style="font-weight: bold;">Fecha docu:</label>
+                            </div>
+                            <div class="row">
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row ms-2 mt-5">
+                        <div class="col-lg-4">
+                                <button type="button" class="btn" style="width: 100%; background-color: #eab308; color: white; height: 75px; font-weight: bold;"><i class="fa-solid fa-barcode me-2"></i>Buscar producto</button>
+                        </div>
+                        <div class="col-lg-4">
+                                <button type="button" class="btn" style="width: 100%; background-color: #ef4444; color: white;height: 75px;">
+                                    <div class="row mt-2 mb-2">
+                                        <i class="fa-regular fa-rectangle-xmark me-2"></i>
+                                    </div>
+                                    <div class="row">
+                                        <h6 style="font-weight: bold;" ;>Cancelar</h6>
+                                    </div>
+                                </button>
+                        </div>
+                        <div class="col-lg-4">
+                                <button type="button" class="btn" style="width: 100%; background-color: #22c55e; color: white;height: 75px;">
+                                    <div class="row mt-2 mb-2">
+                                        <i class="fa-regular fa-floppy-disk me-2"></i>
+                                    </div>
+                                    <div class="row">
+                                        <h6 style="font-weight: bold;">Guardar</h6>
+                                    </div>
+                                </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="row ms-3">
+                        <label for="observacion" class="form-label" style="font-weight: bold;">Observacion:</label>
+                    </div>
+                    <div class="row ms-4 me-3">
+                        <input type="text" class="form-control" id="descripcion" style="height: 160px;" name="descripcion" required>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col"></div>
-     </div>
-     <div class="row"></div>
-</div>
+    </div>
 
 {% endblock %}
