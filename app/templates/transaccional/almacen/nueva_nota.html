@@ -117,7 +117,7 @@
                     </div>
                     <div class="row ms-2 me-2">
                         <div class="input-group input-group-md">
-                            <input type="text" class="form-control" placeholder="I400-00000003" aria-label="numero" aria-describedby="basic-addon1">
+                            <input type="text" class="form-control" placeholder="I400-00000003" aria-label="numero" aria-describedby="basic-addon1" readonly>
                         </div>
                     </div>
                 </div>
@@ -186,7 +186,9 @@
                                 <label for="fechadocu" class="form-label" style="font-weight: bold;">Fecha docu:</label>
                             </div>
                             <div class="row">
-
+                                <div class="input-group input-group-md ms-4">
+                                    <input class="input-group-text" type="text" id="datenormal" placeholder="01/4/2024" style="width: 95%; background-color: white; " readonly>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -195,14 +197,16 @@
                                 <button type="button" class="btn" style="width: 100%; background-color: #eab308; color: white; height: 75px; font-weight: bold;"><i class="fa-solid fa-barcode me-2"></i>Buscar producto</button>
                         </div>
                         <div class="col-lg-4">
-                                <button type="button" class="btn" style="width: 100%; background-color: #ef4444; color: white;height: 75px;">
-                                    <div class="row mt-2 mb-2">
-                                        <i class="fa-regular fa-rectangle-xmark me-2"></i>
-                                    </div>
-                                    <div class="row">
-                                        <h6 style="font-weight: bold;" ;>Cancelar</h6>
-                                    </div>
-                                </button>
+                                <div class="input-group input-group-md">
+                                    <a href="{{ url_for('transaccional.almacen') }}" class="btn" style="width: 100%;background-color: #ef4444; color: white;height: 75px;">
+                                        <div class="row mt-2 mb-2">
+                                            <i class="fa-regular fa-rectangle-xmark me-2"></i>
+                                        </div>
+                                        <div class="row">
+                                            <h6 style="font-weight: bold;";>Cancelar</h6>
+                                        </div>
+                                    </a>
+                                </div>
                         </div>
                         <div class="col-lg-4">
                                 <button type="button" class="btn" style="width: 100%; background-color: #22c55e; color: white;height: 75px;">
@@ -223,6 +227,37 @@
                     <div class="row ms-4 me-3">
                         <input type="text" class="form-control" id="descripcion" style="height: 160px;" name="descripcion" required>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="container mt-2">
+                <div class="table-container">
+                    <table class="table-scroll">
+                        <thead>
+                            <tr>
+                                <th class="centrar" style="font-weight: bold;">CÓDIGO</th>
+                                <th class="centrar" style="font-weight: bold;">DESCRIPCIÓN</th>
+                                <th class="centrar" style="font-weight: bold;">MARCA</th>
+                                <th class="centrar" style="font-weight: bold;">CANTIDAD</th>
+                                <th class="centrar" style="font-weight: bold;">ACCIÓN</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="centrar">Codigo ejemplo</td>
+                                <td class="centrar">Descripcion ejemplo</td>
+                                <td class="centrar">Marca ejemplo</td>
+                                <td class="centrar">Cantidad ejemplo</td>
+                                <td class="accion-dropdown">
+                                    <div class="dropdown">
+                                        <span style="font-size: 14px;" class="action-button secondary trash"><i
+                                                class="fas fa-trash"></i></span>    
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

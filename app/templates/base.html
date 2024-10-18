@@ -304,7 +304,7 @@
 
                     <!-- User Dropdown -->
                     {% if user %}
-                    <div class="dropdown">
+                    <div class="dropdown me-3">
                         <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button"
                             id="userDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fas fa-user-circle" style="font-size: 20px; color: gray;"></i>
@@ -351,6 +351,13 @@
             maxDate: "08/04/2028"
         });
     </script>
+        <script>
+            flatpickr("#datenormal", {
+                dateFormat: "d/m/Y",
+                minDate: "01/01/1900",
+                maxDate: "08/04/2028"
+            });
+        </script>
     <script>
         // Lógica para manejar el sidebar
         document.addEventListener('DOMContentLoaded', function () {
