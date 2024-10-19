@@ -1,5 +1,5 @@
 from flask import render_template, send_file, request, jsonify, redirect, url_for, flash
-from app.models.transaccional_models import obtener_productos, obtener_marcas, obtener_categorias, obtener_ingresos, obtener_nota_salida, obtener_inventario, obtener_subcategorias_por_categoria, agregar_producto
+from app.models.transaccional_models import obtener_productos, obtener_ventas, obtener_marcas, obtener_categorias, obtener_ingresos, obtener_nota_salida, obtener_inventario, obtener_subcategorias_por_categoria, agregar_producto
 from app.models.transaccional_models import generate_barcode
 from . import transactional_bp
 
@@ -94,11 +94,15 @@ def productos():
     return render_template('transaccional/productos/productos.html', productos=productos, marcas=marcas, categorias=categorias)
 
 # Modulo de ventas
-@transactional_bp.route('/ventas')
+@transactional_bp.route('/ventas', methods=['GET'])
 def ventas():
-    return render_template('transaccional/ventas/ventas.html')
+   
+    total_ventas = obtener_ventas()
+    return render_template('transaccional/ventas/ventas.html', total_ventas=total_ventas) 
+
 
 #----------------------------------------------
+
 
 
 # Modulo de compras

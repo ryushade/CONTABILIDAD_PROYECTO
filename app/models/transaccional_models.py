@@ -277,3 +277,102 @@ def agregar_producto(id_marca, id_subcategoria, descripcion, undm, precio, cod_b
     finally:
         conexion.close()
 
+
+
+
+def getTotalVentas():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            sql = """SELECT COUNT(*) as total FROM venta"""
+            cursor.execute(sql)
+            resultado = cursor.fetchone()
+            return resultado['total']
+    finally:
+        conexion.close()
+
+def totalEfectivo():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            sql = """SELECT 
+                ROUND(SUM(CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(metodo_pago, 'EFECTIVO:', -1), ',', 1) AS DECIMAL(10, 2))), 2) AS total_efectivo
+                FROM 
+                venta
+                WHERE 
+                metodo_pago LIKE '%EFECTIVO%';"""
+            cursor.execute(sql)
+            resultado = cursor.fetchone()
+            return resultado['total_efectivo']
+    finally:
+        conexion.close()
+    
+    
+def obtener_ventas(nom_tipocomp='', razon_social='', nombre_sucursal='', fecha_i='2022-01-01', fecha_e='2027-12-27'):
+    # Processing nom_tipocomp to create the IN clause
+    nom_tipocomp_array = [item.strip() for item in nom_tipocomp.split(',') if item.strip() != '']
+    in_clause = '1=1'  # Default to no filtering
+    params = []
+
+    if nom_tipocomp_array:
+        in_clause = f"tp.id_tipocomprobante IN ({', '.join(['%s'] * len(nom_tipocomp_array))})"
+        params.extend(nom_tipocomp_array)
+
+    params.extend([f'%{razon_social}%', f'%{razon_social}%', f'%{nombre_sucursal}%', fecha_i, fecha_e])
+
+    connection = obtener_conexion()
+
+    try:
+        with connection.cursor() as cursor:
+            # Get sales data without pagination
+            sql = f"""
+                SELECT v.id_venta AS id, SUBSTRING(com.num_comprobante, 2, 3) AS serieNum, SUBSTRING(com.num_comprobante, 6, 8) AS num,
+                CASE WHEN tp.nom_tipocomp = 'Nota de venta' THEN 'Nota' ELSE tp.nom_tipocomp END AS tipoComprobante,
+                CONCAT(cl.nombres, ' ', cl.apellidos) AS cliente_n, cl.razon_social AS cliente_r,
+                cl.dni AS dni, cl.ruc AS ruc, DATE_FORMAT(v.f_venta, '%Y-%m-%d') AS fecha, v.igv AS igv,
+                SUM(dv.total) AS total, CONCAT(ve.nombres, ' ', ve.apellidos) AS cajero, ve.dni AS cajeroId,
+                v.estado_venta AS estado, s.nombre_sucursal, s.ubicacion, cl.direccion, v.fecha_iso, v.metodo_pago,
+                anl.id_anular, anl.anular, anlb.id_anular_b, anlb.anular_b, v.estado_sunat, vb.id_venta_boucher, usu.usua, v.observacion
+                FROM venta v
+                INNER JOIN comprobante com ON com.id_comprobante = v.id_comprobante
+                INNER JOIN tipo_comprobante tp ON tp.id_tipocomprobante = com.id_tipocomprobante
+                INNER JOIN cliente cl ON cl.id_cliente = v.id_cliente
+                INNER JOIN detalle_venta dv ON dv.id_venta = v.id_venta
+                INNER JOIN sucursal s ON s.id_sucursal = v.id_sucursal
+                INNER JOIN vendedor ve ON ve.dni = s.dni
+                INNER JOIN anular_sunat anl ON anl.id_anular = v.id_anular
+                INNER JOIN anular_sunat_b anlb ON anlb.id_anular_b = v.id_anular_b
+                INNER JOIN venta_boucher vb ON vb.id_venta_boucher = v.id_venta_boucher
+                INNER JOIN usuario usu ON usu.id_usuario = ve.id_usuario
+                WHERE {in_clause} AND (cl.razon_social LIKE %s OR CONCAT(cl.nombres, ' ', cl.apellidos) LIKE %s)
+                AND s.nombre_sucursal LIKE %s
+                AND DATE_FORMAT(v.f_venta, '%Y-%m-%d') >= %s
+                AND DATE_FORMAT(v.f_venta, '%Y-%m-%d') <= %s
+                GROUP BY id, serieNum, num, tipoComprobante, cliente_n, cliente_r, dni, ruc, DATE_FORMAT(v.f_venta, '%Y-%m-%d'), igv, cajero, cajeroId, estado
+                ORDER BY v.id_venta DESC
+            """
+            cursor.execute(sql, params)
+            ventas_result = cursor.fetchall()
+
+            # Get sales details for each sale
+            ventas = []
+            for venta in ventas_result:
+                cursor.execute("""
+                    SELECT dv.id_detalle AS codigo, pr.descripcion AS nombre, dv.cantidad AS cantidad,
+                    dv.precio AS precio, dv.descuento AS descuento, dv.total AS subtotal, pr.undm AS undm,
+                    m.nom_marca AS marca
+                    FROM detalle_venta dv
+                    INNER JOIN producto pr ON pr.id_producto = dv.id_producto
+                    INNER JOIN marca m ON m.id_marca = pr.id_marca
+                    WHERE dv.id_venta = %s
+                """, (venta['id'],))
+                detalles = cursor.fetchall()
+                venta['detalles'] = detalles
+                ventas.append(venta)
+
+            return {'code': 1, 'data': ventas}
+    except Exception as e:
+        print(f"Error fetching sales data: {e}")
+        return {'code': 0, 'error': str(e)}
+    finally:
+        connection.close()
