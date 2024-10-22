@@ -175,3 +175,40 @@ def obtener_cuentas_excel():
             return cuentas
     finally:
         connection.close()
+
+
+def obtener_usuarios():
+    connection = obtener_conexion()       
+    try: 
+        with connection.cursor(pymysql.cursors.DictCursor) as cursor:
+            sql = "SELECT id_usuario, U.id_rol, nom_rol, usua, contra, estado_usuario FROM usuario U INNER JOIN rol R ON U.id_rol = R.id_rol ORDER BY id_usuario desc"
+            cursor.execute(sql)
+            usuarios = cursor.fetchall()
+            return usuarios
+    finally:
+        connection.close()
+
+def obtener_reglas():
+    connection = obtener_conexion()
+    try:
+        with connection.cursor(pymysql.cursors.DictCursor) as cursor:
+            sql = """
+                SELECT 
+                    r.id_regla, 
+                    r.nombre_regla, 
+                    r.tipo_transaccion, 
+                    cd.codigo_cuenta AS cuenta_debe_codigo,
+                    cd.nombre_cuenta AS cuenta_debe_nombre, 
+                    ch.codigo_cuenta AS cuenta_haber_codigo,
+                    ch.nombre_cuenta AS cuenta_haber_nombre
+                FROM 
+                    reglas_contabilizacion r
+                INNER JOIN 
+                    cuenta cd ON r.cuenta_debe = cd.id_cuenta
+                INNER JOIN 
+                    cuenta ch ON r.cuenta_haber = ch.id_cuenta
+            """
+            cursor.execute(sql)
+            return cursor.fetchall()
+    finally:
+        connection.close()

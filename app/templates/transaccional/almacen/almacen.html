@@ -7,10 +7,10 @@
 {% block content %}
 <header class="mb-4">
     {{ breadcrumb([
-    {'label': 'Inicio', 'url': url_for('transaccional.index'), 'icon': 'M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0
+    {'label': 'Inicio', 'url': url_for('inicio'), 'icon': 'M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0
     001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0
     001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z'},
-    {'label': 'Almacen', 'url': url_for('transaccional.index')}
+    {'label': 'Almacen', 'url': url_for('transaccional.almacen')}
 
     ]) }}
     <h1 class="text-8xl font-bold tracking-wide text-gray-700 title-Inicio">MÓDULO ALMACEN</h1>
@@ -183,14 +183,10 @@
                                     </td>
                                     <td class="accion-dropdown">
                                         <div class="dropdown">
-                                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton{{ loop.index }}" data-bs-toggle="dropdown" aria-expanded="false">
-                                                ...
-                                            </button>
-                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ loop.index }}">
-                                                <li><a class="dropdown-item" href="#">Ver</a></li>
-                                                <li><a class="dropdown-item" href="#">Editar</a></li>
-                                                <li><a class="dropdown-item" href="#">Eliminar</a></li>
-                                            </ul>
+                                            <span style="font-size: 14px;" class="action-button secondary edit"><i
+                                                class="fas fa-edit"></i></span>
+                                            <span style="font-size: 14px;" class="action-button secondary trash"><i
+                                                    class="fas fa-trash"></i></span>    
                                         </div>
                                     </td>
                                 </tr>
@@ -225,48 +221,50 @@
                     </div>
                     <!-- Cuerpo del modal -->
                     <div class="modal-body">
-                        <form id="addProductForm">
-
-                            <!-- Descripcion del producto -->                            
+                        <form id="addProductForm" method="POST" action="{{ url_for('transaccional.add_producto') }}">
+                            <!-- Aquí va el contenido del formulario, como lo tienes configurado -->
+                            <!-- Descripción del producto -->                            
                             <div class="row ms-2 me-2 mb-3">
                                 <label for="productDescription" class="form-label">Descripción:</label>
-                                <input type="text" class="form-control" id="productDescription" required>
+                                <input type="text" class="form-control" id="productDescription" name="descripcion" required>
                             </div>
-
+                            
                             <!-- Categoría y Sub-Categoría -->
                             <div class="row ms-2 me-2 mb-3">
                                 <div class="col-lg-6">
                                     <div class="row">
-                                        <label for="productDescription" class="form-label">Categoría:</label>
+                                        <label for="categoriaSelect" class="form-label">Categoría:</label>
                                     </div>
                                     <div class="row me-1">
-                                        <select class="form-select form-select-md" aria-label="Seleccione...">
-                                            <option selected>Seleccione...</option>
-                                            <option value="1">Prueba</option>
+                                        <select id="categoriaSelect" name="categoria_id" class="form-select form-select-md" aria-label="Seleccione...">
+                                            <option value="" selected>Seleccione...</option>
+                                            {% for categoria in categorias %}
+                                                <option value="{{ categoria['id_categoria'] }}">{{ categoria['nom_categoria'] }}</option>
+                                            {% endfor %}
                                         </select>
                                     </div>
                                 </div>
+                                
                                 <div class="col-lg-6">
                                     <div class="row">
-                                        <label for="productDescription" class="form-label">Sub-Categoría:</label>
+                                        <label for="subCategoriaSelect" class="form-label">Sub-Categoría:</label>
                                     </div>
                                     <div class="row">
-                                        <select class="form-select form-select-md" aria-label="Seleccione...">
-                                            <option selected>Seleccione...</option>
-                                            <option value="1">Prueba</option>
+                                        <select id="subCategoriaSelect" name="sub_categoria_id" class="form-select form-select-md" aria-label="Seleccione...">
+                                            <option value="" selected>Seleccione...</option>
                                         </select>
                                     </div>
                                 </div>
                             </div>
-
+                            
                             <!-- Marca y Precio -->
                             <div class="row ms-2 me-2 mb-3">
                                 <div class="col-lg-6">
                                     <div class="row">
-                                        <label for="productDescription" class="form-label">Marca:</label>
+                                        <label for="marcaSelect" class="form-label">Marca:</label>
                                     </div>
                                     <div class="row me-1">
-                                        <select class="form-select form-select-md" aria-label="Seleccione...">
+                                        <select class="form-select form-select-md" name="marca" aria-label="Seleccione...">
                                             <option selected>Seleccione...</option>
                                             <option value="1">TORMENTA</option>
                                             <option value="2">DASHIR</option>
@@ -275,34 +273,34 @@
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="row">
-                                        <label for="productDescription" class="form-label">Precio:</label>
+                                        <label for="productPrice" class="form-label">Precio:</label>
                                     </div>
                                     <div class="row">
-                                        <input type="number" class="form-control" id="numero" placeholder="89.99" required>
+                                        <input type="number" class="form-control" id="productPrice" name="precio" placeholder="89.99" required>
                                     </div>
                                 </div>
                             </div>
-
+                        
                             <!-- Unidad de medida y Estado -->
                             <div class="row ms-2 me-2 mb-3">
                                 <div class="col-lg-6">
                                     <div class="row">
-                                        <label for="productDescription" class="form-label">Und. Medida:</label>
+                                        <label for="unidadMedidaSelect" class="form-label">Und. Medida:</label>
                                     </div>
                                     <div class="row me-1">
-                                        <select class="form-select form-select-md" aria-label="Seleccione...">
+                                        <select class="form-select form-select-md" name="unidad_medida" aria-label="Seleccione...">
                                             <option selected>Seleccione...</option>
-                                            <option value="1">KGM</option>
-                                            <option value="2">NIU</option>
+                                            <option value="KGM">KGM</option>
+                                            <option value="NIU">NIU</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="row">
-                                        <label for="productDescription" class="form-label">Precio:</label>
+                                        <label for="estadoProducto" class="form-label">Estado:</label>
                                     </div>
                                     <div class="row">
-                                        <select class="form-select form-select-md" aria-label="Seleccione...">
+                                        <select class="form-select form-select-md" name="estado" aria-label="Seleccione...">
                                             <option selected>Seleccione...</option>
                                             <option value="1">Activo</option>
                                             <option value="2">Inactivo</option>
@@ -310,7 +308,8 @@
                                     </div>
                                 </div>
                             </div>
-                        </form>
+                        </form>                        
+
                     </div>
                     <!-- Pie de página del modal -->
                     <div class="modal-footer">
@@ -378,7 +377,7 @@
                     </div>
                     <div class="col-lg-9">
                         <div class="input-group input-group-md ms-4">
-                            <input class="input-group-text" type="text" id="daterange" placeholder="01/4/2024 - 8/04/2028" style="width: 100%;">
+                            <input class="input-group-text" type="text" id="daterange" placeholder="01/4/2024 - 8/04/2028" style="width: 100%; background-color: white;">
                         </div>
                     </div>
                 </div>
@@ -432,7 +431,9 @@
                     </div>
                     <div class="col-lg-7">
                         <div class="input-group input-group-md">
-                            <button type="button" class="btn btn-primary" style="width: 100%;"><i class="fa-solid fa-plus me-2"></i>Nota de Ingreso</button>
+                            <a href="{{ url_for('transaccional.nueva_nota') }}" class="btn btn-primary" style="width: 100%;">
+                                <i class="fa-solid fa-plus me-2"></i>Nota de Ingreso
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -679,9 +680,40 @@
         </div>
     </div>
 </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title mt-3 ms-3 me-3 mb-2" id="confirmationModalLabel">
+                    {% if category == 'success' %}
+                    Éxito
+                    {% else %}
+                    Error
+                    {% endif %}
+                </h5>
+                </div>
+                <div class="modal-body">
+                {{ message }}
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
 </div>
 
+
+
 <script>
+    // Filtro de búsqueda en la tabla
     document.getElementById('searchInput').addEventListener('input', function() {
         let filter = this.value.toLowerCase();
         let rows = document.querySelectorAll('table tbody tr');
@@ -695,6 +727,47 @@
             }
         });
     });
+
+    // Actualización dinámica de subcategorías
+    document.getElementById('categoriaSelect').addEventListener('change', function() {
+        const categoriaId = this.value;
+        const subCategoriaSelect = document.getElementById('subCategoriaSelect');
+
+        if (categoriaId) {
+            // Genera la URL con Flask's url_for
+            const url = "{{ url_for('transaccional.obtener_subcategorias') }}?categoria_id=" + categoriaId;
+            
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error en la respuesta');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    subCategoriaSelect.innerHTML = '<option selected>Seleccione...</option>';
+
+                    data.forEach(subcategoria => {
+                        const option = document.createElement('option');
+                        option.value = subcategoria.id_subcategoria;
+                        option.textContent = subcategoria.nom_subcat;
+                        subCategoriaSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error en la solicitud:', error));
+        } else {
+            subCategoriaSelect.innerHTML = '<option selected>Seleccione...</option>';
+        }
+    });
+
+    // Mostrar el modal automáticamente si hay mensajes
+    document.addEventListener("DOMContentLoaded", function() {
+        var confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+        if (document.getElementById('confirmationModal')) {
+        confirmationModal.show();
+        }
+    });
+
 </script>
 
 {% endblock %}

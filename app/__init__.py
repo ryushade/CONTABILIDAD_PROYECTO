@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for, session
+from flask import Flask, redirect, url_for, session, render_template
 from config import Config
 
 def create_app():
@@ -7,7 +7,7 @@ def create_app():
 
     # Registrar Blueprints
     from app.controllers.transaccional import transactional_bp
-    app.register_blueprint(transactional_bp, url_prefix='/inicio')
+    app.register_blueprint(transactional_bp, url_prefix='/transaccional')
 
     from app.controllers.contable import accounting_bp
     app.register_blueprint(accounting_bp, url_prefix='/contable')
@@ -24,5 +24,10 @@ def create_app():
     @app.route('/')
     def index():
         return redirect(url_for('contable.login'))
+    
+    @app.route('/inicio')
+    def inicio():
+        return render_template('index.html')    
+
     
     return app

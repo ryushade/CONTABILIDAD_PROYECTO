@@ -20,36 +20,35 @@
             width: 13rem;
             overflow-y: auto;
             overflow-x: hidden;
-            transition: width 0.7s;
+            transition: width 0.3s;
             position: fixed;
-            /* Cambiado a fixed */
+            /* Mantiene el sidebar fijo */
             top: 0;
             left: 0;
             height: 100vh;
-            /* Ocupa toda la altura de la ventana */
             z-index: 1000;
-            /* Asegura que el sidebar esté por encima del contenido */
         }
 
         .sidebar.collapsed {
             width: 55px;
+        }
+
+        .main-content {
+            margin-left: 0;
+            /* Sin margen por defecto */
+            transition: margin-left 0.3s ease;
+            width: 100%;
+        }
+
+        .sidebar+.main-content {
+            margin-left: 13rem;
+            /* Ancho del sidebar */
         }
 
         .sidebar.collapsed+.main-content {
             margin-left: 55px;
+            /* Ancho cuando colapsado */
         }
-
-        .main-content {
-            margin-left: 13rem;
-            /* Igual al ancho del sidebar */
-            /* padding: 1rem; Opcional, para dar espacio al contenido */
-        }
-
-        .sidebar.collapsed {
-            width: 55px;
-            overflow: hidden;
-        }
-
 
         .sidebar-header {
             display: flex;
@@ -74,22 +73,16 @@
             display: flex;
             align-items: center;
             height: 48px;
-            transition: padding-left 0.7s;
+            transition: padding-left 0.3s;
         }
 
         li:hover {
             background-color: white;
             border-radius: 5px;
-        }
-
-        li:hover {
             color: #4069e5ff;
         }
 
         .toggle-button {
-            position: absolute;
-            right: -15px;
-            top: 10px;
             cursor: pointer;
             background-color: white;
             padding: 5px;
@@ -97,11 +90,9 @@
             border-radius: 5px;
             color: #4069e5ff;
             z-index: 1200;
-            /* Incrementa el valor */
             box-shadow: 4px 1px 5px 5px rgba(255, 255, 255, 0.1);
             font-size: 18px;
         }
-
 
         .sidebar-nav {
             margin-top: 1rem;
@@ -112,7 +103,7 @@
             align-items: center;
             padding: 0.7rem 0.4rem;
             cursor: pointer;
-            transition: background-color 0.7s;
+            transition: background-color 0.3s;
         }
 
         .nav-item:hover {
@@ -133,7 +124,7 @@
         .subnav {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.5s ease-out;
+            transition: max-height 0.3s ease-out;
         }
 
         .subnav.expanded {
@@ -176,6 +167,14 @@
                 width: 64px;
             }
 
+            .sidebar+.main-content {
+                margin-left: 64px;
+            }
+
+            .sidebar.collapsed+.main-content {
+                margin-left: 64px;
+            }
+
             .sidebar-title span,
             .nav-text,
             .subnav {
@@ -190,8 +189,8 @@
 </head>
 
 <body>
-    <div class="d-flex">
-        <!-- Sidebar -->
+    <div class="d-flex {% if 'transaccional' in request.path or 'contable' in request.path %}with-sidebar{% endif %}">
+        {% if 'transaccional' in request.path or 'contable' in request.path %}
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h2 class="sidebar-title">
@@ -202,35 +201,48 @@
                     <i class="fas fa-arrow-left"></i>
                 </button>
             </div>
+
             <div class="sidebar-nav">
-                <div class="nav-item">
-                    <i class="fas fa-home"></i>
-                    <span class="nav-text">Inicio</span>
-                </div>
+                <a href="{{ url_for('inicio') }}" style="text-decoration: none; color: inherit;">
+                    <div class="nav-item">
+                        <i class="fas fa-home"></i>
+                        <span class="nav-text">Inicio</span>
+                    </div>
+                </a>
 
                 {% if '/contable' not in request.path %}
                 <div class="nav-item has-subnav">
-                    <i class="fas fa-chart-line"></i>
-                    <span class="nav-text">Ventas</span>
-                    <i class="fas fa-chevron-down"></i>
+                    <a href="{{ url_for('transaccional.ventas') }}" style="text-decoration: none; color: inherit;">
+                        <i class="fas fa-chart-line"></i>
+                        <span class="nav-text">Ventas</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </a>
                 </div>
+
                 <div class="subnav">
                     <div class="subnav-item">Nueva Venta</div>
                 </div>
+
                 <div class="nav-item has-subnav">
                     <i class="fas fa-shopping-cart"></i>
-                    <span class="nav-text">Compras</span>
-                    <i class="fas fa-chevron-down"></i>
+                    <a href="{{ url_for('transaccional.compras') }}" style="text-decoration: none; color: inherit;">
+                        <span class="nav-text">Compras</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </a>
                 </div>
+
                 <div class="subnav">
                     <div class="subnav-item">Nueva Compra</div>
                 </div>
 
                 <div class="nav-item has-subnav">
                     <i class="fas fa-warehouse"></i>
-                    <span class="nav-text">Almacén</span>
-                    <i class="fas fa-chevron-down"></i>
+                    <a href="{{ url_for('transaccional.almacen') }}" style="text-decoration: none; color: inherit;">
+                        <span class="nav-text">Almacén</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </a>
                 </div>
+
                 <div class="subnav">
                     <div class="subnav-item">Nota de ingreso</div>
                     <div class="subnav-item">Guía de remisión</div>
@@ -238,13 +250,12 @@
                 </div>
                 {% endif %}
 
-                
-
                 <div class="nav-item has-subnav">
                     <i class="fas fa-calculator"></i>
                     <span class="nav-text">Contabilidad</span>
                     <i class="fas fa-chevron-down"></i>
                 </div>
+
                 <div class="subnav">
                     <div class="subnav-item">Listado de cuentas</div>
                     <div class="subnav-item">Asientos contables</div>
@@ -256,13 +267,14 @@
                     <span class="nav-text">Configuración</span>
                     <i class="fas fa-chevron-down"></i>
                 </div>
+
                 <div class="subnav">
                     <div class="subnav-item">Usuarios</div>
                     <div class="subnav-item">Reglas contables</div>
                 </div>
             </div>
-
         </aside>
+        {% endif %}
 
         <!-- Contenido principal -->
         <div class="main-content flex-grow-1">
@@ -273,6 +285,8 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse ms-1 me-1" id="navbarSupportedContent">
+                    <h4 class="text-6xl font-bold tracking-wide text-gray-70 ms-3 mt-2 me-3"
+                        style="color: #1D4ED8; font-weight: 700;">TORMENTA</h4>
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('transaccional.ventas') }}">Ventas</a>
@@ -290,7 +304,7 @@
 
                     <!-- User Dropdown -->
                     {% if user %}
-                    <div class="dropdown">
+                    <div class="dropdown me-3">
                         <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button"
                             id="userDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fas fa-user-circle" style="font-size: 20px; color: gray;"></i>
@@ -317,7 +331,7 @@
             </nav>
 
             <!-- Contenido de la página -->
-            <div class="ms-5 me-5 mt-2">
+            <div class="me-5 mt-2 {% if 'transaccional' in request.path or 'contable' in request.path %}ms-5{% endif %}">
                 {% block content %}{% endblock %}
             </div>
         </div>
@@ -337,23 +351,42 @@
             maxDate: "08/04/2028"
         });
     </script>
+        <script>
+            flatpickr("#datenormal", {
+                dateFormat: "d/m/Y",
+                minDate: "01/01/1900",
+                maxDate: "08/04/2028"
+            });
+        </script>
     <script>
         // Lógica para manejar el sidebar
         document.addEventListener('DOMContentLoaded', function () {
             const sidebar = document.querySelector('.sidebar');
             const toggleButton = document.querySelector('.toggle-button');
             const navItems = document.querySelectorAll('.nav-item.has-subnav');
+            const mainContent = document.querySelector('.main-content');
 
-            toggleButton.addEventListener('click', function () {
-                sidebar.classList.toggle('collapsed');
-                const icon = this.querySelector('i');
-                icon.classList.toggle('fa-arrow-left');
-                icon.classList.toggle('fa-arrow-right');
-            });
+            if (sidebar) {
+                toggleButton.addEventListener('click', function () {
+                    sidebar.classList.toggle('collapsed');
+                    const icon = this.querySelector('i');
+                    icon.classList.toggle('fa-arrow-left');
+                    icon.classList.toggle('fa-arrow-right');
+
+                    if (sidebar.classList.contains('collapsed')) {
+                        mainContent.style.marginLeft = '55px';
+                    } else {
+                        mainContent.style.marginLeft = '250px';
+                    }
+                });
+            } else {
+                // Si no hay sidebar, asegura que main-content no tenga margen-left
+                mainContent.style.marginLeft = '0';
+            }
 
             navItems.forEach(item => {
                 item.addEventListener('click', function () {
-                    if (!sidebar.classList.contains('collapsed')) {
+                    if (sidebar && !sidebar.classList.contains('collapsed')) {
                         const subnav = this.nextElementSibling;
                         subnav.classList.toggle('expanded');
                         const icon = this.querySelector('.fa-chevron-down, .fa-chevron-up');
