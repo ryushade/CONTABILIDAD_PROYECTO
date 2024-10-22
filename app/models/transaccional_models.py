@@ -228,6 +228,28 @@ def obtener_inventario():
     except Exception as e:
         print(f"Error: {e}")
         return []
+    
+
+'''
+Consultas Compras
+'''
+#Obtener todos las compras
+def obtener_compras():
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            sql = """
+            SELECT c.id_compra, pr.razon_social, c.fecha_compra, sc.nom_subcat, dc.subtotal FROM compra c INNER JOIN detalle_compra dc ON c.id_compra = dc.id_compra
+            INNER JOIN proveedor pr ON c.id_proveedor = pr.id_proveedor INNER JOIN producto p ON p.id_producto = dc.id_producto
+            INNER JOIN sub_categoria sc ON p.id_subcategoria = sc.id_subcategoria
+            """
+            cursor.execute(sql)
+            return cursor.fetchall()  # Asegúrate de retornar solo los datos
+    except Exception as e:
+        print(f"Error: {e}")
+        return []
+    except Exception as e:
+        return jsonify({'code': 0, 'message': str(e)}), 500
 
 
 def generate_barcode(code):
@@ -309,7 +331,6 @@ def totalEfectivo():
     
     
 def obtener_ventas(nom_tipocomp='', razon_social='', nombre_sucursal='', fecha_i='2022-01-01', fecha_e='2027-12-27'):
-    # Processing nom_tipocomp to create the IN clause
     nom_tipocomp_array = [item.strip() for item in nom_tipocomp.split(',') if item.strip() != '']
     in_clause = '1=1'  # Default to no filtering
     params = []
