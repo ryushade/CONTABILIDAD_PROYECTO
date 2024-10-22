@@ -1,5 +1,5 @@
 from flask import render_template, send_file
-from app.models.transaccional_models import obtener_productos, obtener_marcas, obtener_categorias, obtener_ingresos, obtener_nota_salida, obtener_inventario
+from app.models.transaccional_models import obtener_productos, obtener_marcas, obtener_categorias, obtener_ingresos, obtener_nota_salida, obtener_inventario, obtener_compras
 from app.models.transaccional_models import generate_barcode
 from . import transactional_bp
 
@@ -65,5 +65,6 @@ def ventas():
 
 @transactional_bp.route('/compras')
 def compras():
-    return render_template('transaccional/compras/compras.html')
+    compras = obtener_compras()
+    return render_template('transaccional/compras/compras.html', compras=compras)
 #----------------------------------------------
