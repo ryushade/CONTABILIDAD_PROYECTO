@@ -225,40 +225,29 @@
                         <input type="text" class="form-control" placeholder="Buscar un producto aquí..."
                             aria-label="Buscar">
                     </div>
-                    <a href="" class="btn btn-primary mb-2 ms-2 mt-2">
-                        <i class="fa fa-plus"></i> Agregar Producto
-                    </a>
                 </div>
                 <div class="table-container mt-4">
                     <div class="table-scroll">
                         <table>
                             <thead>
                                 <tr>
-                                    <th class="text-center">PRODUCTO</th>
-                                    <th class="text-center">CANTIDAD</th>
-                                    <th class="text-center">PRECIO</th>
-                                    <th class="text-center">EXONERADO</th>
-                                    <th class="text-center">IMPORTE</th>
-                                    <th class="text-center">ELIMINAR</th>
-                                    <th class="text-center">VENCE</th>
+                                    <th class="text-center">ID COMPRA</th>
+                                    <th class="text-center">RAZÓN SOCIAL</th>
+                                    <th class="text-center">FECHA DE COMPRA</th>
+                                    <th class="text-center">SUBCATEGORÍA</th>
+                                    <th class="text-center">SUBTOTAL</th>
                                 </tr>
                             </thead>
                             <tbody>
+                                {% for dato in compras %}
                                 <tr>
-                                    <td class="text-center">SUAVE DOBLE HOJA X2 UND</td>
-                                    <td class="text-center">
-                                        <div class="input-group justify-content-center" style="max-width: 150px; margin: auto;">
-                                            <button class="btn btn-light" type="button">-</button>
-                                            <input type="text" class="form-control" value="1.00" style="max-width: 80px; text-align: center;">
-                                            <button class="btn btn-light" type="button">+</button>
-                                        </div>
-                                    </td>
-                                    <td class="text-center">1.70</td>
-                                    <td class="text-center">0.00</td>
-                                    <td class="text-center">1.70</td>
-                                    <td class="text-center"><button class="btn btn-danger">Quitar</button></td>
-                                    <td class="text-center">/</td>
+                                    <td class="text-center">{{data.id_compra}}</td>
+                                    <td class="text-center">{{data.razon_social}}</td>
+                                    <td class="text-center">{{data.fecha_compra}}</td>
+                                    <td class="text-center">{{data.nom_subcat}}</td>
+                                    <td class="text-center">{{data.subtotal}}</td>
                                 </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
