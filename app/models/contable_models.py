@@ -212,3 +212,19 @@ def obtener_reglas():
             return cursor.fetchall()
     finally:
         connection.close()
+
+def obtener_asientodiario():
+    connection = obtener_conexion()
+    try:
+        with connection.cursor() as cursor:
+            sql = """
+                UPDATE cuenta SET
+                    codigo_cuenta = %s,
+                    nombre_cuenta = %s,
+                    naturaleza = %s,
+                    estado_cuenta = %s
+                WHERE id_cuenta = %s
+            """
+            cursor.execute(sql)
+    finally:
+        connection.close()

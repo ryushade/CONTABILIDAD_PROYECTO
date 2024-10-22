@@ -2,16 +2,10 @@
 
 {% block title %}Tormenta{% endblock %}
 
-{% from 'breadcrumb.html' import breadcrumb %}
 
 {% block content %}
 <header class="mb-4">
-    {{ breadcrumb([
-    {'label': 'Inicio', 'url': url_for('inicio'), 'icon': 'M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0
-    001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0
-    001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z'},
-    {'label': 'Ventas', 'url': url_for('transaccional.ventas')}
-    ]) }}
+
     <h1 class="text-8xl font-bold tracking-wide text-gray-700 title-Inicio">MÓDULO VENTAS - POS</h1>
 </header>
 
@@ -42,19 +36,7 @@
         border-radius: 12px;
     }
 
-    /* Botón desplegable */
-    .dropdown-toggle {
-        border-radius: 8px;
-        padding: 5px 10px;
-        background-color: #e7f1ff;
-        color: #007bff;
-        border: 1px solid #007bff;
-    }
 
-    .dropdown-toggle:focus {
-        outline: none;
-        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-    }
 
     .estado-activo {
         background-color: #eafff0;
@@ -273,7 +255,7 @@
         <div class="mb-4">
             <hr>
             <p class="text-muted" style="font-size: 14px;">
-                Podrás visualizar las ventas del sistema transaccional.
+                Podrás gestionar las ventas del sistema transaccional de Tormenta.
             </p>
         </div>
 
@@ -320,7 +302,9 @@
     <div class="tab-pane fade" id="newventa">
         <!-- Detalles -->
         <div class="mb-4">
-          
+            <h1 class="font-weight-bold display-8 text-left fs-3" style="font-weight: bold;">REGISTRAR NUEVA VENTA
+            </h1>
+
         </div>
         <div class="flex justify-between items-center mb-4">
             <div class="card bg-white">
@@ -358,7 +342,8 @@
                     </script>
                 </div>
                 <div class="flex items-center space mb-4">
-                    <input type="text" class="input" placeholder="Buscar por código o nombre de producto" />
+                    <input type="text" style="width: 25rem;box-shadow: 0 0 10px #171a1f33; border-radius: 10px;"
+                        class="input" placeholder="Buscar producto en el detalle" />
                     <button class="btn btn-primary">Producto</button>
                     <div class="table-container">
                         <table>
@@ -369,7 +354,7 @@
                                     <th class="text-center" style="font-weight: bolder;">Precio</th>
                                     <th class="text-center" style="font-weight: bolder;">Descuento</th>
                                     <th class="text-center" style="font-weight: bolder;">Subtotal</th>
-                                   
+
                                 </tr>
                             </thead>
                             <tbody>
@@ -393,12 +378,37 @@
                                 {% endfor %}
                             </tbody>
                         </table>
+
+                    </div>
+                    <div class="flex justify-content-end mt-4">
+                        <div class="flex flex-col w-100">
+                            <div class="flex justify-between y-1 items-center">
+                                <span class="font-weight-bold flex justify-content-end span-title me-3">IMPORTE</span>
+                                <span class="inputs-montos">S/. </span>
+                            </div>
+                            <div class="flex justify-between my-1 items-center">
+                                <span class="font-weight-bold flex justify-content-end span-title me-3">IGV</span>
+                                <span class="inputs-montos">S/. </span>
+                            </div>
+                            <div class="flex justify-between my-1 items-center">
+                                <span class="font-weight-bold flex justify-content-end span-title me-3">TOTAL</span>
+                                <span class="inputs-montos">S/. </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-content-end mt-4">
+                        <div class="items-center flex me-2">
+                            <button class="btn btn-cotizar flex items-center">Cotizar</button>
+
+                        </div>
+                        <div class="items-center flex- me-2">
+                            <button class="btn btn-cobrar flex items-center">Cobrar</button>
+                        </div>
                     </div>
                 </div>
             </div>
+
         </div>
-
     </div>
-</div>
 
-{% endblock %}
+    {% endblock %}

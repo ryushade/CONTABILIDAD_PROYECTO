@@ -309,7 +309,6 @@ def totalEfectivo():
     
     
 def obtener_ventas(nom_tipocomp='', razon_social='', nombre_sucursal='', fecha_i='2022-01-01', fecha_e='2027-12-27'):
-    # Processing nom_tipocomp to create the IN clause
     nom_tipocomp_array = [item.strip() for item in nom_tipocomp.split(',') if item.strip() != '']
     in_clause = '1=1'  # Default to no filtering
     params = []

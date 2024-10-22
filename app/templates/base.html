@@ -103,11 +103,13 @@
             align-items: center;
             padding: 0.7rem 0.4rem;
             cursor: pointer;
-            transition: background-color 0.3s;
         }
 
         .nav-item:hover {
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: #4069e5ff;
+            color: white;
+            transition: background-color 0.2s ease;
+            border-radius: 20px;
         }
 
         .nav-item i {
@@ -135,6 +137,11 @@
             padding: 0.5rem 1rem 0.5rem 3rem;
             cursor: pointer;
         }
+
+        .nav-link:hover {
+            color: white;
+        }
+
 
         .subnav-item:hover {
             background-color: rgba(255, 255, 255, 0.1);
@@ -211,56 +218,48 @@
                 </a>
 
                 {% if '/contable' not in request.path %}
-                <div class="nav-item has-subnav">
+                <div class="nav-item">
                     <a href="{{ url_for('transaccional.ventas') }}" style="text-decoration: none; color: inherit;">
                         <i class="fas fa-chart-line"></i>
                         <span class="nav-text">Ventas</span>
-                        <i class="fas fa-chevron-down"></i>
                     </a>
                 </div>
 
-                <div class="subnav">
-                    <div class="subnav-item">Nueva Venta</div>
-                </div>
+             
 
-                <div class="nav-item has-subnav">
+                <div class="nav-item">
                     <i class="fas fa-shopping-cart"></i>
                     <a href="{{ url_for('transaccional.compras') }}" style="text-decoration: none; color: inherit;">
                         <span class="nav-text">Compras</span>
-                        <i class="fas fa-chevron-down"></i>
                     </a>
                 </div>
 
-                <div class="subnav">
-                    <div class="subnav-item">Nueva Compra</div>
-                </div>
+               
 
-                <div class="nav-item has-subnav">
+                <div class="nav-item">
                     <i class="fas fa-warehouse"></i>
                     <a href="{{ url_for('transaccional.almacen') }}" style="text-decoration: none; color: inherit;">
                         <span class="nav-text">Almacén</span>
-                        <i class="fas fa-chevron-down"></i>
                     </a>
                 </div>
 
-                <div class="subnav">
-                    <div class="subnav-item">Nota de ingreso</div>
-                    <div class="subnav-item">Guía de remisión</div>
-                    <div class="subnav-item">Nota de salida</div>
-                </div>
+               
                 {% endif %}
 
-                <div class="nav-item has-subnav">
+                <div class="nav-item">
                     <i class="fas fa-calculator"></i>
-                    <span class="nav-text">Contabilidad</span>
-                    <i class="fas fa-chevron-down"></i>
+                    <a href="{{ url_for('contable.cuentas') }}" style="text-decoration: none; color: inherit;">
+                        <span class="nav-text">Plan contable</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <a href="{{ url_for('contable.reportes') }}" style="text-decoration: none; color: inherit;">
+                        <span class="nav-text">Estados financieros</span>
+                    </a>
                 </div>
 
-                <div class="subnav">
-                    <div class="subnav-item">Listado de cuentas</div>
-                    <div class="subnav-item">Asientos contables</div>
-                    <div class="subnav-item">Libro diario</div>
-                </div>
+
 
                 <div class="nav-item has-subnav">
                     <i class="fas fa-cog"></i>
@@ -331,7 +330,8 @@
             </nav>
 
             <!-- Contenido de la página -->
-            <div class="me-5 mt-2 {% if 'transaccional' in request.path or 'contable' in request.path %}ms-5{% endif %}">
+            <div
+                class="me-5 mt-2 {% if 'transaccional' in request.path or 'contable' in request.path %}ms-5{% endif %}">
                 {% block content %}{% endblock %}
             </div>
         </div>
@@ -351,13 +351,13 @@
             maxDate: "08/04/2028"
         });
     </script>
-        <script>
-            flatpickr("#datenormal", {
-                dateFormat: "d/m/Y",
-                minDate: "01/01/1900",
-                maxDate: "08/04/2028"
-            });
-        </script>
+    <script>
+        flatpickr("#datenormal", {
+            dateFormat: "d/m/Y",
+            minDate: "01/01/1900",
+            maxDate: "08/04/2028"
+        });
+    </script>
     <script>
         // Lógica para manejar el sidebar
         document.addEventListener('DOMContentLoaded', function () {
