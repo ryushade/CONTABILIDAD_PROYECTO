@@ -1,5 +1,5 @@
 from flask import request, redirect, url_for, flash, session, jsonify, render_template, send_file
-from app.models.contable_models import obtener_usuario_por_nombre, verificar_contraseña, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta,obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel
+from app.models.contable_models import obtener_usuario_por_nombre, verificar_contraseña, obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, actualizar_reglas, obtener_cuentas_excel
 from . import accounting_bp# routes.py
 import pandas as pd
 import io
@@ -121,9 +121,10 @@ def editar_cuenta(cuenta_id):
 
     return redirect(url_for('contable.cuentas'))
 
-@accounting_bp.route('/reglas')
+@accounting_bp.route('/reglas', methods=['GET'])
 def reglas():
-    return render_template('contable/reglas/reglas.html')
+    reglas = obtener_reglas()
+    return render_template('contable/reglas/reglas.html', reglas=reglas)
 
 @accounting_bp.route('/usuarios', methods = ['GET'])
 def usuarios():
@@ -134,3 +135,20 @@ def usuarios():
 def eliminar_cuenta(cuenta_id):
     eliminar_cuenta(cuenta_id)
     return redirect(url_for('contable.cuentas'))
+
+@accounting_bp.route('/reglas/eliminar/<int:regla_id>', methods=['POST'])
+def eliminar_regla(regla_id):
+    eliminar_regla_bd(regla_id)  # Llama a la función separada
+    return redirect(url_for('contable.reglas'))
+
+@accounting_bp.route('/reglas/editar/<int:regla_id>', methods=['POST'])
+def editar_regla(regla_id):
+    nombre_regla = request.form['nombre_regla']
+    tipo_transaccion = request.form['tipo_transaccion']
+    cuenta_debe = request.form['cuenta_debe']
+    cuenta_haber = request.form['cuenta_haber']
+    estado_regla = request.form['estado']
+
+    actualizar_reglas(regla_id, nombre_regla, tipo_transaccion, cuenta_debe, cuenta_haber, estado_regla)
+    
+    return redirect(url_for('contable.reglas'))

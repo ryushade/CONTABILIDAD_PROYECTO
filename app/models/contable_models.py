@@ -134,6 +134,20 @@ def eliminar_cuenta(cuenta_id):
     finally:
         conexion.close()
 
+def eliminar_regla_bd(regla_id):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            sql = "DELETE FROM reglas_contabilizacion WHERE id_regla = %s"
+            cursor.execute(sql, (regla_id,))
+            conexion.commit()
+            print(f"Regla con id {regla_id} eliminada correctamente")
+    except Exception as e:
+        print(f"Error al eliminar la regla: {e}")
+    finally:
+        conexion.close()
+
+
 
 
 
@@ -188,30 +202,30 @@ def obtener_usuarios():
     finally:
         connection.close()
 
-def obtener_reglas():
-    connection = obtener_conexion()
-    try:
-        with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-            sql = """
-                SELECT 
-                    r.id_regla, 
-                    r.nombre_regla, 
-                    r.tipo_transaccion, 
-                    cd.codigo_cuenta AS cuenta_debe_codigo,
-                    cd.nombre_cuenta AS cuenta_debe_nombre, 
-                    ch.codigo_cuenta AS cuenta_haber_codigo,
-                    ch.nombre_cuenta AS cuenta_haber_nombre
-                FROM 
-                    reglas_contabilizacion r
-                INNER JOIN 
-                    cuenta cd ON r.cuenta_debe = cd.id_cuenta
-                INNER JOIN 
-                    cuenta ch ON r.cuenta_haber = ch.id_cuenta
-            """
-            cursor.execute(sql)
-            return cursor.fetchall()
-    finally:
-        connection.close()
+# def obtener_reglas():
+#     connection = obtener_conexion()
+#     try:
+#         with connection.cursor(pymysql.cursors.DictCursor) as cursor:
+#             sql = """
+#                 SELECT 
+#                     r.id_regla, 
+#                     r.nombre_regla, 
+#                     r.tipo_transaccion, 
+#                     cd.codigo_cuenta AS cuenta_debe_codigo,
+#                     cd.nombre_cuenta AS cuenta_debe_nombre, 
+#                     ch.codigo_cuenta AS cuenta_haber_codigo,
+#                     ch.nombre_cuenta AS cuenta_haber_nombre
+#                 FROM 
+#                     reglas_contabilizacion r
+#                 INNER JOIN 
+#                     cuenta cd ON r.cuenta_debe = cd.id_cuenta
+#                 INNER JOIN 
+#                     cuenta ch ON r.cuenta_haber = ch.id_cuenta
+#             """
+#             cursor.execute(sql)
+#             return cursor.fetchall()
+#     finally:
+#         connection.close()
 
 def obtener_asientodiario():
     connection = obtener_conexion()
@@ -226,5 +240,34 @@ def obtener_asientodiario():
                 WHERE id_cuenta = %s
             """
             cursor.execute(sql)
+    finally:
+        connection.close()
+
+
+def obtener_reglas():
+    connection = obtener_conexion()
+    try:
+        with connection.cursor() as cursor:
+            sql = """SELECT id_regla, tipo_transaccion, cuenta_debe, cuenta_haber, nombre_regla, estado FROM reglas_contabilizacion"""
+            cursor.execute(sql)
+            reglas = cursor.fetchall()  
+            return reglas  
+    finally:
+        connection.close()
+
+def actualizar_reglas(id_regla, nombre_regla, tipo_transaccion, cuenta_debe, cuenta_haber, estado):
+    connection = obtener_conexion()
+    try:
+        with connection.cursor() as cursor:
+            sql = """
+                UPDATE reglas_contabilizacion SET
+                    nombre_regla = %s,
+                    tipo_transaccion = %s,
+                    cuenta_debe = %s,
+                    cuenta_haber = %s,
+                    estado = %s
+                WHERE id_cuenta = %s
+            """
+            cursor.execute(sql, (nombre_regla, tipo_transaccion, cuenta_debe, cuenta_haber, estado, id_regla))
     finally:
         connection.close()
