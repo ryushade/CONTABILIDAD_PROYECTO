@@ -230,6 +230,29 @@ def obtener_inventario():
         return []
     
 
+# Obtener productos de ventas según la sucursal
+def obtener_inventario_vigente():
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            sql = """
+                SELECT PR.id_producto AS codigo, PR.descripcion AS nombre, 
+                    CAST(PR.precio AS DECIMAL(10, 2)) AS precio, 
+                    inv.stock AS stock
+                FROM producto PR
+                INNER JOIN inventario inv ON inv.id_producto = PR.id_producto
+                WHERE PR.estado_producto = 1 AND inv.stock > 0
+                ORDER BY PR.id_producto DESC;
+            """
+            cursor.execute(sql)
+            resultados = cursor.fetchall()
+            return resultados
+    except Exception as e:
+        print(f"Error: {e}")
+        return []
+
+
+
 '''
 Consultas Compras
 '''
