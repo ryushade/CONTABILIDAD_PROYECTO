@@ -132,14 +132,14 @@
 <div class="row align-items-center mt-2 mb-4">
     <div class="col-md-12 d-flex flex-wrap align-items-center">
         <div class="input-group me-2 mb-2" style="flex: 1; max-width: 400px;">
-            <input style="font-size: 14px;"  type="text" id="searchInput" class="form-control" placeholder="Buscar por nombre o num. de cuenta"
-                aria-label="Buscar">
+            <input style="font-size: 14px;" type="text" id="searchInput" class="form-control"
+                placeholder="Buscar por nombre o num. de cuenta" aria-label="Buscar">
         </div>
 
 
         <div class="dropdown me-2 mb-2" style="width: 300px;">
-            <button style="font-size: 14px;" class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="tipoCuenta"
-                data-bs-toggle="dropdown" aria-expanded="false"
+            <button style="font-size: 14px;" class="btn btn-outline-secondary dropdown-toggle w-100" type="button"
+                id="tipoCuenta" data-bs-toggle="dropdown" aria-expanded="false"
                 style="background-color: white; border: 0.2px solid rgb(219, 215, 215); color: black;">
                 {{ tipo_cuenta if tipo_cuenta else 'Tipo de cuenta' }}
             </button>
@@ -177,7 +177,8 @@
 
 
         <div class="dropdown me-2 mb-2" style="width: 220px;">
-            <button style="font-size: 14px;" class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="dropdown2" style="
+            <button style="font-size: 14px;" class="btn btn-outline-secondary dropdown-toggle w-100" type="button"
+                id="dropdown2" style="
     background-color: white; border: 0.2px solid rgb(219, 215, 215); color: black; " data-bs-toggle="dropdown"
                 aria-expanded="false">
                 {{ naturaleza if naturaleza else 'Naturaleza' }}
@@ -222,7 +223,7 @@
                 <tr>
                     <td class="text-center" style="font-size: 14px;">{{ cuenta.codigo_cuenta }}</td>
                     <td class="text-align" style="height: 5px; font-size: 14px;">{{ cuenta.nombre_cuenta }}</td>
-                    <td class="text-center" >
+                    <td class="text-center">
                         <span style="font-size: 14px;" class="estado 
                     {% if cuenta.naturaleza == 'Deudora' %}
                         deudora
@@ -262,8 +263,8 @@
                             <i class="fas fa-eye"></i>
                         </span>
 
-                        <span style="font-size: 14px;" class="action-button secondary edit"  data-cuenta-id="{{ cuenta.id_cuenta }}"><i
-                                class="fas fa-edit"></i></span>
+                        <span style="font-size: 14px;" class="action-button secondary edit"
+                            data-cuenta-id="{{ cuenta.id_cuenta }}"><i class="fas fa-edit"></i></span>
                         <span style="font-size: 14px;" class="action-button secondary trash"
                             onclick='openModalDelete({{ cuenta.id_cuenta }}, "{{ cuenta.codigo_cuenta }}", "{{ cuenta.nombre_cuenta }}")'>
                             <i class="fas fa-trash"></i>
@@ -336,7 +337,7 @@
 
     <!-- Selector de Cantidad -->
     <div class="col-md-4 text-end mt-3 mt-md-0">
-        <select style="font-size: 14px;"  class="form-select w-auto d-inline" onchange="location = this.value;">
+        <select style="font-size: 14px;" class="form-select w-auto d-inline" onchange="location = this.value;">
             <option
                 value="{{ url_for('contable.cuentas', page=page, per_page=50, tipo_cuenta=tipo_cuenta, naturaleza=naturaleza) }}"
                 {% if per_page==50 %}selected{% endif %}>50</option>

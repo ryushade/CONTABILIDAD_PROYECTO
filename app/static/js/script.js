@@ -71,10 +71,10 @@ document.addEventListener('DOMContentLoaded', function () {
   const searchInput = document.getElementById('searchInput');
   const tableRows = document.querySelectorAll('table tbody tr');
   const noResultsMessage = document.createElement('tr');
-  
+
   noResultsMessage.innerHTML = '<td colspan="5" style="text-align: center;">No se encontraron resultados..</td>';
   noResultsMessage.style.display = 'none';
-  
+
   tableRows[0].parentNode.appendChild(noResultsMessage);
 
   searchInput.addEventListener('keyup', function () {
@@ -115,6 +115,7 @@ function closeModalDelete() {
   document.getElementById('deleteCuentaModal').style.display = 'none';
 }
 
+
 function deleteCuenta() {
   var cuentaId = document.getElementById('deleteCuentaId').value;
   // Crear un formulario para enviar la solicitud POST
@@ -124,6 +125,8 @@ function deleteCuenta() {
   document.body.appendChild(form);
   form.submit();
 }
+
+
 
 
 function openModalAdd() {
