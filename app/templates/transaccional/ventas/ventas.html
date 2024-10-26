@@ -1,3 +1,5 @@
+HTML:
+
 {% extends 'base.html' %}
 
 {% block title %}Tormenta{% endblock %}
@@ -301,50 +303,60 @@
     <!-- Nueva Venta -->
     <div class="tab-pane fade" id="newventa">
         <!-- Detalles -->
-        <div class="mb-4">
-            <h1 class="font-weight-bold display-8 text-left fs-3" style="font-weight: bold;">REGISTRAR NUEVA VENTA
+        <div class="mb-5">
+            <h1 class="font-weight-bold display-8 text-left fs-3" style="font-weight: bold;">
+                REGISTRAR NUEVA VENTA
             </h1>
-
         </div>
         <div class="flex justify-between items-center mb-4">
-            <div class="card bg-white">
-                <div class="text-lg font-bold">Detalle de venta</div>
-                <div class="flex items-center space x-2">
-                    <label for="switchDetalles" style="display: flex; align-items: center; cursor: pointer;">
-                        <div style="position: relative; width: 48px; height: 24px; transition: background-color 0.2s ease-in-out; border-radius: 12px;"
-                            class="bg-gray-200" id="toggleContainer">
-                            <input id="switchDetalles" type="checkbox"
-                                style="position: absolute; width: 100%; height: 100%; opacity: 0;"
-                                onchange="toggleDetalleMode(this)" />
-                            <div style="width: 24px; height: 24px; border-radius: 50%; position: absolute; top: 0; left: 0; background-color: #d1d5db; transition: transform 0.2s ease-in-out;"
-                                class="toggleIndicator"></div>
-                        </div>
-                        <div style="margin-left: 12px; color: #4b5563; font-weight: 500;">Búsqueda por detalle</div>
-                    </label>
-
-                    <script>
-                        function toggleDetalleMode(checkbox) {
-                            const toggleContainer = document.getElementById('toggleContainer');
-                            const toggleIndicator = toggleContainer.querySelector('.toggleIndicator');
-
-                            if (checkbox.checked) {
-                                toggleContainer.classList.add('bg-custom-blue');
-                                toggleContainer.classList.remove('bg-gray-200');
-                                toggleIndicator.style.transform = 'translateX(24px)';
-                                toggleIndicator.style.backgroundColor = '#ffffff';
-                            } else {
-                                toggleContainer.classList.add('bg-gray-200');
-                                toggleContainer.classList.remove('bg-custom-blue');
-                                toggleIndicator.style.transform = 'translateX(0)';
-                                toggleIndicator.style.backgroundColor = '#d1d5db';
+            <div class="card bg-white p-3">
+                <div class="row justify-content-between">
+                    <div class="text-lg fw-bolder col-4">Detalle de venta</div>
+                    <div class="flex items-center space x-2 col-3">
+                        <label for="switchDetalles" style="display: flex; align-items: center; cursor: pointer;">
+                            <div style="position: relative; width: 48px; height: 24px; transition: background-color 0.2s ease-in-out; border-radius: 12px;"
+                                class="bg-gray-200" id="toggleContainer">
+                                <input id="switchDetalles" type="checkbox"
+                                    style="position: absolute; width: 100%; height: 100%; opacity: 0;"
+                                    onchange="toggleDetalleMode(this)" />
+                                <div style="width: 24px; height: 24px; border-radius: 50%; position: absolute; top: 0; left: 0; background-color: #d1d5db; transition: transform 0.2s ease-in-out;"
+                                    class="toggleIndicator"></div>
+                            </div>
+                            <div style="color: #4b5563; font-weight: 500;">Búsqueda por detalle</div>
+                        </label>
+                        <script>
+                            function toggleDetalleMode(checkbox) {
+                                const toggleContainer = document.getElementById('toggleContainer');
+                                const toggleIndicator = toggleContainer.querySelector('.toggleIndicator');
+    
+                                if (checkbox.checked) {
+                                    toggleContainer.classList.add('bg-custom-blue');
+                                    toggleContainer.classList.remove('bg-gray-200');
+                                    toggleIndicator.style.transform = 'translateX(24px)';
+                                    toggleIndicator.style.backgroundColor = '#ffffff';
+                                } else {
+                                    toggleContainer.classList.add('bg-gray-200');
+                                    toggleContainer.classList.remove('bg-custom-blue');
+                                    toggleIndicator.style.transform = 'translateX(0)';
+                                    toggleIndicator.style.backgroundColor = '#d1d5db';
+                                }
                             }
-                        }
-                    </script>
-                </div>
-                <div class="flex items-center space mb-4">
-                    <input type="text" style="width: 25rem;box-shadow: 0 0 10px #171a1f33; border-radius: 10px;"
-                        class="input" placeholder="Buscar producto en el detalle" />
-                    <button class="btn btn-primary">Producto</button>
+                        </script>
+                    </div>
+                  </div>
+                
+                
+                <div class="flex items-center space mb-4 my-2 row">
+                    <div class="col">
+                        <div class="row my-2">
+                            <div class="col-10">
+                                <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="Buscar el producto en el detalle">
+                            </div>
+                             <div class="col"><button class="btn btn-primary">Producto</button></div>
+                        </div>
+                    </div>
+                    
+            
                     <div class="table-container">
                         <table>
                             <thead>
@@ -410,5 +422,75 @@
 
         </div>
     </div>
+
+
+<div id="modalBackground" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 999;" onclick="closeModal()"></div>
+
+<!-- Modal de Bootstrap -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title ms-3 mt-3 mb-2" id="productModalLabel">Busque y seleccione el producto</h5>
+            </div>
+            <div class="modal-body">
+                <!-- Campo de búsqueda -->
+                <input type="text" id="modalSearchInput" placeholder="Realice la búsqueda del producto por el nombre" class="form-control mb-3" />
+                <div style="max-height: 50vh; overflow-y: auto;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Precio</th>
+                                <th>Stock</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productTableBody">
+                            {% for producto in datos_inventario %}
+                            <tr>
+                                <td>{{ producto.nombre }}</td>
+                                <td>S/ {{ producto.precio }}</td>
+                                <td>{{ producto.stock }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function openModal() {
+        document.getElementById("productModal").style.display = "block";
+        document.getElementById("modalBackground").style.display = "block";
+    }
+
+    function closeModal() {
+        document.getElementById("productModal").style.display = "none";
+        document.getElementById("modalBackground").style.display = "none";
+    }
+
+        // Búsqueda en tiempo real en el modal
+        document.getElementById('modalSearchInput').addEventListener('input', function() {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#productTableBody tr');
+
+        rows.forEach(row => {
+            const nombre = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+
+            if (nombre.includes(filter)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script>
 
     {% endblock %}
