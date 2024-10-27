@@ -252,7 +252,7 @@ HTML:
 
 
     <!-- Lista de Ventas -->
-    <div class="tab-pane fade show active" id="lisventas">
+    <div class="tab-pane fade" id="lisventas">
         <!-- Detalles -->
         <div class="mb-4">
             <hr>
@@ -301,9 +301,9 @@ HTML:
     </div>
 
     <!-- Nueva Venta -->
-    <div class="tab-pane fade" id="newventa">
+    <div class="tab-pane fade show active" id="newventa">
         <!-- Detalles -->
-        <div class="mb-5">
+        <div class="mb-3">
             <h1 class="font-weight-bold display-8 text-left fs-3" style="font-weight: bold;">
                 REGISTRAR NUEVA VENTA
             </h1>
@@ -346,13 +346,13 @@ HTML:
                   </div>
                 
                 
-                <div class="flex items-center space mb-4 my-2 row">
+                <div class="flex items-center space mb-4 m-2 row">
                     <div class="col">
                         <div class="row my-2">
-                            <div class="col-10">
+                            <div class="col-11">
                                 <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="Buscar el producto en el detalle">
                             </div>
-                             <div class="col"><button class="btn btn-primary">Producto</button></div>
+                             <div class="col d-flex justify-content-end p-0"><button class="btn btn-primary">Producto</button></div>
                         </div>
                     </div>
                     
@@ -393,27 +393,27 @@ HTML:
 
                     </div>
                     <div class="flex justify-content-end mt-4">
-                        <div class="flex flex-col w-100">
-                            <div class="flex justify-between y-1 items-center">
-                                <span class="font-weight-bold flex justify-content-end span-title me-3">IMPORTE</span>
+                        <div class="flex flex-col w-100 ">
+                            <div class="flex justify-between y-1 items-center row justify-content-end">
+                                <span class="fw-bolder d-flex align-items-center span-title me-3">IMPORTE</span>
                                 <span class="inputs-montos">S/. </span>
                             </div>
-                            <div class="flex justify-between my-1 items-center">
-                                <span class="font-weight-bold flex justify-content-end span-title me-3">IGV</span>
+                            <div class="flex justify-between my-1 items-center row justify-content-end">
+                                <span class="fw-bolder d-flex align-items-center span-title me-3">IGV</span>
                                 <span class="inputs-montos">S/. </span>
                             </div>
-                            <div class="flex justify-between my-1 items-center">
-                                <span class="font-weight-bold flex justify-content-end span-title me-3">TOTAL</span>
+                            <div class="flex justify-between my-1 items-center row justify-content-end">
+                                <span class="fw-bolder d-flex align-items-center span-title me-3">TOTAL</span>
                                 <span class="inputs-montos">S/. </span>
                             </div>
                         </div>
                     </div>
-                    <div class="flex justify-content-end mt-4">
-                        <div class="items-center flex me-2">
+                    <div class="row justify-content-end mt-4">
+                        <div class="col-1">
                             <button class="btn btn-cotizar flex items-center">Cotizar</button>
 
                         </div>
-                        <div class="items-center flex- me-2">
+                        <div class="col-1">
                             <button class="btn btn-cobrar flex items-center">Cobrar</button>
                         </div>
                     </div>
