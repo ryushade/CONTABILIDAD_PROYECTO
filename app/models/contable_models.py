@@ -1,5 +1,6 @@
 from app.models.conexion import obtener_conexion
 import pymysql
+from collections import defaultdict
 
 # Obtener un usuario por nombre
 def obtener_usuario_por_nombre(username):
@@ -271,3 +272,40 @@ def actualizar_reglas(id_regla, nombre_regla, tipo_transaccion, cuenta_debe, cue
             cursor.execute(sql, (nombre_regla, tipo_transaccion, cuenta_debe, cuenta_haber, estado, id_regla))
     finally:
         connection.close()
+
+def obtener_asientos_agrupados():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT a.id_asiento, a.fecha_asiento, a.glosa, co.num_comprobante, cu.codigo_cuenta, cu.nombre_cuenta, d.debe, d.haber
+                FROM asiento_contable a
+                INNER JOIN detalle_asiento d ON a.id_asiento = d.id_asiento
+                INNER JOIN cuenta cu ON cu.id_cuenta = d.id_cuenta
+                INNER JOIN comprobante co ON co.id_comprobante = a.id_comprobante
+                ORDER BY a.id_asiento
+            """)
+            resultados = cursor.fetchall()
+        
+        # Agrupar resultados
+        asientos_agrupados = defaultdict(lambda: {"detalles": []})
+        
+        for row in resultados:
+            id_asiento = row["id_asiento"]
+            if "fecha_asiento" not in asientos_agrupados[id_asiento]:
+                asientos_agrupados[id_asiento].update({
+                    "fecha_asiento": row["fecha_asiento"],
+                    "glosa": row["glosa"],
+                    "num_comprobante": row["num_comprobante"],
+                    "detalles": []
+                })
+            asientos_agrupados[id_asiento]["detalles"].append({
+                "codigo_cuenta": row["codigo_cuenta"],
+                "nombre_cuenta": row["nombre_cuenta"],
+                "debe": row["debe"],
+                "haber": row["haber"]
+            })
+        
+        return asientos_agrupados
+    finally:
+        conexion.close()

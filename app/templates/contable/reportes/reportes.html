@@ -73,6 +73,144 @@
                         </style>
 
                         <label for="daterange" class="form-label" style="font-size: 14px;">
+                            Fecha<span class="required-asterisk">*</span>
+                        </label>
+                        <div class="input-group" style="width: auto;">
+                            <input class="form-control" type="text" id="daterange"
+                                placeholder="Selecciona un rango de fecha">
+                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="tipo-registro" style="font-size: 14px;" class="form-label">Tipo de
+                            registro</label>
+                        <select class="form-select" id="tipo-registro">
+                            <option selected>Todas</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2 d-flex justify-content-end" style="margin-left: auto;">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-calendar-alt"></i> Generar Reporte
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+
+
+
+            <div class="table-responsive mb-4">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="text-center">NÚMERO CORRELATIVO</th>
+                            <th class="text-center">FECHA DE LA OPERACIÓN</th>
+                            <th class="text-center">GLOSA O DESCRIPCIÓN</th>
+                            <th class="text-center">NÚMERO DEL DOCUMENTO</th>
+                            <th class="text-center">CÓDIGO</th>
+                            <th class="text-center">DENOMINACIÓN</th>
+                            <th class="text-center">DEBE</th>
+                            <th class="text-center">HABER</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set numero_correlativo = 1 %}
+                        {% for id_asiento, asiento in asientos.items() %}
+                        {% for detalle in asiento.detalles %}
+                        <tr>
+                            {% if loop.first %}
+                            <td class="text-center" rowspan="{{ asiento.detalles|length }}">{{ numero_correlativo }}
+                            </td>
+                            <td rowspan="{{ asiento.detalles|length }}">{{ asiento.fecha_asiento.strftime('%d/%m/%Y') }}
+                            </td>
+                            <td rowspan="{{ asiento.detalles|length }}">{{ asiento.glosa }}</td>
+                            <td rowspan="{{ asiento.detalles|length }}">{{ asiento.num_comprobante }}</td>
+                            {% endif %}
+                            <td>{{ detalle.codigo_cuenta }}</td>
+                            <td>{{ detalle.nombre_cuenta }}</td>
+                            <td class="text-end">{{ detalle.debe | round(2) }}</td>
+                            <td class="text-end">{{ detalle.haber| round(2) }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% set numero_correlativo = numero_correlativo + 1 %}
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                           
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <nav aria-label="Navegación de páginas" class="d-flex justify-content-between align-items-center">
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
+                            aria-disabled="true">&laquo;</a></li>
+                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
+                            aria-disabled="true">&lsaquo;</a></li>
+                    <li class="page-item active" aria-current="page"><span class="page-link">1</span></li>
+                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
+                            aria-disabled="true">&rsaquo;</a></li>
+                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
+                            aria-disabled="true">&raquo;</a></li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <span class="text-muted small me-2">Mostrando 1-10 De 10</span>
+                    <select class="form-select form-select-sm" style="width: auto;">
+                        <option>10</option>
+                    </select>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Tab: Libro Mayor -->
+    <div class="tab-pane fade" id="libro-mayor">
+        <div class="card bg-white rounded custom-shadow p-4">
+            <header class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h4 mb-0 d-flex align-items-center" style="font-weight: bold;">
+                    <span></span>
+                    LIBRO MAYOR
+                </h1>
+
+                <div class="dropdown me-2">
+                    <button class="btn btn-light border dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Más acciones
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item d-flex flex-column" href="#">
+                            <span class="d-flex align-items-center">
+                                <i class="fa fa-file-excel mr-2"></i>
+                                <strong>Exportar a Excel</strong>
+                            </span>
+                        </a>
+                        <a class="dropdown-item d-flex flex-column" href="#">
+                            <span class="d-flex align-items-center">
+                                <i class="fa fa-file-pdf mr-2" style="color: red;"></i>
+                                <strong>Exportar a PDF</strong>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+
+            </header>
+
+
+            <p class="text-muted small mb-4">Consulta el detalle de los movimientos registrados, clasificados por
+                cuentas, mostrando los debe, haber y saldos</p>
+            <div class="container">
+
+                <form class="row g-3 mb-3 align-items-end">
+                    <div class="col-md-3">
+                        <style>
+                            .required-asterisk {
+                                color: red;
+                            }
+                        </style>
+
+                        <label for="daterange" class="form-label" style="font-size: 14px;">
                             Período <span class="required-asterisk">*</span>
                         </label>
                         <div class="input-group" style="width: auto;">
@@ -111,6 +249,7 @@
                             <th class="text-center">DENOMINACIÓN</th>
                             <th class="text-center">DEBE</th>
                             <th class="text-center">HABER</th>
+                            <th class="text-center">SALDO</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -119,57 +258,49 @@
                             <td>02/01/2024</td>
                             <td>Por la adquisición de material de oficina</td>
                             <td>F/001-2024</td>
-                            <td>285</td>
+                            <td class="text-center">285</td>
                             <td>Materiales auxiliares, suministros y repuestos</td>
-                            <td>500.00</td>
+                            <td class="text-end">500.00</td>
                             <td></td>
+                            <td class="text-end">500.00</td>
                         </tr>
                         <tr>
-                            <td class="text-center">2</td>
+                            <td class="text-center align-middle" rowspan="2">2</td>
                             <td>02/01/2024</td>
                             <td>Por el pago de alquiler de oficinas</td>
                             <td>F/002-2024</td>
-                            <td>635</td>
-                            <td>Alquileres</td>
-                            <td>1500.00</td>
+                            <td class="text-center align-middle" rowspan="2">635</td>
+                            <td rowspan="2" class="align-middle">Alquileres</td>
+                            <td class="text-end">1500.00</td>
                             <td></td>
+                            <td class="text-end align-middle" rowspan="2">1750.00</td>
                         </tr>
                         <tr>
-                            <td class="text-center">3</td>
-                            <td>02/01/2024</td>
-                            <td>Por el abono en cuenta bancaria</td>
-                            <td>B/001-2024</td>
-                            <td>101</td>
-                            <td>Caja</td>
+                            <td>03/01/2024</td>
+                            <td>Por el pago de alquiler de almacen</td>
+                            <td>F/003-2024</td>
+                            <td class="text-end">250.00</td>
                             <td></td>
-                            <td>1500.00</td>
                         </tr>
                         <tr>
                             <td class="text-center">4</td>
-                            <td>03/01/2024</td>
-                            <td>Por la compra de mercaderías</td>
-                            <td>F/003-2024</td>
-                            <td>601</td>
-                            <td>Mercaderías</td>
-                            <td>2000.00</td>
+                            <td>02/01/2024</td>
+                            <td>Por el abono en cuenta bancaria</td>
+                            <td>B/001-2024</td>
+                            <td class="text-center">101</td>
+                            <td class="text-center">Caja</td>
                             <td></td>
+                            <td class="text-end">2250.00</td>
+                            <td class="text-end">2250.00</td>
                         </tr>
-                        <tr>
-                            <td class="text-center">5</td>
-                            <td>03/01/2024</td>
-                            <td>Por el abono de ventas</td>
-                            <td>F/004-2024</td>
-                            <td>70</td>
-                            <td>Ventas</td>
-                            <td></td>
-                            <td>2500.00</td>
-                        </tr>
+
                     </tbody>
                     <tfoot>
                         <tr>
                             <th colspan="6" class="text-end" style="font-weight: bold;">TOTALES</th>
-                            <th style="font-weight: bold;">4000.00</th>
-                            <th style="font-weight: bold;">4000.00</th>
+                            <th class="text-end" style="font-weight: bold;">2250.00</th>
+                            <th class="text-end" style="font-weight: bold;">2250.00</th>
+                            <th style="font-weight: bold;">S/</th>
                         </tr>
                     </tfoot>
                 </table>
@@ -231,7 +362,8 @@
             </header>
 
 
-            <p class="text-muted small mb-4">Consulta el detalle de los movimientos registrados, clasificados por cuentas, mostrando los debe, haber y saldos</p>
+            <p class="text-muted small mb-4">Consulta el detalle de los movimientos registrados, clasificados por
+                cuentas, mostrando los debe, haber y saldos</p>
             <div class="container">
 
                 <form class="row g-3 mb-3 align-items-end">
@@ -325,14 +457,14 @@
                             <td class="text-end">2250.00</td>
                             <td class="text-end">2250.00</td>
                         </tr>
-                        
+
                     </tbody>
                     <tfoot>
                         <tr>
                             <th colspan="6" class="text-end" style="font-weight: bold;">TOTALES</th>
                             <th class="text-end" style="font-weight: bold;">2250.00</th>
                             <th class="text-end" style="font-weight: bold;">2250.00</th>
-                            <th  style="font-weight: bold;">S/</th>
+                            <th style="font-weight: bold;">S/</th>
                         </tr>
                     </tfoot>
                 </table>
@@ -358,170 +490,7 @@
                     </select>
                 </div>
             </nav>
-        </div>    
-    </div>
-
-    <!-- Tab: Libro Mayor -->
-    <div class="tab-pane fade" id="libro-mayor">
-        <div class="card bg-white rounded custom-shadow p-4">
-            <header class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="h4 mb-0 d-flex align-items-center" style="font-weight: bold;">
-                    <span></span>
-                    LIBRO MAYOR
-                </h1>
-
-                <div class="dropdown me-2">
-                    <button class="btn btn-light border dropdown-toggle" type="button" id="dropdownMenuButton"
-                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Más acciones
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item d-flex flex-column" href="#">
-                            <span class="d-flex align-items-center">
-                                <i class="fa fa-file-excel mr-2"></i>
-                                <strong>Exportar a Excel</strong>
-                            </span>
-                        </a>
-                        <a class="dropdown-item d-flex flex-column" href="#">
-                            <span class="d-flex align-items-center">
-                                <i class="fa fa-file-pdf mr-2" style="color: red;"></i>
-                                <strong>Exportar a PDF</strong>
-                            </span>
-                        </a>
-                    </div>
-                </div>
-
-            </header>
-
-
-            <p class="text-muted small mb-4">Consulta el detalle de los movimientos registrados, clasificados por cuentas, mostrando los debe, haber y saldos</p>
-            <div class="container">
-
-                <form class="row g-3 mb-3 align-items-end">
-                    <div class="col-md-3">
-                        <style>
-                            .required-asterisk {
-                                color: red;
-                            }
-                        </style>
-
-                        <label for="daterange" class="form-label" style="font-size: 14px;">
-                            Período <span class="required-asterisk">*</span>
-                        </label>
-                        <div class="input-group" style="width: auto;">
-                            <input class="form-control" type="text" id="daterange"
-                                placeholder="Selecciona un rango de fecha">
-                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="tipo-registro" style="font-size: 14px;" class="form-label">Tipo de
-                            registro</label>
-                        <select class="form-select" id="tipo-registro">
-                            <option selected>Todas</option>
-                        </select>
-                    </div>
-                    <div class="col-lg-2 d-flex justify-content-end" style="margin-left: auto;">
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="fas fa-calendar-alt"></i> Generar Reporte
-                        </button>
-                    </div>
-                </form>
-
-            </div>
-
-
-
-            <div class="table-responsive mb-4">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="text-center">NÚMERO CORRELATIVO</th>
-                            <th class="text-center">FECHA DE LA OPERACIÓN</th>
-                            <th class="text-center">GLOSA O DESCRIPCIÓN</th>
-                            <th class="text-center">NÚMERO DEL DOCUMENTO</th>
-                            <th class="text-center">CUENTA CONTABLE</th>
-                            <th class="text-center">DENOMINACIÓN</th>
-                            <th class="text-center">DEBE</th>
-                            <th class="text-center">HABER</th>
-                            <th class="text-center">SALDO</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="text-center">1</td>
-                            <td>02/01/2024</td>
-                            <td>Por la adquisición de material de oficina</td>
-                            <td>F/001-2024</td>
-                            <td class="text-center">285</td>
-                            <td>Materiales auxiliares, suministros y repuestos</td>
-                            <td class="text-end">500.00</td>
-                            <td></td>
-                            <td class="text-end">500.00</td>
-                        </tr>
-                        <tr>
-                            <td class="text-center align-middle" rowspan="2">2</td>
-                            <td>02/01/2024</td>
-                            <td>Por el pago de alquiler de oficinas</td>
-                            <td>F/002-2024</td>
-                            <td class="text-center align-middle" rowspan="2">635</td>
-                            <td rowspan="2" class="align-middle">Alquileres</td>
-                            <td class="text-end">1500.00</td>
-                            <td></td>
-                            <td class="text-end align-middle" rowspan="2">1750.00</td>
-                        </tr>
-                        <tr>
-                            <td>03/01/2024</td>
-                            <td>Por el pago de alquiler de almacen</td>
-                            <td>F/003-2024</td>
-                            <td class="text-end">250.00</td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td class="text-center">4</td>
-                            <td>02/01/2024</td>
-                            <td>Por el abono en cuenta bancaria</td>
-                            <td>B/001-2024</td>
-                            <td class="text-center">101</td>
-                            <td class="text-center">Caja</td>
-                            <td></td>
-                            <td class="text-end">2250.00</td>
-                            <td class="text-end">2250.00</td>
-                        </tr>
-                        
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th colspan="6" class="text-end" style="font-weight: bold;">TOTALES</th>
-                            <th class="text-end" style="font-weight: bold;">2250.00</th>
-                            <th class="text-end" style="font-weight: bold;">2250.00</th>
-                            <th  style="font-weight: bold;">S/</th>
-                        </tr>
-                    </tfoot>
-                </table>
-
-            </div>
-
-            <nav aria-label="Navegación de páginas" class="d-flex justify-content-between align-items-center">
-                <ul class="pagination pagination-sm mb-0">
-                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
-                            aria-disabled="true">&laquo;</a></li>
-                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
-                            aria-disabled="true">&lsaquo;</a></li>
-                    <li class="page-item active" aria-current="page"><span class="page-link">1</span></li>
-                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
-                            aria-disabled="true">&rsaquo;</a></li>
-                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
-                            aria-disabled="true">&raquo;</a></li>
-                </ul>
-                <div class="d-flex align-items-center">
-                    <span class="text-muted small me-2">Mostrando 1-10 De 10</span>
-                    <select class="form-select form-select-sm" style="width: auto;">
-                        <option>10</option>
-                    </select>
-                </div>
-            </nav>
-        </div>    
+        </div>
     </div>
 
     <!-- Tab: Estado de Resultados -->
@@ -577,17 +546,18 @@
                                 placeholder="dd/mm/yyyy to dd/mm/yyyy">
                             <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
                         </div>
-                       
+
                     </div>
                     <div class="col-md-2">
-                        
-                        <span>Incluir cierre anual</span>    
-                        
+
+                        <span>Incluir cierre anual</span>
+
                     </div>
                     <div class="col-md-5">
 
                         <div class="form-check form-switch">
-                            <label class="form-check-label" for="flexSwitchCheckDefault">Incluir cuentas con saldo cero</label>
+                            <label class="form-check-label" for="flexSwitchCheckDefault">Incluir cuentas con saldo
+                                cero</label>
                             <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
                         </div>
                     </div>
@@ -596,14 +566,13 @@
                             <i class="fas fa-calendar-alt"></i> Generar Reporte
                         </button>
                     </div>
-                    
+
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Tab: Cuentas por Pagar -->
-    <div class="tab-pane fade show active" id="cuentas-pagar">
+    <!-- <div class="tab-pane fade show active" id="cuentas-pagar">
         <div class="card bg-white rounded custom-shadow p-4">
             <header class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="h4 mb-0 d-flex align-items-center" style="font-weight: bold;">
@@ -670,7 +639,6 @@
                     <thead class="table-light">
                         <tr>
                             <th class="text-center">NOMBRE DEL PROVEEDOR</th>
-                            <!-- <th class="text-center">NÚMERO DEL DOCUMENTO</th> -->
                             <th class="text-center">CUENTA CONTABLE</th>
                             <th class="text-center">DENOMINACIÓN</th>
                             <th class="text-center">FECHA DE LA OPERACIÓN</th>
@@ -682,7 +650,6 @@
                     <tbody>
                         <tr>
                             <td>PROVEEDOR NUMERO 1</td>
-                            <!-- <td>B /001-0215</td> -->
                             <td class="text-center">285</td>
                             <td>Materiales auxiliares, suministros y repuestos</td>
                             <td class="text-center">01/01/2024</td>
@@ -696,11 +663,11 @@
                         </tr>
                     </tbody>
                     <tfoot>
-                        <!-- <tr>
+                        <tr>
                             <th colspan="6" class="text-end" style="font-weight: bold;">TOTALES</th>
                             <th style="font-weight: bold;">4000.00</th>
                             <th style="font-weight: bold;">4000.00</th>
-                        </tr> -->
+                        </tr> 
                     </tfoot>
                 </table>
 
@@ -726,7 +693,7 @@
                 </div>
             </nav>
         </div>
-    </div>
+    </div> -->
 </div>
 
 

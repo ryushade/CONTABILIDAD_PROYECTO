@@ -1,5 +1,5 @@
 from flask import request, redirect, url_for, flash, session, jsonify, render_template, send_file
-from app.models.contable_models import obtener_usuario_por_nombre, verificar_contraseña, obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, actualizar_reglas, obtener_cuentas_excel
+from app.models.contable_models import obtener_usuario_por_nombre, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, actualizar_reglas, obtener_cuentas_excel
 from . import accounting_bp# routes.py
 import pandas as pd
 import io
@@ -28,9 +28,10 @@ def logout():
     session.pop('user_id', None)
     return redirect(url_for('contable.login'))
 
-@accounting_bp.route('/reportes')
+@accounting_bp.route('/reportes', methods=['GET'])
 def reportes():
-    return render_template('contable/reportes/reportes.html')
+    asientos = obtener_asientos_agrupados()
+    return render_template('contable/reportes/reportes.html', asientos=asientos)
 
 @accounting_bp.route('/cuentas', methods=['GET'])
 def cuentas():
