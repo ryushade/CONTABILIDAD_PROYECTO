@@ -526,8 +526,7 @@
             </header>
 
             <p class="text-muted small mb-4">
-                Consulta los ingresos, costos, gastos y utilidades de la empresa en el periodo de tiempo
-                que elijas, no incluye impuestos.
+                Consulta las ganancias y perdidas de la empresa.
             </p>
             <div class="container">
                 <form class="row g-3 mb-3 align-items-end">
@@ -543,32 +542,108 @@
                         </label>
                         <div class="input-group" style="width: auto;">
                             <input class="form-control" type="text" id="daterange"
-                                placeholder="dd/mm/yyyy to dd/mm/yyyy">
+                                placeholder="Selecciona un rango de fecha">
                             <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
                         </div>
-
                     </div>
-                    <div class="col-md-2">
-
-                        <span>Incluir cierre anual</span>
-
+                    <div class="col-md-3">
+                        <label for="tipo-registro" style="font-size: 14px;" class="form-label">Tipo de
+                            registro</label>
+                        <select class="form-select" id="tipo-registro">
+                            <option selected>Todas</option>
+                        </select>
                     </div>
-                    <div class="col-md-5">
-
-                        <div class="form-check form-switch">
-                            <label class="form-check-label" for="flexSwitchCheckDefault">Incluir cuentas con saldo
-                                cero</label>
-                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
-                        </div>
-                    </div>
-                    <div class="col-md-2">
+                    <div class="col-lg-2 d-flex justify-content-end" style="margin-left: auto;">
                         <button type="submit" class="btn btn-primary w-100">
                             <i class="fas fa-calendar-alt"></i> Generar Reporte
                         </button>
                     </div>
-
                 </form>
+
             </div>
+
+
+
+            <div class="table-responsive mb-4">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="text-center">CÓDIGO DE CUENTA</th>
+                            <th class="text-center">DESCRIPCIÓN</th>
+                            <th class="text-center">INGRESOS</th>
+                            <th class="text-center">GASTOS</th>
+                            <th class="text-center">TOTAL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr>
+                            <td class="text-center">3001</td>
+                            <td class="text-center">Ingresos por ventas</td>
+                            <td class="text-center">10000.00</td>
+                            <td class="text-center">0.00</td>
+                            <td class="text-center">10000.00</td>
+                        </tr>
+
+                        
+                        <tr>
+                            <td class="text-center">4001</td>
+                            <td class="text-center">Costos de ventas</td>
+                            <td class="text-center">0.00</td>
+                            <td class="text-center">6000.00</td>
+                            <td class="text-center">-6000.00</td>
+                        </tr>
+
+                        
+                        <tr>
+                            <td class="text-center">5001</td>
+                            <td class="text-center">Gastos operativos</td>
+                            <td class="text-center">0.00</td>
+                            <td class="text-center">1500.00</td>
+                            <td class="text-center">-1500.00</td>
+                        </tr>
+
+                        
+                        <tr>
+                            <td class="text-center">6001</td>
+                            <td class="text-center">Ingresos por ventas</td>
+                            <td class="text-center">500.00</td>
+                            <td class="text-center">0.00</td>
+                            <td class="text-center">500.00</td>
+                        </tr>
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="2" class="text-end" style="font-weight: bold;">TOTALES</th>
+                            <th class="text-center" class="text-end" style="font-weight: bold;">10500.00</th>
+                            <th class="text-center" class="text-end" style="font-weight: bold;">7500.00</th>
+                            <th class="text-center" style="font-weight: bold;">S/3000.00</th>
+                        </tr>
+                    </tfoot>
+                </table>
+
+            </div>
+
+            <nav aria-label="Navegación de páginas" class="d-flex justify-content-between align-items-center">
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
+                            aria-disabled="true">&laquo;</a></li>
+                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
+                            aria-disabled="true">&lsaquo;</a></li>
+                    <li class="page-item active" aria-current="page"><span class="page-link">1</span></li>
+                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
+                            aria-disabled="true">&rsaquo;</a></li>
+                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
+                            aria-disabled="true">&raquo;</a></li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <span class="text-muted small me-2">Mostrando 1-10 De 10</span>
+                    <select class="form-select form-select-sm" style="width: auto;">
+                        <option>10</option>
+                    </select>
+                </div>
+            </nav>
         </div>
     </div>
 
