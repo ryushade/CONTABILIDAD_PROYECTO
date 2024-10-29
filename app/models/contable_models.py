@@ -1,6 +1,7 @@
 from app.models.conexion import obtener_conexion
 import pymysql
 from collections import defaultdict
+from decimal import Decimal
 
 # Obtener un usuario por nombre
 def obtener_usuario_por_nombre(username):
@@ -309,3 +310,49 @@ def obtener_asientos_agrupados():
         return asientos_agrupados
     finally:
         conexion.close()
+
+
+def obtener_libro_mayor():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT cu.codigo_cuenta, cu.nombre_cuenta, a.fecha_asiento, co.num_comprobante, d.debe, d.haber
+                FROM asiento_contable a
+                INNER JOIN detalle_asiento d ON a.id_asiento = d.id_asiento
+                INNER JOIN cuenta cu ON cu.id_cuenta = d.id_cuenta
+                INNER JOIN comprobante co ON co.id_comprobante = a.id_comprobante
+                ORDER BY cu.codigo_cuenta, a.fecha_asiento
+            """)
+            resultados = cursor.fetchall()
+
+        # Agrupar y calcular el saldo por cuenta
+        libro_mayor = defaultdict(lambda: {"detalles": [], "saldo": Decimal("0.00")})
+        
+        for row in resultados:
+            codigo_cuenta = row["codigo_cuenta"]
+            debe = row["debe"] or Decimal("0.00")
+            haber = row["haber"] or Decimal("0.00")
+
+            # Actualizar saldo
+            libro_mayor[codigo_cuenta]["saldo"] += debe - haber
+
+            # Guardar el registro con el saldo actual
+            libro_mayor[codigo_cuenta]["detalles"].append({
+                "fecha_asiento": row["fecha_asiento"],
+                "num_comprobante": row["num_comprobante"],
+                "debe": debe,
+                "haber": haber,
+                "saldo": libro_mayor[codigo_cuenta]["saldo"]
+            })
+
+            # Información adicional de la cuenta
+            if "nombre_cuenta" not in libro_mayor[codigo_cuenta]:
+                libro_mayor[codigo_cuenta].update({
+                    "nombre_cuenta": row["nombre_cuenta"]
+                })
+        
+        return libro_mayor
+    finally:
+        conexion.close()
+

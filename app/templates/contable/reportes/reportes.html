@@ -241,68 +241,29 @@
                 <table class="table table-bordered table-hover">
                     <thead class="table-light">
                         <tr>
-                            <th class="text-center">NÚMERO CORRELATIVO</th>
-                            <th class="text-center">FECHA DE LA OPERACIÓN</th>
-                            <th class="text-center">GLOSA O DESCRIPCIÓN</th>
-                            <th class="text-center">NÚMERO DEL DOCUMENTO</th>
-                            <th class="text-center">CUENTA CONTABLE</th>
-                            <th class="text-center">DENOMINACIÓN</th>
+                            <th class="text-center">CÓDIGO DE CUENTA</th>
+                            <th class="text-center">NOMBRE DE LA CUENTA</th>
+                            <th class="text-center">FECHA</th>
                             <th class="text-center">DEBE</th>
                             <th class="text-center">HABER</th>
                             <th class="text-center">SALDO</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td class="text-center">1</td>
-                            <td>02/01/2024</td>
-                            <td>Por la adquisición de material de oficina</td>
-                            <td>F/001-2024</td>
-                            <td class="text-center">285</td>
-                            <td>Materiales auxiliares, suministros y repuestos</td>
-                            <td class="text-end">500.00</td>
-                            <td></td>
-                            <td class="text-end">500.00</td>
-                        </tr>
-                        <tr>
-                            <td class="text-center align-middle" rowspan="2">2</td>
-                            <td>02/01/2024</td>
-                            <td>Por el pago de alquiler de oficinas</td>
-                            <td>F/002-2024</td>
-                            <td class="text-center align-middle" rowspan="2">635</td>
-                            <td rowspan="2" class="align-middle">Alquileres</td>
-                            <td class="text-end">1500.00</td>
-                            <td></td>
-                            <td class="text-end align-middle" rowspan="2">1750.00</td>
-                        </tr>
-                        <tr>
-                            <td>03/01/2024</td>
-                            <td>Por el pago de alquiler de almacen</td>
-                            <td>F/003-2024</td>
-                            <td class="text-end">250.00</td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td class="text-center">4</td>
-                            <td>02/01/2024</td>
-                            <td>Por el abono en cuenta bancaria</td>
-                            <td>B/001-2024</td>
-                            <td class="text-center">101</td>
-                            <td class="text-center">Caja</td>
-                            <td></td>
-                            <td class="text-end">2250.00</td>
-                            <td class="text-end">2250.00</td>
-                        </tr>
-
+                        {% for codigo_cuenta, cuenta in libro_mayor.items() %}
+                            <tr>
+                                <td class="text-center" rowspan="{{ cuenta.detalles|length }}">{{ codigo_cuenta }}</td>
+                                <td rowspan="{{ cuenta.detalles|length }}">{{ cuenta.nombre_cuenta }}</td>
+                                {% for detalle in cuenta.detalles %}
+                                    {% if not loop.first %}<tr>{% endif %}
+                                    <td>{{ detalle.fecha_asiento }}</td>
+                                    <td class="text-end">{{ detalle.debe or '' }}</td>
+                                    <td class="text-end">{{ detalle.haber or '' }}</td>
+                                    <td class="text-end">{{ detalle.saldo }}</td>
+                                    </tr>
+                                {% endfor %}
+                        {% endfor %}
                     </tbody>
-                    <tfoot>
-                        <tr>
-                            <th colspan="6" class="text-end" style="font-weight: bold;">TOTALES</th>
-                            <th class="text-end" style="font-weight: bold;">2250.00</th>
-                            <th class="text-end" style="font-weight: bold;">2250.00</th>
-                            <th style="font-weight: bold;">S/</th>
-                        </tr>
-                    </tfoot>
                 </table>
 
             </div>
