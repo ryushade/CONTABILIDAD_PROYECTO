@@ -312,47 +312,54 @@ def obtener_asientos_agrupados():
         conexion.close()
 
 
-def obtener_libro_mayor():
+def obtener_libro_mayor_agrupado_por_fecha():
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                SELECT cu.codigo_cuenta, cu.nombre_cuenta, a.fecha_asiento, co.num_comprobante, d.debe, d.haber
+                SELECT cu.codigo_cuenta, cu.nombre_cuenta, a.fecha_asiento, 
+                       SUM(d.debe) AS total_debe, SUM(d.haber) AS total_haber
                 FROM asiento_contable a
                 INNER JOIN detalle_asiento d ON a.id_asiento = d.id_asiento
                 INNER JOIN cuenta cu ON cu.id_cuenta = d.id_cuenta
-                INNER JOIN comprobante co ON co.id_comprobante = a.id_comprobante
+                GROUP BY cu.codigo_cuenta, cu.nombre_cuenta, a.fecha_asiento
                 ORDER BY cu.codigo_cuenta, a.fecha_asiento
             """)
             resultados = cursor.fetchall()
 
-        # Agrupar y calcular el saldo por cuenta
+        # Variables para totales globales
+        total_debe_global = Decimal("0.00")
+        total_haber_global = Decimal("0.00")
+
+        # Agrupar por cuenta y calcular el saldo acumulado
         libro_mayor = defaultdict(lambda: {"detalles": [], "saldo": Decimal("0.00")})
-        
+
         for row in resultados:
             codigo_cuenta = row["codigo_cuenta"]
-            debe = row["debe"] or Decimal("0.00")
-            haber = row["haber"] or Decimal("0.00")
+            total_debe = row["total_debe"] or Decimal("0.00")
+            total_haber = row["total_haber"] or Decimal("0.00")
 
-            # Actualizar saldo
-            libro_mayor[codigo_cuenta]["saldo"] += debe - haber
+            # Actualizar saldo acumulado
+            libro_mayor[codigo_cuenta]["saldo"] += total_debe - total_haber
 
-            # Guardar el registro con el saldo actual
+            # Añadir entrada agrupada por fecha
             libro_mayor[codigo_cuenta]["detalles"].append({
                 "fecha_asiento": row["fecha_asiento"],
-                "num_comprobante": row["num_comprobante"],
-                "debe": debe,
-                "haber": haber,
+                "debe": total_debe,
+                "haber": total_haber,
                 "saldo": libro_mayor[codigo_cuenta]["saldo"]
             })
 
-            # Información adicional de la cuenta
+            # Sumar totales globales
+            total_debe_global += total_debe
+            total_haber_global += total_haber
+
+            # Información de la cuenta
             if "nombre_cuenta" not in libro_mayor[codigo_cuenta]:
                 libro_mayor[codigo_cuenta].update({
                     "nombre_cuenta": row["nombre_cuenta"]
                 })
         
-        return libro_mayor
+        return libro_mayor, total_debe_global, total_haber_global
     finally:
         conexion.close()
-
