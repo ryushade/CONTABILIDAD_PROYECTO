@@ -80,7 +80,7 @@
                             <button class="btn btn-cotizar flex items-center">Cotizar</button>
                         </div>
                         <div class="col-1">
-                            <button class="btn btn-cobrar flex items-center">Cobrar</button>
+                            <button class="btn btn-cobrar flex items-center" data-bs-toggle="modal" data-bs-target="#ventaModal">Cobrar</button>
                         </div>
                     </div>
                 </div>
@@ -128,6 +128,100 @@
         </div>
     </div>
 </div>
+
+<!-- Modal de Bootstrap -->
+<div class="modal fade" id="ventaModal" tabindex="-1" aria-labelledby="ventaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title ms-3 mt-3 mb-2" id="productModalLabel">PAGO</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col">
+                        <div class="row">
+                            <div class="col">
+                                <p>Seleccione el cliente</p>
+                                <select class="form-select form-select-sm" aria-label="Small select example">
+                                    <option selected>Open this select menu</option>
+                                    <option value="1">One</option>
+                                    <option value="2">Two</option>
+                                    <option value="3">Three</option>
+                                  </select>
+                            </div>
+                            <div class="col">
+                                <p>Select. el comprobante</p>
+                                <select class="form-select form-select-sm" aria-label="Small select example">
+                                    <option selected>Open this select menu</option>
+                                    <option value="1">One</option>
+                                    <option value="2">Two</option>
+                                    <option value="3">Three</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-floating">
+                                <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
+                                <label for="floatingTextarea2" class="fs-6 mx-2">Descripción</label>
+                              </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="row">
+                                    <p>Total a pagar</p>
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text">S/.</span>
+                                        <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <p>Monto recibido</p>
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text">S/.</span>
+                                        <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <p>Cambio</p>
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text">S/.</span>
+                                        <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="row">
+                                    <p>Metodo de pago</p>
+                                    <select class="form-select form-select-sm" aria-label="Small select example">
+                                        <option selected>Open this select menu</option>
+                                        <option value="1">One</option>
+                                        <option value="2">Two</option>
+                                        <option value="3">Three</option>
+                                    </select>
+                                </div>
+                                <div class="row">
+                                    <p>Aplicar descuento</p>
+                                    
+                                </div>
+                                <div class="row">
+                                    <p>Faltante</p>
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text">S/.</span>
+                                        <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script>
     // Búsqueda en tiempo real en el modal
