@@ -172,6 +172,8 @@
 
                     </td>
                     <td class="text-center acciones">
+                        <span style="font-size: 14px; color: #1e40af;" class="action-button secondary view"
+                            data-cuenta-id="{{ regla.id_regla }}"><i class="fas fa-eye"></i></span>
                         <span style="font-size: 14px;" class="action-button secondary edit"
                             data-cuenta-id="{{ regla.id_regla }}"><i class="fas fa-edit"></i></span>
                         <span style="font-size: 14px;" class="action-button secondary trash"
@@ -286,6 +288,83 @@
                 onclick="closeModalDeleteRegla()">No, Cancelar</button>
             <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" class="btn btn-danger"
                 onclick="deleteRegla()">Sí, Eliminar!</button>
+        </div>
+    </div>
+</div>
+
+
+<div id="openVerModal" class="modal-overlay" style="display: none;">
+    <div class="content-modal">
+        <div class="modal-header">
+            <h3 class="modal-title">DETALLES DE LA REGLA</h3>
+            <button type="button" class="modal-close" onclick="closeModalOpen()"
+                style="border: none; color: black; background-color: white; width: 15px; font-weight: bold;">
+                &times;
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="w-full text-start mb-5">
+                <!-- Campo de código de la cuenta -->
+                <label for="codigo_cuenta" class="text-sm font-bold text-black mt-4 block" style="font-weight: bold;">
+                    Nombre:
+                </label>
+                <input type="text" id="codigo_cuenta" name="codigo_cuenta" value=""
+                    class="w-100 bg-gray-50 border-gray-300 text-gray-900 rounded-lg border p-2 text-sm"
+                    placeholder="Nombre de la regla" required />
+
+
+
+                <!-- Campo de nombre de la cuenta -->
+                <label for="nombre_cuenta" class="text-sm font-bold text-black mt-4 block" style="font-weight: bold;">
+                    Tipo de transacción:
+                </label>
+                <input type="text" id="nombre_cuenta" name="nombre_cuenta" value=""
+                    class="w-100 bg-gray-50 border-gray-300 text-gray-900 rounded-lg border p-2 text-sm"
+                    placeholder="Seleccione el tipo" required />
+
+                <!-- Campo de naturaleza de la cuenta -->
+                <label for="naturaleza" class="text-sm font-bold text-black mt-4 block" style="font-weight: bold;">
+                    Cuenta débito:
+                </label>
+                <select id="naturaleza" name="naturaleza"
+                    class="w-100 text-sm bg-gray-50 border-gray-300 text-gray-900 rounded-lg border p-2" required>
+                    <option value="Deudora">Deudora</option>
+                    <option value="Acreedora">Acreedora</option>
+                </select>
+
+                <!-- Campo de estado de la cuenta -->
+                <label for="estado_cuenta" class="text-sm font-bold text-black mt-4 block" style="font-weight: bold;">
+                    Cuenta crédito:
+                </label>
+                <select id="estado_cuenta" name="estado_cuenta"
+                    class="w-100 text-sm bg-gray-50 border-gray-300 text-gray-900 rounded-lg border p-2" required>
+                    <option value="1">Activo</option>
+                    <option value="0">Inactivo</option>
+                </select>
+
+                <!-- Cuenta Padre (Opcional, según nivel) -->
+                <div class="grid grid-cols-4 items-center gap-4 mt-3" id="cuenta_padre_container" style="display:none;"
+                    style="font-weight: bold;">
+                    <label class="text-right col-span-1">Cuenta Padre:</label>
+                    <select id="cuenta_padre" name="cuenta_padre"
+                        class="col-span-3 w-100 text-sm bg-gray-50 border-gray-300 text-gray-900 rounded-lg border p-2">
+                        <option value="">Seleccione la cuenta padre</option>
+                        <!-- Simulación de cuentas -->
+                        <option value="1">1 - Activo</option>
+                        <option value="10">10 - Efectivo y equivalentes</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="modal-buttons d-flex justify-content-end">
+                <button type="button" onclick="closeModalAdd()" class="btn btn-secondary me-2">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Guardar
+                </button>
+            </div>
         </div>
     </div>
 </div>
