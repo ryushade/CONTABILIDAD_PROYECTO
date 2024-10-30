@@ -2,6 +2,7 @@ from app.models.conexion import obtener_conexion
 import pymysql
 from collections import defaultdict
 from datetime import datetime
+from decimal import Decimal
 
 # Obtener un usuario por nombre
 def obtener_usuario_por_nombre(username):
@@ -335,14 +336,3 @@ def obtener_asientos_agrupados():
         return asientos_agrupados, totales
     finally:
         conexion.close()
-
-def insertar_regla(nombre_regla, tipo_transaccion, cuenta_debe, cuenta_haber):
-    conexion = obtener_conexion()
-    
-    with conexion.cursor() as cursor:
-            cursor.execute("INSERT INTO reglas_contabilizacion (nombre_regla, tipo_transaccion, cuenta_debe, cuenta_haber, estado) VALUES (%s, %s, %s, %s, %s)"
-            , (nombre_regla,tipo_transaccion, cuenta_debe, cuenta_haber ))
-    conexion.commit()   
-    conexion.close()
-    return True
-            

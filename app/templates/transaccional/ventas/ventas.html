@@ -1,244 +1,14 @@
-HTML:
-
 {% extends 'base.html' %}
 
 {% block title %}Tormenta{% endblock %}
 
-
 {% block content %}
 <header class="mb-4">
-
     <h1 class="text-8xl font-bold tracking-wide text-gray-700 title-Inicio">MÓDULO VENTAS - POS</h1>
 </header>
 
-<style>
-    table {
-        border-collapse: separate;
-        border-spacing: 0 8px;
-        width: 100%;
-        height: 100%;
-    }
-
-    table th,
-    table td {
-        font-weight: normal;
-        color: #6c757d;
-        border-bottom: 1px solid #dee2e6;
-        padding: 10px 10px;
-        vertical-align: middle;
-    }
-
-    table td {
-        background-color: #f8f9fa;
-        border-bottom: 3px solid white;
-    }
-
-    table tbody tr {
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        border-radius: 12px;
-    }
-
-
-
-    .estado-activo {
-        background-color: #eafff0;
-        color: #28a745;
-        padding: 5px 15px;
-        border-radius: 12px;
-        font-weight: bold;
-        text-align: center;
-    }
-
-    /* Alineación de acciones */
-    .accion-dropdown {
-        text-align: center;
-    }
-
-    .centrar {
-        text-align: center;
-    }
-
-    .container-registro-detalle-venta {
-        box-shadow: 0 0 10px #171a1f33;
-        background-color: #171a1f09 !important;
-        border-radius: 10px;
-    }
-
-    .div-pagar-1 {
-        width: 26.5rem !important;
-    }
-
-    .modal-prod {
-        box-shadow: 0 0 10px #171a1f33;
-        background-color: #ededed;
-        animation: fadeIn 0.3s ease-in-out;
-
-    }
-
-    .modal-pagar {
-        box-shadow: 0 0 10px #171a1f33;
-        background-color: #efefef;
-        animation: fadeIn 0.3s ease-in-out;
-
-    }
-
-    .modal-prod hr,
-    .modal-pagar hr {
-        border: solid 0.1rem #bdbdbd !important;
-    }
-
-    .close-modal-prod,
-    .close-modal-pagar {
-        background-color: #e05858ff;
-        font-size: 20px;
-    }
-
-    .btn-nuevo-cliente {
-        background-color: #4069e5ff;
-        color: white;
-        font-weight: bold;
-        align-items: center;
-        padding: 0.4rem 0.5rem;
-        border-radius: 0.25rem;
-    }
-
-    .button-tipo-prendas button {
-        border: none;
-        background: none;
-        cursor: pointer;
-        transition: color 0.3s, border-width 0.3s;
-        /* Transición suave para color y ancho del borde */
-        color: black;
-    }
-
-    .button-tipo-prendas button:hover {
-        color: #00bdd6;
-        box-shadow: 0px 3px 0px 0px #00bdd6;
-        /* Crea una sombra en la parte inferior */
-        border-radius: 0px;
-    }
-
-    .btn-producto {
-        background-color: #4069e5ff;
-        color: white;
-        font-weight: 500;
-        align-items: center;
-    }
-
-    .btn-producto:hover {
-        background-color: #2655e1ff;
-    }
-
-    .spinner {
-        display: flex;
-        align-items: center;
-    }
-
-    .spinner button {
-        padding: 0;
-        width: 24px;
-        /* Adjust the size as needed */
-        height: 24px;
-        /* Adjust the size as needed */
-        border: none;
-        background-color: #f0f0f0;
-        /* Base color */
-        cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.1s;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .spinner button.decrement {
-        background-color: #e0585842;
-        border: solid 3px #e05858;
-        color: #d22929;
-        font-weight: bold;
-    }
-
-    .spinner button.increment {
-        background-color: #58c9e042;
-        border: solid 3px #58c9e0;
-        color: #33bcce;
-        font-weight: bold;
-    }
-
-    .spinner button:active {
-        transform: scale(0.95);
-    }
-
-    .spinner span {
-        margin: 0px;
-    }
-
-    .inputs-montos {
-        background-color: rgb(255, 255, 255);
-        padding: 6px 16px;
-        border: solid 2px #a2a2a2;
-        border-radius: 5px;
-        width: 8.5rem;
-    }
-
-    .span-title {
-        width: 7rem;
-    }
-
-    .btn-cobrar,
-    .btn-aceptar-cliente {
-        background-color: #379AE6FF;
-        color: white;
-        font-weight: 500;
-        align-items: center;
-    }
-
-    .btn-cobrar:hover,
-    .btn-aceptar-cliente:hover {
-        background-color: #1f7db9ff;
-    }
-
-    .btn-cerrar {
-        background-color: #e05858ff;
-        color: white;
-        font-weight: 500;
-        align-items: center;
-    }
-
-    .btn-cerrar:hover {
-        background-color: #d22929ff;
-    }
-
-    .btn-cotizar {
-        background-color: rgb(4, 187, 86, 0.8);
-        color: white;
-        font-weight: 500;
-        align-items: center;
-    }
-
-    .btn-cotizar:hover {
-        background-color: rgb(4, 187, 86);
-    }
-
-
-
-    /* Animación de entrada del modal */
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: scale(0.9);
-        }
-
-        to {
-            opacity: 1;
-            transform: scale(1);
-        }
-    }
-</style>
-
-<!-- Tabs de Reporte -->
 <div class="mb-4">
     <div class="nav nav-tabs">
-
         <a class="nav-item nav-link active" href="#lisventas" data-bs-toggle="tab">
             <i class="fas fa-shopping-cart"></i> Lista de ventas
         </a>
@@ -249,60 +19,8 @@ HTML:
 </div>
 
 <div class="tab-content">
-
-
-    <!-- Lista de Ventas -->
-    <div class="tab-pane fade" id="lisventas">
-        <!-- Detalles -->
-        <div class="mb-4">
-            <hr>
-            <p class="text-muted" style="font-size: 14px;">
-                Podrás gestionar las ventas del sistema transaccional de Tormenta.
-            </p>
-        </div>
-
-        <div class="table-container mt-4">
-            <div class="table-scroll">
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th class="text-center" style="font-weight: bolder;">Nro. Venta</th>
-                            <th class="text-center" style="font-weight: bolder;">Tipo. comp</th>
-                            <th class="text-center" style="font-weight: bolder;">Cliente</th>
-                            <th class="text-center" style="font-weight: bolder;">F. Emisión</th>
-                            <th class="text-center" style="font-weight: bolder;">IGV</th>
-                            <th class="text-center" style="font-weight: bolder;">Total</th>
-                            <th class="text-center" style="font-weight: bolder;">Cajero</th>
-                            <th class="text-center" style="font-weight: bolder;">ACCIONES</th>
-
-
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for venta in total_ventas %}
-                        <tr>
-                            <td class="text-center">{{ venta.num_comprobante }}</td>
-                            <td class="text-center">{{ venta.nom_tipocomp }}</td>
-                            <td class="text-center">{{ venta.cliente }}</td>
-                            <td class="text-center">{{venta.fecha_emision}}</td>
-                            <td class="text-center">{{ venta.total }}</td>
-                            <td class="text-center">{{ venta.igv }}</td>
-                            <td class="text-center">{{ venta.total }}</td>
-                            <td class="text-center">{{venta.cajero}}</td>
-
-
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
     <!-- Nueva Venta -->
     <div class="tab-pane fade show active" id="newventa">
-        <!-- Detalles -->
         <div class="mb-3">
             <h1 class="font-weight-bold display-8 text-left fs-3" style="font-weight: bold;">
                 REGISTRAR NUEVA VENTA
@@ -310,53 +28,18 @@ HTML:
         </div>
         <div class="flex justify-between items-center mb-4">
             <div class="card bg-white p-3">
-                <div class="row justify-content-between">
-                    <div class="text-lg fw-bolder col-4">Detalle de venta</div>
-                    <div class="flex items-center space x-2 col-3">
-                        <label for="switchDetalles" style="display: flex; align-items: center; cursor: pointer;">
-                            <div style="position: relative; width: 48px; height: 24px; transition: background-color 0.2s ease-in-out; border-radius: 12px;"
-                                class="bg-gray-200" id="toggleContainer">
-                                <input id="switchDetalles" type="checkbox"
-                                    style="position: absolute; width: 100%; height: 100%; opacity: 0;"
-                                    onchange="toggleDetalleMode(this)" />
-                                <div style="width: 24px; height: 24px; border-radius: 50%; position: absolute; top: 0; left: 0; background-color: #d1d5db; transition: transform 0.2s ease-in-out;"
-                                    class="toggleIndicator"></div>
-                            </div>
-                            <div style="color: #4b5563; font-weight: 500;">Búsqueda por detalle</div>
-                        </label>
-                        <script>
-                            function toggleDetalleMode(checkbox) {
-                                const toggleContainer = document.getElementById('toggleContainer');
-                                const toggleIndicator = toggleContainer.querySelector('.toggleIndicator');
-    
-                                if (checkbox.checked) {
-                                    toggleContainer.classList.add('bg-custom-blue');
-                                    toggleContainer.classList.remove('bg-gray-200');
-                                    toggleIndicator.style.transform = 'translateX(24px)';
-                                    toggleIndicator.style.backgroundColor = '#ffffff';
-                                } else {
-                                    toggleContainer.classList.add('bg-gray-200');
-                                    toggleContainer.classList.remove('bg-custom-blue');
-                                    toggleIndicator.style.transform = 'translateX(0)';
-                                    toggleIndicator.style.backgroundColor = '#d1d5db';
-                                }
-                            }
-                        </script>
-                    </div>
-                  </div>
-                
-                
                 <div class="flex items-center space mb-4 m-2 row">
                     <div class="col">
                         <div class="row my-2">
                             <div class="col-11">
                                 <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="Buscar el producto en el detalle">
                             </div>
-                             <div class="col d-flex justify-content-end p-0"><button class="btn btn-primary">Producto</button></div>
+                            <div class="col d-flex justify-content-end p-0">
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productModal">Producto</button>
+                            </div>
                         </div>
                     </div>
                     
-            
                     <div class="table-container">
                         <table>
                             <thead>
@@ -366,63 +49,44 @@ HTML:
                                     <th class="text-center" style="font-weight: bolder;">Precio</th>
                                     <th class="text-center" style="font-weight: bolder;">Descuento</th>
                                     <th class="text-center" style="font-weight: bolder;">Subtotal</th>
-
+                                    <th class="text-center" style="font-weight: bolder;">Acción</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for producto in productos %}
-                                <tr>
-                                    <td class="text-center">{{ producto.codigo }}</td>
-                                    <td class="text-center">{{ producto.nombre }}</td>
-                                    <td class="text-center">{{ producto.precio }}</td>
-                                    <td class="text-center">{{ producto.stock }}</td>
-                                    <td class="text-center">
-                                        <div class="spinner">
-                                            <button class="decrement" onclick="decrement(this)">-</button>
-                                            <span>1</span>
-                                            <button class="increment" onclick="increment(this)">+</button>
-                                        </div>
-                                    </td>
-                                    <td class="text-center">
-                                        <button class="btn btn-primary">Agregar</button>
-                                    </td>
-                                </tr>
-                                {% endfor %}
+                                <!-- Aquí se agregarán los productos seleccionados del modal -->
                             </tbody>
                         </table>
-
                     </div>
+
                     <div class="flex justify-content-end mt-4">
-                        <div class="flex flex-col w-100 ">
+                        <div class="flex flex-col w-100">
                             <div class="flex justify-between y-1 items-center row justify-content-end">
                                 <span class="fw-bolder d-flex align-items-center span-title me-3">IMPORTE</span>
-                                <span class="inputs-montos">S/. </span>
+                                <span class="inputs-montos" id="importe">S/. 0.00</span>
                             </div>
                             <div class="flex justify-between my-1 items-center row justify-content-end">
                                 <span class="fw-bolder d-flex align-items-center span-title me-3">IGV</span>
-                                <span class="inputs-montos">S/. </span>
+                                <span class="inputs-montos" id="igv">S/. 0.00</span>
                             </div>
                             <div class="flex justify-between my-1 items-center row justify-content-end">
                                 <span class="fw-bolder d-flex align-items-center span-title me-3">TOTAL</span>
-                                <span class="inputs-montos">S/. </span>
+                                <span class="inputs-montos" id="total">S/. 0.00</span>
                             </div>
                         </div>
                     </div>
+
                     <div class="row justify-content-end mt-4">
                         <div class="col-1">
                             <button class="btn btn-cotizar flex items-center">Cotizar</button>
-
                         </div>
                         <div class="col-1">
-                            <button class="btn btn-cobrar flex items-center">Cobrar</button>
+                            <button class="btn btn-cobrar flex items-center" data-bs-toggle="modal" data-bs-target="#ventaModal">Cobrar</button>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
-
 
 <div id="modalBackground" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 999;" onclick="closeModal()"></div>
 
@@ -434,7 +98,6 @@ HTML:
                 <h5 class="modal-title ms-3 mt-3 mb-2" id="productModalLabel">Busque y seleccione el producto</h5>
             </div>
             <div class="modal-body">
-                <!-- Campo de búsqueda -->
                 <input type="text" id="modalSearchInput" placeholder="Realice la búsqueda del producto por el nombre" class="form-control mb-3" />
                 <div style="max-height: 50vh; overflow-y: auto;">
                     <table class="table">
@@ -443,6 +106,7 @@ HTML:
                                 <th>Nombre</th>
                                 <th>Precio</th>
                                 <th>Stock</th>
+                                <th>Acción</th>
                             </tr>
                         </thead>
                         <tbody id="productTableBody">
@@ -451,6 +115,7 @@ HTML:
                                 <td>{{ producto.nombre }}</td>
                                 <td>S/ {{ producto.precio }}</td>
                                 <td>{{ producto.stock }}</td>
+                                <td><button class="btn btn-primary" onclick="addToTable('{{ producto.nombre }}', {{ producto.precio }})">Seleccionar</button></td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -464,26 +129,108 @@ HTML:
     </div>
 </div>
 
+<!-- Modal de Bootstrap -->
+<div class="modal fade" id="ventaModal" tabindex="-1" aria-labelledby="ventaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title ms-3 mt-3 mb-2" id="productModalLabel">PAGO</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col">
+                        <div class="row">
+                            <div class="col">
+                                <p>Seleccione el cliente</p>
+                                <select class="form-select form-select-sm" aria-label="Small select example">
+                                    <option selected>Open this select menu</option>
+                                    <option value="1">One</option>
+                                    <option value="2">Two</option>
+                                    <option value="3">Three</option>
+                                  </select>
+                            </div>
+                            <div class="col">
+                                <p>Select. el comprobante</p>
+                                <select class="form-select form-select-sm" aria-label="Small select example">
+                                    <option selected>Open this select menu</option>
+                                    <option value="1">One</option>
+                                    <option value="2">Two</option>
+                                    <option value="3">Three</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-floating">
+                                <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
+                                <label for="floatingTextarea2" class="fs-6 mx-2">Descripción</label>
+                              </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="row">
+                                    <p>Total a pagar</p>
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text">S/.</span>
+                                        <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <p>Monto recibido</p>
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text">S/.</span>
+                                        <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <p>Cambio</p>
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text">S/.</span>
+                                        <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="row">
+                                    <p>Metodo de pago</p>
+                                    <select class="form-select form-select-sm" aria-label="Small select example">
+                                        <option selected>Open this select menu</option>
+                                        <option value="1">One</option>
+                                        <option value="2">Two</option>
+                                        <option value="3">Three</option>
+                                    </select>
+                                </div>
+                                <div class="row">
+                                    <p>Aplicar descuento</p>
+                                    
+                                </div>
+                                <div class="row">
+                                    <p>Faltante</p>
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text">S/.</span>
+                                        <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script>
-    function openModal() {
-        document.getElementById("productModal").style.display = "block";
-        document.getElementById("modalBackground").style.display = "block";
-    }
-
-    function closeModal() {
-        document.getElementById("productModal").style.display = "none";
-        document.getElementById("modalBackground").style.display = "none";
-    }
-
-        // Búsqueda en tiempo real en el modal
-        document.getElementById('modalSearchInput').addEventListener('input', function() {
+    // Búsqueda en tiempo real en el modal
+    document.getElementById('modalSearchInput').addEventListener('input', function() {
         const filter = this.value.toLowerCase();
         const rows = document.querySelectorAll('#productTableBody tr');
 
         rows.forEach(row => {
             const nombre = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
-
             if (nombre.includes(filter)) {
                 row.style.display = '';
             } else {
@@ -491,6 +238,73 @@ HTML:
             }
         });
     });
+
+    // Función para añadir el producto seleccionado a la tabla o incrementar si ya existe
+    function addToTable(nombre, precio) {
+        const tableBody = document.querySelector("#newventa .table-container tbody");
+        const existingRow = Array.from(tableBody.rows).find(row => row.cells[0].textContent === nombre);
+
+        if (existingRow) {
+            updateQuantity(existingRow, 1, precio);
+        } else {
+            const newRow = document.createElement("tr");
+            newRow.innerHTML = `
+                <td class="text-center">${nombre}</td>
+                <td class="text-center">
+                    <button onclick="updateQuantity(this.parentElement.parentElement, -1, ${precio})">-</button>
+                    <span class="quantity">1</span>
+                    <button onclick="updateQuantity(this.parentElement.parentElement, 1, ${precio})">+</button>
+                </td>
+                <td class="text-center">S/ ${precio.toFixed(2)}</td>
+                <td class="text-center">0</td>
+                <td class="text-center subtotal">S/ ${precio.toFixed(2)}</td>
+                <td class="text-center">
+                    <button class="btn btn-danger" onclick="removeRow(this)">Eliminar</button>
+                </td>
+            `;
+            tableBody.appendChild(newRow);
+        }
+        updateTotals(); // Asegura actualizar los totales después de añadir el producto
+        closeModal();
+    }
+
+    // Función para actualizar la cantidad y subtotal de una fila
+    function updateQuantity(row, change, price) {
+        const quantityCell = row.querySelector(".quantity");
+        const subtotalCell = row.querySelector(".subtotal");
+
+        let quantity = parseInt(quantityCell.textContent) + change;
+        if (quantity < 1) quantity = 1;  // Prevent quantity from going below 1
+        quantityCell.textContent = quantity;
+
+        // Update subtotal
+        subtotalCell.textContent = "S/ " + (quantity * price).toFixed(2);
+
+        updateTotals(); // Asegura actualizar los totales después de cambiar la cantidad
+    }
+
+    // Función para eliminar una fila
+    function removeRow(button) {
+        button.parentElement.parentElement.remove();
+        updateTotals(); // Asegura actualizar los totales después de eliminar un producto
+    }
+
+    // Función para actualizar los totales (Importe, IGV, Total)
+    function updateTotals() {
+        const subtotals = document.querySelectorAll(".subtotal");
+        let importe = 0;
+
+        subtotals.forEach(subtotal => {
+            importe += parseFloat(subtotal.textContent.replace("S/ ", "").replace(",", "."));
+        });
+
+        const igv = importe * 0.18;  // Assuming 18% IGV
+        const total = importe + igv;
+
+        document.getElementById("importe").textContent = "S/. " + importe.toFixed(2);
+        document.getElementById("igv").textContent = "S/. " + igv.toFixed(2);
+        document.getElementById("total").textContent = "S/. " + total.toFixed(2);
+    }
 </script>
 
-    {% endblock %}
+{% endblock %}
