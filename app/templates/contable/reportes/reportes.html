@@ -9,6 +9,16 @@
     <h1 class="font-weight-bold display-8 text-left fs-3" style="font-weight: bold;">REPORTES DE CONTABILIDAD</h1>
 </header>
 
+<style>
+    .saldo-acreedor {
+        color: green;
+    }
+
+    .saldo-deudor {
+        color: red;
+    }
+</style>
+
 <div class="mb-4">
     <div class="nav nav-tabs">
         <a class="nav-item nav-link active" href="#libro-diario" data-bs-toggle="tab">
@@ -260,26 +270,27 @@
                     </thead>
                     <tbody>
                         {% for codigo_cuenta, cuenta in libro_mayor.items() %}
-                            <tr>
-                                <td class="text-center" rowspan="{{ cuenta.detalles|length }}">{{ codigo_cuenta }}</td>
-                                <td rowspan="{{ cuenta.detalles|length }}">{{ cuenta.nombre_cuenta }}</td>
-                                {% for detalle in cuenta.detalles %}
-                                    {% if not loop.first %}<tr>{% endif %}
+                            {% for detalle in cuenta.detalles %}
+                                <tr>
+                                    {% if loop.first %}
+                                        <td class="text-center" rowspan="{{ cuenta.detalles|length }}">{{ codigo_cuenta }}</td>
+                                        <td rowspan="{{ cuenta.detalles|length }}">{{ cuenta.nombre_cuenta }}</td>
+                                    {% endif %}
                                     <td>{{ detalle.fecha_asiento }}</td>
                                     <td class="text-end">{{ detalle.debe | round(2) if detalle.debe is not none else '' }}</td>
                                     <td class="text-end">{{ detalle.haber | round(2) if detalle.haber is not none else '' }}</td>
-                                    {% if loop.last %}
-                                        <td class="text-end">
-                                            <span tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
-                                                data-bs-content="{% if detalle.saldo >= 0 %}Saldo Acreedor: S/ {{ detalle.saldo | round(2) }}{% else %}Saldo Deudor: S/ {{ detalle.saldo | abs | round(2) }}{% endif %}">
-                                                {{ detalle.saldo | round(2) }}
-                                            </span>
-                                        </td>
-                                    {% else %}
-                                        <td></td>
+                                    
+                                    {% if loop.first %}
+                                    <td class="text-end" rowspan="{{ cuenta.detalles|length }}">
+                                        <span tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                            data-bs-content="{% if cuenta.saldo >= 0 %}Saldo Acreedor: S/ {{ cuenta.saldo | round(2) }}{% else %}Saldo Deudor: S/ {{ cuenta.saldo | abs | round(2) }}{% endif %}">
+                                            {{ cuenta.saldo | round(2) }}
+                                        </span>
+                                    </td>
+                                    
                                     {% endif %}
-                                    </tr>
-                                {% endfor %}
+                                </tr>
+                            {% endfor %}
                         {% endfor %}
                     </tbody>
                     <tfoot>
@@ -290,7 +301,7 @@
                             <th></th>
                         </tr>
                     </tfoot>
-                </table>                           
+                </table>
                 
             </div>
 
@@ -607,8 +618,16 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-        var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-            return new bootstrap.Popover(popoverTriggerEl);
+        popoverTriggerList.forEach(function (popoverTriggerEl) {
+            var isAcreedor = popoverTriggerEl.getAttribute("data-bs-content").includes("Saldo Acreedor");
+            var colorClass = isAcreedor ? "saldo-acreedor" : "saldo-deudor";
+
+            var popover = new bootstrap.Popover(popoverTriggerEl, {
+                html: true,
+                content: function() {
+                    return '<span class="' + colorClass + '">' + popoverTriggerEl.getAttribute("data-bs-content") + '</span>';
+                }
+            });
         });
     });
 </script>        
