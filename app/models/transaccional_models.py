@@ -420,3 +420,28 @@ def obtener_ventas(nom_tipocomp='', razon_social='', nombre_sucursal='', fecha_i
         return {'code': 0, 'error': str(e)}
     finally:
         connection.close()
+        
+#*
+# ------------------ VENTAS ------------------ 
+# *#
+
+def listarClientes():
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            sql = """
+                SELECT id_cliente,
+                    CASE 
+                        WHEN (nombres IS NULL OR nombres = '') AND (apellidos IS NULL OR apellidos = '') 
+                        THEN razon_social 
+                        ELSE CONCAT_WS(' ', nombres, apellidos) 
+                    END AS nombre_completo
+                FROM 
+                    cliente;
+            """
+            cursor.execute(sql)
+            resultados = cursor.fetchall()
+            return resultados
+    except Exception as e:
+        print(f"Error: {e}")
+        return []

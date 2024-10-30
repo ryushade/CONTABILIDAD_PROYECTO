@@ -131,35 +131,35 @@
 
 <!-- Modal de Bootstrap -->
 <div class="modal fade" id="ventaModal" tabindex="-1" aria-labelledby="ventaModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-md">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title ms-3 mt-3 mb-2" id="productModalLabel">PAGO</h5>
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col">
-                        <div class="row">
+                    <div class="col mx-3">
+                        <div class="row my-4">
                             <div class="col">
                                 <p>Seleccione el cliente</p>
                                 <select class="form-select form-select-sm" aria-label="Small select example">
-                                    <option selected>Open this select menu</option>
-                                    <option value="1">One</option>
-                                    <option value="2">Two</option>
-                                    <option value="3">Three</option>
+                                    <option selected>Seleccionar</option>
+                                    {% for cliente in clientes %}
+                                    <option value="{{ cliente.id_cliente }}">{{ cliente.nombre_completo }}</option>
+                                    {% endfor %}
+
                                   </select>
                             </div>
                             <div class="col">
                                 <p>Select. el comprobante</p>
                                 <select class="form-select form-select-sm" aria-label="Small select example">
-                                    <option selected>Open this select menu</option>
-                                    <option value="1">One</option>
-                                    <option value="2">Two</option>
-                                    <option value="3">Three</option>
+                                    <option selected>Comprob. de pago</option>
+                                    <option value="1">Boleta</option>
+                                    <option value="2">Factura</option>
                                 </select>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row mb-4">
                             <div class="form-floating">
                                 <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
                                 <label for="floatingTextarea2" class="fs-6 mx-2">Descripción</label>
@@ -171,43 +171,51 @@
                                     <p>Total a pagar</p>
                                     <div class="input-group mb-3">
                                         <span class="input-group-text">S/.</span>
-                                        <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                                        <input type="text" id="totalAPagar" class="form-control" readonly />
                                     </div>
                                 </div>
                                 <div class="row">
                                     <p>Monto recibido</p>
                                     <div class="input-group mb-3">
                                         <span class="input-group-text">S/.</span>
-                                        <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                                        <input type="number" id="montoRecibido" class="form-control" oninput="calculateChange()" />
                                     </div>
                                 </div>
                                 <div class="row">
                                     <p>Cambio</p>
                                     <div class="input-group mb-3">
                                         <span class="input-group-text">S/.</span>
-                                        <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                                        <input type="text" id="cambio" class="form-control" readonly />
                                     </div>
                                 </div>
                             </div>
                             <div class="col">
-                                <div class="row">
+                                <div class="row mb-4">
                                     <p>Metodo de pago</p>
-                                    <select class="form-select form-select-sm" aria-label="Small select example">
-                                        <option selected>Open this select menu</option>
-                                        <option value="1">One</option>
-                                        <option value="2">Two</option>
-                                        <option value="3">Three</option>
-                                    </select>
+                                    <div class="">
+                                        <select class="form-select form-select-sm" aria-label="Small select example">
+                                            <option selected>Seleccionar metodo</option>
+                                            <option value="1">EFECTIVO</option>
+                                            <option value="2">PLIN</option>
+                                            <option value="3">YAPE</option>
+                                            <option value="3">VISA</option>
+                                            <option value="3">AMERICAN EXPRESS</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div class="row">
                                     <p>Aplicar descuento</p>
-                                    
+                                    <div class="input-group mb-3">
+                                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                                        <span class="input-group-text">S/.</span>
+                                        <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                                    </div>
                                 </div>
                                 <div class="row">
                                     <p>Faltante</p>
                                     <div class="input-group mb-3">
                                         <span class="input-group-text">S/.</span>
-                                        <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                                        <input type="text" id="faltante" class="form-control" readonly />
                                     </div>
                                 </div>
                             </div>
@@ -305,6 +313,36 @@
         document.getElementById("igv").textContent = "S/. " + igv.toFixed(2);
         document.getElementById("total").textContent = "S/. " + total.toFixed(2);
     }
+
+    // Actualizar el valor de "Total a pagar" al abrir el modal
+    document.querySelector('.btn-cobrar').addEventListener('click', () => {
+        const total = document.getElementById("total").textContent.replace("S/. ", "") || "0.00";
+        document.getElementById("totalAPagar").value = parseFloat(total).toFixed(2);
+    });
+
+    // Función para calcular el cambio en el modal de pago
+    function calculateChange() {
+        const total = parseFloat(document.getElementById("totalAPagar").value) || 0;
+        const recibido = parseFloat(document.getElementById("montoRecibido").value) || 0;
+
+        const cambio = recibido >= total ? recibido - total : 0;
+
+        document.getElementById("cambio").value = "S/. " + cambio.toFixed(2);
+    }
+
+    // Función para calcular el cambio y el faltante en el modal de pago
+    function calculateChange() {
+        const total = parseFloat(document.getElementById("totalAPagar").value) || 0;
+        const recibido = parseFloat(document.getElementById("montoRecibido").value) || 0;
+
+        const cambio = recibido >= total ? recibido - total : 0;
+        const faltante = recibido < total ? total - recibido : 0;
+
+        document.getElementById("cambio").value = "S/. " + cambio.toFixed(2);
+        document.getElementById("faltante").value = "S/. " + faltante.toFixed(2);
+    }
+
+
 </script>
 
 {% endblock %}

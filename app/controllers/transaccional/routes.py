@@ -3,7 +3,7 @@ from flask import render_template, send_file
 from app.models.transaccional_models import obtener_productos, obtener_marcas, obtener_categorias, obtener_ingresos, obtener_nota_salida, obtener_inventario, obtener_compras
 
 from flask import render_template, send_file, request, jsonify, redirect, url_for, flash
-from app.models.transaccional_models import obtener_productos, obtener_ventas, obtener_marcas, obtener_categorias, obtener_ingresos, obtener_nota_salida, obtener_inventario, obtener_subcategorias_por_categoria, agregar_producto, obtener_inventario_vigente
+from app.models.transaccional_models import obtener_productos, obtener_ventas, obtener_marcas, obtener_categorias, obtener_ingresos, obtener_nota_salida, obtener_inventario, obtener_subcategorias_por_categoria, agregar_producto, obtener_inventario_vigente, listarClientes
 
 from app.models.transaccional_models import generate_barcode
 from . import transactional_bp
@@ -102,12 +102,14 @@ def productos():
 @transactional_bp.route('/ventas', methods=['GET'])
 def ventas():
     total_ventas = obtener_ventas()
-    datos_inventario = obtener_inventario_vigente()  # Cambia a la función de productos vigentes
 
+    datos_inventario = obtener_inventario_vigente()  # Cambia a la función de productos vigentes
+    clientes = listarClientes()
     return render_template(
         'transaccional/ventas/ventas.html',
         total_ventas=total_ventas,
-        datos_inventario=datos_inventario
+        datos_inventario=datos_inventario,
+        clientes = clientes
     )
 
 
