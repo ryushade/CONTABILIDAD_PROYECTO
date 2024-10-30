@@ -259,8 +259,8 @@
                                     <td class="text-end">{{ detalle.haber | round(2) if detalle.haber is not none else '' }}</td>
                                     {% if loop.last %}
                                         <td class="text-end">
-                                            <span tabindex="0" data-bs-toggle="popover" data-bs-trigger="focus"
-                                                data-bs-content="{% if detalle.saldo >= 0 %}Saldo Acreedor: S/ {{ detalle.saldo | round(2) }}{% else %}Saldo Deudor: S/ {{ detalle.saldo | round(2) }}{% endif %}">
+                                            <span tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                                  data-bs-content="{% if detalle.saldo >= 0 %}Saldo Acreedor: S/ {{ detalle.saldo | round(2) }}{% else %}Saldo Deudor: S/ {{ detalle.saldo | abs | round(2) }}{% endif %}">
                                                 {{ detalle.saldo | round(2) }}
                                             </span>
                                         </td>
@@ -279,7 +279,7 @@
                             <th></th>
                         </tr>
                     </tfoot>
-                </table>
+                </table>                           
                 
             </div>
 
@@ -600,8 +600,7 @@
             return new bootstrap.Popover(popoverTriggerEl);
         });
     });
-</script>
-    
+</script>        
 
 </div>
 
