@@ -344,12 +344,11 @@ def obtener_libro_mayor_agrupado_por_fecha():
         with conexion.cursor(DictCursor) as cursor:
             cursor.execute("""
                 SELECT cu.codigo_cuenta, cu.nombre_cuenta, a.fecha_asiento, 
-                       co.num_comprobante, SUM(d.debe) AS total_debe, SUM(d.haber) AS total_haber
+                    SUM(d.debe) AS total_debe, SUM(d.haber) AS total_haber
                 FROM asiento_contable a
                 INNER JOIN detalle_asiento d ON a.id_asiento = d.id_asiento
                 INNER JOIN cuenta cu ON cu.id_cuenta = d.id_cuenta
-                INNER JOIN comprobante co ON co.id_comprobante = a.id_comprobante
-                GROUP BY cu.codigo_cuenta, cu.nombre_cuenta, a.fecha_asiento, co.num_comprobante
+                GROUP BY cu.codigo_cuenta, cu.nombre_cuenta, a.fecha_asiento
                 ORDER BY cu.codigo_cuenta, a.fecha_asiento
             """)
             resultados = cursor.fetchall()
@@ -370,7 +369,6 @@ def obtener_libro_mayor_agrupado_por_fecha():
             # Guardar el registro con el saldo actual
             libro_mayor[codigo_cuenta]["detalles"].append({
                 "fecha_asiento": row["fecha_asiento"],
-                "num_comprobante": row["num_comprobante"],
                 "debe": debe,
                 "haber": haber,
                 "saldo": libro_mayor[codigo_cuenta]["saldo"]

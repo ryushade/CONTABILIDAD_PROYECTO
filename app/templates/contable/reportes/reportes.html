@@ -271,7 +271,7 @@
                                     {% if loop.last %}
                                         <td class="text-end">
                                             <span tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
-                                                  data-bs-content="{% if detalle.saldo >= 0 %}Saldo Acreedor: S/ {{ detalle.saldo | round(2) }}{% else %}Saldo Deudor: S/ {{ detalle.saldo | abs | round(2) }}{% endif %}">
+                                                data-bs-content="{% if detalle.saldo >= 0 %}Saldo Acreedor: S/ {{ detalle.saldo | round(2) }}{% else %}Saldo Deudor: S/ {{ detalle.saldo | abs | round(2) }}{% endif %}">
                                                 {{ detalle.saldo | round(2) }}
                                             </span>
                                         </td>
