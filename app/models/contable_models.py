@@ -1,6 +1,7 @@
 from app.models.conexion import obtener_conexion
 import pymysql
 from collections import defaultdict
+from datetime import datetime
 
 # Obtener un usuario por nombre
 def obtener_usuario_por_nombre(username):
@@ -278,7 +279,17 @@ def obtener_asientos_agrupados():
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                SELECT a.id_asiento, a.fecha_asiento, a.glosa, co.num_comprobante, cu.codigo_cuenta, cu.nombre_cuenta, d.debe, d.haber
+                SELECT 
+                    a.id_asiento, 
+                    a.fecha_asiento, 
+                    a.glosa, 
+                    co.num_comprobante, 
+                    cu.codigo_cuenta, 
+                    cu.nombre_cuenta, 
+                    d.debe, 
+                    d.haber,
+                    a.total_debe, 
+                    a.total_haber
                 FROM asiento_contable a
                 INNER JOIN detalle_asiento d ON a.id_asiento = d.id_asiento
                 INNER JOIN cuenta cu ON cu.id_cuenta = d.id_cuenta
@@ -287,25 +298,51 @@ def obtener_asientos_agrupados():
             """)
             resultados = cursor.fetchall()
         
-        # Agrupar resultados
+        # agrupar resultados
         asientos_agrupados = defaultdict(lambda: {"detalles": []})
+        global_total_debe = 0.0
+        global_total_haber = 0.0
         
         for row in resultados:
             id_asiento = row["id_asiento"]
-            if "fecha_asiento" not in asientos_agrupados[id_asiento]:
+            if id_asiento not in asientos_agrupados:
+                fecha_asiento = row["fecha_asiento"]
+                if isinstance(fecha_asiento, str):
+                    fecha_asiento = datetime.strptime(fecha_asiento, '%Y-%m-%d')  
                 asientos_agrupados[id_asiento].update({
-                    "fecha_asiento": row["fecha_asiento"],
+                    "fecha_asiento": fecha_asiento,
                     "glosa": row["glosa"],
                     "num_comprobante": row["num_comprobante"],
-                    "detalles": []
+                    "detalles": [],
+                    "total_debe": float(row["total_debe"]),
+                    "total_haber": float(row["total_haber"])
                 })
+                global_total_debe += float(row["total_debe"])
+                global_total_haber += float(row["total_haber"])
+            
             asientos_agrupados[id_asiento]["detalles"].append({
                 "codigo_cuenta": row["codigo_cuenta"],
                 "nombre_cuenta": row["nombre_cuenta"],
-                "debe": row["debe"],
-                "haber": row["haber"]
+                "debe": float(row["debe"]),
+                "haber": float(row["haber"]),
             })
         
-        return asientos_agrupados
+        totales = {
+            "total_debe": global_total_debe,
+            "total_haber": global_total_haber
+        }
+        
+        return asientos_agrupados, totales
     finally:
         conexion.close()
+
+def insertar_regla(nombre_regla, tipo_transaccion, cuenta_debe, cuenta_haber):
+    conexion = obtener_conexion()
+    
+    with conexion.cursor() as cursor:
+            cursor.execute("INSERT INTO reglas_contabilizacion (nombre_regla, tipo_transaccion, cuenta_debe, cuenta_haber, estado) VALUES (%s, %s, %s, %s, %s)"
+            , (nombre_regla,tipo_transaccion, cuenta_debe, cuenta_haber ))
+    conexion.commit()   
+    conexion.close()
+    return True
+            
