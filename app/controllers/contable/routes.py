@@ -30,9 +30,9 @@ def logout():
 
 @accounting_bp.route('/reportes', methods=['GET'])
 def reportes():
-    asientos = obtener_asientos_agrupados()
+    asientos, totales = obtener_asientos_agrupados()
     libro_mayor_data, total_debe, total_haber = obtener_libro_mayor_agrupado_por_fecha()
-    return render_template('contable/reportes/reportes.html', asientos=asientos, libro_mayor=libro_mayor_data, total_debe=total_debe, total_haber=total_haber)
+    return render_template('contable/reportes/reportes.html', asientos=asientos, totales=totales, libro_mayor=libro_mayor_data, total_debe=total_debe, total_haber=total_haber)
 
 @accounting_bp.route('/cuentas', methods=['GET'])
 def cuentas():
@@ -154,3 +154,7 @@ def editar_regla(regla_id):
     actualizar_reglas(regla_id, nombre_regla, tipo_transaccion, cuenta_debe, cuenta_haber, estado_regla)
     
     return redirect(url_for('contable.reglas'))
+
+@accounting_bp.route('/reportes/ldpdf')
+def ldpf():
+    return render_template('contable/reportes/pdf_ld.html')

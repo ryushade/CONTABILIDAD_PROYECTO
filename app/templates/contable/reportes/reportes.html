@@ -117,17 +117,21 @@
                         {% for detalle in asiento.detalles %}
                         <tr>
                             {% if loop.first %}
-                            <td class="text-center" rowspan="{{ asiento.detalles|length }}">{{ numero_correlativo }}
+                            <td style="padding-top: 20px;" class="text-center" rowspan="{{ asiento.detalles|length }}">
+                                {{ numero_correlativo }}
                             </td>
-                            <td rowspan="{{ asiento.detalles|length }}">{{ asiento.fecha_asiento.strftime('%d/%m/%Y') }}
+                            <td style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">{{
+                                asiento.fecha_asiento.strftime('%d/%m/%Y') }}
                             </td>
-                            <td rowspan="{{ asiento.detalles|length }}">{{ asiento.glosa }}</td>
-                            <td rowspan="{{ asiento.detalles|length }}">{{ asiento.num_comprobante }}</td>
+                            <td style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">{{ asiento.glosa }}
+                            </td>
+                            <td style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">{{
+                                asiento.num_comprobante }}</td>
                             {% endif %}
                             <td>{{ detalle.codigo_cuenta }}</td>
                             <td>{{ detalle.nombre_cuenta }}</td>
                             <td class="text-end">{{ detalle.debe | round(2) }}</td>
-                            <td class="text-end">{{ detalle.haber| round(2) }}</td>
+                            <td class="text-end">{{ detalle.haber | round(2) }}</td>
                         </tr>
                         {% endfor %}
                         {% set numero_correlativo = numero_correlativo + 1 %}
@@ -135,7 +139,13 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                           
+                            <th colspan="6" class="text-end" style="font-weight: bold;">TOTALES (S/.)</th>
+                            <th style="font-weight: bold; font-size: 15px;" class="text-end">
+                                {{ totales.total_debe | round(2) }}
+                            </th>
+                            <th style="font-weight: bold; font-size: 15px;" class="text-end">
+                                {{ totales.total_haber | round(2) }}
+                            </th>
                         </tr>
                     </tfoot>
                 </table>
@@ -224,7 +234,8 @@
                             <option selected>Todas</option>
                         </select>
                     </div>
-                    <div class="col-lg-2 d-flex justify-content-end" style="margin-left: auto;">
+
+                    <div class="col-lg-2 d-flex justify-content-end" style="margin-left: auto; margin-right: 20px;">
                         <button type="submit" class="btn btn-primary w-100">
                             <i class="fas fa-calendar-alt"></i> Generar Reporte
                         </button>
@@ -259,8 +270,8 @@
                                     <td class="text-end">{{ detalle.haber | round(2) if detalle.haber is not none else '' }}</td>
                                     {% if loop.last %}
                                         <td class="text-end">
-                                            <span tabindex="0" data-bs-toggle="popover" data-bs-trigger="focus"
-                                                data-bs-content="{% if detalle.saldo >= 0 %}Saldo Acreedor: S/ {{ detalle.saldo | round(2) }}{% else %}Saldo Deudor: S/ {{ detalle.saldo | round(2) }}{% endif %}">
+                                            <span tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                                  data-bs-content="{% if detalle.saldo >= 0 %}Saldo Acreedor: S/ {{ detalle.saldo | round(2) }}{% else %}Saldo Deudor: S/ {{ detalle.saldo | abs | round(2) }}{% endif %}">
                                                 {{ detalle.saldo | round(2) }}
                                             </span>
                                         </td>
@@ -279,7 +290,7 @@
                             <th></th>
                         </tr>
                     </tfoot>
-                </table>
+                </table>                           
                 
             </div>
 
@@ -600,8 +611,7 @@
             return new bootstrap.Popover(popoverTriggerEl);
         });
     });
-</script>
-    
+</script>        
 
 </div>
 
