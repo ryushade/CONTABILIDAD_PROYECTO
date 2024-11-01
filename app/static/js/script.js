@@ -127,7 +127,9 @@ function deleteCuenta() {
 }
 
 
-
+function openModalVerRegla() {
+  document.getElementById('openVerModal').style.display = 'flex';
+}
 
 function openModalAdd() {
   document.getElementById('addAccountModal').style.display = 'flex';
@@ -146,6 +148,10 @@ function openModalVer(codigo_cuenta, nombre_cuenta, naturaleza, nivel, estado_cu
 
 function closeModalView() {
   document.getElementById('verCuentaModal').style.display = 'none';
+}
+
+function closeModalVer(){
+  document.getElementById('openVerModal').style.display = 'none';
 }
 
 

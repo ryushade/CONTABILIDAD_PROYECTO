@@ -3,10 +3,27 @@
 {% block title %}Tormenta{% endblock %}
 
 {% block content %}
+
+<style>
+    .fade-lazy {
+        opacity: 0;
+        transition: opacity 0.6s ease-in-out;
+    }
+
+    .fade-lazy.visible {
+        opacity: 1;
+    }
+
+    .nav-tabs .nav-link.active {
+        border-bottom: 3px solid #1D4ED8;
+    }
+</style>
+
 <div class="mt-2 p-2 ms-5">
     <header class="mb-4 mt-4">
         <h1 class="title" style="color: #1D4ED8; font-weight: 700;">MÓDULOS DEL SISTEMA</h1>
     </header>
+
     <!-- Tabs de Reporte -->
     <div class="mb-4">
         <div class="nav nav-tabs">
@@ -21,8 +38,7 @@
 
     <div class="tab-content">
         <!-- Sistema Transaccional -->
-        <div class="tab-pane fade show active" id="sistrans">
-            <!-- Detalles -->
+        <div class="tab-pane fade show active fade-lazy" id="sistrans">
             <div class="mb-4">
                 <hr>
                 <p class="text-muted" style="font-size: 14px;">
@@ -42,10 +58,8 @@
                                 </div>
                                 <div>
                                     <h5 class="card-title text-gray-500" style="font-size: 14px;">Módulo de Ventas</h5>
-                                    <p class="card-text text-muted text-sm text-gray-500">Gestiona las ventas,
-                                        facturación y seguimiento de clientes.</p>
-                                    <p class="card-text text-muted " style="font-size: 14px;"><strong>Roles
-                                            Autorizados:</strong> Vendedor</p>
+                                    <p class="card-text text-muted text-sm text-gray-500">Gestiona las ventas, facturación y seguimiento de clientes.</p>
+                                    <p class="card-text text-muted " style="font-size: 14px;"><strong>Roles Autorizados:</strong> Vendedor</p>
                                 </div>
                             </div>
                         </div>
@@ -61,12 +75,9 @@
                                     <i class="fas fa-box-open text-success" style="font-size: 24px;"></i>
                                 </div>
                                 <div>
-                                    <h5 class="card-title text-gray-500" style="font-size: 14px;">Módulo de Productos
-                                    </h5>
-                                    <p class="card-text text-muted text-sm text-gray-500">Administra el catálogo de
-                                        productos y sus características.</p>
-                                    <p class="card-text text-muted" style="font-size: 14px;"><strong>Roles
-                                            Autorizados:</strong> Administrador</p>
+                                    <h5 class="card-title text-gray-500" style="font-size: 14px;">Módulo de Productos</h5>
+                                    <p class="card-text text-muted text-sm text-gray-500">Administra el catálogo de productos y sus características.</p>
+                                    <p class="card-text text-muted" style="font-size: 14px;"><strong>Roles Autorizados:</strong> Administrador</p>
                                 </div>
                             </div>
                         </div>
@@ -83,10 +94,8 @@
                                 </div>
                                 <div>
                                     <h5 class="card-title text-gray-500" style="font-size: 14px;">Módulo de Compras</h5>
-                                    <p class="card-text text-muted text-sm text-gray-500">Gestiona las órdenes de compra
-                                        y relación con proveedores.</p>
-                                    <p class="card-text text-muted" style="font-size: 14px;"><strong>Roles
-                                            Autorizados:</strong> Administrador</p>
+                                    <p class="card-text text-muted text-sm text-gray-500">Gestiona las órdenes de compra y relación con proveedores.</p>
+                                    <p class="card-text text-muted" style="font-size: 14px;"><strong>Roles Autorizados:</strong> Administrador</p>
                                 </div>
                             </div>
                         </div>
@@ -103,10 +112,8 @@
                                 </div>
                                 <div>
                                     <h5 class="card-title text-gray-500" style="font-size: 14px;">Módulo de Almacén</h5>
-                                    <p class="card-text text-muted text-sm text-gray-500">Controla el inventario y la
-                                        logística de almacén.</p>
-                                    <p class="card-text text-muted" style="font-size: 14px;"><strong>Roles
-                                            Autorizados:</strong> Administrador</p>
+                                    <p class="card-text text-muted text-sm text-gray-500">Controla el inventario y la logística de almacén.</p>
+                                    <p class="card-text text-muted" style="font-size: 14px;"><strong>Roles Autorizados:</strong> Administrador</p>
                                 </div>
                             </div>
                         </div>
@@ -116,16 +123,13 @@
         </div>
 
         <!-- Sistema Contable -->
-        <div class="tab-pane fade" id="siscon">
-            <!-- Detalles -->
+        <div class="tab-pane fade fade-lazy" id="siscon">
             <div class="mb-4">
                 <hr>
                 <p class="text-muted" style="font-size: 14px;">
                     Podrás visualizar el módulo contable de acuerdo al rol del usuario.
                 </p>
             </div>
-
-
 
             <!-- Módulo de Cuentas PCGE -->
             <div class="col-md-6 mb-4 mx-auto">
@@ -136,11 +140,9 @@
                                 <i class="fas fa-folder text-success" style="font-size: 24px;"></i>
                             </div>
                             <div>
-                                <h5 class="card-title text-gray-500" style="font-size: 14px;">Módulo de contabilidad
-                                </h5>
+                                <h5 class="card-title text-gray-500" style="font-size: 14px;">Módulo de contabilidad</h5>
                                 <p class="card-text text-muted text-sm text-gray-500">Gestiona el control de las operaciones transaccionales del sistema.</p>
-                                <p class="card-text text-muted" style="font-size: 14px;"><strong>Roles
-                                        Autorizados:</strong> Contador, Administrador</p>
+                                <p class="card-text text-muted" style="font-size: 14px;"><strong>Roles Autorizados:</strong> Contador, Administrador</p>
                             </div>
                         </div>
                     </div>
@@ -149,5 +151,25 @@
         </div>
     </div>
 </div>
-</div>
+
+<script>
+    // Intersection Observer para aplicar el efecto lazy load
+    document.addEventListener("DOMContentLoaded", function() {
+        const lazyElements = document.querySelectorAll(".fade-lazy");
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("visible");
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        lazyElements.forEach(element => {
+            observer.observe(element);
+        });
+    });
+</script>
+
 {% endblock %}
