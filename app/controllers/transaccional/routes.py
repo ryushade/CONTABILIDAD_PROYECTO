@@ -1,10 +1,10 @@
 
-from flask import render_template, send_file
+from flask import current_app, render_template, send_file
 from app.models.transaccional_models import obtener_productos, obtener_marcas, obtener_categorias, obtener_ingresos, obtener_nota_salida, obtener_inventario, obtener_compras
 
 from flask import render_template, send_file, request, jsonify, redirect, url_for, flash
-from app.models.transaccional_models import obtener_productos, obtener_ventas, obtener_marcas, obtener_categorias, obtener_ingresos, obtener_nota_salida, obtener_inventario, obtener_subcategorias_por_categoria, agregar_producto, obtener_inventario_vigente, listarClientes
-
+from app.models.transaccional_models import obtener_productos, obtener_ventas, obtener_marcas, obtener_categorias, obtener_ingresos, obtener_nota_salida, obtener_inventario, obtener_subcategorias_por_categoria, agregar_producto, obtener_inventario_vigente, listarClientes, obtener_id_sucursal, obtener_ultimo_comprobante
+import app.models.transaccional_models as transac 
 from app.models.transaccional_models import generate_barcode
 from . import transactional_bp
 
@@ -112,9 +112,27 @@ def ventas():
         clientes = clientes
     )
 
-
+@transactional_bp.route('/addVenta', methods=['POST'])
+def add_venta():
+    try:
+        usuario = 1 # Usuario obtener de cookie
+        id_sucursal = 1
+        # obtener el idtipocomprobante
+        comprobante_pago = request.form.get('comprobante_pago')
+        id_cliente = request.form.get('cliente')
+        estado_venta = 2
+        igv = request.form.get('igv')
+        monto_total = request.form.get('monto_total')
+        base_imponible = None
+        metodo_pago = request.form.get('metodo_pago') + ":" + monto_total
+        id_anular = 4
+        id_anular_b = 5
+        observacion = request.form.get('observacion')
+        transac.vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_total, base_imponible, metodo_pago, id_anular, id_anular_b, observacion)
+        return redirect('/transaccional/ventas')
+    except Exception as e:
+        return str(e)
 #----------------------------------------------
-
 
 
 # Modulo de compras

@@ -1,3 +1,4 @@
+from datetime import datetime
 from barcode.writer import ImageWriter
 from app.models.conexion import obtener_conexion
 from flask import Blueprint, request, jsonify, send_file
@@ -420,7 +421,21 @@ def obtener_ventas(nom_tipocomp='', razon_social='', nombre_sucursal='', fecha_i
         return {'code': 0, 'error': str(e)}
     finally:
         connection.close()
-        
+
+
+def obtener_id_sucursal(usuario):
+    connection = obtener_conexion()
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT id_sucursal FROM sucursal su
+            INNER JOIN vendedor ve ON ve.dni = su.dni
+            INNER JOIN usuario u ON u.id_usuario = ve.id_usuario
+            WHERE u.usua = %s
+        """, (usuario,))
+        result = cursor.fetchone()
+    connection.close()
+    return result['id_sucursal'] if result else None
+      
 #*
 # ------------------ VENTAS ------------------ 
 # *#
@@ -445,3 +460,95 @@ def listarClientes():
     except Exception as e:
         print(f"Error: {e}")
         return []
+    
+def obtener_ultimo_comprobante(tipoComprobante):
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            # Ejecuta el procedimiento almacenado
+            sql_procedure = "CALL insert_comprobante(%s);"
+            cursor.execute(sql_procedure, (tipoComprobante,))
+            
+            # Luego realiza la consulta para obtener el último id_comprobante
+            sql_select = "SELECT id_comprobante FROM comprobante ORDER BY id_comprobante DESC LIMIT 1;"
+            cursor.execute(sql_select)
+            
+            # Obtén el id_comprobante
+            id_comprobante = cursor.fetchone()
+            print("id_comprobante", id_comprobante)
+            
+            return id_comprobante['id_comprobante']
+
+    except Exception as e:
+        print("Error en obtener_ultimo_comprobante:", str(e))
+        print(repr(e))  # Información detallada del error
+        raise  # Propaga la excepción para que sea manejada externamente
+
+def obtener_ultimo_boucher():
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            # Inserta un nuevo registro en venta_boucher
+            sql_insert = "INSERT INTO venta_boucher () VALUES ();"
+            cursor.execute(sql_insert)
+            
+            # Obtén el último id_venta_boucher
+            sql_select = "SELECT id_venta_boucher FROM venta_boucher ORDER BY id_venta_boucher DESC LIMIT 1;"
+            cursor.execute(sql_select)
+            id_venta_boucher = cursor.fetchone()
+            
+            # Confirma la transacción
+            conexion.commit()
+
+            return id_venta_boucher['id_venta_boucher']  # Devuelve solo el primer valor de la tupla
+
+    except Exception as e:
+        print("Error en obtener_ultimo_boucher:", str(e))
+        print(repr(e))  # Información detallada del error
+        raise  # Propaga la excepción para que sea manejada externamente
+
+def vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_total, base_imponible, metodo_pago, id_anular, id_anular_b, observacion):
+    try:
+        # Asegúrate de que las conexiones y funciones auxiliares estén correctamente definidas
+        conexion = obtener_conexion()
+        id_comprobante = obtener_ultimo_comprobante(comprobante_pago)
+        f_venta = datetime.now().strftime("%Y-%m-%d")
+        fecha_iso = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
+        estado_sunat = None
+        id_venta_baucher = obtener_ultimo_boucher()
+
+        # Verificar los valores antes de ejecutar la consulta
+        print("id_sucursal:", id_sucursal)
+        print("id_comprobante:", id_comprobante)
+        print("id_cliente:", id_cliente)
+        print("estado_venta:", estado_venta)
+        print("f_venta:", f_venta)
+        print("igv:", igv)
+        print("monto_total:", monto_total)
+        print("base_imponible:", base_imponible)
+        print("fecha_iso:", fecha_iso)
+        print("metodo_pago:", metodo_pago)
+        print("estado_sunat:", estado_sunat)
+        print("id_anular:", id_anular)
+        print("id_anular_b:", id_anular_b)
+        print("id_venta_baucher:", id_venta_baucher)
+        print("observacion:", observacion)
+
+        with conexion.cursor() as cursor:
+            sql = """
+            INSERT INTO venta (
+                id_sucursal, id_comprobante, id_cliente, estado_venta, f_venta, igv, monto_total,
+                base_imponible, fecha_iso, metodo_pago, estado_sunat, id_anular, id_anular_b, id_venta_boucher, observacion
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+            """
+            cursor.execute(sql, (
+                id_sucursal, id_comprobante, id_cliente, estado_venta, f_venta, igv, monto_total,
+                base_imponible, fecha_iso, metodo_pago, estado_sunat, id_anular, id_anular_b, id_venta_baucher, observacion
+            ))
+            conexion.commit()  # Asegúrate de confirmar los cambios
+            print("vendido")
+    except Exception as e:
+        print("Error en vender:", str(e))
+        print(repr(e))  # Información detallada del error
+        raise  # Propaga la excepción para ver el error completo
+

@@ -18,218 +18,224 @@
     </div>
 </div>
 
-<div class="tab-content">
-    <!-- Nueva Venta -->
-    <div class="tab-pane fade show active" id="newventa">
-        <div class="mb-3">
-            <h1 class="font-weight-bold display-8 text-left fs-3" style="font-weight: bold;">
-                REGISTRAR NUEVA VENTA
-            </h1>
-        </div>
-        <div class="flex justify-between items-center mb-4">
-            <div class="card bg-white p-3">
-                <div class="flex items-center space mb-4 m-2 row">
-                    <div class="col">
-                        <div class="row my-2">
-                            <div class="col-11">
-                                <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="Buscar el producto en el detalle">
+<form action="{{ url_for('transaccional.add_venta') }}" method="post">
+    <div class="tab-content">
+        <!-- Nueva Venta -->
+        <div class="tab-pane fade show active" id="newventa">
+            <div class="mb-3">
+                <h1 class="font-weight-bold display-8 text-left fs-3" style="font-weight: bold;">
+                    REGISTRAR NUEVA VENTA
+                </h1>
+            </div>
+            <div class="flex justify-between items-center mb-4">
+                <div class="card bg-white p-3">
+                    <div class="flex items-center space mb-4 m-2 row">
+                        <div class="col">
+                            <div class="row my-2">
+                                <div class="col-11">
+                                    <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="Buscar el producto en el detalle">
+                                </div>
+                                <div class="col d-flex justify-content-end p-0">
+                                    <button type="button" class="btn btn-primary btn-producto" data-bs-toggle="modal" data-bs-target="#productModal">Producto</button>
+                                </div>
                             </div>
-                            <div class="col d-flex justify-content-end p-0">
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productModal">Producto</button>
+                        </div>
+                        
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th class="text-center" style="font-weight: bolder;">Nombre</th>
+                                        <th class="text-center" style="font-weight: bolder;">Cantidad</th>
+                                        <th class="text-center" style="font-weight: bolder;">Precio</th>
+                                        <th class="text-center" style="font-weight: bolder;">Descuento</th>
+                                        <th class="text-center" style="font-weight: bolder;">Subtotal</th>
+                                        <th class="text-center" style="font-weight: bolder;">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Aquí se agregarán los productos seleccionados del modal -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="flex justify-content-end mt-4">
+                            <div class="flex flex-col w-100">
+                                <div class="flex justify-between y-1 items-center row justify-content-end">
+                                    <span class="fw-bolder d-flex align-items-center span-title me-3">IMPORTE</span>
+                                    <span class="inputs-montos" id="importe">S/. 0.00</span>
+                                </div>
+                                <div class="flex justify-between my-1 items-center row justify-content-end">
+                                    <span class="fw-bolder d-flex align-items-center span-title me-3">IGV</span>
+                                    <span class="inputs-montos">S/. <span id="igvDisplay">0.00</span></span>
+                                    <input type="hidden" name="igv" id="igv" value="0.00">
+                                </div>
+                                
+                                <div class="flex justify-between my-1 items-center row justify-content-end">
+                                    <span class="fw-bolder d-flex align-items-center span-title me-3">TOTAL</span>
+                                    <span class="inputs-montos">S/. <span id="monto_totalDisplay">0.00</span></span>
+                                    <input type="hidden" name="monto_total" id="monto_total" value="0.00">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row justify-content-end mt-4">
+                            <div class="col-1">
+                                <button type="button" class="btn btn-cotizar flex items-center">Cotizar</button>
+                            </div>
+                            <div class="col-1">
+                                <button type="button" class="btn btn-cobrar flex items-center" data-bs-toggle="modal" data-bs-target="#ventaModal">Cobrar</button>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="table-container">
-                        <table>
+                </div>
+            </div>
+        </div>
+
+    <div id="modalBackground" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 999;" onclick="closeModal()"></div>
+
+    <!-- Modal de Bootstrap -->
+    <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title ms-3 mt-3 mb-2" id="productModalLabel">Busque y seleccione el producto</h5>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="modalSearchInput" placeholder="Realice la búsqueda del producto por el nombre" class="form-control mb-3" />
+                    <div style="max-height: 50vh; overflow-y: auto;">
+                        <table class="table">
                             <thead>
                                 <tr>
-                                    <th class="text-center" style="font-weight: bolder;">Nombre</th>
-                                    <th class="text-center" style="font-weight: bolder;">Cantidad</th>
-                                    <th class="text-center" style="font-weight: bolder;">Precio</th>
-                                    <th class="text-center" style="font-weight: bolder;">Descuento</th>
-                                    <th class="text-center" style="font-weight: bolder;">Subtotal</th>
-                                    <th class="text-center" style="font-weight: bolder;">Acción</th>
+                                    <th>Nombre</th>
+                                    <th>Precio</th>
+                                    <th>Stock</th>
+                                    <th>Acción</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <!-- Aquí se agregarán los productos seleccionados del modal -->
+                            <tbody id="productTableBody">
+                                {% for producto in datos_inventario %}
+                                <tr>
+                                    <td>{{ producto.nombre }}</td>
+                                    <td>S/ {{ producto.precio }}</td>
+                                    <td>{{ producto.stock }}</td>
+                                    <td><button type="button" class="btn btn-primary btn-seleccionar" onclick="addToTable('{{ producto.nombre }}', {{ producto.precio }})">Seleccionar</button></td>
+                                </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
-
-                    <div class="flex justify-content-end mt-4">
-                        <div class="flex flex-col w-100">
-                            <div class="flex justify-between y-1 items-center row justify-content-end">
-                                <span class="fw-bolder d-flex align-items-center span-title me-3">IMPORTE</span>
-                                <span class="inputs-montos" id="importe">S/. 0.00</span>
-                            </div>
-                            <div class="flex justify-between my-1 items-center row justify-content-end">
-                                <span class="fw-bolder d-flex align-items-center span-title me-3">IGV</span>
-                                <span class="inputs-montos" id="igv">S/. 0.00</span>
-                            </div>
-                            <div class="flex justify-between my-1 items-center row justify-content-end">
-                                <span class="fw-bolder d-flex align-items-center span-title me-3">TOTAL</span>
-                                <span class="inputs-montos" id="total">S/. 0.00</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row justify-content-end mt-4">
-                        <div class="col-1">
-                            <button class="btn btn-cotizar flex items-center">Cotizar</button>
-                        </div>
-                        <div class="col-1">
-                            <button class="btn btn-cobrar flex items-center" data-bs-toggle="modal" data-bs-target="#ventaModal">Cobrar</button>
-                        </div>
-                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
         </div>
     </div>
 
-<div id="modalBackground" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 999;" onclick="closeModal()"></div>
-
-<!-- Modal de Bootstrap -->
-<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title ms-3 mt-3 mb-2" id="productModalLabel">Busque y seleccione el producto</h5>
-            </div>
-            <div class="modal-body">
-                <input type="text" id="modalSearchInput" placeholder="Realice la búsqueda del producto por el nombre" class="form-control mb-3" />
-                <div style="max-height: 50vh; overflow-y: auto;">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Precio</th>
-                                <th>Stock</th>
-                                <th>Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody id="productTableBody">
-                            {% for producto in datos_inventario %}
-                            <tr>
-                                <td>{{ producto.nombre }}</td>
-                                <td>S/ {{ producto.precio }}</td>
-                                <td>{{ producto.stock }}</td>
-                                <td><button class="btn btn-primary" onclick="addToTable('{{ producto.nombre }}', {{ producto.precio }})">Seleccionar</button></td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+    <!-- Modal de Bootstrap -->
+    <div class="modal fade" id="ventaModal" tabindex="-1" aria-labelledby="ventaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title ms-3 mt-3 mb-2" id="productModalLabel">PAGO</h5>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-            </div>
-        </div>
-    </div>
-</div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col mx-3">
+                            <div class="row my-4">
+                                <div class="col">
+                                    <p>Seleccione el cliente</p>
+                                    <select class="form-select form-select-sm" name="cliente" aria-label="Small select example">
+                                        <option selected>Seleccionar</option>
+                                        {% for cliente in clientes %}
+                                        <option value="{{ cliente.id_cliente }}">{{ cliente.nombre_completo }}</option>
+                                        {% endfor %}
 
-<!-- Modal de Bootstrap -->
-<div class="modal fade" id="ventaModal" tabindex="-1" aria-labelledby="ventaModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-md">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title ms-3 mt-3 mb-2" id="productModalLabel">PAGO</h5>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col mx-3">
-                        <div class="row my-4">
-                            <div class="col">
-                                <p>Seleccione el cliente</p>
-                                <select class="form-select form-select-sm" aria-label="Small select example">
-                                    <option selected>Seleccionar</option>
-                                    {% for cliente in clientes %}
-                                    <option value="{{ cliente.id_cliente }}">{{ cliente.nombre_completo }}</option>
-                                    {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col">
+                                    <p>Select. el comprobante</p>
+                                    <select class="form-select form-select-sm" name="comprobante_pago" aria-label="Small select example">
+                                        <option selected>Comprob. de pago</option>
+                                        <option value="1">Boleta</option>
+                                        <option value="2">Factura</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mb-4">
+                                <div class="form-floating">
+                                    <textarea class="form-control" name="observacion" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
+                                    <label for="floatingTextarea2" class="fs-6 mx-2">Observacion</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="row">
+                                        <p>Total a pagar</p>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">S/.</span>
+                                            <input type="text" id="totalAPagar" class="form-control" readonly />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <p>Monto recibido</p>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">S/.</span>
+                                            <input type="number" id="montoRecibido" class="form-control" oninput="calculateChange()" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <p>Cambio</p>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">S/.</span>
+                                            <input type="text" id="cambio" class="form-control" readonly />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="row mb-4">
+                                        <p>Metodo de pago</p>
+                                        <div class="">
+                                            <select class="form-select form-select-sm" name="metodo_pago" aria-label="Small select example">
+                                                <option selected>Seleccionar metodo</option>
+                                                <option value="EFECTIVO">EFECTIVO</option>
+                                                <option value="PLIN">PLIN</option>
+                                                <option value="YAPE">YAPE</option>
+                                                <option value="VISA">VISA</option>
+                                                <option value="AMERICAN EXPRESS">AMERICAN EXPRESS</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <p>Aplicar descuento</p>
+                                        <div class="input-group mb-3">
+                                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                                            <span class="input-group-text">S/.</span>
+                                            <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <p>Faltante</p>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">S/.</span>
+                                            <input type="text" id="faltante" class="form-control" readonly />
+                                        </div>
+                                    </div>
+                                </div>
 
-                                  </select>
                             </div>
-                            <div class="col">
-                                <p>Select. el comprobante</p>
-                                <select class="form-select form-select-sm" aria-label="Small select example">
-                                    <option selected>Comprob. de pago</option>
-                                    <option value="1">Boleta</option>
-                                    <option value="2">Factura</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row mb-4">
-                            <div class="form-floating">
-                                <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
-                                <label for="floatingTextarea2" class="fs-6 mx-2">Descripción</label>
-                              </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <div class="row">
-                                    <p>Total a pagar</p>
-                                    <div class="input-group mb-3">
-                                        <span class="input-group-text">S/.</span>
-                                        <input type="text" id="totalAPagar" class="form-control" readonly />
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <p>Monto recibido</p>
-                                    <div class="input-group mb-3">
-                                        <span class="input-group-text">S/.</span>
-                                        <input type="number" id="montoRecibido" class="form-control" oninput="calculateChange()" />
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <p>Cambio</p>
-                                    <div class="input-group mb-3">
-                                        <span class="input-group-text">S/.</span>
-                                        <input type="text" id="cambio" class="form-control" readonly />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="row mb-4">
-                                    <p>Metodo de pago</p>
-                                    <div class="">
-                                        <select class="form-select form-select-sm" aria-label="Small select example">
-                                            <option selected>Seleccionar metodo</option>
-                                            <option value="1">EFECTIVO</option>
-                                            <option value="2">PLIN</option>
-                                            <option value="3">YAPE</option>
-                                            <option value="3">VISA</option>
-                                            <option value="3">AMERICAN EXPRESS</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <p>Aplicar descuento</p>
-                                    <div class="input-group mb-3">
-                                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                                        <span class="input-group-text">S/.</span>
-                                        <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <p>Faltante</p>
-                                    <div class="input-group mb-3">
-                                        <span class="input-group-text">S/.</span>
-                                        <input type="text" id="faltante" class="form-control" readonly />
-                                    </div>
-                                </div>
-                            </div>
-
                         </div>
                     </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-secondary">Vender</button>
+                    
                 </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
-</div>
-
+</form>
 
 <script>
     // Búsqueda en tiempo real en el modal
@@ -310,13 +316,15 @@
         const total = importe + igv;
 
         document.getElementById("importe").textContent = "S/. " + importe.toFixed(2);
-        document.getElementById("igv").textContent = "S/. " + igv.toFixed(2);
-        document.getElementById("total").textContent = "S/. " + total.toFixed(2);
+        document.getElementById("igvDisplay").textContent = igv.toFixed(2);
+        document.getElementById("igv").value = igv.toFixed(2);
+        document.getElementById("monto_totalDisplay").textContent = total.toFixed(2);
+        document.getElementById("monto_total").value = total.toFixed(2);
     }
 
     // Actualizar el valor de "Total a pagar" al abrir el modal
     document.querySelector('.btn-cobrar').addEventListener('click', () => {
-        const total = document.getElementById("total").textContent.replace("S/. ", "") || "0.00";
+        const total = document.getElementById("monto_totalDisplay").textContent.replace("S/. ", "") || "0.00";
         document.getElementById("totalAPagar").value = parseFloat(total).toFixed(2);
     });
 
