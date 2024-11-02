@@ -127,7 +127,6 @@ def ventas():
     )
 
 @transactional_bp.route('/addVenta', methods=['POST'])
-@jwt_required()
 def add_venta():
     try:
         venta_data = request.cookies.get('ventaData')

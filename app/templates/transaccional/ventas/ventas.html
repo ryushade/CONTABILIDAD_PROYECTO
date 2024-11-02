@@ -41,7 +41,7 @@
                         <span style="font-size: 1.1em; font-weight: bold;">Venta Nº {{ id_venta }}</span>
                         <div class="mt-1 ms-5" style="font-size: 0.9em;">
                             <b>F. Venta:</b> {{ venta.f_venta }}<br>
-                            <b>Monto Total:</b> S/ {{ venta.monto_total | round(2) }}
+                            <b>Monto Total:</b> S/ {{ venta.monto_total | round(2) if venta.monto_total is not none else 'No disponible' }}
                         </div>
                     </button>
                 </h2>
