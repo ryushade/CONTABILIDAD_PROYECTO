@@ -12,6 +12,12 @@
     .is-invalid {
         border-color: red;
     }
+
+    .table-border-light th, 
+    .table-border-light td {
+        border-color: #e0e0e0 !important;
+    }
+
 </style>
 
 <div class="mb-4">
@@ -25,232 +31,257 @@
     </div>
 </div>
 
-<form action="{{ url_for('transaccional.add_venta') }}" method="post">
-    <div class="tab-content">
-        <!-- Nueva Venta -->
-        <div class="tab-pane fade show active" id="newventa">
-            <div class="mb-3">
-                <h1 class="font-weight-bold display-8 text-left fs-3" style="font-weight: bold;">
-                    REGISTRAR NUEVA VENTA
-                </h1>
-            </div>
-            <div class="flex justify-between items-center mb-4">
-                <div class="card bg-white p-3">
-                    <div class="flex items-center space mb-4 m-2 row">
-                        <div class="col">
-                            <div class="row my-2">
-                                <div class="col-11">
-                                    <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="Buscar el producto en el detalle">
-                                </div>
-                                <div class="col d-flex justify-content-end p-0">
-                                    <button type="button" class="btn btn-primary btn-producto" data-bs-toggle="modal" data-bs-target="#productModal">Producto</button>
-                                </div>
-                            </div>
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="lisventas">
+        <div class="accordion accordion-flush mb-5" id="accordionVentas">
+            {% for id_venta, venta in ventas_con_detalles.items() %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading{{ id_venta }}">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ id_venta }}" aria-expanded="false" aria-controls="collapse{{ id_venta }}">
+                        <span style="font-size: 1.1em; font-weight: bold;">Venta Nº {{ id_venta }}</span>
+                        <div class="mt-1 ms-5" style="font-size: 0.9em;">
+                            <b>F. Venta:</b> {{ venta.f_venta }}<br>
+                            <b>Monto Total:</b> S/ {{ venta.monto_total | round(2) }}
                         </div>
-                        
-                        <div class="table-container">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th class="text-center" style="font-weight: bolder;">Nombre</th>
-                                        <th class="text-center" style="font-weight: bolder;">Cantidad</th>
-                                        <th class="text-center" style="font-weight: bolder;">Precio</th>
-                                        <th class="text-center" style="font-weight: bolder;">Descuento</th>
-                                        <th class="text-center" style="font-weight: bolder;">Subtotal</th>
-                                        <th class="text-center" style="font-weight: bolder;">Acción</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Aquí se agregarán los productos seleccionados del modal -->
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="flex justify-content-end mt-4">
-                            <div class="flex flex-col w-100">
-                                <div class="flex justify-between y-1 items-center row justify-content-end">
-                                    <span class="fw-bolder d-flex align-items-center span-title me-3">IMPORTE</span>
-                                    <span class="inputs-montos" id="importe">S/. 0.00</span>
-                                </div>
-                                <div class="flex justify-between my-1 items-center row justify-content-end">
-                                    <span class="fw-bolder d-flex align-items-center span-title me-3">IGV</span>
-                                    <span class="inputs-montos">S/. <span id="igvDisplay">0.00</span></span>
-                                    <input type="hidden" name="igv" id="igv" value="0.00">
-                                </div>
-                                
-                                <div class="flex justify-between my-1 items-center row justify-content-end">
-                                    <span class="fw-bolder d-flex align-items-center span-title me-3">TOTAL</span>
-                                    <span class="inputs-montos">S/. <span id="monto_totalDisplay">0.00</span></span>
-                                    <input type="hidden" name="monto_total" id="monto_total" value="0.00">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row justify-content-end mt-4">
-                            <div class="col-1">
-                                <button type="button" class="btn btn-cotizar flex items-center">Cotizar</button>
-                            </div>
-                            <div class="col-1">
-                                <button type="button" class="btn btn-cobrar flex items-center" onclick="openCobrarModal()">Cobrar</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    <div id="modalBackground" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 999;" onclick="closeModal()"></div>
-
-    <!-- Modal de Bootstrap -->
-    <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title ms-3 mt-3 mb-2" id="productModalLabel">Busque y seleccione el producto</h5>
-                </div>
-                <div class="modal-body">
-                    <input type="text" id="modalSearchInput" placeholder="Realice la búsqueda del producto por el nombre" class="form-control mb-3" />
-                    <div style="max-height: 50vh; overflow-y: auto;">
-                        <table class="table" id="detalleVentaTable">
+                    </button>
+                </h2>
+                <div id="collapse{{ id_venta }}" class="accordion-collapse collapse" aria-labelledby="heading{{ id_venta }}">
+                    <div class="accordion-body">
+                        <table class="table table-border-light">
                             <thead>
                                 <tr>
-                                    <th>Nombre</th>
-                                    <th>Precio</th>
-                                    <th>Stock</th>
-                                    <th>Acción</th>
+                                    <th style="font-weight: bold">Producto</th>
+                                    <th style="font-weight: bold; text-align: center">Cantidad</th>
+                                    <th style="font-weight: bold; text-align: center">Total por Producto</th>
                                 </tr>
                             </thead>
-                            <tbody id="productTableBody">
-                                {% for producto in datos_inventario %}
-                                <tr>
-                                    <td>{{ producto.nombre }}</td>
-                                    <td>S/ {{ producto.precio }}</td>
-                                    <td>{{ producto.stock }}</td>
-                                    <td><button type="button" class="btn btn-primary btn-seleccionar" onclick="addToTable('{{ producto.nombre }}', {{ producto.precio }})">Seleccionar</button></td>
+                            <tbody>
+                                {% for producto in venta.productos %}
+                                <tr class="border-light">
+                                    <td>{{ producto.descripcion }}</td>
+                                    <td style="text-align: center">{{ producto.cantidad }}</td>
+                                    <td style="text-align: center">S/ {{ producto.total_producto | round(2) }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                </div>
             </div>
+            {% endfor %}
         </div>
-    </div>
+    </div>    
 
-    <!-- Modal de Bootstrap -->
-    <div class="modal fade" id="ventaModal" tabindex="-1" aria-labelledby="ventaModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-md">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title ms-3 mt-3" id="productModalLabel">PAGO</h5>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col mx-3">
-                            <div class="row my-2">
+    <!-- NUEVA VENTA -->
+    <div class="tab-pane fade" id="newventa">
+        <form action="{{ url_for('transaccional.add_venta') }}" method="post">
+                <!-- Nueva Venta -->
+                <div class="tab-pane fade show active" id="newventa">
+                    <div class="mb-3">
+                        <h1 class="font-weight-bold display-8 text-left fs-3" style="font-weight: bold;">
+                            REGISTRAR NUEVA VENTA
+                        </h1>
+                    </div>
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="card bg-white p-3">
+                            <div class="flex items-center space mb-4 m-2 row">
                                 <div class="col">
-                                    <p>Seleccione el cliente</p>
-                                    <select class="form-select form-select-sm" name="cliente" id="cliente" aria-label="Small select example">
-                                        <option selected>Seleccionar</option>
-                                        {% for cliente in clientes %}
-                                        <option value="{{ cliente.id_cliente }}">{{ cliente.nombre_completo }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="col">
-                                    <p>Select. el comprobante</p>
-                                    <select class="form-select form-select-sm" name="comprobante_pago" id="comprobante_pago" aria-label="Small select example">
-                                        <option selected>Comprob. de pago</option>
-                                        <option value="1">Boleta</option>
-                                        <option value="2">Factura</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row mb-4">
-                                <div class="form-floating">
-                                    <textarea class="form-control" name="observacion" id="observacion" placeholder="Leave a comment here" style="height: 100px"></textarea>
-                                    <label for="observacion" class="fs-6 mx-2">Observacion</label>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col">
-                                    <div class="row">
-                                        <p>Total a pagar</p>
-                                        <div class="input-group mb-3">
-                                            <span class="input-group-text">S/.</span>
-                                            <input type="text" id="totalAPagar" class="form-control" readonly />
+                                    <div class="row my-2">
+                                        <div class="col-11">
+                                            <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="Buscar el producto en el detalle">
                                         </div>
-                                    </div>
-                                    <div class="row">
-                                        <p>Monto recibido</p>
-                                        <div class="input-group mb-3">
-                                            <span class="input-group-text">S/.</span>
-                                            <input type="number" id="montoRecibido" class="form-control" oninput="calculateChange()" />
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <p>Cambio</p>
-                                        <div class="input-group mb-3">
-                                            <span class="input-group-text">S/.</span>
-                                            <input type="text" id="cambio" class="form-control" readonly />
+                                        <div class="col d-flex justify-content-end p-0">
+                                            <button type="button" class="btn btn-primary btn-producto" data-bs-toggle="modal" data-bs-target="#productModal">Producto</button>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col">
-                                    <div class="row mb-4">
-                                        <p>Metodo de pago</p>
-                                        <div class="">
-                                            <select class="form-select form-select-sm" name="metodo_pago" id="metodo_pago" aria-label="Small select example">
-                                                <option selected>Seleccionar metodo</option>
-                                                <option value="EFECTIVO">EFECTIVO</option>
-                                                <option value="PLIN">PLIN</option>
-                                                <option value="YAPE">YAPE</option>
-                                                <option value="VISA">VISA</option>
-                                                <option value="AMERICAN EXPRESS">AMERICAN EXPRESS</option>
-                                            </select>
+                                
+                                <div class="table-container">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center" style="font-weight: bolder;">Nombre</th>
+                                                <th class="text-center" style="font-weight: bolder;">Cantidad</th>
+                                                <th class="text-center" style="font-weight: bolder;">Precio</th>
+                                                <th class="text-center" style="font-weight: bolder;">Descuento</th>
+                                                <th class="text-center" style="font-weight: bolder;">Subtotal</th>
+                                                <th class="text-center" style="font-weight: bolder;">Acción</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Aquí se agregarán los productos seleccionados del modal -->
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="flex justify-content-end mt-4">
+                                    <div class="flex flex-col w-100">
+                                        <div class="flex justify-between y-1 items-center row justify-content-end">
+                                            <span class="fw-bolder d-flex align-items-center span-title me-3">IMPORTE</span>
+                                            <span class="inputs-montos" id="importe">S/. 0.00</span>
+                                        </div>
+                                        <div class="flex justify-between my-1 items-center row justify-content-end">
+                                            <span class="fw-bolder d-flex align-items-center span-title me-3">IGV</span>
+                                            <span class="inputs-montos">S/. <span id="igvDisplay">0.00</span></span>
+                                            <input type="hidden" name="igv" id="igv" value="0.00">
+                                        </div>
+                                        
+                                        <div class="flex justify-between my-1 items-center row justify-content-end">
+                                            <span class="fw-bolder d-flex align-items-center span-title me-3">TOTAL</span>
+                                            <span class="inputs-montos">S/. <span id="monto_totalDisplay">0.00</span></span>
+                                            <input type="hidden" name="monto_total" id="monto_total" value="0.00">
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <p>Faltante</p>
-                                        <div class="input-group mb-3">
-                                            <span class="input-group-text">S/.</span>
-                                            <input type="text" id="faltante" class="form-control" readonly />
-                                        </div>
+                                </div>
+
+                                <div class="row justify-content-end mt-4">
+                                    <div class="col-1">
+                                        <button type="button" class="btn btn-cotizar flex items-center">Cotizar</button>
+                                    </div>
+                                    <div class="col-1">
+                                        <button type="button" class="btn btn-cobrar flex items-center" onclick="openCobrarModal()">Cobrar</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-secondary btn-vender" onclick="validateAndMarkFields()">Vender</button>
+                </div>
+
+            <div id="modalBackground" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 999;" onclick="closeModal()"></div>
+
+            <!-- Modal de Bootstrap -->
+            <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title ms-3 mt-3 mb-2" id="productModalLabel">Busque y seleccione el producto</h5>
+                        </div>
+                        <div class="modal-body">
+                            <input type="text" id="modalSearchInput" placeholder="Realice la búsqueda del producto por el nombre" class="form-control mb-3" />
+                            <div style="max-height: 50vh; overflow-y: auto;">
+                                <table class="table" id="detalleVentaTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Precio</th>
+                                            <th>Stock</th>
+                                            <th>Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="productTableBody">
+                                        {% for producto in datos_inventario %}
+                                        <tr>
+                                            <td>{{ producto.nombre }}</td>
+                                            <td>S/ {{ producto.precio }}</td>
+                                            <td>{{ producto.stock }}</td>
+                                            <td><button type="button" class="btn btn-primary btn-seleccionar" onclick="addToTable('{{ producto.nombre }}', {{ producto.precio }})">Seleccionar</button></td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-</form>
 
-<!-- Modal de Notificación -->
-<div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="notificationModalLabel">Notificación</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <!-- Modal de Bootstrap -->
+            <div class="modal fade" id="ventaModal" tabindex="-1" aria-labelledby="ventaModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-md">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title ms-3 mt-3" id="productModalLabel">PAGO</h5>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col mx-3">
+                                    <div class="row my-2">
+                                        <div class="col">
+                                            <p>Seleccione el cliente</p>
+                                            <select class="form-select form-select-sm" name="cliente" id="cliente" aria-label="Small select example">
+                                                <option selected>Seleccionar</option>
+                                                {% for cliente in clientes %}
+                                                <option value="{{ cliente.id_cliente }}">{{ cliente.nombre_completo }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col">
+                                            <p>Select. el comprobante</p>
+                                            <select class="form-select form-select-sm" name="comprobante_pago" id="comprobante_pago" aria-label="Small select example">
+                                                <option selected>Comprob. de pago</option>
+                                                <option value="1">Boleta</option>
+                                                <option value="2">Factura</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-4">
+                                        <div class="form-floating">
+                                            <textarea class="form-control" name="observacion" id="observacion" placeholder="Leave a comment here" style="height: 100px"></textarea>
+                                            <label for="observacion" class="fs-6 mx-2">Observacion</label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="row">
+                                                <p>Total a pagar</p>
+                                                <div class="input-group mb-3">
+                                                    <span class="input-group-text">S/.</span>
+                                                    <input type="text" id="totalAPagar" class="form-control" readonly />
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <p>Monto recibido</p>
+                                                <div class="input-group mb-3">
+                                                    <span class="input-group-text">S/.</span>
+                                                    <input type="number" id="montoRecibido" class="form-control" oninput="calculateChange()" />
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <p>Cambio</p>
+                                                <div class="input-group mb-3">
+                                                    <span class="input-group-text">S/.</span>
+                                                    <input type="text" id="cambio" class="form-control" readonly />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="row mb-4">
+                                                <p>Metodo de pago</p>
+                                                <div class="">
+                                                    <select class="form-select form-select-sm" name="metodo_pago" id="metodo_pago" aria-label="Small select example">
+                                                        <option selected>Seleccionar metodo</option>
+                                                        <option value="EFECTIVO">EFECTIVO</option>
+                                                        <option value="PLIN">PLIN</option>
+                                                        <option value="YAPE">YAPE</option>
+                                                        <option value="VISA">VISA</option>
+                                                        <option value="AMERICAN EXPRESS">AMERICAN EXPRESS</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <p>Faltante</p>
+                                                <div class="input-group mb-3">
+                                                    <span class="input-group-text">S/.</span>
+                                                    <input type="text" id="faltante" class="form-control" readonly />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="button" class="btn btn-secondary btn-vender" onclick="validateAndMarkFields()">Vender</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="modal-body" id="notificationMessage">
-                <!-- Aquí se mostrará el mensaje -->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
-            </div>
-        </div>
+        </form>
     </div>
 </div>
-
 
 <script>
     // Búsqueda en tiempo real en el modal
@@ -396,7 +427,6 @@
         const comprobante = document.getElementById("comprobante_pago");
         const metodoPago = document.getElementById("metodo_pago");
         const montoRecibido = document.getElementById("montoRecibido");
-        const observacion = document.getElementById("observacion");
         const totalAPagar = parseFloat(document.getElementById("totalAPagar").value) || 0;
         const montoRecibidoValue = parseFloat(montoRecibido.value) || 0;
 
@@ -404,7 +434,7 @@
 
         // Valida y marca campos en rojo si están vacíos
         function markIfEmpty(element) {
-            if (element.value === "" || element.value === "Seleccionar" || element.value === "Comprob. de pago" || element.value === "Seleccionar metodo") {
+            if (element.value === "" || element.value === "Seleccionar") {
                 element.classList.add("is-invalid");
                 hasError = true;
             } else {
@@ -417,7 +447,6 @@
         markIfEmpty(comprobante);
         markIfEmpty(metodoPago);
         markIfEmpty(montoRecibido);
-        markIfEmpty(observacion);
 
         // Verificar si el monto recibido es suficiente
         if (montoRecibidoValue < totalAPagar) {
@@ -428,18 +457,9 @@
             montoRecibido.classList.remove("is-invalid");
         }
 
-        // Si no hay errores, guardar los datos en la cookie
+        // Si no hay errores, enviar el formulario
         if (!hasError) {
-            const jsonData = getDataTable();
-            saveToCookie(jsonData);
-            alert("Venta registrada con éxito.");
-
-            // Limpiar la tabla de productos
-            clearTable();
-
-            // Cierra el modal usando Bootstrap 5
-            const modal = bootstrap.Modal.getInstance(document.getElementById('ventaModal'));
-            modal.hide();
+            document.forms[0].submit(); // Envía el formulario al servidor
         } else {
             alert("Por favor, complete todos los campos requeridos.");
         }

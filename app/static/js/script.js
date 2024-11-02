@@ -33,7 +33,7 @@ function openEditModal(cuentaId) {
     });
 }
 
-function openEditUsu (usuarioId) {
+function openEditUsu(usuarioId) {
   fetch('/contable/usuarios/obtener/' + usuarioId)
     .then(response => response.json())
     .then(data => {
@@ -47,7 +47,7 @@ function openEditUsu (usuarioId) {
 
         document.getElementById('editUsuarioModal').action = '/contable/usuarios/editar/' + usuarioId;
 
-        document.querySelector('.modal-overlay').style.display = 'flex'; 
+        document.querySelector('.modal-overlay').style.display = 'flex';
 
       }
     })
@@ -171,6 +171,10 @@ function openModalAdd() {
   document.getElementById('addAccountModal').style.display = 'flex';
 }
 
+function openModalAddUsu() {
+  document.getElementById('addUsuarioModal').style.display = 'flex';
+}
+
 function openModalVer(codigo_cuenta, nombre_cuenta, naturaleza, nivel, estado_cuenta) {
   document.getElementById('verCuentaModal').style.display = 'flex';
   document.getElementById('codigo_cuenta').textContent = codigo_cuenta;
@@ -190,6 +194,10 @@ function closeModalVer() {
   document.getElementById('openVerModal').style.display = 'none';
 }
 
+function closeModalUsu() {
+  document.getElementById('addUsuarioModal').style.display = 'none';
+}
+
 
 function closeModalAdd() {
   document.getElementById('addAccountModal').style.display = 'none';
@@ -204,4 +212,30 @@ document.getElementById('codigo_cuenta').addEventListener('input', function () {
   } else {
     cuentaPadreContainer.style.display = 'none';
   }
+});
+
+
+document.addEventListener("DOMContentLoaded", function () {
+  const soloDebitoCheckbox = document.getElementById('solo_debito_checkbox');
+  const soloCreditoCheckbox = document.getElementById('solo_credito_checkbox');
+  const cuentaDebitoInput = document.getElementById('cuenta_debito');
+  const cuentaCreditoInput = document.getElementById('cuenta_credito');
+
+  soloDebitoCheckbox.addEventListener('change', () => {
+    if (soloDebitoCheckbox.checked) {
+      cuentaCreditoInput.disabled = true;
+      soloCreditoCheckbox.checked = false;
+    } else {
+      cuentaCreditoInput.disabled = false;
+    }
+  });
+
+  soloCreditoCheckbox.addEventListener('change', () => {
+    if (soloCreditoCheckbox.checked) {
+      cuentaDebitoInput.disabled = true;
+      soloDebitoCheckbox.checked = false;
+    } else {
+      cuentaDebitoInput.disabled = false;
+    }
+  });
 });

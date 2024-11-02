@@ -11,3 +11,4 @@ pdfkit
 python-barcode
 JPype1
 aspose-cells
+Flask-JWT-Extended

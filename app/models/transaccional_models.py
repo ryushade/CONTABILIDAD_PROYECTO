@@ -561,7 +561,6 @@ def obtener_id_producto_nombre(nombre):
 
 def vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_total, base_imponible, metodo_pago, id_anular, id_anular_b, observacion, venta_data):
     try:
-        # Asegúrate de que las conexiones y funciones auxiliares estén correctamente definidas
         conexion = obtener_conexion()
         id_comprobante = obtener_ultimo_comprobante(comprobante_pago)
         f_venta = datetime.now().strftime("%Y-%m-%d")
@@ -570,6 +569,7 @@ def vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_t
         id_venta_baucher = obtener_ultimo_boucher()
 
         with conexion.cursor() as cursor:
+            # Insertar en la tabla venta
             sql = """
             INSERT INTO venta (
                 id_sucursal, id_comprobante, id_cliente, estado_venta, f_venta, igv, monto_total,
@@ -582,23 +582,27 @@ def vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_t
             ))
             id_venta = conexion.insert_id()
             conexion.commit()
-            
+
+            # Procesar los productos en venta_data
             venta_data = json.loads(venta_data)
-            print(venta_data)
             for producto in venta_data:
                 id_producto = obtener_id_producto_nombre(producto['nombre'])
                 cantidad = producto['cantidad']
                 precio = producto['precio']
                 descuento = producto['descuento']
                 total = producto['subtotal']
-                
+
+                # Insertar en detalle_venta
                 sql = """
                 INSERT INTO detalle_venta (id_producto, id_venta, cantidad, precio, descuento, total) 
                 VALUES (%s, %s, %s, %s, %s, %s);
                 """
                 cursor.execute(sql, (id_producto, id_venta, cantidad, precio, descuento, total))
                 
-                # Disminuir stock del producto
+                # Comprobar si el producto y el almacén existen antes de intentar actualizar el stock
+                sql_check = "SELECT stock FROM inventario WHERE id_producto = %s AND id_almacen = 1;"
+                cursor.execute(sql_check, (id_producto,))
+                stock_result = cursor.fetchone()
                 
                 sql = """
                 UPDATE inventario SET stock = stock - %s WHERE id_producto = %s AND id_almacen = 1;
@@ -610,6 +614,18 @@ def vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_t
             # Asegúrate de confirmar los cambios
             generarPDF(f_venta, id_comprobante, id_cliente, venta_data, igv, monto_total)
             print("vendido y generado PDF")
+            if stock_result:
+                    # Disminuir stock del producto
+                    sql_update_stock = """
+                    UPDATE inventario SET stock = stock - %s WHERE id_producto = %s AND id_almacen = 1;
+                    """
+                    cursor.execute(sql_update_stock, (cantidad, id_producto))
+                    print(f"Stock actualizado para producto {id_producto} en almacen 1: -{cantidad}")
+            else:
+                    print(f"Producto {id_producto} no encontrado en inventario para almacen 1")
+
+            conexion.commit()
+            print("Venta registrada exitosamente")
     except Exception as e:
         print("Error en vender:", str(e))
         print(repr(e))  # Información detallada del error
@@ -663,3 +679,35 @@ def generarPDF(fecha, idComprobante, id_cliente, venta_data, igv, monto_total):
     exc.save("factura.pdf")
     jpype.shutdownJVM()
     print()
+def obtener_ventas_con_detalles():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            sql = """
+                SELECT dv.id_venta, pr.descripcion, dv.cantidad, dv.total AS total_producto, ve.f_venta, ve.monto_total
+                FROM detalle_venta AS dv
+                INNER JOIN venta AS ve ON dv.id_venta = ve.id_venta
+                INNER JOIN producto AS pr ON dv.id_producto = pr.id_producto
+                ORDER BY dv.id_venta, ve.f_venta;
+            """
+            cursor.execute(sql)
+            ventas = cursor.fetchall()
+            
+            # Agrupar los productos por venta
+            ventas_dict = {}
+            for venta in ventas:
+                id_venta = venta['id_venta']
+                if id_venta not in ventas_dict:
+                    ventas_dict[id_venta] = {
+                        'f_venta': venta['f_venta'],
+                        'monto_total': venta['monto_total'],
+                        'productos': []
+                    }
+                ventas_dict[id_venta]['productos'].append({
+                    'descripcion': venta['descripcion'],
+                    'cantidad': venta['cantidad'],
+                    'total_producto': venta['total_producto']
+                })
+            return ventas_dict
+    finally:
+        conexion.close()
