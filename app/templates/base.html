@@ -217,35 +217,28 @@
                     </div>
                 </a>
 
-                {% if '/contable' not in request.path %}
+                {% if 'contable' not in request.path %}
+                <!-- Opciones del sistema transaccional -->
                 <div class="nav-item">
                     <a href="{{ url_for('transaccional.ventas') }}" style="text-decoration: none; color: inherit;">
                         <i class="fas fa-chart-line"></i>
                         <span class="nav-text">Ventas</span>
                     </a>
                 </div>
-
-
-
                 <div class="nav-item">
                     <i class="fas fa-shopping-cart"></i>
                     <a href="{{ url_for('transaccional.compras') }}" style="text-decoration: none; color: inherit;">
                         <span class="nav-text">Compras</span>
                     </a>
                 </div>
-
-
-
                 <div class="nav-item">
                     <i class="fas fa-warehouse"></i>
                     <a href="{{ url_for('transaccional.almacen') }}" style="text-decoration: none; color: inherit;">
                         <span class="nav-text">Almacén</span>
                     </a>
                 </div>
-
-
-                {% endif %}
-
+                {% else %}
+                <!-- Opciones del sistema contable -->
                 <div class="nav-item">
                     <i class="fas fa-calculator"></i>
                     <a href="{{ url_for('contable.cuentas') }}" style="text-decoration: none; color: inherit;">
@@ -258,15 +251,11 @@
                         <span class="nav-text">Reportes</span>
                     </a>
                 </div>
-
-
-
                 <div class="nav-item has-subnav">
                     <i class="fas fa-cog"></i>
                     <span class="nav-text">Configuración</span>
                     <i class="fas fa-chevron-down"></i>
                 </div>
-
                 <div class="subnav">
                     <a href="{{url_for('contable.usuarios')}}" style="text-decoration: none; color: inherit;">
                         <div class="subnav-item">Usuarios</div>
@@ -275,9 +264,11 @@
                         <div class="subnav-item">Reglas contables</div>
                     </a>
                 </div>
+                {% endif %}
             </div>
         </aside>
         {% endif %}
+
 
         <!-- Contenido principal -->
         <div class="main-content flex-grow-1">
