@@ -6,6 +6,7 @@ import barcode
 import io
 import random
 from barcode.writer import ImageWriter
+import json
 
 def obtener_marcas():
     conexion = obtener_conexion()
@@ -475,7 +476,7 @@ def obtener_ultimo_comprobante(tipoComprobante):
             
             # Obtén el id_comprobante
             id_comprobante = cursor.fetchone()
-            print("id_comprobante", id_comprobante)
+            print("id_comprobante", id_comprobante['id_comprobante'])
             
             return id_comprobante['id_comprobante']
 
@@ -507,7 +508,24 @@ def obtener_ultimo_boucher():
         print(repr(e))  # Información detallada del error
         raise  # Propaga la excepción para que sea manejada externamente
 
-def vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_total, base_imponible, metodo_pago, id_anular, id_anular_b, observacion):
+def obtener_id_producto_nombre(nombre):
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            sql = """
+                SELECT id_producto FROM producto WHERE descripcion = %s
+            """
+            cursor.execute(sql, (nombre))
+            id_producto = cursor.fetchone()
+            print("id_producto:",  id_producto['id_producto'])
+            return id_producto['id_producto']
+        
+    except Exception as e:
+        print("Error en vender:", str(e))
+        print(repr(e))  # Información detallada del error
+        raise  # Propaga la excepción para ver el error completo
+
+def vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_total, base_imponible, metodo_pago, id_anular, id_anular_b, observacion, venta_data):
     try:
         # Asegúrate de que las conexiones y funciones auxiliares estén correctamente definidas
         conexion = obtener_conexion()
@@ -516,23 +534,6 @@ def vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_t
         fecha_iso = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
         estado_sunat = None
         id_venta_baucher = obtener_ultimo_boucher()
-
-        # Verificar los valores antes de ejecutar la consulta
-        print("id_sucursal:", id_sucursal)
-        print("id_comprobante:", id_comprobante)
-        print("id_cliente:", id_cliente)
-        print("estado_venta:", estado_venta)
-        print("f_venta:", f_venta)
-        print("igv:", igv)
-        print("monto_total:", monto_total)
-        print("base_imponible:", base_imponible)
-        print("fecha_iso:", fecha_iso)
-        print("metodo_pago:", metodo_pago)
-        print("estado_sunat:", estado_sunat)
-        print("id_anular:", id_anular)
-        print("id_anular_b:", id_anular_b)
-        print("id_venta_baucher:", id_venta_baucher)
-        print("observacion:", observacion)
 
         with conexion.cursor() as cursor:
             sql = """
@@ -545,7 +546,26 @@ def vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_t
                 id_sucursal, id_comprobante, id_cliente, estado_venta, f_venta, igv, monto_total,
                 base_imponible, fecha_iso, metodo_pago, estado_sunat, id_anular, id_anular_b, id_venta_baucher, observacion
             ))
-            conexion.commit()  # Asegúrate de confirmar los cambios
+            id_venta = conexion.insert_id()
+            conexion.commit()
+            
+            venta_data = json.loads(venta_data)
+            print(venta_data)
+            for producto in venta_data:
+                id_producto = obtener_id_producto_nombre(producto['nombre'])
+                cantidad = producto['cantidad']
+                precio = producto['precio']
+                descuento = producto['descuento']
+                total = producto['subtotal']
+                
+                sql = """
+                INSERT INTO detalle_venta (id_producto, id_venta, cantidad, precio, descuento, total) 
+                VALUES (%s, %s, %s, %s, %s, %s);
+                """
+                cursor.execute(sql, (id_producto, id_venta, cantidad, precio, descuento, total))
+            
+            conexion.commit()
+            # Asegúrate de confirmar los cambios
             print("vendido")
     except Exception as e:
         print("Error en vender:", str(e))

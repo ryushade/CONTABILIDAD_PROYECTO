@@ -104,7 +104,7 @@
                 <div class="modal-body">
                     <input type="text" id="modalSearchInput" placeholder="Realice la búsqueda del producto por el nombre" class="form-control mb-3" />
                     <div style="max-height: 50vh; overflow-y: auto;">
-                        <table class="table">
+                        <table class="table" id="detalleVentaTable">
                             <thead>
                                 <tr>
                                     <th>Nombre</th>
@@ -229,7 +229,7 @@
                     </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn btn-secondary">Vender</button>
+                    <button type="submit" class="btn btn-secondary btn-vender">Vender</button>
                     
                 </div>
             </div>
@@ -350,7 +350,41 @@
         document.getElementById("faltante").value = "S/. " + faltante.toFixed(2);
     }
 
+    function getDataTable() {
+        const rows = document.querySelectorAll("#newventa .table-container tbody tr");
+        let data = [];
+    
+        rows.forEach(row => {
+            let nombre = row.cells[0].textContent;
+            let cantidad = row.cells[1].querySelector(".quantity").textContent;
+            let precio = row.cells[2].textContent.replace('S/ ', '');
+            let descuento = row.cells[3].textContent;
+            let subtotal = row.cells[4].textContent.replace('S/ ', '');
+            
+            data.push({
+                nombre: nombre,
+                cantidad: parseInt(cantidad),
+                precio: parseFloat(precio),
+                descuento: parseFloat(descuento),
+                subtotal: parseFloat(subtotal)
+            });
+        });
+    
+        return JSON.stringify(data);
+    }
 
+    function saveToCookie(jsonData) {
+        const d = new Date();
+        d.setTime(d.getTime() + (24*60*60*1000)); // Expira en 1 día
+        let expires = "expires=" + d.toUTCString();
+        document.cookie = "ventaData=" + jsonData + ";" + expires + ";path=/";
+    }
+
+    document.querySelector('.btn-vender').addEventListener('click', () => {
+        const jsonData = getDataTable();
+        saveToCookie(jsonData);
+    });
+    
 </script>
 
 {% endblock %}

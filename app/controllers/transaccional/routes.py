@@ -1,5 +1,6 @@
 
-from flask import current_app, render_template, send_file
+from urllib import response
+from flask import current_app, make_response, render_template, send_file
 from app.models.transaccional_models import obtener_productos, obtener_marcas, obtener_categorias, obtener_ingresos, obtener_nota_salida, obtener_inventario, obtener_compras
 
 from flask import render_template, send_file, request, jsonify, redirect, url_for, flash
@@ -115,9 +116,10 @@ def ventas():
 @transactional_bp.route('/addVenta', methods=['POST'])
 def add_venta():
     try:
+        venta_data = request.cookies.get('ventaData')
+        print(venta_data)
         usuario = 1 # Usuario obtener de cookie
         id_sucursal = 1
-        # obtener el idtipocomprobante
         comprobante_pago = request.form.get('comprobante_pago')
         id_cliente = request.form.get('cliente')
         estado_venta = 2
@@ -128,12 +130,14 @@ def add_venta():
         id_anular = 4
         id_anular_b = 5
         observacion = request.form.get('observacion')
-        transac.vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_total, base_imponible, metodo_pago, id_anular, id_anular_b, observacion)
-        return redirect('/transaccional/ventas')
+        transac.vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_total, base_imponible, metodo_pago, id_anular, id_anular_b, observacion, venta_data)
+
+        # Crea la redirección y elimina la cookie en la respuesta
+        response = make_response(redirect(url_for('transaccional.ventas')))
+        response.delete_cookie('ventaData')
+        return response
     except Exception as e:
         return str(e)
-#----------------------------------------------
-
 
 # Modulo de compras
 
