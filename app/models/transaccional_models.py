@@ -587,4 +587,35 @@ def vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_t
         print(repr(e))  # Información detallada del error
         raise  # Propaga la excepción para ver el error completo
 
-
+def obtener_ventas_con_detalles():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            sql = """
+                SELECT dv.id_venta, pr.descripcion, dv.cantidad, dv.total AS total_producto, ve.f_venta, ve.monto_total
+                FROM detalle_venta AS dv
+                INNER JOIN venta AS ve ON dv.id_venta = ve.id_venta
+                INNER JOIN producto AS pr ON dv.id_producto = pr.id_producto
+                ORDER BY dv.id_venta, ve.f_venta;
+            """
+            cursor.execute(sql)
+            ventas = cursor.fetchall()
+            
+            # Agrupar los productos por venta
+            ventas_dict = {}
+            for venta in ventas:
+                id_venta = venta['id_venta']
+                if id_venta not in ventas_dict:
+                    ventas_dict[id_venta] = {
+                        'f_venta': venta['f_venta'],
+                        'monto_total': venta['monto_total'],
+                        'productos': []
+                    }
+                ventas_dict[id_venta]['productos'].append({
+                    'descripcion': venta['descripcion'],
+                    'cantidad': venta['cantidad'],
+                    'total_producto': venta['total_producto']
+                })
+            return ventas_dict
+    finally:
+        conexion.close()

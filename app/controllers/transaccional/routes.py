@@ -1,10 +1,10 @@
 
 from urllib import response
 from flask import current_app, make_response, render_template, send_file
-from app.models.transaccional_models import obtener_productos, obtener_marcas, obtener_categorias, obtener_ingresos, obtener_nota_salida, obtener_inventario, obtener_compras
 
 from flask import render_template, send_file, request, jsonify, redirect, url_for, flash
-from app.models.transaccional_models import obtener_productos, obtener_ventas, obtener_marcas, obtener_categorias, obtener_ingresos, obtener_nota_salida, obtener_inventario, obtener_subcategorias_por_categoria, agregar_producto, obtener_inventario_vigente, listarClientes, obtener_id_sucursal, obtener_ultimo_comprobante
+from app.models.transaccional_models import obtener_productos, obtener_ventas, obtener_marcas, obtener_categorias, obtener_ingresos, obtener_nota_salida, obtener_inventario, obtener_subcategorias_por_categoria, agregar_producto, obtener_inventario_vigente, listarClientes, obtener_id_sucursal, obtener_ultimo_comprobante, obtener_ventas_con_detalles, obtener_compras
+
 import app.models.transaccional_models as transac 
 from app.models.transaccional_models import generate_barcode
 from . import transactional_bp
@@ -103,14 +103,16 @@ def productos():
 @transactional_bp.route('/ventas', methods=['GET'])
 def ventas():
     total_ventas = obtener_ventas()
-
-    datos_inventario = obtener_inventario_vigente()  # Cambia a la función de productos vigentes
+    ventas_con_detalles = obtener_ventas_con_detalles()  # Nueva función para obtener ventas detalladas
+    datos_inventario = obtener_inventario_vigente()  
     clientes = listarClientes()
+
     return render_template(
         'transaccional/ventas/ventas.html',
         total_ventas=total_ventas,
+        ventas_con_detalles=ventas_con_detalles,
         datos_inventario=datos_inventario,
-        clientes = clientes
+        clientes=clientes
     )
 
 @transactional_bp.route('/addVenta', methods=['POST'])

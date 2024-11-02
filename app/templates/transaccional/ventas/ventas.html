@@ -12,6 +12,12 @@
     .is-invalid {
         border-color: red;
     }
+
+    .table-border-light th, 
+    .table-border-light td {
+        border-color: #e0e0e0 !important;
+    }
+
 </style>
 
 <div class="mb-4">
@@ -26,10 +32,45 @@
 </div>
 
 <div class="tab-content">
-
     <div class="tab-pane fade show active" id="lisventas">
-
-    </div>
+        <div class="accordion accordion-flush mb-5" id="accordionVentas">
+            {% for id_venta, venta in ventas_con_detalles.items() %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading{{ id_venta }}">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ id_venta }}" aria-expanded="false" aria-controls="collapse{{ id_venta }}">
+                        <span style="font-size: 1.1em; font-weight: bold;">Venta Nº {{ id_venta }}</span>
+                        <div class="mt-1 ms-5" style="font-size: 0.9em;">
+                            <b>F. Venta:</b> {{ venta.f_venta }}<br>
+                            <b>Monto Total:</b> S/ {{ venta.monto_total | round(2) }}
+                        </div>
+                    </button>
+                </h2>
+                <div id="collapse{{ id_venta }}" class="accordion-collapse collapse" aria-labelledby="heading{{ id_venta }}">
+                    <div class="accordion-body">
+                        <table class="table table-border-light">
+                            <thead>
+                                <tr>
+                                    <th style="font-weight: bold">Producto</th>
+                                    <th style="font-weight: bold; text-align: center">Cantidad</th>
+                                    <th style="font-weight: bold; text-align: center">Total por Producto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for producto in venta.productos %}
+                                <tr class="border-light">
+                                    <td>{{ producto.descripcion }}</td>
+                                    <td style="text-align: center">{{ producto.cantidad }}</td>
+                                    <td style="text-align: center">S/ {{ producto.total_producto | round(2) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>    
 
     <!-- NUEVA VENTA -->
     <div class="tab-pane fade" id="newventa">
