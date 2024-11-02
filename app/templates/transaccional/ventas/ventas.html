@@ -265,15 +265,15 @@
             newRow.innerHTML = `
                 <td class="text-center">${nombre}</td>
                 <td class="text-center">
-                    <button onclick="updateQuantity(this.parentElement.parentElement, -1, ${precio})">-</button>
+                    <button type="button" onclick="updateQuantity(this.parentElement.parentElement, -1, ${precio})">-</button>
                     <span class="quantity">1</span>
-                    <button onclick="updateQuantity(this.parentElement.parentElement, 1, ${precio})">+</button>
+                    <button type="button" onclick="updateQuantity(this.parentElement.parentElement, 1, ${precio})">+</button>
                 </td>
                 <td class="text-center">S/ ${precio.toFixed(2)}</td>
                 <td class="text-center">0</td>
                 <td class="text-center subtotal">S/ ${precio.toFixed(2)}</td>
                 <td class="text-center">
-                    <button class="btn btn-danger" onclick="removeRow(this)">Eliminar</button>
+                    <button type="button" class="btn btn-danger" onclick="removeRow(this)">Eliminar</button>
                 </td>
             `;
             tableBody.appendChild(newRow);
