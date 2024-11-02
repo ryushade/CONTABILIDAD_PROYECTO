@@ -563,6 +563,14 @@ def vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_t
                 VALUES (%s, %s, %s, %s, %s, %s);
                 """
                 cursor.execute(sql, (id_producto, id_venta, cantidad, precio, descuento, total))
+                
+                # Disminuir stock del producto
+                
+                sql = """
+                UPDATE inventario SET stock = stock - %s WHERE id_producto = %s AND id_almacen = 1;
+                """
+                cursor.execute(sql, (cantidad, id_producto))
+                
             
             conexion.commit()
             # Asegúrate de confirmar los cambios
