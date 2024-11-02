@@ -33,6 +33,29 @@ function openEditModal(cuentaId) {
     });
 }
 
+function openEditUsu (usuarioId) {
+  fetch('/contable/usuarios/obtener/' + usuarioId)
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        alert('Error: ' + data.error);
+      } else {
+        document.getElementById('nom_rol').value = data.nom_rol;
+        document.getElementById('usua').value = data.usua;
+        document.getElementById('contra').value = data.contra;
+        document.getElementById('estado_usuario').value = data.estado_usuario;
+
+        document.getElementById('editUsuarioModal').action = '/contable/usuarios/editar/' + usuarioId;
+
+        document.querySelector('.modal-overlay').style.display = 'flex'; 
+
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching account data:', error);
+    });
+}
+
 function closeModal() {
   document.querySelector('.modal-overlay').style.display = 'none';
 }
@@ -98,7 +121,15 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
+function openModalDeleteUsu(idUsuario, nombreUsuario) {
+  document.getElementById('deleteUsuarioModal').style.display = 'flex';
+  document.getElementById('deleteUsuarioId').value = idUsuario;
+  document.getElementById('deleteUsuInfo').innerText = `"${nombreUsuario}"`;
+}
 
+function closeModalDeleteUsuario() {
+  document.getElementById('deleteUsuarioModal').style.display = 'none';
+}
 
 function openModalDelete(cuentaId, codigoCuenta, nombreCuenta) {
   // Mostrar el modal
@@ -127,8 +158,13 @@ function deleteCuenta() {
 }
 
 
-function openModalVerRegla() {
+function openModalVerRegla(nombre_regla, tipo_transaccion, estado, cuenta_debito, cuenta_credito) {
   document.getElementById('openVerModal').style.display = 'flex';
+  document.getElementById('nombre_regla').textContent = nombre_regla;
+  document.getElementById('tipo_transaccion').textContent = tipo_transaccion;
+  document.getElementById('estado').textContent = estado;
+  document.getElementById('cuenta_debito').textContent = cuenta_debito;
+  document.getElementById('cuenta_credito').textContent = cuenta_credito;
 }
 
 function openModalAdd() {
@@ -150,7 +186,7 @@ function closeModalView() {
   document.getElementById('verCuentaModal').style.display = 'none';
 }
 
-function closeModalVer(){
+function closeModalVer() {
   document.getElementById('openVerModal').style.display = 'none';
 }
 
