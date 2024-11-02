@@ -233,25 +233,6 @@
     </div>
 </form>
 
-<!-- Modal de Notificación -->
-<div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="notificationModalLabel">Notificación</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="notificationMessage">
-                <!-- Aquí se mostrará el mensaje -->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
 <script>
     // Búsqueda en tiempo real en el modal
     document.getElementById('modalSearchInput').addEventListener('input', function() {
@@ -396,7 +377,6 @@
         const comprobante = document.getElementById("comprobante_pago");
         const metodoPago = document.getElementById("metodo_pago");
         const montoRecibido = document.getElementById("montoRecibido");
-        const observacion = document.getElementById("observacion");
         const totalAPagar = parseFloat(document.getElementById("totalAPagar").value) || 0;
         const montoRecibidoValue = parseFloat(montoRecibido.value) || 0;
 
@@ -404,7 +384,7 @@
 
         // Valida y marca campos en rojo si están vacíos
         function markIfEmpty(element) {
-            if (element.value === "" || element.value === "Seleccionar" || element.value === "Comprob. de pago" || element.value === "Seleccionar metodo") {
+            if (element.value === "" || element.value === "Seleccionar") {
                 element.classList.add("is-invalid");
                 hasError = true;
             } else {
@@ -417,7 +397,6 @@
         markIfEmpty(comprobante);
         markIfEmpty(metodoPago);
         markIfEmpty(montoRecibido);
-        markIfEmpty(observacion);
 
         // Verificar si el monto recibido es suficiente
         if (montoRecibidoValue < totalAPagar) {
@@ -428,18 +407,9 @@
             montoRecibido.classList.remove("is-invalid");
         }
 
-        // Si no hay errores, guardar los datos en la cookie
+        // Si no hay errores, enviar el formulario
         if (!hasError) {
-            const jsonData = getDataTable();
-            saveToCookie(jsonData);
-            alert("Venta registrada con éxito.");
-
-            // Limpiar la tabla de productos
-            clearTable();
-
-            // Cierra el modal usando Bootstrap 5
-            const modal = bootstrap.Modal.getInstance(document.getElementById('ventaModal'));
-            modal.hide();
+            document.forms[0].submit(); // Envía el formulario al servidor
         } else {
             alert("Por favor, complete todos los campos requeridos.");
         }
