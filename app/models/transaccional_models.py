@@ -624,7 +624,7 @@ def vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_t
             conexion.commit()
             print("Venta registrada exitosamente")
             # Asegúrate de confirmar los cambios
-            generarPDF(f_venta, id_comprobante, id_cliente, venta_data, igv, monto_total)
+            #generarPDF(f_venta, id_comprobante, id_cliente, venta_data, igv, monto_total)
             print("vendido y generado PDF")
     except Exception as e:
         print("Error en vender:", str(e))
