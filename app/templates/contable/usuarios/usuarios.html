@@ -95,7 +95,7 @@
         </p>
     </div>
     <div class="col-md-4 d-flex justify-content-end align-items-center mt-2 mt-md-0">
-        <a class="btn btn-primary mb-2" style="margin-left: auto;" onclick="openModalAdd()">
+        <a class="btn btn-primary mb-2" style="margin-left: auto;" onclick="openModalAddUsu()">
             <i class="fa fa-plus" style="font-size: 14px;"></i> Agregar usuario
         </a>
     </div>
@@ -155,13 +155,14 @@
 </div>
 
 
-<div id="addAccountModal" class="modal-overlay" style="display: none;">
+<div id="addUsuarioModal" class="modal-overlay" style="display: none;">
     <div class="content-modal p-4 rounded" style="background-color: white; max-width: 600px; margin: auto;">
         <!-- Header -->
         <div class="modal-header">
             <h5 class="modal-title" style="font-size: 32px;">NUEVO USUARIO</h5>
-            <button type="button" class="modal-close" onclick="closeModalAdd()" style="border: none; background: none;">
-                <i class="fas fa-times"></i>
+            <button type="button" class="modal-close" onclick="closeModalUsu()"
+                style="border: none; color: black; background-color: #e74c3c; font-weight: bold; font-size: 24px; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                &times;
             </button>
         </div>
 
@@ -206,12 +207,12 @@
 
                 <!-- Botones de acción -->
                 <div class="d-flex justify-content-end mt-4" style="gap: 10px;">
-                    <button type="button" onclick="closeModalAdd()"
-                        class="btn btn-secondary me-2"> <i  class="fas fa-times"></i>
+                    <button type="button" onclick="closeModalUsu()" class="btn btn-secondary me-2"> <i
+                            class="fas fa-times"></i>
                         Cerrar
                     </button>
-                    <button  type="submit" class="btn btn-primary">
-                        <i  class="fas fa-save"></i> Guardar
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar
                     </button>
                 </div>
             </form>
@@ -226,7 +227,7 @@
         <!-- Header -->
         <div class="modal-header">
             <h5 class="modal-title" style="font-size: 32px;">EDITAR USUARIO</h5>
-            <button type="button" class="modal-close" onclick="closeModalUsu()" style="border: none; background: none;">
+            <button type="button" class="modal-close" onclick="CloseModalUsu()" style="border: none; background: none;">
                 <i class="fas fa-times"></i>
             </button>
         </div>

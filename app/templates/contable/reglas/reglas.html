@@ -25,6 +25,7 @@
         document.body.appendChild(form);
         form.submit();
     }
+
 </script>
 <style>
     :root {
@@ -193,7 +194,7 @@
 
 
 <div id="addAccountModal" class="modal-overlay"
-    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 1050;">
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1050;">
     <div class="content-modal p-4"
         style="background-color: white; max-width: 600px; max-height: 90vh; overflow-y: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
         <!-- Encabezado -->
@@ -211,7 +212,7 @@
                 <div class="mb-4">
                     <label for="codigo_cuenta" class="form-label" style="font-weight: bold;">Nombre:</label>
                     <input type="text" id="codigo_cuenta" name="codigo_cuenta" class="form-control"
-                        placeholder="Nombre de la regla" required />
+                        placeholder="Ej: Registro de venta al contado" required />
                 </div>
 
                 <!-- Tipo de transacción -->
@@ -236,9 +237,10 @@
                     <div class="card-body">
                         <!-- Opción Solo Débito -->
                         <div class="d-flex align-items-start mb-3">
-                            <input type="checkbox" id="solo_debito" class="form-check-input me-2 mt-1">
+                            <input type="checkbox" id="solo_debito_checkbox" class="form-check-input me-2 mt-1">
                             <div>
-                                <label for="solo_debito" class="form-check-label" style="font-weight: bold;">Solo
+                                <label for="solo_debito_checkbox" class="form-check-label"
+                                    style="font-weight: bold;">Solo
                                     débito</label>
                                 <p class="text-muted" style="font-size: 14px; margin: 0;">
                                     Marque esta opción si la regla solo registra en el debe.
@@ -248,9 +250,10 @@
 
                         <!-- Opción Solo Crédito -->
                         <div class="d-flex align-items-start">
-                            <input type="checkbox" id="solo_credito" class="form-check-input me-2 mt-1">
+                            <input type="checkbox" id="solo_credito_checkbox" class="form-check-input me-2 mt-1">
                             <div>
-                                <label for="solo_credito" class="form-check-label" style="font-weight: bold;">Solo
+                                <label for="solo_credito_checkbox" class="form-check-label"
+                                    style="font-weight: bold;">Solo
                                     crédito</label>
                                 <p class="text-muted" style="font-size: 14px; margin: 0;">
                                     Marque esta opción si la regla solo registra en el haber.
@@ -291,7 +294,6 @@
 </div>
 
 
-
 <div id="deleteReglaModal" class="confirmation-modal-overlay" style="display: none;">
     <div class="confirmation-modal" style="text-align: center;">
         <div class="modal-icon" style="margin-bottom: 10px;">
@@ -319,29 +321,55 @@
 </div>
 
 
-<div id="openVerModal" class="modal-overlay" style="display: none;">
-    <div class="content-modal" style="width: 100%;">
-        <div class="modal-header">
+<div id="openVerModal" class="modal-overlay"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; align-items: center; justify-content: center;">
+    <div class="content-modal"
+        style="width: 90%; max-height: 90vh; overflow-y: auto; background-color: white; border-radius: 8px; padding: 20px;">
+        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center;">
             <h3 class="modal-title" style="font-size: 36px;">DETALLES DE LA REGLA</h3>
             <button type="button" class="modal-close" onclick="closeModalVer()"
-                style="border: none; color: black; background-color: white; width: 15px; font-weight: bold;">
+                style="border: none; color: black; background-color: #e74c3c; font-weight: bold; font-size: 24px; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
                 &times;
             </button>
+
         </div>
         <div class="modal-body">
             <div class="w-full text-start mb-5">
+                <!-- Contenido del modal (cards y demás información) -->
                 <div class="card" style="margin-bottom: 20px;">
                     <div class="card-body">
                         <h6 class="card-title" style="font-weight: bold;">Nombre de la regla</h6>
-                        <p style="font-size: 14px;" class="text-muted" id="nombre_regla"></p>
+                        <p style="font-size: 14px;" class="text-muted" id="nombre_regla">Registro del monto total en
+                            Cuentas por Cobrar (1212)</p>
+                        <div class="grid-container"
+                            style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
+                            <div>
+                                <h6 style="font-weight: bold;">Tipo de transacción</h6>
+                                <span class="badge bg-secondary">venta_contado</span>
+                            </div>
+                            <div>
+                                <h6 style="font-weight: bold;">Estado</h6>
+                                <span class="badge bg-success">Activo</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="card" style="margin-bottom: 20px;">
                     <div class="card-body">
-                        <h6 class="card-title" style="font-weight: bold;">Configuracion de cuentas</h6>
+                        <h6 class="card-title" style="font-weight: bold;">Configuración de Cuentas</h6>
                         <div class="container bg-light rounded p-4" style="background-color: #F4F4F5;">
-
+                            <div class="row"
+                                style="display: flex; flex-direction: row; justify-content: space-between;">
+                                <div style="flex: 1;">
+                                    <h6 style="font-weight: bold;">Cuenta Débito</h6>
+                                    <p style="font-size: 24px; font-weight: bold;">49</p>
+                                </div>
+                                <div style="flex: 1;">
+                                    <h6 style="font-weight: bold;">Cuenta Crédito</h6>
+                                    <p style="font-size: 24px; font-weight: bold;">Ninguna</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -349,9 +377,11 @@
                 <div class="card" style="margin-bottom: 20px;">
                     <div class="card-body">
                         <h6 class="card-title" style="font-weight: bold;">Información adicional</h6>
-                        <p class="text-muted" style="font-size: 14px;">Tipo de transacción: <span
-                                id="tipo_transaccion">Tipo
-                                de transacción</span></p>
+                        <ul class="text-muted" style="font-size: 14px; list-style-type: disc; padding-left: 10px;">
+                            <li>Esta regla se aplica automáticamente en transacciones de tipo venta_contado</li>
+                            <li>Las cuentas se procesarán según las normas contables vigentes</li>
+                            <li>El sistema validará la disponibilidad de las cuentas antes de aplicar la regla</li>
+                        </ul>
                     </div>
                 </div>
 
@@ -359,8 +389,7 @@
         </div>
     </div>
 </div>
-</div>
-</div>
+
 
 
 
