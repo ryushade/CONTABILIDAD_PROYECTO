@@ -7,6 +7,13 @@
     <h1 class="text-8xl font-bold tracking-wide text-gray-700 title-Inicio">MÓDULO VENTAS - POS</h1>
 </header>
 
+<style>
+    /* Estilo para remarcar los campos en rojo */
+    .is-invalid {
+        border-color: red;
+    }
+</style>
+
 <div class="mb-4">
     <div class="nav nav-tabs">
         <a class="nav-item nav-link active" href="#lisventas" data-bs-toggle="tab">
@@ -84,7 +91,7 @@
                                 <button type="button" class="btn btn-cotizar flex items-center">Cotizar</button>
                             </div>
                             <div class="col-1">
-                                <button type="button" class="btn btn-cobrar flex items-center" data-bs-toggle="modal" data-bs-target="#ventaModal">Cobrar</button>
+                                <button type="button" class="btn btn-cobrar flex items-center" onclick="openCobrarModal()">Cobrar</button>
                             </div>
                         </div>
                     </div>
@@ -138,25 +145,24 @@
         <div class="modal-dialog modal-md">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title ms-3 mt-3 mb-2" id="productModalLabel">PAGO</h5>
+                    <h5 class="modal-title ms-3 mt-3" id="productModalLabel">PAGO</h5>
                 </div>
                 <div class="modal-body">
                     <div class="row">
                         <div class="col mx-3">
-                            <div class="row my-4">
+                            <div class="row my-2">
                                 <div class="col">
                                     <p>Seleccione el cliente</p>
-                                    <select class="form-select form-select-sm" name="cliente" aria-label="Small select example">
+                                    <select class="form-select form-select-sm" name="cliente" id="cliente" aria-label="Small select example">
                                         <option selected>Seleccionar</option>
                                         {% for cliente in clientes %}
                                         <option value="{{ cliente.id_cliente }}">{{ cliente.nombre_completo }}</option>
                                         {% endfor %}
-
                                     </select>
                                 </div>
                                 <div class="col">
                                     <p>Select. el comprobante</p>
-                                    <select class="form-select form-select-sm" name="comprobante_pago" aria-label="Small select example">
+                                    <select class="form-select form-select-sm" name="comprobante_pago" id="comprobante_pago" aria-label="Small select example">
                                         <option selected>Comprob. de pago</option>
                                         <option value="1">Boleta</option>
                                         <option value="2">Factura</option>
@@ -165,8 +171,8 @@
                             </div>
                             <div class="row mb-4">
                                 <div class="form-floating">
-                                    <textarea class="form-control" name="observacion" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
-                                    <label for="floatingTextarea2" class="fs-6 mx-2">Observacion</label>
+                                    <textarea class="form-control" name="observacion" id="observacion" placeholder="Leave a comment here" style="height: 100px"></textarea>
+                                    <label for="observacion" class="fs-6 mx-2">Observacion</label>
                                 </div>
                             </div>
                             <div class="row">
@@ -197,7 +203,7 @@
                                     <div class="row mb-4">
                                         <p>Metodo de pago</p>
                                         <div class="">
-                                            <select class="form-select form-select-sm" name="metodo_pago" aria-label="Small select example">
+                                            <select class="form-select form-select-sm" name="metodo_pago" id="metodo_pago" aria-label="Small select example">
                                                 <option selected>Seleccionar metodo</option>
                                                 <option value="EFECTIVO">EFECTIVO</option>
                                                 <option value="PLIN">PLIN</option>
@@ -208,14 +214,6 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <p>Aplicar descuento</p>
-                                        <div class="input-group mb-3">
-                                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                                            <span class="input-group-text">S/.</span>
-                                            <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
-                                        </div>
-                                    </div>
-                                    <div class="row">
                                         <p>Faltante</p>
                                         <div class="input-group mb-3">
                                             <span class="input-group-text">S/.</span>
@@ -223,19 +221,36 @@
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                     </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn btn-secondary btn-vender">Vender</button>
-                    
+                    <button type="button" class="btn btn-secondary btn-vender" onclick="validateAndMarkFields()">Vender</button>
                 </div>
             </div>
         </div>
     </div>
 </form>
+
+<!-- Modal de Notificación -->
+<div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="notificationModalLabel">Notificación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="notificationMessage">
+                <!-- Aquí se mostrará el mensaje -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script>
     // Búsqueda en tiempo real en el modal
@@ -328,16 +343,6 @@
         document.getElementById("totalAPagar").value = parseFloat(total).toFixed(2);
     });
 
-    // Función para calcular el cambio en el modal de pago
-    function calculateChange() {
-        const total = parseFloat(document.getElementById("totalAPagar").value) || 0;
-        const recibido = parseFloat(document.getElementById("montoRecibido").value) || 0;
-
-        const cambio = recibido >= total ? recibido - total : 0;
-
-        document.getElementById("cambio").value = "S/. " + cambio.toFixed(2);
-    }
-
     // Función para calcular el cambio y el faltante en el modal de pago
     function calculateChange() {
         const total = parseFloat(document.getElementById("totalAPagar").value) || 0;
@@ -385,6 +390,84 @@
         saveToCookie(jsonData);
     });
     
+    // Función para validar y marcar campos vacíos en rojo
+    function validateAndMarkFields() {
+        const cliente = document.getElementById("cliente");
+        const comprobante = document.getElementById("comprobante_pago");
+        const metodoPago = document.getElementById("metodo_pago");
+        const montoRecibido = document.getElementById("montoRecibido");
+        const observacion = document.getElementById("observacion");
+        const totalAPagar = parseFloat(document.getElementById("totalAPagar").value) || 0;
+        const montoRecibidoValue = parseFloat(montoRecibido.value) || 0;
+
+        let hasError = false;
+
+        // Valida y marca campos en rojo si están vacíos
+        function markIfEmpty(element) {
+            if (element.value === "" || element.value === "Seleccionar" || element.value === "Comprob. de pago" || element.value === "Seleccionar metodo") {
+                element.classList.add("is-invalid");
+                hasError = true;
+            } else {
+                element.classList.remove("is-invalid");
+            }
+        }
+
+        // Verificar todos los campos
+        markIfEmpty(cliente);
+        markIfEmpty(comprobante);
+        markIfEmpty(metodoPago);
+        markIfEmpty(montoRecibido);
+        markIfEmpty(observacion);
+
+        // Verificar si el monto recibido es suficiente
+        if (montoRecibidoValue < totalAPagar) {
+            alert("El monto recibido es insuficiente para completar la venta.");
+            montoRecibido.classList.add("is-invalid");
+            hasError = true;
+        } else {
+            montoRecibido.classList.remove("is-invalid");
+        }
+
+        // Si no hay errores, guardar los datos en la cookie
+        if (!hasError) {
+            const jsonData = getDataTable();
+            saveToCookie(jsonData);
+            alert("Venta registrada con éxito.");
+
+            // Limpiar la tabla de productos
+            clearTable();
+
+            // Cierra el modal usando Bootstrap 5
+            const modal = bootstrap.Modal.getInstance(document.getElementById('ventaModal'));
+            modal.hide();
+        } else {
+            alert("Por favor, complete todos los campos requeridos.");
+        }
+    }
+
+    // Función para limpiar la tabla de productos después de la venta
+    function clearTable() {
+        const tableBody = document.querySelector("#newventa .table-container tbody");
+        tableBody.innerHTML = ""; // Limpia todo el contenido de la tabla
+        updateTotals(); // Actualiza los totales para asegurarse de que todo se reinicie
+    }
+
+    function openCobrarModal() {
+        // Verificar si hay productos en la tabla
+        const tableBody = document.querySelector("#newventa .table-container tbody");
+        if (tableBody.rows.length === 0) {
+            alert("No hay productos agregados. Agregue al menos un producto para continuar.");
+            return; // No abrir el modal
+        }
+
+        // Actualizar el total a pagar en el modal
+        const total = document.getElementById("monto_totalDisplay").textContent.replace("S/. ", "") || "0.00";
+        document.getElementById("totalAPagar").value = parseFloat(total).toFixed(2);
+
+        // Abrir el modal de Cobrar usando Bootstrap 5
+        const modal = new bootstrap.Modal(document.getElementById('ventaModal'));
+        modal.show();
+    }
 </script>
 
 {% endblock %}
