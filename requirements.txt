@@ -9,3 +9,4 @@ openpyxl
 cryptography
 pdfkit
 python-barcode
+Flask-JWT-Extended
