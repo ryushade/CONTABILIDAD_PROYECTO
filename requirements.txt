@@ -9,3 +9,5 @@ openpyxl
 cryptography
 pdfkit
 python-barcode
+JPype1
+aspose-cells
