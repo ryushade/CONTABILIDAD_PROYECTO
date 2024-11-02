@@ -1,6 +1,5 @@
-from flask import Flask, redirect, url_for, session, render_template
+from flask import Flask, redirect, url_for, session, render_template, jsonify
 from config import Config
-from flask_jwt_extended import JWTManager
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
 from app.models.contable_models import obtener_usuario_por_id
 
@@ -9,6 +8,11 @@ def create_app():
     app.config.from_object(Config)
 
     jwt = JWTManager(app)
+
+    @jwt.unauthorized_loader
+    def unauthorized_callback(callback):
+        # Redirige al usuario a la página de inicio de sesión con un parámetro en la URL
+        return redirect(url_for('contable.login', login_required=1))
 
     # Registrar Blueprints
     from app.controllers.transaccional import transactional_bp

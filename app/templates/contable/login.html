@@ -42,10 +42,44 @@
         </div>
     </div>
 
+    <!-- Modal de Inicio de Sesión Requerido -->
+    <div id="loginModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title mt-3 ms-5" style="font-size: 25px">Inicio de sesión requerido</h6>
+                </div>
+                <div class="modal-body">
+                    <p>Debe iniciar sesión para acceder a esta página.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="redirectToLogin()">Ir a Iniciar Sesión</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- JS de Bootstrap -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+        
+    <script>
+        // Función para redirigir al usuario a la página de inicio de sesión
+        function redirectToLogin() {
+            window.location.href = "/contable/login";
+        }
+
+        // Verifica si el parámetro "login_required" está presente en la URL
+        $(document).ready(function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('login_required')) {
+                // Muestra el modal si el parámetro está presente
+                $('#loginModal').modal('show');
+            }
+        });
+    </script>
 </body>
 
 </html>
