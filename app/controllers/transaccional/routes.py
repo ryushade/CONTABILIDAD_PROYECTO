@@ -145,7 +145,6 @@ def add_venta():
         id_anular_b = 5
         observacion = request.form.get('observacion')
         transac.vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_total, base_imponible, metodo_pago, id_anular, id_anular_b, observacion, venta_data)
-
         # Crea la redirección y elimina la cookie en la respuesta
         response = make_response(redirect(url_for('transaccional.ventas')))
         response.delete_cookie('ventaData')

@@ -127,6 +127,20 @@
         closeModalDownloadExcel();
     }
 
+    function closeModalDownloadPDF() {
+        document.getElementById("downloadPDFModal").style.display = "none";
+    }
+
+    function openModalDownloadPDF() {
+        document.getElementById("downloadPDFModal").style.display = "flex";
+    }
+
+    function downloadPDF() {
+        // Redirecciona a la URL de descarga de PDF después de la confirmación
+        window.location.href = "{{ url_for('contable.exportar_excel') }}";
+        closeModalDownloadPDF();
+    }
+
 </script>
 
 
@@ -156,12 +170,13 @@
                         <strong>Exportar a Excel</strong>
                     </span>
                 </a>
-                <a class="dropdown-item d-flex flex-column" href="#">
+                <a class="dropdown-item d-flex flex-column" href="#" onclick="openModalDownloadPDF()">
                     <span class="d-flex align-items-center">
                         <i class="fa fa-file-pdf mr-2" style="color: red;"></i>
                         <strong>Exportar a PDF</strong>
                     </span>
                 </a>
+
             </div>
         </div>
     </div>
@@ -648,6 +663,32 @@
             <button
                 style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600; background-color: #1F6E43; border: none;"
                 class="btn btn-primary" onclick="downloadExcel()">Sí, Descargar</button>
+        </div>
+    </div>
+</div>
+
+<!--PDF descargar modal-->
+<!-- PDF Descargar Modal -->
+<div id="downloadPDFModal" class="confirmation-modal-overlay" style="display: none;">
+    <div class="confirmation-modal" style="text-align: center;">
+        <div class="modal-icon" style="margin-bottom: 10px;">
+            <!-- Icono de descarga en rojo para PDF -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="red"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+        </div>
+        <h2 class="confirmation-modal-title" style="color: rgb(30, 30, 30);">DESCARGAR ARCHIVO PDF</h2>
+        <p class="confirmation-modal-message">¿Estás seguro que deseas descargar el plan contable en formato PDF?</p>
+        <div class="confirmation-modal-buttons"
+            style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
+            <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" class="btn btn-secondary"
+                onclick="closeModalDownloadPDF()">No, Cancelar</button>
+            <button
+                style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600; background-color: #B22222; border: none;"
+                class="btn btn-primary" onclick="downloadPDF()">Sí, Descargar</button>
         </div>
     </div>
 </div>

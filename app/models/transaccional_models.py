@@ -7,6 +7,10 @@ import io
 import random
 from barcode.writer import ImageWriter
 import json
+import jpype     
+#import asposecells     
+#from asposecells.api import Workbook as wk
+#import openpyxl
 
 def obtener_marcas():
     conexion = obtener_conexion()
@@ -32,8 +36,6 @@ def obtener_marcas():
     finally:
         conexion.close()
 
-
-
 def obtener_categorias():
     conexion = obtener_conexion()
     try:
@@ -57,7 +59,6 @@ def obtener_categorias():
     finally:
         conexion.close()
 
-
 def obtener_subcategorias_por_categoria(categoria_id):
     conexion = obtener_conexion()
     try:
@@ -79,7 +80,6 @@ def obtener_subcategorias_por_categoria(categoria_id):
             return subcategorias
     finally:
         conexion.close()
-
 
 # Controlador de las notas de ingreso
 def obtener_ingresos():
@@ -137,7 +137,6 @@ def obtener_almacenes():
 
     except Exception as e:
         return jsonify({'code': 0, 'message': str(e)}), 500
-
 
 def obtener_productos():
     descripcion = request.args.get('descripcion', '')
@@ -207,8 +206,6 @@ def obtener_nota_salida():
     except Exception as e:
         return jsonify({'code': 0, 'message': str(e)}), 500
     
-
-
 '''
 Consultas Productos
 '''
@@ -231,7 +228,6 @@ def obtener_inventario():
         print(f"Error: {e}")
         return []
     
-
 # Obtener productos de ventas según la sucursal
 def obtener_inventario_vigente():
     try:
@@ -253,8 +249,6 @@ def obtener_inventario_vigente():
         print(f"Error: {e}")
         return []
 
-
-
 '''
 Consultas Compras
 '''
@@ -275,7 +269,6 @@ def obtener_compras():
         return []
     except Exception as e:
         return jsonify({'code': 0, 'message': str(e)}), 500
-
 
 def generate_barcode(code):
     try:
@@ -324,9 +317,6 @@ def agregar_producto(id_marca, id_subcategoria, descripcion, undm, precio, cod_b
     finally:
         conexion.close()
 
-
-
-
 def getTotalVentas():
     conexion = obtener_conexion()
     try:
@@ -353,7 +343,6 @@ def totalEfectivo():
             return resultado['total_efectivo']
     finally:
         conexion.close()
-    
     
 def obtener_ventas(nom_tipocomp='', razon_social='', nombre_sucursal='', fecha_i='2022-01-01', fecha_e='2027-12-27'):
     nom_tipocomp_array = [item.strip() for item in nom_tipocomp.split(',') if item.strip() != '']
@@ -423,7 +412,6 @@ def obtener_ventas(nom_tipocomp='', razon_social='', nombre_sucursal='', fecha_i
     finally:
         connection.close()
 
-
 def obtener_id_sucursal(usuario):
     connection = obtener_conexion()
     with connection.cursor() as cursor:
@@ -482,6 +470,52 @@ def obtener_ultimo_comprobante(tipoComprobante):
 
     except Exception as e:
         print("Error en obtener_ultimo_comprobante:", str(e))
+        print(repr(e))  # Información detallada del error
+        raise  # Propaga la excepción para que sea manejada externamente
+
+def obtener_numero_comprobante(idComprobante):
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            # Luego realiza la consulta para obtener el último id_comprobante
+            sql_select = "SELECT num_comprobante FROM comprobante WHERE id_comprobante = %s"
+            cursor.execute(sql_select,(idComprobante))
+            
+            # Obtén el id_comprobante
+            id_comprobante = cursor.fetchone()
+            return id_comprobante['num_comprobante']
+
+    except Exception as e:
+        print("Error en obtener_numero_comprobante:", str(e))
+        print(repr(e))  # Información detallada del error
+        raise  # Propaga la excepción para que sea manejada externamente
+
+def obtener_cliente(idCliente):
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            # Luego realiza la consulta para obtener el último id_comprobante
+            sql_select = """SELECT 
+                                id_cliente,
+                                CASE 
+                                    WHEN ruc IS NOT NULL AND ruc <> '' THEN ruc 
+                                    ELSE dni 
+                                END AS identificacion,
+                                CASE 
+                                    WHEN nombres IS NOT NULL AND nombres <> '' AND apellidos IS NOT NULL AND apellidos <> '' 
+                                        THEN CONCAT(nombres, ' ', apellidos)
+                                    ELSE razon_social 
+                                END AS nombre_completo,
+                                direccion
+                            FROM cliente
+                            WHERE id_cliente = %s;"""
+            cursor.execute(sql_select,(idCliente))
+            
+            # Obtén el id_comprobante
+            cliente = cursor.fetchone()
+            return cliente
+    except Exception as e:
+        print("Error en obtener_numero_comprobante:", str(e))
         print(repr(e))  # Información detallada del error
         raise  # Propaga la excepción para que sea manejada externamente
 
@@ -570,23 +604,86 @@ def vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_t
                 cursor.execute(sql_check, (id_producto,))
                 stock_result = cursor.fetchone()
                 
-                if stock_result:
+                sql = """
+                UPDATE inventario SET stock = stock - %s WHERE id_producto = %s AND id_almacen = 1;
+                """
+                cursor.execute(sql, (cantidad, id_producto, id_cliente, venta_data))
+                
+            conexion.commit()
+            
+            if stock_result:
                     # Disminuir stock del producto
                     sql_update_stock = """
                     UPDATE inventario SET stock = stock - %s WHERE id_producto = %s AND id_almacen = 1;
                     """
                     cursor.execute(sql_update_stock, (cantidad, id_producto))
                     print(f"Stock actualizado para producto {id_producto} en almacen 1: -{cantidad}")
-                else:
+            else:
                     print(f"Producto {id_producto} no encontrado en inventario para almacen 1")
 
             conexion.commit()
             print("Venta registrada exitosamente")
+            # Asegúrate de confirmar los cambios
+            generarPDF(f_venta, id_comprobante, id_cliente, venta_data, igv, monto_total)
+            print("vendido y generado PDF")
     except Exception as e:
         print("Error en vender:", str(e))
         print(repr(e))  # Información detallada del error
         raise  # Propaga la excepción para ver el error completo
 
+# def generarPDF(fecha, idComprobante, id_cliente, venta_data, igv, monto_total):
+#     try:
+#         workbook = openpyxl.load_workbook('factura2.xlsx')
+#         sheet = workbook['Factura']
+#         cliente = obtener_cliente(id_cliente)
+#         sheet['F2'] = fecha # Fecha venta
+#         sheet['F3'] = obtener_numero_comprobante(idComprobante) # Numero de factura
+#         sheet['F4'] = cliente['identificacion']  # RUC del cliente
+        
+#         sheet['A9'] = cliente['nombre_completo']  # Nombre del cliente
+#         sheet['A10'] = cliente['direccion']  # direccion del cliente
+        
+#         # Asumimos que los detalles comienzan en la fila 12
+#         fila_inicial = 12
+
+#         # Iterar sobre cada producto en venta_data
+#         for i, producto in enumerate(venta_data):
+#             nombre = producto['nombre']
+#             cantidad = producto['cantidad']
+#             precio = producto['precio']
+#             subtotal = producto['subtotal']
+
+#             # Determinar la fila actual
+#             fila_actual = fila_inicial + i
+
+#             # Insertar los datos en la fila correspondiente
+#             sheet[f'A{fila_actual}'] = f"{nombre} - {cantidad} - {precio}"  # Descripción
+#             sheet[f'F{fila_actual}'] = subtotal  # Subtotal    
+
+#         # Calcular las nuevas posiciones para F18, F20, y F22
+#         nueva_fila_inicial = fila_inicial + len(venta_data)  # Nueva posición inicial después de los productos
+#         fila_subtotal = nueva_fila_inicial + 6  # Ajustar según la estructura de tu archivo
+#         fila_igv = fila_subtotal + 2
+#         fila_total = fila_igv + 2
+
+#         # Insertar los totales en las nuevas posiciones
+#         sheet[f'F{fila_subtotal}'] = monto_total - igv  # Subtotal de la venta
+#         sheet[f'F{fila_igv}'] = igv  # IGV
+#         sheet[f'F{fila_total}'] = monto_total  # Total
+
+#         # Guardar los cambios en el mismo archivo
+#         workbook.save('factura2.xlsx')
+
+#         jpype.startJVM() 
+#         exc = wk("factura2.xlsx")
+#         exc.save("factura.pdf")
+#         jpype.shutdownJVM()
+
+#     except Exception as e:
+#         print("Error en generar PDF:", str(e))
+#         print(repr(e))  # Información detallada del error
+#         raise  # Propaga la excepción para ver el error completo
+    
 def obtener_ventas_con_detalles():
     conexion = obtener_conexion()
     try:

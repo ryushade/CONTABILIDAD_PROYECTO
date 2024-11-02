@@ -4,6 +4,7 @@ from collections import defaultdict
 from datetime import datetime
 from decimal import Decimal
 from pymysql.cursors import DictCursor
+from flask import request, jsonify
 
 # Obtener un usuario por nombre
 def obtener_usuario_por_nombre(username):
@@ -137,6 +138,56 @@ def eliminar_cuenta(cuenta_id):
             conexion.commit()
     finally:
         conexion.close()
+
+
+
+def agregar_usuario():
+    conexion = obtener_conexion()
+    try:
+        datos = request.get_json()
+        id_rol = datos.get("id_rol")
+        usua = datos.get("usua")
+        contra = datos.get("contra")
+        estado_usuario = datos.get("estado_usuario")
+
+        if id_rol is None or usua is None or contra is None:
+            return jsonify({"message": "Bad Request. Please fill all fields."}), 400
+
+        usuario = {
+            "id_rol": id_rol,
+            "usua": usua.strip(),
+            "contra": contra.strip(),
+            "estado_usuario": estado_usuario
+        }
+
+        with conexion.cursor() as cursor:
+            cursor.execute("INSERT INTO usuario SET id_rol=%s, usua=%s, contra=%s, estado_usuario=%s", 
+                           (usuario["id_rol"], usuario["usua"], usuario["contra"], usuario["estado_usuario"]))
+            conexion.commit()
+
+        return jsonify({"code": 1, "message": "Usuario añadido"})
+    except Exception as error:
+        return jsonify({"error": str(error)}), 500
+    finally:
+        conexion.close()
+
+
+def eliminar_usuario(usuario_id):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("SELECT 1 FROM vendedor WHERE id_usuario = %s", (usuario_id,))
+            is_user_in_use = cursor.fetchone() is not None
+
+            if is_user_in_use:
+                cursor.execute("UPDATE usuario SET estado_usuario = 0 WHERE id_usuario = %s", (usuario_id,))
+                conexion.commit()
+            else:
+                cursor.execute("DELETE FROM usuario WHERE id_usuario = %s", (usuario_id,))
+                conexion.commit()
+    finally:
+        conexion.close()
+
 
 def eliminar_regla_bd(regla_id):
     conexion = obtener_conexion()
