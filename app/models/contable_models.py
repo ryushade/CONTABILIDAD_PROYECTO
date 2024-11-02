@@ -140,8 +140,36 @@ def eliminar_cuenta(cuenta_id):
         conexion.close()
 
 
+# Backend - usuarios
+def agregar_usuario(id_rol, usua, contra, estado_usuario):
+    conexion = obtener_conexion()
+    try:
+        if id_rol is None or usua is None or contra is None:
+            return {"error": "Bad Request. Please fill all fields."}
 
-def agregar_usuario():
+        usuario = {
+            "id_rol": id_rol,
+            "usua": usua.strip(),
+            "contra": contra.strip(),
+            "estado_usuario": estado_usuario
+        }
+
+        with conexion.cursor() as cursor:
+            cursor.execute(
+                "INSERT INTO usuario SET id_rol=%s, usua=%s, contra=%s, estado_usuario=%s",
+                (usuario["id_rol"], usuario["usua"], usuario["contra"], usuario["estado_usuario"])
+            )
+            conexion.commit()
+
+        return {"code": 1, "message": "Usuario añadido"}
+    except Exception as error:
+        return {"error": str(error)}
+    finally:
+        conexion.close()
+
+
+
+def actualizar_usuario(usuario_id):
     conexion = obtener_conexion()
     try:
         datos = request.get_json()
@@ -150,7 +178,7 @@ def agregar_usuario():
         contra = datos.get("contra")
         estado_usuario = datos.get("estado_usuario")
 
-        if id_rol is None or usua is None or contra is None:
+        if id_rol is None or usua is None or contra is None or estado_usuario is None:
             return jsonify({"message": "Bad Request. Please fill all fields."}), 400
 
         usuario = {
@@ -161,16 +189,19 @@ def agregar_usuario():
         }
 
         with conexion.cursor() as cursor:
-            cursor.execute("INSERT INTO usuario SET id_rol=%s, usua=%s, contra=%s, estado_usuario=%s", 
-                           (usuario["id_rol"], usuario["usua"], usuario["contra"], usuario["estado_usuario"]))
+            query = "UPDATE usuario SET id_rol=%s, usua=%s, contra=%s, estado_usuario=%s WHERE id_usuario=%s"
+            values = (usuario["id_rol"], usuario["usua"], usuario["contra"], usuario["estado_usuario"], usuario_id)
+            cursor.execute(query, values)
             conexion.commit()
 
-        return jsonify({"code": 1, "message": "Usuario añadido"})
+            if cursor.rowcount == 0:
+                return jsonify({"code": 0, "message": "Usuario no encontrado"}), 404
+
+        return jsonify({"code": 1, "message": "Usuario modificado"})
     except Exception as error:
         return jsonify({"error": str(error)}), 500
     finally:
         conexion.close()
-
 
 def eliminar_usuario(usuario_id):
     conexion = obtener_conexion()
@@ -188,6 +219,16 @@ def eliminar_usuario(usuario_id):
     finally:
         conexion.close()
 
+def obtener_roles():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute("SELECT id_rol, nom_rol, estado_rol FROM rol")
+            roles = cursor.fetchall()
+        return roles
+    finally:
+        conexion.close()
+## ----------------------------
 
 def eliminar_regla_bd(regla_id):
     conexion = obtener_conexion()

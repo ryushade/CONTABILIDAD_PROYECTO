@@ -1,7 +1,7 @@
 from flask import request, redirect, url_for, flash, session, jsonify, render_template, send_file
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
-from app.models.contable_models import obtener_usuario_por_nombre, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, actualizar_reglas, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha
-from . import accounting_bp# routes.py
+from app.models.contable_models import obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, actualizar_reglas, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha
+from . import accounting_bp
 import pandas as pd
 import io
 from openpyxl.utils import get_column_letter
@@ -154,7 +154,37 @@ def reglas():
 @jwt_required()
 def usuarios():
     usuarios = obtener_usuarios()
-    return render_template('contable/usuarios/usuarios.html', usuarios=usuarios)
+    roles = obtener_roles()
+    return render_template('contable/usuarios/usuarios.html', usuarios=usuarios, roles=roles)
+
+@accounting_bp.route('/usuarios/agregar', methods=['POST'])
+def agregar_usu():
+    datos = request.get_json()
+    id_rol = datos.get('id_rol')
+    usua = datos.get('usua')
+    contra = datos.get('contra')
+    estado_usuario = datos.get('estado_usuario')
+
+    # Verifica que los datos no sean nulos
+    if not id_rol or not usua or not contra or not estado_usuario:
+        return jsonify({"message": "Bad Request. Please fill all fields."}), 400
+
+    resultado = agregar_usuario(id_rol, usua, contra, estado_usuario)
+
+    # Verifica si hubo un error y devuelve un mensaje apropiado
+    if "error" in resultado:
+        return jsonify({"code": 0, "message": resultado["error"]}), 400
+
+    return jsonify({"code": 1, "message": "Usuario añadido"})
+
+
+@accounting_bp.route('/usuarios/eliminar/<int:usuario_id>', methods=['POST'])
+def eliminar_usu(usuario_id):
+    eliminar_usuario(usuario_id)
+    return redirect(url_for('contable.usuarios'))
+
+
+
 
 @accounting_bp.route('/cuentas/eliminar/<int:cuenta_id>', methods=['POST'])
 @jwt_required()
