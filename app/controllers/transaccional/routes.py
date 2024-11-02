@@ -1,6 +1,7 @@
 
 from urllib import response
 from flask import current_app, make_response, render_template, send_file
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from flask import render_template, send_file, request, jsonify, redirect, url_for, flash
 from app.models.transaccional_models import obtener_productos, obtener_ventas, obtener_marcas, obtener_categorias, obtener_ingresos, obtener_nota_salida, obtener_inventario, obtener_subcategorias_por_categoria, agregar_producto, obtener_inventario_vigente, listarClientes, obtener_id_sucursal, obtener_ultimo_comprobante, obtener_ventas_con_detalles, obtener_compras
@@ -12,6 +13,7 @@ from . import transactional_bp
 
 # Modulo de almacen
 @transactional_bp.route('/almacen', methods=['GET'])
+@jwt_required()
 def almacen():
     datos_almacen_entrada = obtener_ingresos()
     datos_almacen_salida = obtener_nota_salida()
@@ -27,6 +29,7 @@ def almacen():
     )
 
 @transactional_bp.route('/obtener_subcategorias', methods=['GET'])
+@jwt_required()
 def obtener_subcategorias():
     categoria_id = request.args.get('categoria_id')
     print("Categoria ID:", categoria_id)  # Para depurar
@@ -38,6 +41,7 @@ def obtener_subcategorias():
     return jsonify(subcategorias)
 
 @transactional_bp.route('/add_producto', methods=['POST'])
+@jwt_required()
 def add_producto():
     id_marca = request.form.get('marca')
     id_subcategoria = request.form.get('sub_categoria_id')
@@ -61,6 +65,7 @@ def add_producto():
 
 
 @transactional_bp.route('/barcode/<string:code>', methods=['GET'])
+@jwt_required()
 def barcode(code):
     response = generate_barcode(code)
     
@@ -70,6 +75,7 @@ def barcode(code):
     return response
 
 @transactional_bp.route('/nueva_nota', methods=['GET'])
+@jwt_required()
 def nueva_nota():
     return render_template('transaccional/almacen/nueva_nota.html')
 #----------------------------------------------
@@ -78,14 +84,17 @@ def nueva_nota():
 
 
 @transactional_bp.route('/marcas')
+@jwt_required()
 def marcas():
     return render_template('transaccional/productos/marcas.html')
 
 @transactional_bp.route('/categorias')
+@jwt_required()
 def categorias():
     return render_template('transaccional/productos/categorias.html')
 
 @transactional_bp.route('/subcategorias')
+@jwt_required()
 def subcategorias():
     return render_template('transaccional/productos/subcategorias.html')
 
@@ -93,6 +102,7 @@ def subcategorias():
 
 
 @transactional_bp.route('/productos', methods=['GET'])
+@jwt_required()
 def productos():
     productos = obtener_productos()
     marcas = obtener_marcas()
@@ -101,6 +111,7 @@ def productos():
 
 # Modulo de ventas
 @transactional_bp.route('/ventas', methods=['GET'])
+@jwt_required()
 def ventas():
     total_ventas = obtener_ventas()
     ventas_con_detalles = obtener_ventas_con_detalles()  # Nueva función para obtener ventas detalladas
@@ -116,6 +127,7 @@ def ventas():
     )
 
 @transactional_bp.route('/addVenta', methods=['POST'])
+@jwt_required()
 def add_venta():
     try:
         venta_data = request.cookies.get('ventaData')
@@ -144,6 +156,7 @@ def add_venta():
 # Modulo de compras
 
 @transactional_bp.route('/compras')
+@jwt_required()
 def compras():
     compras = obtener_compras()
     return render_template('transaccional/compras/compras.html', compras=compras)

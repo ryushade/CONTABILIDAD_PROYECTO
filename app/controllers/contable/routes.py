@@ -1,4 +1,5 @@
 from flask import request, redirect, url_for, flash, session, jsonify, render_template, send_file
+from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
 from app.models.contable_models import obtener_usuario_por_nombre, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, actualizar_reglas, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha
 from . import accounting_bp# routes.py
 import pandas as pd
@@ -9,6 +10,14 @@ from openpyxl.styles import Font, Alignment, PatternFill
 
 @accounting_bp.route('/login', methods=['GET', 'POST'])
 def login():
+    try:
+        # Verifica si hay un JWT en la solicitud
+        verify_jwt_in_request(optional=True)
+        if get_jwt_identity():  # Si el usuario ya tiene un JWT válido
+            return redirect(url_for('inicio'))  # Redirigir a la página principal
+    except:
+        pass  # Si no hay un JWT válido, continúa con el proceso de inicio de sesión
+
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -18,23 +27,32 @@ def login():
 
         # Verifica si el usuario existe y la contraseña es correcta
         if user and verificar_contraseña(user, password):
-            session['user_id'] = user['id_usuario']
-            return redirect(url_for('inicio'))  # Redirige a la ruta /inicio
+            # Generar el token de acceso JWT
+            access_token = create_access_token(identity=user['id_usuario'])
+            response = redirect(url_for('inicio'))
+            set_access_cookies(response, access_token)  # Guardar el token en una cookie segura
+            return response
+        else:
+            flash("Usuario o contraseña incorrectos", "error")
 
     return render_template('contable/login.html')
 
+
 @accounting_bp.route('/logout')
 def logout():
-    session.pop('user_id', None)
-    return redirect(url_for('contable.login'))
+    response = redirect(url_for('contable.login'))
+    unset_jwt_cookies(response)  # Elimina el token de la cookie
+    return response
 
 @accounting_bp.route('/reportes', methods=['GET'])
+@jwt_required()
 def reportes():
     asientos, totales = obtener_asientos_agrupados()
     libro_mayor_data, total_debe, total_haber = obtener_libro_mayor_agrupado_por_fecha()
     return render_template('contable/reportes/reportes.html', asientos=asientos, totales=totales, libro_mayor=libro_mayor_data, total_debe=total_debe, total_haber=total_haber)
 
 @accounting_bp.route('/cuentas', methods=['GET'])
+@jwt_required()
 def cuentas():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 50, type=int)
@@ -60,6 +78,7 @@ def cuentas():
 
 
 @accounting_bp.route('/exportar_excel', methods=['GET'])
+@jwt_required()
 def exportar_excel():
     cuentas = obtener_cuentas_excel()
 
@@ -105,6 +124,7 @@ def exportar_excel():
 @accounting_bp.route('/exportar_pdf', methods=['GET'])
 
 @accounting_bp.route('/cuentas/obtener/<int:cuenta_id>', methods=['GET'])
+@jwt_required()
 def obtener_cuenta(cuenta_id):
     cuenta = obtener_cuenta_por_id(cuenta_id)
     if cuenta:
@@ -113,6 +133,7 @@ def obtener_cuenta(cuenta_id):
         return jsonify({'error': 'Cuenta no encontrada'}), 404
 
 @accounting_bp.route('/cuentas/editar/<int:cuenta_id>', methods=['POST'])
+@jwt_required()
 def editar_cuenta(cuenta_id):
     codigo_cuenta = request.form['codigo_cuenta']
     nombre_cuenta = request.form['nombre_cuenta']
@@ -124,26 +145,31 @@ def editar_cuenta(cuenta_id):
     return redirect(url_for('contable.cuentas'))
 
 @accounting_bp.route('/reglas', methods=['GET'])
+@jwt_required()
 def reglas():
     reglas = obtener_reglas()
     return render_template('contable/reglas/reglas.html', reglas=reglas)
 
 @accounting_bp.route('/usuarios', methods = ['GET'])
+@jwt_required()
 def usuarios():
     usuarios = obtener_usuarios()
     return render_template('contable/usuarios/usuarios.html', usuarios=usuarios)
 
 @accounting_bp.route('/cuentas/eliminar/<int:cuenta_id>', methods=['POST'])
+@jwt_required()
 def eliminar_cuenta(cuenta_id):
     eliminar_cuenta(cuenta_id)
     return redirect(url_for('contable.cuentas'))
 
 @accounting_bp.route('/reglas/eliminar/<int:regla_id>', methods=['POST'])
+@jwt_required()
 def eliminar_regla(regla_id):
     eliminar_regla_bd(regla_id)  # Llama a la función separada
     return redirect(url_for('contable.reglas'))
 
 @accounting_bp.route('/reglas/editar/<int:regla_id>', methods=['POST'])
+@jwt_required()
 def editar_regla(regla_id):
     nombre_regla = request.form['nombre_regla']
     tipo_transaccion = request.form['tipo_transaccion']
@@ -156,5 +182,6 @@ def editar_regla(regla_id):
     return redirect(url_for('contable.reglas'))
 
 @accounting_bp.route('/reportes/ldpdf')
+@jwt_required()
 def ldpf():
     return render_template('contable/reportes/pdf_ld.html')
