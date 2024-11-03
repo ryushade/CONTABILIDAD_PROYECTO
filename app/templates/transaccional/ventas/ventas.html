@@ -283,6 +283,18 @@
     </div>
 </div>
 
+{% if download_url %}
+<script>
+    window.onload = function() {
+        window.location.href = "{{ download_url }}";
+        setTimeout(function() {
+            window.location.href = "{{ url_for('transaccional.ventas') }}";
+        }, 5000);  // Espera 5 segundos antes de redirigir nuevamente a ventas
+    }
+</script>
+{% endif %}
+
+
 <script>
     // Búsqueda en tiempo real en el modal
     document.getElementById('modalSearchInput').addEventListener('input', function() {

@@ -658,6 +658,7 @@ def vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_t
             # Asegúrate de confirmar los cambios
             generarPDF(f_venta, id_comprobante, id_cliente, venta_data, igv, monto_total)
             print("vendido y generado PDF")
+            return id_venta, obtener_numero_comprobante(id_comprobante)
     except Exception as e:
         print("Error en vender:", str(e))
         print(repr(e))  # Información detallada del error
