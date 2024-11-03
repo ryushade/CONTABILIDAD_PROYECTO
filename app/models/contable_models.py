@@ -55,6 +55,16 @@ def obtener_usuario_por_id_2(usuario_id):
     finally:
         connection.close()
 
+def obtener_regla_por_id(regla_id):
+    connection = obtener_conexion()
+    try:
+        with connection.cursor(pymysql.cursors.DictCursor) as cursor:
+            sql = "SELECT * FROM reglas_contabilizacion WHERE id_regla = %s"
+            cursor.execute(sql, (regla_id,))
+            regla = cursor.fetchone()
+            return regla
+    finally:
+        connection.close()
 
 def obtener_usuario_por_id(user_id):
     conexion = obtener_conexion()

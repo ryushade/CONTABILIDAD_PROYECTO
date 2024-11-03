@@ -194,6 +194,23 @@ function submitAddUsuario(event) {
 }
 
 
+
+function fetchReglaDetails(reglaId) {
+  fetch(`/contable/reglas/detalles/${reglaId}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        alert('Error: ' + data.error);
+      } else {
+        // Llama a la función para abrir el modal y pasar los datos obtenidos
+        openModalVerRegla(data.nombre_regla, data.tipo_transaccion, data.estado, data.cuenta_debito, data.cuenta_credito);
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching rule details:', error);
+    });
+}
+
 function openModalVerRegla(nombre_regla, tipo_transaccion, estado, cuenta_debito, cuenta_credito) {
   document.getElementById('openVerModal').style.display = 'flex';
   document.getElementById('nombre_regla').textContent = nombre_regla;
