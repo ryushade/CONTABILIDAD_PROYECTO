@@ -9,6 +9,8 @@ from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font, Alignment, PatternFill
 from datetime import datetime
 import openpyxl
+from fpdf import FPDF
+from io import BytesIO
 
 @accounting_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -186,6 +188,7 @@ def obtener_detalles_regla(regla_id):
         })
     else:
         return jsonify({'error': 'Regla no encontrada'}), 404
+
 
 
 
@@ -434,6 +437,161 @@ def exportar_libro_mayor_excel():
         zip_output = BytesIO()
         with zipfile.ZipFile(zip_output, 'w') as zf:
             for archivo in archivos_generados:
+                zf.writestr(archivo['filename'], archivo['content'])
+        zip_output.seek(0)
+        return send_file(zip_output, download_name="libro_mayor.zip", as_attachment=True)
+
+@accounting_bp.route('/exportar_libro_diario_pdf', methods=['GET'])
+@jwt_required()
+def exportar_libro_diario_pdf():
+    # Crear un objeto FPDF en orientación horizontal
+    pdf = FPDF(orientation='L', unit='mm', format='A4')
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    
+    # Encabezado
+    pdf.set_font("Arial", style='B', size=14)
+    pdf.cell(0, 10, 'Libro Diario', ln=True, align='C')
+    pdf.set_font("Arial", size=12)
+    pdf.cell(0, 10, f'Período: {datetime.now().strftime("%m/%Y")}', ln=True, align='C')
+    pdf.cell(0, 10, 'RUC: 20610588981', ln=True, align='C')
+    pdf.cell(0, 10, 'Razón Social: Tormenta', ln=True, align='C')
+
+    pdf.ln(10)  # Espacio vertical
+
+    # Encabezados de la tabla
+    pdf.set_font("Arial", style='B', size=10)
+    pdf.cell(20, 10, 'N°', border=1, align='C')
+    pdf.cell(30, 10, 'Fecha', border=1, align='C')
+    pdf.cell(100, 10, 'Glosa', border=1, align='C')  # Aumentar el ancho de la columna Glosa
+    pdf.cell(30, 10, 'Documento', border=1, align='C')
+    pdf.cell(35, 10, 'Debe', border=1, align='C')
+    pdf.cell(35, 10, 'Haber', border=1, align='C')
+    pdf.ln(10)
+
+    # Datos de los asientos
+    asientos, _ = obtener_asientos_agrupados()
+    numero_correlativo = 1
+    total_debe = 0
+    total_haber = 0
+
+    pdf.set_font("Arial", size=10)
+    for id_asiento, asiento in asientos.items():
+        for detalle in asiento['detalles']:
+            pdf.cell(20, 10, str(numero_correlativo), border=1, align='C')
+            pdf.cell(30, 10, asiento['fecha_asiento'].strftime('%d/%m/%Y'), border=1, align='C')
+            
+            # Reducir el tamaño de la fuente para la glosa
+            pdf.set_font("Arial", size=8)
+            pdf.cell(100, 10, asiento['glosa'], border=1)
+            pdf.set_font("Arial", size=10)  # Restaurar el tamaño de la fuente
+            
+            pdf.cell(30, 10, asiento['num_comprobante'], border=1, align='C')
+            pdf.cell(35, 10, f"{detalle['debe']:.2f}", border=1, align='R')
+            pdf.cell(35, 10, f"{detalle['haber']:.2f}", border=1, align='R')
+            pdf.ln(10)
+            
+            total_debe += detalle['debe']
+            total_haber += detalle['haber']
+            numero_correlativo += 1
+
+    # Totales
+    pdf.set_font("Arial", style='B', size=10)
+    pdf.cell(180, 10, 'Total', border=1, align='R')
+    pdf.cell(35, 10, f"{total_debe:.2f}", border=1, align='R')
+    pdf.cell(35, 10, f"{total_haber:.2f}", border=1, align='R')
+
+    # Guardar el archivo PDF en un buffer de memoria
+    output = BytesIO()
+    pdf.output(dest='S').encode('latin1')  # Generar el contenido del PDF como bytes
+    output.write(pdf.output(dest='S').encode('latin1'))
+    output.seek(0)
+
+    return send_file(output, download_name="libro_diario.pdf", as_attachment=True)
+
+@accounting_bp.route('/exportar_libro_mayor_pdf', methods=['GET'])
+@jwt_required()
+def exportar_libro_mayor_pdf():
+    # Obtener datos del libro mayor con glosa agrupados por fecha
+    libro_mayor = obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica()
+
+    # Obtener la fecha actual para el período
+    fecha_actual = datetime.now()
+    mes_anio_actual = fecha_actual.strftime('%m/%Y')
+
+    pdf_files = []
+
+    for codigo_cuenta, detalles in libro_mayor.items():
+        pdf = FPDF(orientation='L')
+        pdf.add_page()
+
+        # Configurar la fuente
+        pdf.set_font("Arial", size=10)
+
+        # Título
+        pdf.set_font("Arial", style='B', size=14)
+        pdf.cell(0, 10, "FORMATO 6.1: \"LIBRO MAYOR\"", ln=True, align='C')
+
+        # Información del período, RUC, razón social y cuenta
+        pdf.set_font("Arial", size=10)
+        pdf.cell(40, 10, f"PERÍODO: {mes_anio_actual}", ln=True)
+        pdf.cell(40, 10, "RUC: 20610588981", ln=True)
+        pdf.cell(40, 10, "APELLIDOS Y NOMBRE: Tormenta", ln=True)
+        pdf.cell(40, 10, f"CODIGO Y/O DENOMINACIÓN: {codigo_cuenta}", ln=True)
+
+        # Encabezado de tabla
+        pdf.set_font("Arial", style='B', size=10)
+        pdf.cell(60, 10, "FECHA DE LA OPERACIÓN", border=1)
+        pdf.cell(100, 10, "DESCRIPCIÓN O GLOSA", border=1)
+        pdf.cell(50, 10, "DEUDOR", border=1, align='R')
+        pdf.cell(50, 10, "ACREEDOR", border=1, align='R')
+        pdf.ln()
+
+        # Detalles del libro mayor
+        total_debe = 0
+        total_haber = 0
+
+        pdf.set_font("Arial", size=10)
+        for detalle in detalles:
+            fecha = detalle['fecha_asiento'].strftime('%d/%m/%Y')
+            glosa = detalle['glosa']
+            debe = detalle['total_debe']
+            haber = detalle['total_haber']
+
+            pdf.cell(60, 10, fecha, border=1)
+            pdf.cell(100, 10, glosa, border=1)
+            pdf.cell(50, 10, f"{debe:.2f}", border=1, align='R')
+            pdf.cell(50, 10, f"{haber:.2f}", border=1, align='R')
+            pdf.ln()
+
+            total_debe += debe
+            total_haber += haber
+
+        # Total al final de la tabla
+        pdf.set_font("Arial", style='B', size=10)
+        pdf.cell(160, 10, "Total", border=1, align='R')
+        pdf.cell(50, 10, f"{total_debe:.2f}", border=1, align='R')
+        pdf.cell(50, 10, f"{total_haber:.2f}", border=1, align='R')
+        pdf.ln()
+
+        # Guardar el PDF en memoria
+        output = BytesIO()
+        output.write(pdf.output(dest='S').encode('latin1'))
+        output.seek(0)
+
+        pdf_files.append({
+            'filename': f"libro_mayor_{codigo_cuenta}.pdf",
+            'content': output.getvalue()
+        })
+
+    # Enviar todos los archivos generados
+    if len(pdf_files) == 1:
+        return send_file(BytesIO(pdf_files[0]['content']), download_name=pdf_files[0]['filename'], as_attachment=True)
+    else:
+        import zipfile
+        zip_output = BytesIO()
+        with zipfile.ZipFile(zip_output, 'w') as zf:
+            for archivo in pdf_files:
                 zf.writestr(archivo['filename'], archivo['content'])
         zip_output.seek(0)
         return send_file(zip_output, download_name="libro_mayor.zip", as_attachment=True)

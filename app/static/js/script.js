@@ -269,87 +269,12 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-// Función para Abrir el Modal con los Detalles de la Regla
-function fetchReglaDetails(regla_id) {
-  fetch(`/reglas/detalles/${regla_id}`)
-      .then(response => response.json())
-      .then(data => {
-          if (data.error) {
-              alert(data.error);
-          } else {
-              openModalVerRegla(
-                  data.nombre_regla,
-                  data.tipo_transaccion,
-                  data.estado,
-                  data.cuenta_debito_codigo,
-                  data.cuenta_debito_nombre,
-                  data.cuenta_credito_codigo,
-                  data.cuenta_credito_nombre
-              );
-          }
-      })
-      .catch(error => {
-          console.error('Error al obtener los detalles de la regla:', error);
-          alert('Ocurrió un error al obtener los detalles de la regla.');
-      });
-}
 
-function fetchReglaDetails(regla_id) {
-  fetch(`/contable/reglas/detalles/${regla_id}`)
-      .then(response => {
-          if (!response.ok) {
-              throw new Error('Network response was not ok');
-          }
-          return response.json();
-      })
-      .then(data => {
-          if (data.error) {
-              alert(data.error);
-          } else {
-              openModalVerRegla(
-                  data.nombre_regla,
-                  data.tipo_transaccion,
-                  data.estado,
-                  data.cuenta_debito_codigo,
-                  data.cuenta_debito_nombre,
-                  data.cuenta_credito_codigo,
-                  data.cuenta_credito_nombre
-              );
-          }
-      })
-      .catch(error => {
-          console.error('Error al obtener los detalles de la regla:', error);
-          alert('Ocurrió un error al obtener los detalles de la regla.');
-      });
-}
 
-// Función para Asignar los Valores al Modal y Mostrarlo
-function openModalVerRegla(nombre_regla, tipo_transaccion, estado, cuenta_debito_codigo, cuenta_debito_nombre, cuenta_credito_codigo, cuenta_credito_nombre) {
-  // Mostrar el Modal
-  document.getElementById('openVerModal').style.display = 'flex';
 
-  // Asignar valores al modal, o mostrar "No disponible" si el valor es null
-  document.getElementById('nombre_regla').textContent = nombre_regla || "No disponible";
-  document.getElementById('tipo_transaccion').textContent = tipo_transaccion || "No disponible";
-  document.getElementById('estado').textContent = estado || "No disponible";
 
-  // Cuenta Débito
-  if (cuenta_debito_codigo && cuenta_debito_nombre) {
-      document.getElementById('cuenta_debito').textContent = `${cuenta_debito_codigo} - ${cuenta_debito_nombre}`;
-  } else {
-      document.getElementById('cuenta_debito').textContent = "No disponible";
-  }
 
-  // Cuenta Crédito
-  if (cuenta_credito_codigo && cuenta_credito_nombre) {
-      document.getElementById('cuenta_credito').textContent = `${cuenta_credito_codigo} - ${cuenta_credito_nombre}`;
-  } else {
-      document.getElementById('cuenta_credito').textContent = "No disponible";
-  }
 
-  // Información Adicional
-  document.getElementById('tipo_transaccion_info').textContent = tipo_transaccion || "No disponible";
-}
 
 // Función para Cerrar el Modal
 function closeModalVer() {
