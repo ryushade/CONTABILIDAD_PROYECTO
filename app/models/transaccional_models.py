@@ -632,12 +632,12 @@ def vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_t
         raise  # Propaga la excepción para ver el error completo
 
 import openpyxl
-import jpype
+from openpyxl.styles import Border, Side
 
 def generarPDF(fecha, idComprobante, id_cliente, venta_data, igv, monto_total):
     try:
         # Cargar el archivo Excel
-        workbook = openpyxl.load_workbook('./app/static/factura2.xlsx')
+        workbook = openpyxl.load_workbook('./app/templates/contable/plantillas/factura2.xlsx')
         sheet = workbook['Factura']
 
         # Obtener información del cliente
@@ -654,35 +654,42 @@ def generarPDF(fecha, idComprobante, id_cliente, venta_data, igv, monto_total):
         fila_inicial = 13
         print("data del pdf:", venta_data)
 
+        # Estilo de borde lateral
+        thin_border = Border(left=Side(style='thin'), right=Side(style='thin'))
+
+        # Calcular la fila base para los totales
+        fila_base_totales = 18  # Fila inicial para Subtotal si no hay productos adicionales
+
         # Iterar sobre cada producto en venta_data
         for i, producto in enumerate(venta_data):
-            nombre = producto['nombre']
-            cantidad = producto['cantidad']
-            precio = producto['precio']
-            subtotal = producto['subtotal']
-
-            # Determinar la fila actual
             fila_actual = fila_inicial + i
+            sheet.insert_rows(fila_actual)  # Insertar una fila nueva para cada producto
+            
+            # Establecer datos del producto
+            sheet[f'A{fila_actual}'] = f"{producto['nombre']} - cantidad: {producto['cantidad']} - precio un.: S/. {producto['precio']}"  # Descripción
+            sheet[f'F{fila_actual}'] = producto['subtotal']  # Subtotal en la columna F
+            
+            # Aplicar bordes a las celdas de la fila insertada
+            for col in ['A', 'F']:
+                cell = sheet[f'{col}{fila_actual}']
+                cell.border = thin_border
 
-            # Escribir solo en la primera celda de las celdas combinadas (A)
-            sheet[f'A{fila_actual}'] = f"{nombre} - {cantidad} - {precio}"  # Descripción
-            sheet[f'F{fila_actual}'] = subtotal  # Subtotal en la columna F
+            fila_base_totales += 1  # Ajustar la fila base para los totales según los productos
 
-        # Calcular las nuevas posiciones para Subtotal, IGV y Total
-        # La fila del subtotal es 18 más la cantidad de productos, desplazada si hay más de un producto
-        fila_subtotal = 18 + (len(venta_data) - 1)  # Se ajusta dinámicamente según la cantidad de productos
-        fila_igv = fila_subtotal + 2
-        fila_total = fila_igv + 2
+        # Ajustar las filas de subtotal, IGV y total
+        fila_subtotal = fila_base_totales
+        fila_impuesto = fila_subtotal + 2  # Dinámico: siempre dos filas después de los comentarios que comienzan en la fila 20
+        fila_total = fila_impuesto + 2  # Dinámico: siempre cuatro filas después de los comentarios
 
-        # Insertar los totales en las nuevas posiciones
-        sheet[f'F{fila_subtotal}'] = float(monto_total) - float(igv)  # Subtotal de la venta
-        sheet[f'F{fila_igv}'] = float(igv)  # IGV
+        # Escribir los totales en las posiciones adecuadas
+        sheet[f'F{fila_subtotal}'] = float(monto_total) - float(igv)  # Subtotal
+        sheet[f'F{fila_impuesto}'] = float(igv)  # IGV
         sheet[f'F{fila_total}'] = float(monto_total)  # Total
 
-        # Guardar los cambios en el archivo
+        # Guardar el archivo con los cambios
         workbook.save('./app/static/PDF/factura2_copia.xlsx')
 
-        # Iniciar la JVM si no está ya iniciada
+        # Iniciar la JVM si no está ya iniciada y convertir a PDF
         if not jpype.isJVMStarted():
             jpype.startJVM()
 
@@ -693,8 +700,7 @@ def generarPDF(fecha, idComprobante, id_cliente, venta_data, igv, monto_total):
 
     except Exception as e:
         print("Error en generar PDF:", str(e))
-        print(repr(e))  # Información detallada del error
-        raise  # Propaga la excepción para ver el error completo
+        raise  # Propaga la excepción para manejarla más arriba
 
 def obtener_ventas_con_detalles():
     conexion = obtener_conexion()
