@@ -101,9 +101,6 @@ def obtener_cuentas(page, per_page, tipo_cuenta=None, naturaleza=None):
     finally:
         conexion.close()
 
-
-
-
 def obtener_total_cuentas(tipo_cuenta=None, naturaleza=None):
     conexion = obtener_conexion()
     try:
@@ -374,6 +371,7 @@ def obtener_asientos_agrupados():
         with conexion.cursor() as cursor:
             cursor.execute("""
                 SELECT 
+                    ROW_NUMBER() OVER (ORDER BY a.id_asiento) AS numero_correlativo,
                     a.id_asiento, 
                     a.fecha_asiento, 
                     a.glosa, 
@@ -392,7 +390,6 @@ def obtener_asientos_agrupados():
             """)
             resultados = cursor.fetchall()
         
-        # agrupar resultados
         asientos_agrupados = defaultdict(lambda: {"detalles": []})
         global_total_debe = 0.0
         global_total_haber = 0.0
@@ -402,8 +399,9 @@ def obtener_asientos_agrupados():
             if id_asiento not in asientos_agrupados:
                 fecha_asiento = row["fecha_asiento"]
                 if isinstance(fecha_asiento, str):
-                    fecha_asiento = datetime.strptime(fecha_asiento, '%Y-%m-%d')  
+                    fecha_asiento = datetime.strptime(fecha_asiento, '%Y-%m-%d')
                 asientos_agrupados[id_asiento].update({
+                    "numero_correlativo": row["numero_correlativo"],
                     "fecha_asiento": fecha_asiento,
                     "glosa": row["glosa"],
                     "num_comprobante": row["num_comprobante"],
