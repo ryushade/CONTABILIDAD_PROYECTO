@@ -1,6 +1,6 @@
 from flask import request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
-from app.models.contable_models import obtener_regla_por_id, obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, actualizar_reglas, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha
+from app.models.contable_models import obtener_regla_por_id, obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, actualizar_reglas, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica
 from . import accounting_bp
 import pandas as pd
 import io
@@ -329,3 +329,108 @@ def exportar_libro_diario_excel():
     output.seek(0)
 
     return send_file(output, download_name="libro_diario.xlsx", as_attachment=True)
+
+
+@accounting_bp.route('/exportar_libro_mayor_excel', methods=['GET'])
+@jwt_required()
+def exportar_libro_mayor_excel():
+    import openpyxl
+    import os
+    from flask import current_app, send_file
+    from io import BytesIO
+    from datetime import datetime
+
+    # Ruta de la plantilla
+    template_path = os.path.join(current_app.root_path, 'templates', 'contable', 'plantillas', '234_formato51.xlsx')
+    
+    if not os.path.exists(template_path):
+        return "La plantilla de Excel no se encontró.", 404
+    
+    # Obtener datos del libro mayor con glosa agrupados por fecha
+    libro_mayor = obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica()
+
+    archivos_generados = []
+    
+    # Obtener la fecha actual para el período
+    fecha_actual = datetime.now()
+    mes_anio_actual = fecha_actual.strftime('%m/%Y')
+
+    for codigo_cuenta, detalles in libro_mayor.items():
+        output = BytesIO()
+        
+        # Cargar el archivo de plantilla
+        workbook = openpyxl.load_workbook(template_path)
+        worksheet = workbook.active
+        
+        # Llenar las celdas específicas con los datos necesarios
+        worksheet['B3'] = mes_anio_actual  # Coloca el período en la celda derecha de 'PERÍODO:'
+        worksheet['B4'] = '20610588981'    # Coloca el RUC
+        worksheet['B5'] = 'Tormenta'       # Coloca la razón social
+        worksheet['B6'] = codigo_cuenta    # Coloca el código de la cuenta
+        
+        # Insertar los detalles en la tabla, fila por fila
+        start_row = 11
+        current_row = start_row
+        
+        # Definir el estilo de fuente
+        font = openpyxl.styles.Font(size=10, bold=False)
+        
+        for detalle in detalles:
+            worksheet[f'A{current_row}'] = detalle['fecha_asiento'].strftime('%d/%m/%Y')
+            worksheet[f'A{current_row}'].font = font
+            
+            worksheet[f'C{current_row}'] = detalle['glosa']
+            worksheet[f'C{current_row}'].font = font
+            
+            saldo_debe = detalle['total_debe']
+            saldo_haber = detalle['total_haber']
+
+            worksheet[f'D{current_row}'] = saldo_debe if saldo_debe > 0 else None
+            worksheet[f'D{current_row}'].number_format = '0.00#################'
+            worksheet[f'D{current_row}'].font = font
+
+            worksheet[f'E{current_row}'] = saldo_haber if saldo_haber > 0 else None
+            worksheet[f'E{current_row}'].number_format = '0.00#################'
+            worksheet[f'E{current_row}'].font = font
+
+            current_row += 1
+
+        # Añadir el total al final de la tabla
+        worksheet[f'C{current_row}'] = "Total"
+        worksheet[f'C{current_row}'].font = openpyxl.styles.Font(size=10, bold=True)
+        
+        # Sumar las columnas D (Deudor) y E (Acreedor)
+        total_debe_formula = f'=SUM(D{start_row}:D{current_row - 1})'
+        total_haber_formula = f'=SUM(E{start_row}:E{current_row - 1})'
+        
+        worksheet[f'D{current_row}'] = total_debe_formula
+        worksheet[f'D{current_row}'].number_format = '0.00#################'
+        worksheet[f'D{current_row}'].font = openpyxl.styles.Font(size=10, bold=True)
+        
+        worksheet[f'E{current_row}'] = total_haber_formula
+        worksheet[f'E{current_row}'].number_format = '0.00#################'
+        worksheet[f'E{current_row}'].font = openpyxl.styles.Font(size=10, bold=True)
+        
+        # Guardar el archivo modificado en un buffer de memoria
+        workbook.save(output)
+        output.seek(0)
+
+        # Preparar el archivo para descarga
+        archivos_generados.append({
+            'filename': f"libro_mayor_{codigo_cuenta}.xlsx",
+            'content': output.getvalue()
+        })
+
+    # Enviar todos los archivos generados
+    if len(archivos_generados) == 1:
+        # Si solo se genera un archivo, se devuelve directamente
+        return send_file(BytesIO(archivos_generados[0]['content']), download_name=archivos_generados[0]['filename'], as_attachment=True)
+    else:
+        # Si hay múltiples archivos, se podría comprimir y enviar en un archivo ZIP
+        import zipfile
+        zip_output = BytesIO()
+        with zipfile.ZipFile(zip_output, 'w') as zf:
+            for archivo in archivos_generados:
+                zf.writestr(archivo['filename'], archivo['content'])
+        zip_output.seek(0)
+        return send_file(zip_output, download_name="libro_mayor.zip", as_attachment=True)
