@@ -1,6 +1,6 @@
 from flask import request, redirect, url_for, flash, session, jsonify, render_template, send_file
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
-from app.models.contable_models import obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, actualizar_reglas, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha
+from app.models.contable_models import obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, actualizar_reglas, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha
 from . import accounting_bp
 import pandas as pd
 import io
@@ -124,16 +124,15 @@ def exportar_excel():
 @accounting_bp.route('/exportar_pdf', methods=['GET'])
 
 @accounting_bp.route('/cuentas/obtener/<int:cuenta_id>', methods=['GET'])
-@jwt_required()
 def obtener_cuenta(cuenta_id):
     cuenta = obtener_cuenta_por_id(cuenta_id)
     if cuenta:
         return jsonify(cuenta)
     else:
         return jsonify({'error': 'Cuenta no encontrada'}), 404
+    
 
 @accounting_bp.route('/cuentas/editar/<int:cuenta_id>', methods=['POST'])
-@jwt_required()
 def editar_cuenta(cuenta_id):
     codigo_cuenta = request.form['codigo_cuenta']
     nombre_cuenta = request.form['nombre_cuenta']
@@ -151,11 +150,37 @@ def reglas():
     return render_template('contable/reglas/reglas.html', reglas=reglas)
 
 @accounting_bp.route('/usuarios', methods = ['GET'])
-@jwt_required()
 def usuarios():
     usuarios = obtener_usuarios()
     roles = obtener_roles()
     return render_template('contable/usuarios/usuarios.html', usuarios=usuarios, roles=roles)
+
+@accounting_bp.route('/usuarios/obtener/<int:usuario_id>', methods=['GET'])
+def obtener_usuario(usuario_id):
+    usuario = obtener_usuario_por_id_2(usuario_id)
+    if usuario:
+        return jsonify(usuario)
+    else:
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+
+
+
+@accounting_bp.route('/usuarios/actualizar/<int:id_usuario>', methods=['POST'])
+def actualizar_usu(id_usuario):
+    id_rol = request.form['id_rol']
+    usua = request.form['usua']
+    contra = request.form['contra']
+    estado_usuario = request.form['estado_usuario']
+
+    resultado = actualizar_usuario(id_usuario, id_rol, usua, contra, estado_usuario)
+
+    if "error" in resultado:
+        return redirect(url_for('contable.usuarios'))
+    elif resultado.get("code") == 0:
+        return redirect(url_for('contable.usuarios'))
+
+    return redirect(url_for('contable.usuarios'))
+
 
 @accounting_bp.route('/usuarios/agregar', methods=['POST'])
 def agregar_usu():
@@ -187,19 +212,16 @@ def eliminar_usu(usuario_id):
 
 
 @accounting_bp.route('/cuentas/eliminar/<int:cuenta_id>', methods=['POST'])
-@jwt_required()
 def eliminar_cuenta(cuenta_id):
     eliminar_cuenta(cuenta_id)
     return redirect(url_for('contable.cuentas'))
 
 @accounting_bp.route('/reglas/eliminar/<int:regla_id>', methods=['POST'])
-@jwt_required()
 def eliminar_regla(regla_id):
     eliminar_regla_bd(regla_id)  # Llama a la función separada
     return redirect(url_for('contable.reglas'))
 
 @accounting_bp.route('/reglas/editar/<int:regla_id>', methods=['POST'])
-@jwt_required()
 def editar_regla(regla_id):
     nombre_regla = request.form['nombre_regla']
     tipo_transaccion = request.form['tipo_transaccion']
