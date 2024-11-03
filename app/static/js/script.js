@@ -1,37 +1,3 @@
-document.addEventListener('DOMContentLoaded', function () {
-  const editButtons = document.querySelectorAll('.action-button.edit');
-
-  editButtons.forEach(button => {
-    button.addEventListener('click', function () {
-      const cuentaId = this.dataset.cuentaId;
-      openEditModal(cuentaId);
-    });
-  });
-});
-
-function openEditModal(cuentaId) {
-  fetch('/contable/cuentas/obtener/' + cuentaId)
-    .then(response => response.json())
-    .then(data => {
-      if (data.error) {
-        alert('Error: ' + data.error);
-      } else {
-        document.getElementById('codigo_cuenta').value = data.codigo_cuenta;
-        document.getElementById('nombre_cuenta').value = data.nombre_cuenta;
-        document.getElementById('naturaleza').value = data.naturaleza;
-        document.getElementById('estado_cuenta').value = data.estado_cuenta;
-
-        document.getElementById('editCuentaModal').action = '/contable/cuentas/editar/' + cuentaId;
-
-        // Mostrar el modal
-        document.querySelector('.modal-overlay').style.display = 'flex'; // Usa 'flex' si usas flexbox
-
-      }
-    })
-    .catch(error => {
-      console.error('Error fetching account data:', error);
-    });
-}
 
 function openEditUsu(usuarioId) {
   fetch('/contable/usuarios/obtener/' + usuarioId)
@@ -40,21 +6,25 @@ function openEditUsu(usuarioId) {
       if (data.error) {
         alert('Error: ' + data.error);
       } else {
-        document.getElementById('nom_rol').value = data.nom_rol;
+        // Verifica los datos que están siendo asignados
+        console.log("Datos recibidos:", data);
+
+        // Asignar valores a los campos del formulario
+        document.getElementById('rol').value = data.rol;
         document.getElementById('usua').value = data.usua;
-        document.getElementById('contra').value = data.contra;
-        document.getElementById('estado_usuario').value = data.estado_usuario;
+        document.getElementById('contrasena').value = data.contra;
+        document.getElementById('estado').value = data.estado_usuario;
 
-        document.getElementById('editUsuarioModal').action = '/contable/usuarios/editar/' + usuarioId;
-
-        document.querySelector('.modal-overlay').style.display = 'flex';
-
+        // Mostrar el modal de edición
+        document.getElementById('editUsuarioModal').style.display = 'flex';
       }
     })
     .catch(error => {
-      console.error('Error fetching account data:', error);
+      console.error('Error fetching user data:', error);
     });
 }
+
+
 
 function closeModal() {
   document.querySelector('.modal-overlay').style.display = 'none';
@@ -120,6 +90,9 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
+function closeModalUsuEdit() {
+  document.getElementById('editUsuarioModal').style.display = 'none';
+}
 
 function openModalDeleteUsu(idUsuario, nombreUsuario) {
   document.getElementById('deleteUsuarioModal').style.display = 'flex';
@@ -161,29 +134,29 @@ function deleteUsuario() {
   const usuarioId = document.getElementById('deleteUsuarioId').value;
 
   fetch(`/contable/usuarios/eliminar/${usuarioId}`, {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json'
-      }
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    }
   })
-  .then(response => {
+    .then(response => {
       if (response.redirected) {
-          window.location.href = response.url;  // Redirige a la página a la que el servidor haya especificado
+        window.location.href = response.url;  // Redirige a la página a la que el servidor haya especificado
       } else if (response.ok) {
-          alert("Usuario eliminado correctamente");
-          closeModalDeleteUsuario();
-          // Aquí puedes actualizar la interfaz, por ejemplo, eliminando la fila del usuario de la tabla
+        alert("Usuario eliminado correctamente");
+        closeModalDeleteUsuario();
+        // Aquí puedes actualizar la interfaz, por ejemplo, eliminando la fila del usuario de la tabla
       } else {
-          alert("Error al eliminar el usuario");
+        alert("Error al eliminar el usuario");
       }
-  })
-  .catch(error => {
+    })
+    .catch(error => {
       console.error("Error al eliminar el usuario:", error);
-  });
+    });
 }
 
 function submitAddUsuario(event) {
-  event.preventDefault();  
+  event.preventDefault();
 
   const rol = document.getElementById('rol').value;
   const usuario = document.getElementById('usuario').value;
@@ -191,33 +164,33 @@ function submitAddUsuario(event) {
   const estado = document.getElementById('estado').value;
 
   const data = {
-      id_rol: rol,
-      usua: usuario,
-      contra: contrasena,
-      estado_usuario: estado
+    id_rol: rol,
+    usua: usuario,
+    contra: contrasena,
+    estado_usuario: estado
   };
 
   fetch('/contable/usuarios/agregar', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
   })
-  .then(response => {
+    .then(response => {
       if (response.ok) {
-          closeModalUsu();  
-          window.location.reload();  
+        closeModalUsu();
+        window.location.reload();
       } else {
-          return response.json().then(data => {
-              alert(data.message || "Error al añadir el usuario");
-          });
+        return response.json().then(data => {
+          alert(data.message || "Error al añadir el usuario");
+        });
       }
-  })
-  .catch(error => {
+    })
+    .catch(error => {
       console.error("Error:", error);
       alert("Error al conectar con el servidor");
-  });
+    });
 }
 
 

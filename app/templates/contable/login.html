@@ -8,6 +8,16 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
+<style>
+    .btn-login {
+        background-color: #A07CE9;
+        font-weight: bold;
+    }
+
+    .btn-login:hover {
+        background-color: #9333EA;
+    }
+</style>
 
 <body>
     <div class="background-container d-flex align-items-center justify-content-center">
@@ -24,11 +34,13 @@
                     <form method="post" action="{{ url_for('contable.login') }}">
                         <div class="form-group">
                             <label for="username" style="font-weight: bold;">Usuario</label>
-                            <input type="text" class="form-control" id="username" name="username" placeholder="Tormenta" required>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Tormenta"
+                                required>
                         </div>
                         <div class="form-group">
                             <label for="password" style="font-weight: bold;">Contraseña</label>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="********" required>
+                            <input type="password" class="form-control" id="password" name="password"
+                                placeholder="Ingresa tu contraseña" required>
                         </div>
                         <button type="submit" class="btn-login btn-primary w-100">Ingresar</button>
                     </form>
@@ -47,13 +59,15 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header ms-4">
-                    <h6 class="modal-title mt-3 mb-2" style="font-size: 25px; text-align: center; margin-left: 14px;">Inicio de sesión requerido</h6>
+                    <h6 class="modal-title mt-3 mb-2" style="font-size: 25px; text-align: center; margin-left: 14px;">
+                        Inicio de sesión requerido</h6>
                 </div>
                 <div class="modal-body">
                     <p>Debe iniciar sesión para acceder a esta página.</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" onclick="redirectToLogin()">Ir a Iniciar Sesión</button>
+                    <button type="button" class="btn btn-primary" onclick="redirectToLogin()">Ir a Iniciar
+                        Sesión</button>
                 </div>
             </div>
         </div>
@@ -64,7 +78,7 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-        
+
     <script>
         // Función para redirigir al usuario a la página de inicio de sesión
         function redirectToLogin() {
@@ -72,7 +86,7 @@
         }
 
         // Verifica si el parámetro "login_required" está presente en la URL
-        $(document).ready(function() {
+        $(document).ready(function () {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.has('login_required')) {
                 // Muestra el modal si el parámetro está presente

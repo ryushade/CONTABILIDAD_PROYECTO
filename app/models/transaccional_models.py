@@ -689,7 +689,7 @@ def generarPDF(fecha, idComprobante, id_cliente, venta_data, igv, monto_total):
         # Convertir el archivo Excel a PDF usando Aspose.Cells
         from asposecells.api import Workbook as wk
         exc = wk("./app/static/PDF/factura2_copia.xlsx")
-        exc.save("./app/static/PDF/factura.pdf")
+        exc.save(f"./app/static/PDF/{obtener_numero_comprobante(idComprobante)}.pdf")
 
     except Exception as e:
         print("Error en generar PDF:", str(e))
