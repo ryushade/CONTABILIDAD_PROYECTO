@@ -7,8 +7,8 @@ import io
 import random
 from barcode.writer import ImageWriter
 import json
-import jpype     
-import asposecells     
+from spire.xls import *
+from spire.xls.common import *
 # from asposecells.api import Workbook as wk
 import openpyxl
 
@@ -721,14 +721,13 @@ def generarPDF(fecha, idComprobante, id_cliente, venta_data, igv, monto_total):
         # Guardar el archivo con los cambios
         workbook.save('./app/static/PDF/factura2_copia.xlsx')
 
-        # Iniciar la JVM si no está ya iniciada y convertir a PDF
-        if not jpype.isJVMStarted():
-            jpype.startJVM()
-
-        # Convertir el archivo Excel a PDF usando Aspose.Cells
-        from asposecells.api import Workbook as wk
-        exc = wk("./app/static/PDF/factura2_copia.xlsx")
-        exc.save(f"./app/static/PDF/{obtener_numero_comprobante(idComprobante)}.pdf")
+        ## PDFF
+        workbook = Workbook()
+        workbook.LoadFromFile("./app/static/PDF/factura2_copia.xlsx")
+        sheet = workbook.Worksheets['Factura']
+        workbook.ConverterSetting.SheetFitToPage = True
+        sheet.SaveToPdf(f"./app/static/PDF/{obtener_numero_comprobante(idComprobante)}.pdf")
+        workbook.Dispose()
 
     except Exception as e:
         print("Error en generar PDF:", str(e))

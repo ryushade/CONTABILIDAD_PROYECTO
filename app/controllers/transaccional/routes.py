@@ -195,6 +195,7 @@ def registrar_compra():
         
         # Si el registro es exitoso, eliminar la cookie
         if result['success']:
+            response = make_response(redirect(url_for('transaccional.compras')))
             response.delete_cookie('compraData')
 
         return response
