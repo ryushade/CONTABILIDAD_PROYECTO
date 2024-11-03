@@ -17,17 +17,51 @@
     .nav-tabs .nav-link.active {
         border-bottom: 3px solid #1D4ED8;
     }
+
+    .gradient-text {
+        font-size: 3rem;
+        /* Ajusta el tamaño de la fuente según sea necesario */
+        font-weight: 700;
+        /* Hace el texto grueso */
+        background: linear-gradient(90deg, #b279db, #4747f9, #547dfa, #9dc8e4);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .line-with-text {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        color: #4A5568;
+        font-size: 0.9rem;
+    }
+
+    .line-with-text::before,
+    .line-with-text::after {
+        content: "";
+        flex: 1;
+        border-bottom: 1px solid #E2E8F0;
+        /* Color y grosor de la línea */
+        margin: 0 10px;
+    }
 </style>
+
 
 <div class="mt-2 p-2 ms-5">
     <header class="mb-4 mt-4 text-center">
-        <h1 class="title"
-            style="font-weight: 700; font-size: 2.5rem; background: linear-gradient(90deg, #0D1A54, #1976D2, #00ADEF); -webkit-background-clip: text; color: transparent; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);">
+        <h1 class="gradient-text">
             MÓDULOS DEL SISTEMA
         </h1>
+
+
+
+
+
+
+
     </header>
-
-
 
     <!-- Tabs de Reporte -->
     <div class="mb-4">
@@ -45,7 +79,10 @@
         <!-- Sistema Transaccional -->
         <div class="tab-pane fade show active fade-lazy" id="sistrans">
             <div class="mb-4">
-                <hr>
+                <div class="line-with-text">
+                    <span>Detalles</span>
+                </div>
+
                 <p class="text-muted" style="font-size: 14px;">
                     Podrás visualizar los módulos de ventas, compras, almacén de acuerdo al rol del usuario.
                 </p>
@@ -139,7 +176,9 @@
         <!-- Sistema Contable -->
         <div class="tab-pane fade fade-lazy" id="siscon">
             <div class="mb-4">
-                <hr>
+                <div class="line-with-text">
+                    <span>Detalles</span>
+                </div>
                 <p class="text-muted" style="font-size: 14px;">
                     Podrás visualizar el módulo contable de acuerdo al rol del usuario.
                 </p>

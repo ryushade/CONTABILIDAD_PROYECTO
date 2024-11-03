@@ -58,8 +58,26 @@ def obtener_usuario_por_id_2(usuario_id):
 def obtener_regla_por_id(regla_id):
     connection = obtener_conexion()
     try:
-        with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-            sql = "SELECT * FROM reglas_contabilizacion WHERE id_regla = %s"
+        with connection.cursor() as cursor:
+            sql = """
+            SELECT 
+                r.id_regla, 
+                r.nombre_regla,
+                r.tipo_transaccion,
+                r.estado,
+                c_debe.codigo_cuenta AS cuenta_debe_codigo,
+                c_debe.nombre_cuenta AS cuenta_debe_nombre,
+                c_haber.codigo_cuenta AS cuenta_haber_codigo,
+                c_haber.nombre_cuenta AS cuenta_haber_nombre
+            FROM 
+                reglas_contabilizacion r
+            LEFT JOIN 
+                cuenta c_debe ON r.cuenta_debe = c_debe.id_cuenta
+            LEFT JOIN 
+                cuenta c_haber ON r.cuenta_haber = c_haber.id_cuenta
+            WHERE
+                r.id_regla = %s
+            """
             cursor.execute(sql, (regla_id,))
             regla = cursor.fetchone()
             return regla
@@ -369,12 +387,29 @@ def obtener_reglas():
     connection = obtener_conexion()
     try:
         with connection.cursor() as cursor:
-            sql = """SELECT id_regla, tipo_transaccion, cuenta_debe, cuenta_haber, nombre_regla, estado FROM reglas_contabilizacion"""
+            sql = """
+            SELECT 
+                r.id_regla, 
+                r.tipo_transaccion, 
+                c_debe.codigo_cuenta AS cuenta_debe_codigo, 
+                c_debe.nombre_cuenta AS cuenta_debe_nombre,
+                c_haber.codigo_cuenta AS cuenta_haber_codigo, 
+                c_haber.nombre_cuenta AS cuenta_haber_nombre,
+                r.nombre_regla, 
+                r.estado 
+            FROM 
+                reglas_contabilizacion r
+            LEFT JOIN 
+                cuenta c_debe ON r.cuenta_debe = c_debe.id_cuenta
+            LEFT JOIN 
+                cuenta c_haber ON r.cuenta_haber = c_haber.id_cuenta
+            """
             cursor.execute(sql)
             reglas = cursor.fetchall()  
             return reglas  
     finally:
         connection.close()
+
 
 def actualizar_reglas(id_regla, nombre_regla, tipo_transaccion, cuenta_debe, cuenta_haber, estado):
     connection = obtener_conexion()

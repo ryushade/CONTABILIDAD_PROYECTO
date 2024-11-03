@@ -179,11 +179,14 @@ def obtener_detalles_regla(regla_id):
             "nombre_regla": regla.get("nombre_regla"),
             "tipo_transaccion": regla.get("tipo_transaccion"),
             "estado": "Activo" if regla.get("estado") == 1 else "Inactivo",
-            "cuenta_debito": regla.get("cuenta_debe"),
-            "cuenta_credito": regla.get("cuenta_haber")
+            "cuenta_debito_codigo": regla.get("cuenta_debe_codigo"),
+            "cuenta_debito_nombre": regla.get("cuenta_debe_nombre"),
+            "cuenta_credito_codigo": regla.get("cuenta_haber_codigo"),
+            "cuenta_credito_nombre": regla.get("cuenta_haber_nombre")
         })
     else:
         return jsonify({'error': 'Regla no encontrada'}), 404
+
 
 
 @accounting_bp.route('/usuarios/actualizar/<int:id_usuario>', methods=['POST'])
