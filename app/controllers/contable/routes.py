@@ -189,6 +189,7 @@ def obtener_detalles_regla(regla_id):
 
 
 
+
 @accounting_bp.route('/usuarios/actualizar/<int:id_usuario>', methods=['POST'])
 def actualizar_usu(id_usuario):
     id_rol = request.form['id_rol']
