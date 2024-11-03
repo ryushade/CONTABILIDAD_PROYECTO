@@ -58,8 +58,26 @@ def obtener_usuario_por_id_2(usuario_id):
 def obtener_regla_por_id(regla_id):
     connection = obtener_conexion()
     try:
-        with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-            sql = "SELECT * FROM reglas_contabilizacion WHERE id_regla = %s"
+        with connection.cursor() as cursor:
+            sql = """
+            SELECT 
+                r.id_regla, 
+                r.nombre_regla,
+                r.tipo_transaccion,
+                r.estado,
+                c_debe.codigo_cuenta AS cuenta_debe_codigo,
+                c_debe.nombre_cuenta AS cuenta_debe_nombre,
+                c_haber.codigo_cuenta AS cuenta_haber_codigo,
+                c_haber.nombre_cuenta AS cuenta_haber_nombre
+            FROM 
+                reglas_contabilizacion r
+            LEFT JOIN 
+                cuenta c_debe ON r.cuenta_debe = c_debe.id_cuenta
+            LEFT JOIN 
+                cuenta c_haber ON r.cuenta_haber = c_haber.id_cuenta
+            WHERE
+                r.id_regla = %s
+            """
             cursor.execute(sql, (regla_id,))
             regla = cursor.fetchone()
             return regla
@@ -369,12 +387,29 @@ def obtener_reglas():
     connection = obtener_conexion()
     try:
         with connection.cursor() as cursor:
-            sql = """SELECT id_regla, tipo_transaccion, cuenta_debe, cuenta_haber, nombre_regla, estado FROM reglas_contabilizacion"""
+            sql = """
+            SELECT 
+                r.id_regla, 
+                r.tipo_transaccion, 
+                c_debe.codigo_cuenta AS cuenta_debe_codigo, 
+                c_debe.nombre_cuenta AS cuenta_debe_nombre,
+                c_haber.codigo_cuenta AS cuenta_haber_codigo, 
+                c_haber.nombre_cuenta AS cuenta_haber_nombre,
+                r.nombre_regla, 
+                r.estado 
+            FROM 
+                reglas_contabilizacion r
+            LEFT JOIN 
+                cuenta c_debe ON r.cuenta_debe = c_debe.id_cuenta
+            LEFT JOIN 
+                cuenta c_haber ON r.cuenta_haber = c_haber.id_cuenta
+            """
             cursor.execute(sql)
             reglas = cursor.fetchall()  
             return reglas  
     finally:
         connection.close()
+
 
 def actualizar_reglas(id_regla, nombre_regla, tipo_transaccion, cuenta_debe, cuenta_haber, estado):
     connection = obtener_conexion()
@@ -501,5 +536,45 @@ def obtener_libro_mayor_agrupado_por_fecha():
             total_haber_global += haber
 
         return libro_mayor, total_debe_global, total_haber_global
+    finally:
+        conexion.close()
+
+
+def obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor(DictCursor) as cursor:
+            cursor.execute("""
+                SELECT 
+                    cu.codigo_cuenta, 
+                    cu.nombre_cuenta, 
+                    a.fecha_asiento, 
+                    LEFT(MIN(a.glosa), LOCATE('SEGÚN', MIN(a.glosa)) - 1) AS glosa,
+                    SUM(d.debe) AS total_debe, 
+                    SUM(d.haber) AS total_haber
+                FROM 
+                    asiento_contable a
+                INNER JOIN 
+                    detalle_asiento d ON a.id_asiento = d.id_asiento
+                INNER JOIN 
+                    cuenta cu ON cu.id_cuenta = d.id_cuenta
+                GROUP BY 
+                    cu.codigo_cuenta, cu.nombre_cuenta, a.fecha_asiento
+                ORDER BY 
+                    cu.codigo_cuenta, a.fecha_asiento;
+            """)
+            resultados = cursor.fetchall()
+
+        libro_mayor = defaultdict(list)
+
+        for row in resultados:
+            libro_mayor[row['codigo_cuenta']].append({
+                'fecha_asiento': row['fecha_asiento'],
+                'glosa': row['glosa'],
+                'total_debe': row['total_debe'],
+                'total_haber': row['total_haber']
+            })
+
+        return libro_mayor
     finally:
         conexion.close()
