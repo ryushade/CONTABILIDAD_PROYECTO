@@ -159,7 +159,13 @@ def usuarios():
 def obtener_usuario(usuario_id):
     usuario = obtener_usuario_por_id_2(usuario_id)
     if usuario:
-        return jsonify(usuario)
+        # Devuelve todos los datos necesarios del usuario en formato JSON
+        return jsonify({
+            "rol": usuario.get("rol"),
+            "usua": usuario.get("usua"),
+            "contra": usuario.get("contra"),
+            "estado_usuario": usuario.get("estado_usuario")
+        })
     else:
         return jsonify({'error': 'Usuario no encontrado'}), 404
 

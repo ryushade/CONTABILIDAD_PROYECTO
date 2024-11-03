@@ -6,16 +6,16 @@ function openEditUsu(usuarioId) {
       if (data.error) {
         alert('Error: ' + data.error);
       } else {
+        // Verifica los datos que están siendo asignados
+        console.log("Datos recibidos:", data);
+
         // Asignar valores a los campos del formulario
-        document.getElementById('rol').value = data.rol;  // Verifica que `data.rol` es el nombre correcto del campo
+        document.getElementById('rol').value = data.rol;
         document.getElementById('usua').value = data.usua;
         document.getElementById('contrasena').value = data.contra;
         document.getElementById('estado').value = data.estado_usuario;
 
-        // Configurar la acción del formulario de edición
-        document.getElementById('editUsuarioModal').action = '/contable/usuarios/editar/' + usuarioId;
-
-        // Muestra el modal
+        // Mostrar el modal de edición
         document.getElementById('editUsuarioModal').style.display = 'flex';
       }
     })
@@ -23,6 +23,7 @@ function openEditUsu(usuarioId) {
       console.error('Error fetching user data:', error);
     });
 }
+
 
 
 function closeModal() {
