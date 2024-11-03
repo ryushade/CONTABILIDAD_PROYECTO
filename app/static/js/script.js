@@ -157,6 +157,69 @@ function deleteCuenta() {
   form.submit();
 }
 
+function deleteUsuario() {
+  const usuarioId = document.getElementById('deleteUsuarioId').value;
+
+  fetch(`/contable/usuarios/eliminar/${usuarioId}`, {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      }
+  })
+  .then(response => {
+      if (response.redirected) {
+          window.location.href = response.url;  // Redirige a la página a la que el servidor haya especificado
+      } else if (response.ok) {
+          alert("Usuario eliminado correctamente");
+          closeModalDeleteUsuario();
+          // Aquí puedes actualizar la interfaz, por ejemplo, eliminando la fila del usuario de la tabla
+      } else {
+          alert("Error al eliminar el usuario");
+      }
+  })
+  .catch(error => {
+      console.error("Error al eliminar el usuario:", error);
+  });
+}
+
+function submitAddUsuario(event) {
+  event.preventDefault();  
+
+  const rol = document.getElementById('rol').value;
+  const usuario = document.getElementById('usuario').value;
+  const contrasena = document.getElementById('contrasena').value;
+  const estado = document.getElementById('estado').value;
+
+  const data = {
+      id_rol: rol,
+      usua: usuario,
+      contra: contrasena,
+      estado_usuario: estado
+  };
+
+  fetch('/contable/usuarios/agregar', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+  })
+  .then(response => {
+      if (response.ok) {
+          closeModalUsu();  
+          window.location.reload();  
+      } else {
+          return response.json().then(data => {
+              alert(data.message || "Error al añadir el usuario");
+          });
+      }
+  })
+  .catch(error => {
+      console.error("Error:", error);
+      alert("Error al conectar con el servidor");
+  });
+}
+
 
 function openModalVerRegla(nombre_regla, tipo_transaccion, estado, cuenta_debito, cuenta_credito) {
   document.getElementById('openVerModal').style.display = 'flex';
