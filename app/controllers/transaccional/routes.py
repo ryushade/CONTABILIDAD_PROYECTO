@@ -1,10 +1,10 @@
-
+import json
 from urllib import response
 from flask import current_app, make_response, render_template, send_file
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from flask import render_template, send_file, request, jsonify, redirect, url_for, flash
-from app.models.transaccional_models import obtener_productos, obtener_ventas, obtener_marcas, obtener_categorias, obtener_ingresos, obtener_nota_salida, obtener_inventario, obtener_subcategorias_por_categoria, agregar_producto, obtener_inventario_vigente, listarClientes, obtener_id_sucursal, obtener_ultimo_comprobante, obtener_ventas_con_detalles, obtener_compras
+from app.models.transaccional_models import obtener_productos, obtener_ventas, obtener_marcas, obtener_categorias, obtener_ingresos, obtener_nota_salida, obtener_inventario, obtener_subcategorias_por_categoria, agregar_producto, obtener_inventario_vigente, listarClientes, obtener_id_sucursal, obtener_ultimo_comprobante, obtener_ventas_con_detalles, obtener_proveedor, obtener_almacen
 
 import app.models.transaccional_models as transac 
 from app.models.transaccional_models import generate_barcode
@@ -156,6 +156,49 @@ def add_venta():
 @transactional_bp.route('/compras')
 @jwt_required()
 def compras():
-    compras = obtener_compras()
-    return render_template('transaccional/compras/compras.html', compras=compras)
-#----------------------------------------------
+    proveedor = obtener_proveedor()
+    almacen = obtener_almacen()
+    categoria = obtener_categorias()
+    datos_inventario = obtener_inventario_vigente()
+    return render_template('transaccional/compras/compras.html', compras=compras, proveedor=proveedor, almacen=almacen, categoria=categoria, datos_inventario=datos_inventario)
+
+
+@transactional_bp.route('/registrar_compra', methods=['POST'])
+def registrar_compra():
+    try:
+        # Obtener los datos de la cookie
+        compra_data = request.cookies.get('compraData')
+        print("Datos de la cookie compraData:", compra_data)
+
+        # Asegurar que compra_data no sea None
+        if compra_data:
+            productos = json.loads(compra_data)
+        else:
+            return jsonify({'success': False, 'message': 'No hay datos de productos en la cookie.'})
+
+        # Capturar otros datos del formulario
+        proveedor = request.form.get('proveedor')
+        nro_comprobante = request.form.get('nro_comprobante')
+        almacen = request.form.get('almacen')
+        fecha = request.form.get('fecha')
+        igv = request.form.get('igv')
+        monto_total = request.form.get('monto_total')
+
+        print(f"Proveedor: {proveedor}, Nro Comprobante: {nro_comprobante}, Almacén: {almacen}, Fecha: {fecha}, IGV: {igv}, Monto Total: {monto_total}")
+        print("Productos:", productos)  # Verifica la estructura de productos
+
+        # Llamar a la función para registrar la compra
+        result = transac.registrar_compra(proveedor, nro_comprobante, almacen, fecha, igv, monto_total, productos)
+
+        # Preparar la respuesta
+        response = make_response(jsonify(result))
+        
+        # Si el registro es exitoso, eliminar la cookie
+        if result['success']:
+            response = make_response(redirect(url_for('transaccional.compras')))
+            response.delete_cookie('compraData')
+
+        return response
+    except Exception as e:
+        print("Error en registrar_compra:", str(e))
+        return jsonify({'success': False, 'message': 'Error al registrar la compra.'})

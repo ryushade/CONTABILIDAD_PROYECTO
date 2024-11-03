@@ -7,11 +7,11 @@
 {% block content %}
 <header class="mb-4">
     {{ breadcrumb([
-        {'label': 'Inicio', 'url': url_for('inicio'), 'icon': 'M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0
-        001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0
-        001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z'},
-        {'label': 'Compras', 'url': url_for('transaccional.compras')}
-        ]) }}
+    {'label': 'Inicio', 'url': url_for('inicio'), 'icon': 'M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0
+    001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0
+    001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z'},
+    {'label': 'Compras', 'url': url_for('transaccional.compras')}
+    ]) }}
     <h1 class="text-8xl font-bold tracking-wide text-gray-700 title-Inicio">MÓDULO COMPRAS</h1>
 </header>
 
@@ -42,7 +42,7 @@
         border-radius: 12px;
     }
 
-   
+
 
     .dropdown-toggle:focus {
         outline: none;
@@ -99,182 +99,146 @@
 
     </div>
 
-    <form>
+    <form id="compraForm" method="post" action="{{ url_for('transaccional.registrar_compra') }}">
         <div class="row align-items-center">
-            <div class="col-lg-3">
+            <div class="col-lg-4">
                 <div class="row">
                     <div class="col-lg-4">
                         <h6 class="mt-2"><b>Proveedor:</b></h6>
                     </div>
                     <div class="col-lg-8">
-                        <select class="form-control" aria-label="Default select example" id="provider">
+                        <select class="form-control" aria-label="Default select example" name="proveedor" id="provider">
                             <option selected>Seleccione...</option>
-                            <option value="1">CORPORACION 1</option>
-                            <option value="2">CORPORACION 2</option>
-                            <option value="3">CORPORACION 3</option>
-                            <option value="4">CORPORACION 4</option>
-                            <option value="5">CORPORACION 5</option>
+                            {% for proveedor in proveedor %}
+                            <option value="{{proveedor.id_proveedor}}">{{proveedor.razon_social}}</option>
+                            {% endfor %}
                         </select>
                     </div>
                 </div>
             </div>
 
-            <div class="col-lg-5">
+            <div class="col-lg-4">
                 <div class="row align-items-center">
                     <div class="col-lg-4">
-                        <h6 class="mt-2"><b>Tipo Comprobante:</b></h6>
+                        <h6 class="mt-2"><b>Nro. Comprobante:</b></h6>
                     </div>
                     <div class="col-lg-8">
-                        <select class="form-control" aria-label="Default select example" id="tipoComprobante">
-                            <option selected>BOLETA</option>
-                            <option value="1">FACTURA</option>
-                            <option value="2">???</option>
-                            <!-- <option value="3">CORPORACION 3</option>
-                            <option value="4">CORPORACION 4</option>
-                            <option value="5">CORPORACION 5</option> -->
-                        </select>
+                        <div>
+                            <!-- <span class="input-group-text" id="basic-addon1"><i class="fa-solid fa-magnifying-glass"></i></span> -->
+                            <input type="text" class="form-control" name="nro_comprobante" placeholder="B000-000000"
+                                aria-label="razonsosial" aria-describedby="basic-addon1">
+                        </div>
                     </div>
                 </div>
             </div>
+
             <div class="col-lg-4">
                 <div class="row align-items-center">
-                    <div class="col-lg-6">
-                        <h6 class="mt-2"><b>Nro. Comprobante:</b></h6>
+                    <div class="col-lg-4">
+                        <h6 class="mt-2"><b>Forma de Pago:</b></h6>
                     </div>
-                    <div class="col-lg-6">
-                        <div>
-                            <!-- <span class="input-group-text" id="basic-addon1"><i class="fa-solid fa-magnifying-glass"></i></span> -->
-                            <input type="text" class="form-control" placeholder="B000-000000" aria-label="razonsosial"
-                                aria-describedby="basic-addon1">
-                        </div>
+                    <div class="col-lg-8">
+                        <select class="form-control" aria-label="Default select example" name="forma_pago"
+                            id="formaPago">
+                            <option selected>Seleccione...</option>
+                            <option value="1">Efectivo</option>
+                            <option value="2">Yape</option>
+                            <option value="3">Plin</option>
+                            <option value="3">Visa</option>
+                            <option value="4">America Express</option>
+                        </select>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="row align-items-center" style="margin-top: 10px;">
-            <div class="col-lg-3">
-                <div class="row align-items-center">
-                    <div class="col-lg-4">
-                        <h6 class="mt-2"><b>Forma de Pago:</b></h6>
-                    </div>
-                    <div class="col-lg-8">
-                        <select class="form-control" aria-label="Default select example" id="formaPago">
-                            <option selected>CONTADO</option>
-                            <option value="1">???</option>
-                            <option value="2">???</option>
-                            <!-- <option value="3">CORPORACION 3</option>
-                        <option value="4">CORPORACION 4</option>
-                        <option value="5">CORPORACION 5</option> -->
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3">
-                <div class="row align-items-center">
-                    <div class="col-lg-4">
-                        <h6 class="mt-2"><b>Sucursal:</b></h6>
-                    </div>
-                    <div class="col-lg-8">
-                        <select class="form-control" aria-label="Default select example" id="sucursal">
-                            <option selected>TIENDA PRINCIPAL</option>
-                            <option value="1">???</option>
-                            <option value="2">???</option>
-                            <!-- <option value="3">CORPORACION 3</option>
-                            <option value="4">CORPORACION 4</option>
-                            <option value="5">CORPORACION 5</option> -->
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3">
+            <div class="col-lg-4">
                 <div class="row">
                     <div class="col-lg-4">
                         <h6 class="mt-2"><b>Almacen:</b></h6>
                     </div>
                     <div class="col-lg-8">
-                        <select class="form-control" aria-label="Default select example" id="almacen">
-                            <option selected>PRINCIPAL</option>
-                            <option value="1">???</option>
-                            <option value="2">???</option>
-                            <!-- <option value="3">CORPORACION 3</option>
-                            <option value="4">CORPORACION 4</option>
-                            <option value="5">CORPORACION 5</option> -->
+                        <select class="form-control" aria-label="Default select example" name="almacen" id="almacen">
+                            <option selected>Seleccione...</option>
+                            {% for almacen in almacen %}
+                            <option value="1">{{almacen.nom_almacen}}</option>
+                            {% endfor %}
                         </select>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-3">
+            <div class="col-lg-4">
                 <div class="row align-items-center">
-                    <div class="col-lg-3">
+                    <div class="col-lg-4">
                         <h6 class="mt-2"><b>Fecha:</b></h6>
                     </div>
-                    <div class="col-lg-9">
+                    <div class="col-lg-8">
                         <div class="input-group input-group-md">
-                            <input type="date" class="form-control" id="date">
+                            <input type="date" class="form-control" name="fecha" id="date">
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-lg-10">
+            </div>
+            <div class="col-lg-2 text-end">
+                <button type="button" class="btn btn-success mt-4" style="width: 100%;" data-bs-toggle="modal"
+                    data-bs-target="#productModal">Agregar</button>
+            </div>
+        </div>
         <!------------------------------------------------------------------------------------------------>
         <div class="row" style="margin-bottom: 7%;">
             <div class="container mt-4">
-                <div class="d-flex align-items-center me-2 mb-2">
-                    <div class="input-group flex-grow-1" style="max-width: 50%;">
-                        <input type="text" class="form-control" placeholder="Buscar un producto aquí..."
-                            aria-label="Buscar">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="text-center" style="font-weight: bolder;">Producto</th>
+                                <th class="text-center" style="font-weight: bolder;">Cantidad</th>
+                                <th class="text-center" style="font-weight: bolder;">Precio unitario</th>
+                                <th class="text-center" style="font-weight: bolder;">Subtotal</th>
+                                <th class="text-center" style="font-weight: bolder;">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Aquí se agregarán los productos seleccionados del modal -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="flex justify-content-end container mt-4">
+                    <div class="flex flex-col w-100">
+                        <div class="flex justify-between y-1 items-center row justify-content-end">
+                            <span class="fw-bolder d-flex align-items-center span-title me-3">IMPORTE</span>
+                            <span class="inputs-montos" id="importe">S/. 0.00</span>
+                        </div>
+                        <div class="flex justify-between my-1 items-center row justify-content-end">
+                            <span class="fw-bolder d-flex align-items-center span-title me-3">IGV</span>
+                            <span class="inputs-montos">S/. <span id="igvDisplay">0.00</span></span>
+                            <input type="hidden" name="igv" id="igv" value="0.00">
+                        </div>
+
+                        <div class="flex justify-between my-1 items-center row justify-content-end">
+                            <span class="fw-bolder d-flex align-items-center span-title me-3">TOTAL</span>
+                            <span class="inputs-montos">S/. <span id="monto_totalDisplay">0.00</span></span>
+                            <input type="hidden" name="monto_total" id="monto_total" value="0.00">
+                        </div>
                     </div>
                 </div>
-                <div class="table-container mt-4">
-                    <div class="table-scroll">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th class="text-center">ID COMPRA</th>
-                                    <th class="text-center">RAZÓN SOCIAL</th>
-                                    <th class="text-center">FECHA DE COMPRA</th>
-                                    <th class="text-center">SUBCATEGORÍA</th>
-                                    <th class="text-center">SUBTOTAL</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for dato in compras %}
-                                <tr>
-                                    <td class="text-center">{{data.id_compra}}</td>
-                                    <td class="text-center">{{data.razon_social}}</td>
-                                    <td class="text-center">{{data.fecha_compra}}</td>
-                                    <td class="text-center">{{data.nom_subcat}}</td>
-                                    <td class="text-center">{{data.subtotal}}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+
                 <div>
                     <div class="row">
                         <div class="col-lg-10">
                         </div>
                         <div class="col-lg-2 mt-4 text-end">
-                            <button class="btn btn-success" style="width: 100%;">Guardar Compra</button>
+                            <button type="submit" class="btn btn-success" style="width: 100%;">Guardar Compra</button>
                         </div>
                     </div>
                 </div>
-                <!-- Paginación -->
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination mt-3">
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&lt;</a>
-                        </li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">&gt;</a>
-                        </li>
-                    </ul>
-                </nav>
             </div>
         </div>
     </form>
@@ -291,5 +255,195 @@
     </div>
 </div>
 </div>
+
+<!-- Modal para Categorias -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title ms-3 mt-3 mb-2" id="productModalLabel">Busque y seleccione el producto</h5>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="modalSearchInput" placeholder="Realice la búsqueda del producto por el nombre"
+                    class="form-control mb-3" />
+                <div style="max-height: 50vh; overflow-y: auto;">
+                    <table class="table" id="detalleCompraTable">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Precio</th>
+                                <th>Stock</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productTableBody">
+                            {% for producto in datos_inventario %}
+                            <tr>
+                                <td>{{ producto.nombre }}</td>
+                                <td>S/ {{ producto.precio }}</td>
+                                <td>{{ producto.stock }}</td>
+                                <td><button type="button" class="btn btn-primary btn-seleccionar"
+                                        onclick="addToTable('{{ producto.nombre }}', {{ producto.precio }})">Seleccionar</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // Búsqueda en tiempo real en el modal
+    document.getElementById('modalSearchInput').addEventListener('input', function () {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#productTableBody tr');
+
+        rows.forEach(row => {
+            const nombre = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+            if (nombre.includes(filter)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+
+    function addToTable(nombre, precio) {
+        // Selecciona el cuerpo de la tabla en la clase "table-container"
+        const tableBody = document.querySelector(".table-container tbody");
+
+        // Verifica si el producto ya existe en la tabla
+        const existingRow = Array.from(tableBody.rows).find(row => row.cells[0].textContent === nombre);
+
+        if (existingRow) {
+            // Si el producto ya existe, actualiza la cantidad y el subtotal
+            updateQuantity(existingRow, 1, precio);
+        } else {
+            // Si el producto no existe, crea una nueva fila
+            const newRow = document.createElement("tr");
+            newRow.innerHTML = `
+            <td class="text-center">${nombre}</td>
+            <td class="text-center">
+                <button type="button" onclick="updateQuantity(this.parentElement.parentElement, -1, ${precio})">-</button>
+                <span class="quantity">1</span>
+                <button type="button" onclick="updateQuantity(this.parentElement.parentElement, 1, ${precio})">+</button>
+            </td>
+            <td class="text-center">S/ ${precio.toFixed(2)}</td>
+            <td class="text-center subtotal">S/ ${precio.toFixed(2)}</td>
+            <td class="text-center">
+                <button type="button" class="btn btn-danger" onclick="removeRow(this)">Eliminar</button>
+            </td>
+        `;
+            tableBody.appendChild(newRow);
+        }
+        console.log(`Producto agregado a la tabla: ${nombre}, ${precio}`); // Debugging statement
+        updateTotals(); // Actualiza los totales después de añadir el producto
+    }
+
+    // Función para actualizar la cantidad y el subtotal
+    function updateQuantity(row, amount, unitPrice) {
+        const quantityElement = row.querySelector('.quantity');
+        let quantity = parseInt(quantityElement.textContent);
+        quantity += amount;
+        if (quantity < 1) quantity = 1; // Asegura que la cantidad no sea menor a 1
+        quantityElement.textContent = quantity;
+
+        // Actualiza el subtotal
+        const subtotalElement = row.querySelector('.subtotal');
+        subtotalElement.textContent = `S/ ${(quantity * unitPrice).toFixed(2)}`;
+
+        updateTotals(); // Actualiza los totales después de cambiar la cantidad
+    }
+
+    // Función para eliminar una fila
+    function removeRow(button) {
+        const row = button.parentElement.parentElement;
+        row.remove();
+        updateTotals(); // Actualiza los totales después de eliminar una fila
+    }
+
+    // Función para actualizar el total y el IGV
+    function updateTotals() {
+        const tableBody = document.querySelector(".table-container tbody");
+        let total = 0;
+
+        // Calcula el total
+        Array.from(tableBody.rows).forEach(row => {
+            const subtotalText = row.querySelector('.subtotal').textContent;
+            const subtotal = parseFloat(subtotalText.replace('S/ ', ''));
+            total += subtotal;
+        });
+
+        // Calcula el IGV (asumiendo un 18% de IGV)
+        const igv = total * 0.18;
+
+        // Actualiza los elementos en el DOM
+        document.getElementById('importe').textContent = `S/. ${total.toFixed(2)}`;
+        document.getElementById('igvDisplay').textContent = igv.toFixed(2);
+        document.getElementById('monto_totalDisplay').textContent = (total + igv).toFixed(2);
+
+        // Actualiza los inputs ocultos
+        document.getElementById('igv').value = igv.toFixed(2);
+        document.getElementById('monto_total').value = (total + igv).toFixed(2);
+    }
+
+    // Función para cerrar el modal
+    function closeModal() {
+        const modal = document.getElementById('productModal');
+        const modalInstance = bootstrap.Modal.getInstance(modal);
+        modalInstance.hide();
+    }
+
+    // Función para obtener los datos de la tabla de compra
+    function getCompraDataTable() {
+        const rows = document.querySelectorAll(".table-container tbody tr");
+        let data = [];
+
+        rows.forEach(row => {
+            let nombre = row.cells[0].textContent;
+            let cantidad = row.cells[1].querySelector(".quantity").textContent;
+            let precio = row.cells[2].textContent.replace('S/ ', '');
+            let subtotal = row.cells[3].textContent.replace('S/ ', '');
+
+            data.push({
+                nombre: nombre,
+                cantidad: parseInt(cantidad),
+                precio: parseFloat(precio),
+                subtotal: parseFloat(subtotal)
+            });
+        });
+
+        console.log("Datos recopilados de la tabla:", data); // Debugging statement
+        return JSON.stringify(data);
+    }
+
+    function saveCompraDataToCookie(jsonData) {
+        const d = new Date();
+        d.setTime(d.getTime() + (24 * 60 * 60 * 1000)); // Expira en 1 día
+        let expires = "expires=" + d.toUTCString();
+        document.cookie = "compraData=" + jsonData + ";" + expires + ";path=/";
+    }
+
+    // Modificar el listener al evento submit del formulario
+    document.getElementById('compraForm').addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevenir el envío por defecto del formulario
+        const jsonData = getCompraDataTable();
+        
+        console.log("Datos capturados para enviar:", jsonData);  // Verifica el JSON antes de enviarlo
+        saveCompraDataToCookie(jsonData);
+        alert('Compra registrada exitosamente.');
+        // Ahora, enviar el formulario programáticamente después de asegurar que la cookie se ha establecido
+        this.submit();
+    });
+
+
+</script>
 
 {% endblock %}
