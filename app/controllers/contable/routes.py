@@ -262,11 +262,7 @@ def ldpf():
 @accounting_bp.route('/exportar_libro_diario_excel', methods=['GET'])
 @jwt_required()
 def exportar_libro_diario_excel():
-    import openpyxl
-    import os
-    from flask import current_app, send_file
     from io import BytesIO
-    from datetime import datetime
 
     # Ruta de la plantilla
     template_path = os.path.join(current_app.root_path, 'templates', 'contable', 'plantillas', 'L,D.xlsx')
