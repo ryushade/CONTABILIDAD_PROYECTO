@@ -8,9 +8,9 @@ import random
 from barcode.writer import ImageWriter
 import json
 import jpype     
-#import asposecells     
-#from asposecells.api import Workbook as wk
-#import openpyxl
+import asposecells     
+# from asposecells.api import Workbook as wk
+import openpyxl
 
 def obtener_marcas():
     conexion = obtener_conexion()
@@ -624,66 +624,78 @@ def vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_t
             conexion.commit()
             print("Venta registrada exitosamente")
             # Asegúrate de confirmar los cambios
-            #generarPDF(f_venta, id_comprobante, id_cliente, venta_data, igv, monto_total)
+            generarPDF(f_venta, id_comprobante, id_cliente, venta_data, igv, monto_total)
             print("vendido y generado PDF")
     except Exception as e:
         print("Error en vender:", str(e))
         print(repr(e))  # Información detallada del error
         raise  # Propaga la excepción para ver el error completo
 
-# def generarPDF(fecha, idComprobante, id_cliente, venta_data, igv, monto_total):
-#     try:
-#         workbook = openpyxl.load_workbook('factura2.xlsx')
-#         sheet = workbook['Factura']
-#         cliente = obtener_cliente(id_cliente)
-#         sheet['F2'] = fecha # Fecha venta
-#         sheet['F3'] = obtener_numero_comprobante(idComprobante) # Numero de factura
-#         sheet['F4'] = cliente['identificacion']  # RUC del cliente
-        
-#         sheet['A9'] = cliente['nombre_completo']  # Nombre del cliente
-#         sheet['A10'] = cliente['direccion']  # direccion del cliente
-        
-#         # Asumimos que los detalles comienzan en la fila 12
-#         fila_inicial = 12
+import openpyxl
+import jpype
 
-#         # Iterar sobre cada producto en venta_data
-#         for i, producto in enumerate(venta_data):
-#             nombre = producto['nombre']
-#             cantidad = producto['cantidad']
-#             precio = producto['precio']
-#             subtotal = producto['subtotal']
+def generarPDF(fecha, idComprobante, id_cliente, venta_data, igv, monto_total):
+    try:
+        # Cargar el archivo Excel
+        workbook = openpyxl.load_workbook('./app/static/factura2.xlsx')
+        sheet = workbook['Factura']
 
-#             # Determinar la fila actual
-#             fila_actual = fila_inicial + i
+        # Obtener información del cliente
+        cliente = obtener_cliente(id_cliente)
+        sheet['F2'] = fecha  # Fecha de venta
+        sheet['F3'] = obtener_numero_comprobante(idComprobante)  # Número de factura
+        sheet['F4'] = str(cliente['identificacion'])  # RUC del cliente
 
-#             # Insertar los datos en la fila correspondiente
-#             sheet[f'A{fila_actual}'] = f"{nombre} - {cantidad} - {precio}"  # Descripción
-#             sheet[f'F{fila_actual}'] = subtotal  # Subtotal    
+        # Información del cliente
+        sheet['A9'] = cliente['nombre_completo']  # Nombre del cliente
+        sheet['A10'] = cliente['direccion']  # Dirección del cliente
 
-#         # Calcular las nuevas posiciones para F18, F20, y F22
-#         nueva_fila_inicial = fila_inicial + len(venta_data)  # Nueva posición inicial después de los productos
-#         fila_subtotal = nueva_fila_inicial + 6  # Ajustar según la estructura de tu archivo
-#         fila_igv = fila_subtotal + 2
-#         fila_total = fila_igv + 2
+        # Asumimos que los detalles comienzan en la fila 13
+        fila_inicial = 13
+        print("data del pdf:", venta_data)
 
-#         # Insertar los totales en las nuevas posiciones
-#         sheet[f'F{fila_subtotal}'] = monto_total - igv  # Subtotal de la venta
-#         sheet[f'F{fila_igv}'] = igv  # IGV
-#         sheet[f'F{fila_total}'] = monto_total  # Total
+        # Iterar sobre cada producto en venta_data
+        for i, producto in enumerate(venta_data):
+            nombre = producto['nombre']
+            cantidad = producto['cantidad']
+            precio = producto['precio']
+            subtotal = producto['subtotal']
 
-#         # Guardar los cambios en el mismo archivo
-#         workbook.save('factura2.xlsx')
+            # Determinar la fila actual
+            fila_actual = fila_inicial + i
 
-#         jpype.startJVM() 
-#         exc = wk("factura2.xlsx")
-#         exc.save("factura.pdf")
-#         jpype.shutdownJVM()
+            # Escribir solo en la primera celda de las celdas combinadas (A)
+            sheet[f'A{fila_actual}'] = f"{nombre} - {cantidad} - {precio}"  # Descripción
+            sheet[f'F{fila_actual}'] = subtotal  # Subtotal en la columna F
 
-#     except Exception as e:
-#         print("Error en generar PDF:", str(e))
-#         print(repr(e))  # Información detallada del error
-#         raise  # Propaga la excepción para ver el error completo
-    
+        # Calcular las nuevas posiciones para Subtotal, IGV y Total
+        # La fila del subtotal es 18 más la cantidad de productos, desplazada si hay más de un producto
+        fila_subtotal = 18 + (len(venta_data) - 1)  # Se ajusta dinámicamente según la cantidad de productos
+        fila_igv = fila_subtotal + 2
+        fila_total = fila_igv + 2
+
+        # Insertar los totales en las nuevas posiciones
+        sheet[f'F{fila_subtotal}'] = float(monto_total) - float(igv)  # Subtotal de la venta
+        sheet[f'F{fila_igv}'] = float(igv)  # IGV
+        sheet[f'F{fila_total}'] = float(monto_total)  # Total
+
+        # Guardar los cambios en el archivo
+        workbook.save('./app/static/PDF/factura2_copia.xlsx')
+
+        # Iniciar la JVM si no está ya iniciada
+        if not jpype.isJVMStarted():
+            jpype.startJVM()
+
+        # Convertir el archivo Excel a PDF usando Aspose.Cells
+        from asposecells.api import Workbook as wk
+        exc = wk("./app/static/PDF/factura2_copia.xlsx")
+        exc.save("./app/static/PDF/factura.pdf")
+
+    except Exception as e:
+        print("Error en generar PDF:", str(e))
+        print(repr(e))  # Información detallada del error
+        raise  # Propaga la excepción para ver el error completo
+
 def obtener_ventas_con_detalles():
     conexion = obtener_conexion()
     try:
