@@ -162,7 +162,7 @@
                         <select class="form-control" aria-label="Default select example" name="almacen" id="almacen">
                             <option selected>Seleccione...</option>
                             {% for almacen in almacen %}
-                            <option value="{{almacen.id_almacen}}">{{almacen.nom_almacen}}</option>
+                            <option value="1">{{almacen.nom_almacen}}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -343,6 +343,7 @@
         `;
             tableBody.appendChild(newRow);
         }
+        console.log(`Producto agregado a la tabla: ${nombre}, ${precio}`); // Debugging statement
         updateTotals(); // Actualiza los totales después de añadir el producto
     }
 
@@ -393,7 +394,6 @@
         document.getElementById('monto_total').value = (total + igv).toFixed(2);
     }
 
-
     // Función para cerrar el modal
     function closeModal() {
         const modal = document.getElementById('productModal');
@@ -401,7 +401,7 @@
         modalInstance.hide();
     }
 
-    // Para compra
+    // Función para obtener los datos de la tabla de compra
     function getCompraDataTable() {
         const rows = document.querySelectorAll(".table-container tbody tr");
         let data = [];
@@ -420,6 +420,7 @@
             });
         });
 
+        console.log("Datos recopilados de la tabla:", data); // Debugging statement
         return JSON.stringify(data);
     }
 
@@ -430,12 +431,17 @@
         document.cookie = "compraData=" + jsonData + ";" + expires + ";path=/";
     }
 
-    document.querySelector('.btn-success').addEventListener('click', () => {
+    // Modificar el listener al evento submit del formulario
+    document.getElementById('compraForm').addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevenir el envío por defecto del formulario
         const jsonData = getCompraDataTable();
+        
         console.log("Datos capturados para enviar:", jsonData);  // Verifica el JSON antes de enviarlo
         saveCompraDataToCookie(jsonData);
+        alert('Compra registrada exitosamente.');
+        // Ahora, enviar el formulario programáticamente después de asegurar que la cookie se ha establecido
+        this.submit();
     });
-
 
 
 </script>
