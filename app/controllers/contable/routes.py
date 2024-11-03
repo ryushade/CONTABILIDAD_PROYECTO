@@ -295,6 +295,9 @@ def exportar_libro_diario_excel():
     asientos, _ = obtener_asientos_agrupados()
     numero_correlativo = 1
 
+    total_debe = 0
+    total_haber = 0
+
     # Insertar los datos en la tabla, fila por fila
     current_row = start_row
     for id_asiento, asiento in asientos.items():
@@ -307,9 +310,24 @@ def exportar_libro_diario_excel():
             worksheet[f'H{current_row}'] = detalle['nombre_cuenta']
             worksheet[f'I{current_row}'] = detalle['debe']
             worksheet[f'J{current_row}'] = detalle['haber']
+            
+            # Sumar los valores para el total
+            total_debe += detalle['debe']
+            total_haber += detalle['haber']
+
             current_row += 1
         numero_correlativo += 1
     
+    # Combinar las celdas de la fila del total
+    total_row = current_row
+    worksheet.merge_cells(f'A{total_row}:H{total_row}')
+    worksheet[f'A{total_row}'] = "Total"
+    worksheet[f'A{total_row}'].alignment = openpyxl.styles.Alignment(horizontal='right')
+
+    # Insertar los totales en las columnas I y J
+    worksheet[f'I{total_row}'] = total_debe
+    worksheet[f'J{total_row}'] = total_haber
+
     # Guardar el archivo modificado en un buffer de memoria
     workbook.save(output)
     output.seek(0)
