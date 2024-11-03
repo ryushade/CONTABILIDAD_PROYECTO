@@ -258,9 +258,41 @@ def obtener_compras():
         conexion = obtener_conexion()
         with conexion.cursor() as cursor:
             sql = """
-            SELECT c.id_compra, pr.razon_social, c.fecha_compra, sc.nom_subcat, dc.subtotal FROM compra c INNER JOIN detalle_compra dc ON c.id_compra = dc.id_compra
+            SELECT c.id_compra, pr.razon_social, c.f_compra, sc.nom_subcat, dc.total FROM compra c INNER JOIN detalle_compra dc ON c.id_compra = dc.id_compra
             INNER JOIN proveedor pr ON c.id_proveedor = pr.id_proveedor INNER JOIN producto p ON p.id_producto = dc.id_producto
             INNER JOIN sub_categoria sc ON p.id_subcategoria = sc.id_subcategoria
+            """
+            cursor.execute(sql)
+            return cursor.fetchall()  # Asegúrate de retornar solo los datos
+    except Exception as e:
+        print(f"Error: {e}")
+        return []
+    except Exception as e:
+        return jsonify({'code': 0, 'message': str(e)}), 500
+    
+
+def obtener_proveedor():
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            sql = """
+            SELECT id_proveedor, razon_social FROM proveedor WHERE estado_proveedor = '1'
+            """
+            cursor.execute(sql)
+            return cursor.fetchall()  # Asegúrate de retornar solo los datos
+    except Exception as e:
+        print(f"Error: {e}")
+        return []
+    except Exception as e:
+        return jsonify({'code': 0, 'message': str(e)}), 500
+    
+
+def obtener_almacen():
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            sql = """
+            SELECT id_almacen, nom_almacen FROM almacen WHERE estado_almacen = '1'
             """
             cursor.execute(sql)
             return cursor.fetchall()  # Asegúrate de retornar solo los datos
@@ -732,5 +764,50 @@ def obtener_ventas_con_detalles():
                     'total_producto': venta['total_producto']
                 })
             return ventas_dict
+    finally:
+        conexion.close()
+
+
+def registrar_compra(proveedor, nro_comprobante, almacen, fecha, igv, monto_total, productos):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            # Insertar la compra
+            sql_compra = """
+                INSERT INTO compra (id_proveedor, nro_comprobante, estado_compra, f_compra, igv, monto_total)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """
+            cursor.execute(sql_compra, (proveedor, nro_comprobante, 1, fecha, igv, monto_total))
+            id_compra = cursor.lastrowid
+
+            # Insertar detalles de la compra
+            sql_detalle_compra = """
+                INSERT INTO detalle_compra (id_compra, id_producto, cantidad, precio, total)
+                VALUES (%s, %s, %s, %s, %s)
+            """
+            for producto in productos:
+                id_producto = obtener_id_producto_nombre(producto['nombre'])
+                cantidad = producto['cantidad']
+                precio = producto['precio']
+                total = cantidad * precio
+
+                print(f"Insertando detalle: id_producto={id_producto}, cantidad={cantidad}, precio={precio}, total={total}")
+                
+                cursor.execute(sql_detalle_compra, (id_compra, id_producto, cantidad, precio, total))
+
+                # Actualizar el stock en la tabla inventario
+                sql_update_stock = """
+                    UPDATE inventario SET stock = stock + %s
+                    WHERE id_producto = %s AND id_almacen = %s
+                """
+                cursor.execute(sql_update_stock, (cantidad, id_producto, almacen))
+                print(f"Actualizando stock: id_producto={id_producto}, cantidad={cantidad}, almacen={almacen}")
+
+            conexion.commit()
+            return {'success': True, 'message': 'Compra registrada exitosamente'}
+    except Exception as e:
+        conexion.rollback()
+        print("Error al registrar la compra:", str(e))
+        return {'success': False, 'message': str(e)}
     finally:
         conexion.close()
