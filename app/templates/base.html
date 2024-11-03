@@ -34,10 +34,14 @@
         }
 
         .main-content {
-            margin-left: 0;
-            /* Sin margen por defecto */
-            transition: margin-left 0.3s ease;
-            width: 100%;
+            margin-left: 13rem; /* Valor inicial del margen */
+            transition: margin-left 0.3s ease; /* Asegura una transición suave */
+            z-index: 1; /* Contenido por debajo del botón */
+            position: relative; /* Asegura que el contenido no afecte al botón */
+        }
+
+        .sidebar.collapsed + .main-content {
+            margin-left: 55px;
         }
 
         .sidebar+.main-content {
@@ -89,13 +93,22 @@
             border: none;
             border-radius: 5px;
             color: #4069e5ff;
-            z-index: 1200;
-            box-shadow: 4px 1px 5px 5px rgba(255, 255, 255, 0.1);
+            z-index: 1050;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5); /* Ajusta la sombra aquí */
             font-size: 18px;
+            position: absolute; /* Asegura que esté por encima del contenido */
+            top: 1rem; /* Ajusta según tu diseño */
+            right: -15px; /* Ajusta para posicionarlo justo al borde del sidebar */
+            transition: transform 0.3s;
+        }
+
+        .sidebar.collapsed .toggle-button {
+            right: -10px;
+            margin-top: 40px; /* Asegura que siga visible cuando colapsado */
         }
 
         .sidebar-nav {
-            margin-top: 1rem;
+            margin-top: 2rem;
         }
 
         .nav-item {
@@ -175,11 +188,11 @@
             }
 
             .sidebar+.main-content {
-                margin-left: 64px;
+                margin-left: 13rem;
             }
 
             .sidebar.collapsed+.main-content {
-                margin-left: 64px;
+                margin-left: 55px;
             }
 
             .sidebar-title span,
@@ -371,7 +384,7 @@
                     if (sidebar.classList.contains('collapsed')) {
                         mainContent.style.marginLeft = '55px';
                     } else {
-                        mainContent.style.marginLeft = '250px';
+                        mainContent.style.marginLeft = '208px';
                     }
                 });
             } else {
