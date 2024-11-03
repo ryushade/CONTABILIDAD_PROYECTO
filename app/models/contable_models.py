@@ -538,3 +538,43 @@ def obtener_libro_mayor_agrupado_por_fecha():
         return libro_mayor, total_debe_global, total_haber_global
     finally:
         conexion.close()
+
+
+def obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor(DictCursor) as cursor:
+            cursor.execute("""
+                SELECT 
+                    cu.codigo_cuenta, 
+                    cu.nombre_cuenta, 
+                    a.fecha_asiento, 
+                    LEFT(MIN(a.glosa), LOCATE('SEGÚN', MIN(a.glosa)) - 1) AS glosa,
+                    SUM(d.debe) AS total_debe, 
+                    SUM(d.haber) AS total_haber
+                FROM 
+                    asiento_contable a
+                INNER JOIN 
+                    detalle_asiento d ON a.id_asiento = d.id_asiento
+                INNER JOIN 
+                    cuenta cu ON cu.id_cuenta = d.id_cuenta
+                GROUP BY 
+                    cu.codigo_cuenta, cu.nombre_cuenta, a.fecha_asiento
+                ORDER BY 
+                    cu.codigo_cuenta, a.fecha_asiento;
+            """)
+            resultados = cursor.fetchall()
+
+        libro_mayor = defaultdict(list)
+
+        for row in resultados:
+            libro_mayor[row['codigo_cuenta']].append({
+                'fecha_asiento': row['fecha_asiento'],
+                'glosa': row['glosa'],
+                'total_debe': row['total_debe'],
+                'total_haber': row['total_haber']
+            })
+
+        return libro_mayor
+    finally:
+        conexion.close()
