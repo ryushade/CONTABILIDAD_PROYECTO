@@ -162,7 +162,10 @@
                     <td class="text-center" style="font-size: 14px;">
 
                         <span style="font-size: 14px;" class="action-button secondary edit"
-                            data-cuenta-id="{{ usuario.id_usuario }}"><i class="fas fa-edit"></i></span>
+                            onclick="openEditUsu({{ usuario.id_usuario }})">
+                            <i class="fas fa-edit"></i>
+                        </span>
+
                         <span style="font-size: 14px;" class="action-button secondary trash"
                             onclick="openModalDeleteUsu('{{ usuario.id_usuario }}', '{{ usuario.usu }}')">
                             <i class="fas fa-trash"></i>
@@ -232,7 +235,7 @@
 
                 <!-- Botones de acción -->
                 <div class="d-flex justify-content-end mt-4" style="gap: 10px;">
-                    <button type="button" onclick="closeModalUsu()" class="btn btn-secondary me-2">
+                    <button type="button" onclick="closeModalUsuE()" class="btn btn-secondary me-2">
                         <i class="fas fa-times"></i> Cerrar
                     </button>
                     <button type="submit" class="btn btn-primary">
@@ -244,36 +247,36 @@
     </div>
 </div>
 
-<!---Editar usuario-->
+<form method="POST" id="editUsuarioModal" class="edit-form" style="display: none;">
+    <div class="modal-overlay">
+        <div class="content-modal p-4 rounded" style="background-color: white; max-width: 600px; margin: auto;">
+            <!-- Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" style="font-size: 32px;">EDITAR USUARIO</h5>
+                <button type="button" class="modal-close" onclick="closeModalUsuEdit()"
+                    style="border: none; background: none;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
 
-<div id="editUsuarioModal" class="modal-overlay" style="display: none;">
-    <div class="content-modal p-4 rounded" style="background-color: white; max-width: 600px; margin: auto;">
-        <!-- Header -->
-        <div class="modal-header">
-            <h5 class="modal-title" style="font-size: 32px;">EDITAR USUARIO</h5>
-            <button type="button" class="modal-close" onclick="CloseModalUsu()" style="border: none; background: none;">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-
-        <!-- Body -->
-        <div class="modal-body">
-            <form>
+            <!-- Body -->
+            <div class="modal-body">
                 <div class="row g-4">
                     <!-- Campo de Rol -->
                     <div class="col-md-6">
                         <label for="rol" class="form-label" style="font-weight: bold;">Rol:</label>
                         <select id="rol" name="rol" class="form-select">
-                            <option selected>Seleccione...</option>
-                            <!-- Opciones de rol -->
+                            <option value="ADMIN">Administrador</option>
+                            <option value="EMPLEADO">Empleado</option>
+                            <option value="Vendedor">Vendedor</option>
+                            <option value="Contador">Contador</option>
                         </select>
                     </div>
 
                     <!-- Campo de Usuario -->
                     <div class="col-md-6">
-                        <label for="usuario" class="form-label" style="font-weight: bold;">Usuario:</label>
-                        <input type="text" id="usuario" name="usuario" class="form-control"
-                            placeholder="Ingrese usuario">
+                        <label for="usua" class="form-label" style="font-weight: bold;">Usuario:</label>
+                        <input type="text" id="usua" name="usua" class="form-control" placeholder="Ingrese usuario">
                     </div>
 
                     <!-- Campo de Contraseña -->
@@ -289,26 +292,26 @@
                     <div class="col-md-6">
                         <label for="estado" class="form-label" style="font-weight: bold;">Estado:</label>
                         <select id="estado" name="estado" class="form-select">
-                            <option selected>Seleccione...</option>
-                            <!-- Opciones de estado -->
+                            <option value="1">Activo</option>
+                            <option value="0">Inactivo</option>
                         </select>
                     </div>
                 </div>
 
                 <!-- Botones de acción -->
                 <div class="d-flex justify-content-end mt-4" style="gap: 10px;">
-                    <button style="width: 122px; height: 45px;" type="button" onclick="closeModalAdd()"
-                        class="btn btn-secondary me-2"> <i style="height: 25px; width: 25px;" class="fas fa-times"></i>
-                        Cerrar
+                    <button style="width: 122px; height: 45px;" type="button" onclick="closeModalUsuEdit()"
+                        class="btn btn-secondary me-2">
+                        <i style="height: 25px; width: 25px;" class="fas fa-times"></i> Cerrar
                     </button>
                     <button style="width: 122px; height: 45px;" type="submit" class="btn btn-primary">
                         <i style="height: 25px; width: 25px;" class="fas fa-save"></i> Guardar
                     </button>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
-</div>
+</form>
 
 
 

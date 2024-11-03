@@ -39,6 +39,23 @@ def obtener_usuario_por_nombre(username):
         conexion.close()
 
 
+def obtener_usuario_por_id_2(usuario_id):
+    connection = obtener_conexion()
+    try:
+        with connection.cursor(pymysql.cursors.DictCursor) as cursor:
+            sql = """
+                SELECT usuario.*, rol.nom_rol AS rol
+                FROM usuario
+                LEFT JOIN rol ON usuario.id_rol = rol.id_rol
+                WHERE usuario.id_usuario = %s
+            """
+            cursor.execute(sql, (usuario_id,))
+            usuario = cursor.fetchone()
+            return usuario
+    finally:
+        connection.close()
+
+
 def obtener_usuario_por_id(user_id):
     conexion = obtener_conexion()
     try:
@@ -285,6 +302,7 @@ def obtener_cuentas_excel():
             return cuentas
     finally:
         connection.close()
+
 
 
 def obtener_usuarios():
