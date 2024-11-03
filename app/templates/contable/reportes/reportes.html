@@ -56,7 +56,7 @@
                         Más acciones
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item d-flex flex-column" href="#">
+                        <a class="dropdown-item d-flex flex-column" href="{{ url_for('contable.exportar_libro_diario_excel') }}">
                             <span class="d-flex align-items-center">
                                 <i class="fa fa-file-excel mr-2"></i>
                                 <strong>Exportar a Excel</strong>
@@ -111,8 +111,6 @@
 
             </div>
 
-
-
             <div class="table-responsive mb-4">
                 <table class="table table-bordered table-hover">
                     <thead class="table-light">
@@ -128,31 +126,27 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% set numero_correlativo = 1 %}
                         {% for id_asiento, asiento in asientos.items() %}
-                        {% for detalle in asiento.detalles %}
-                        <tr>
-                            {% if loop.first %}
-                            <td style="padding-top: 20px;" class="text-center" rowspan="{{ asiento.detalles|length }}">
-                                {{ numero_correlativo }}
-                            </td>
-                            <td style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">{{
-                                asiento.fecha_asiento.strftime('%d/%m/%Y') }}
-                            </td>
-                            <td style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">{{ asiento.glosa }}
-                            </td>
-                            <td style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">{{
-                                asiento.num_comprobante }}</td>
-                            {% endif %}
-                            <td>{{ detalle.codigo_cuenta }}</td>
-                            <td>{{ detalle.nombre_cuenta }}</td>
-                            <td class="text-end">{{ detalle.debe | round(2) }}</td>
-                            <td class="text-end">{{ detalle.haber | round(2) }}</td>
-                        </tr>
+                            {% for detalle in asiento.detalles %}
+                            <tr>
+                                {% if loop.first %}
+                                <td style="padding-top: 20px;" class="text-center" rowspan="{{ asiento.detalles|length }}">
+                                    {{ asiento.numero_correlativo }}
+                                </td>
+                                <td style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">
+                                    {{ asiento.fecha_asiento.strftime('%d/%m/%Y') }}
+                                </td>
+                                <td style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">{{ asiento.glosa }}</td>
+                                <td style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">{{ asiento.num_comprobante }}</td>
+                                {% endif %}
+                                <td>{{ detalle.codigo_cuenta }}</td>
+                                <td>{{ detalle.nombre_cuenta }}</td>
+                                <td class="text-end">{{ detalle.debe | round(2) }}</td>
+                                <td class="text-end">{{ detalle.haber | round(2) }}</td>
+                            </tr>
+                            {% endfor %}
                         {% endfor %}
-                        {% set numero_correlativo = numero_correlativo + 1 %}
-                        {% endfor %}
-                    </tbody>
+                    </tbody>                    
                     <tfoot>
                         <tr>
                             <th colspan="6" class="text-end" style="font-weight: bold;">TOTALES (S/.)</th>

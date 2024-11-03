@@ -1,12 +1,14 @@
-from flask import request, redirect, url_for, flash, session, jsonify, render_template, send_file
+from flask import request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
-from app.models.contable_models import obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, actualizar_reglas, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha
+from app.models.contable_models import obtener_regla_por_id, obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, actualizar_reglas, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha
 from . import accounting_bp
 import pandas as pd
 import io
+import os
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font, Alignment, PatternFill
-
+from datetime import datetime
+import openpyxl
 
 @accounting_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -169,6 +171,19 @@ def obtener_usuario(usuario_id):
     else:
         return jsonify({'error': 'Usuario no encontrado'}), 404
 
+@accounting_bp.route('/reglas/detalles/<int:regla_id>', methods=['GET'])
+def obtener_detalles_regla(regla_id):
+    regla = obtener_regla_por_id(regla_id)
+    if regla:
+        return jsonify({
+            "nombre_regla": regla.get("nombre_regla"),
+            "tipo_transaccion": regla.get("tipo_transaccion"),
+            "estado": "Activo" if regla.get("estado") == 1 else "Inactivo",
+            "cuenta_debito": regla.get("cuenta_debe"),
+            "cuenta_credito": regla.get("cuenta_haber")
+        })
+    else:
+        return jsonify({'error': 'Regla no encontrada'}), 404
 
 
 @accounting_bp.route('/usuarios/actualizar/<int:id_usuario>', methods=['POST'])
@@ -243,3 +258,60 @@ def editar_regla(regla_id):
 @jwt_required()
 def ldpf():
     return render_template('contable/reportes/pdf_ld.html')
+
+@accounting_bp.route('/exportar_libro_diario_excel', methods=['GET'])
+@jwt_required()
+def exportar_libro_diario_excel():
+    import openpyxl
+    import os
+    from flask import current_app, send_file
+    from io import BytesIO
+    from datetime import datetime
+
+    # Ruta de la plantilla
+    template_path = os.path.join(current_app.root_path, 'templates', 'contable', 'plantillas', 'L,D.xlsx')
+    
+    if not os.path.exists(template_path):
+        return "La plantilla de Excel no se encontró.", 404
+    
+    output = BytesIO()
+    
+    # Cargar el archivo de plantilla
+    workbook = openpyxl.load_workbook(template_path)
+    worksheet = workbook.active
+    
+    # Obtener la fecha actual
+    fecha_actual = datetime.now()
+    mes_anio_actual = fecha_actual.strftime('%m/%Y')
+    
+    # Llenar las celdas específicas con los datos necesarios
+    worksheet['B3'] = mes_anio_actual  # Coloca el período en la celda derecha de 'PERÍODO:'
+    worksheet['B4'] = '20610588981'    # Coloca el RUC
+    worksheet['B5'] = 'Tormenta'       # Coloca la razón social
+    
+    # Definir la fila inicial para insertar los datos en la tabla
+    start_row = 11  # Comenzar desde la fila 11 como especificaste
+
+    asientos, _ = obtener_asientos_agrupados()
+    numero_correlativo = 1
+
+    # Insertar los datos en la tabla, fila por fila
+    current_row = start_row
+    for id_asiento, asiento in asientos.items():
+        for detalle in asiento['detalles']:
+            worksheet[f'A{current_row}'] = numero_correlativo
+            worksheet[f'B{current_row}'] = asiento['fecha_asiento'].strftime('%d/%m/%Y')
+            worksheet[f'C{current_row}'] = asiento['glosa']
+            worksheet[f'F{current_row}'] = asiento['num_comprobante']
+            worksheet[f'G{current_row}'] = detalle['codigo_cuenta']
+            worksheet[f'H{current_row}'] = detalle['nombre_cuenta']
+            worksheet[f'I{current_row}'] = detalle['debe']
+            worksheet[f'J{current_row}'] = detalle['haber']
+            current_row += 1
+        numero_correlativo += 1
+    
+    # Guardar el archivo modificado en un buffer de memoria
+    workbook.save(output)
+    output.seek(0)
+
+    return send_file(output, download_name="libro_diario.xlsx", as_attachment=True)
