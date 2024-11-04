@@ -675,7 +675,7 @@ def exportar_registro_ventas_excel():
 
     # Fetch the purchase records
     registros_compras, totales = obtener_registro_ventas()
-
+    print(registros_compras)
     # Define the starting row for data
     start_row = 11
     current_row = start_row
@@ -703,13 +703,12 @@ def exportar_registro_ventas_excel():
         worksheet[f'T{current_row}'] = ''
         worksheet[f'U{current_row}'] = ''
         worksheet[f'V{current_row}'] = ''
-
         current_row += 1
 
     # Adding totals row at the end
     total_row = current_row
-    worksheet.merge_cells(f'H{total_row}:J{total_row}')
-    
+    worksheet.merge_cells(f'H{total_row}:J{total_row}') 
+    worksheet[f'H{total_row}'] = 'Totales'
     worksheet[f'K{total_row}'] = totales["total_importe"]
     worksheet[f'O{total_row}'] = totales["total_igv"]
     worksheet[f'Q{total_row}'] = totales["total_general"]

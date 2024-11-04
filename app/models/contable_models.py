@@ -661,7 +661,7 @@ def obtener_registro_ventas():
                 "igv": float(row["igv"]),
                 "total": float(row["total"])
             })
-
+            
             # Acumular los totales
             total_importe += float(row["importe"])
             total_igv += float(row["igv"])
