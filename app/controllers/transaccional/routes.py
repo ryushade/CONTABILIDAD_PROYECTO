@@ -182,7 +182,8 @@ def compras():
     compras_con_detalles = obtener_compras_con_detalles()
     proveedor = obtener_proveedor()
     almacen = obtener_almacen()
-    return render_template('transaccional/compras/compras.html', proveedor=proveedor, almacen=almacen, compras=compras_con_detalles)
+    datos_inventario = obtener_inventario_vigente()
+    return render_template('transaccional/compras/compras.html', proveedor=proveedor, almacen=almacen, datos_inventario=datos_inventario,compras=compras_con_detalles)
 
 
 @transactional_bp.route('/registrar_compra', methods=['POST'])
