@@ -1,6 +1,7 @@
 import json
+import os
 from urllib import response
-from flask import current_app, make_response, render_template, send_file
+from flask import current_app, make_response, render_template, send_file, session
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from flask import render_template, send_file, request, jsonify, redirect, url_for, flash
@@ -109,29 +110,48 @@ def productos():
     categorias = obtener_categorias()
     return render_template('transaccional/productos/productos.html', productos=productos, marcas=marcas, categorias=categorias)
 
-# Modulo de ventas
+@transactional_bp.route('/descargar_pdf/<filename>')
+@jwt_required()
+def descargar_pdf(filename):
+    print("asdaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+    file_path = os.path.join(current_app.root_path, 'static', 'PDF', filename)
+    return send_file(file_path, as_attachment=True, download_name=filename)
+
 @transactional_bp.route('/ventas', methods=['GET'])
 @jwt_required()
 def ventas():
+    pdf_filename = session.pop('pdf_filename', None)
     total_ventas = obtener_ventas()
-    ventas_con_detalles = obtener_ventas_con_detalles()  # Nueva función para obtener ventas detalladas
-    datos_inventario = obtener_inventario_vigente()  
+    ventas_con_detalles = obtener_ventas_con_detalles()
+    datos_inventario = obtener_inventario_vigente()
     clientes = listarClientes()
 
-    return render_template(
-        'transaccional/ventas/ventas.html',
-        total_ventas=total_ventas,
-        ventas_con_detalles=ventas_con_detalles,
-        datos_inventario=datos_inventario,
-        clientes=clientes
-    )
+    if pdf_filename:
+        return render_template(
+            'transaccional/ventas/ventas.html',
+            pdf_filename=pdf_filename,
+            download_url=url_for('transaccional.descargar_pdf', filename=pdf_filename),
+            total_ventas=total_ventas,
+            ventas_con_detalles=ventas_con_detalles,
+            datos_inventario=datos_inventario,
+            clientes=clientes
+        )
+    else:
+        return render_template(
+            'transaccional/ventas/ventas.html',
+            total_ventas=total_ventas,
+            ventas_con_detalles=ventas_con_detalles,
+            datos_inventario=datos_inventario,
+            clientes=clientes
+        )
+
+
 
 @transactional_bp.route('/addVenta', methods=['POST'])
 def add_venta():
     try:
         venta_data = request.cookies.get('ventaData')
-        print(venta_data)
-        usuario = 1 # Usuario obtener de cookie
+        usuario = 1  # Usuario obtener de cookie
         id_sucursal = 1
         comprobante_pago = request.form.get('comprobante_pago')
         id_cliente = request.form.get('cliente')
@@ -143,8 +163,10 @@ def add_venta():
         id_anular = 4
         id_anular_b = 5
         observacion = request.form.get('observacion')
-        transac.vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_total, base_imponible, metodo_pago, id_anular, id_anular_b, observacion, venta_data)
-        # Crea la redirección y elimina la cookie en la respuesta
+        id_venta, numero_com = transac.vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_total, base_imponible, metodo_pago, id_anular, id_anular_b, observacion, venta_data)
+        
+        session['pdf_filename'] = f'{numero_com}.pdf'
+        # Redirige a la página de inicio
         response = make_response(redirect(url_for('transaccional.ventas')))
         response.delete_cookie('ventaData')
         return response
