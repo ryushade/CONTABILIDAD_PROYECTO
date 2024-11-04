@@ -611,7 +611,7 @@ def insertar_regla(nombre_regla, tipo_transaccion, cuenta_debito_id, cuenta_cred
     finally:
         conexion.close()
 
-def obtener_registro_compras():
+def obtener_registro_ventas():
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
@@ -619,6 +619,7 @@ def obtener_registro_compras():
                 SELECT 
                     ROW_NUMBER() OVER (ORDER BY v.id_venta) AS numero_correlativo,
                     v.f_venta AS fecha,
+                    vb.fecha as fechaVencimiento,
                     vb.documento_cliente,
                     vb.nombre_cliente,
                     c.num_comprobante,
@@ -644,11 +645,14 @@ def obtener_registro_compras():
             fecha = row["fecha"]
             if isinstance(fecha, str):
                 fecha = datetime.strptime(fecha, '%Y-%m-%d')
-
+            fechaV = row["fechaVencimiento"]
+            if isinstance(fechaV, str):
+                fechaV = datetime.strptime(fechaV, '%Y-%m-%d')
             # Agregar cada registro a la lista de registros de compras
             registros_compras.append({
                 "numero_correlativo": row["numero_correlativo"],
                 "fecha": fecha,
+                "fechaV":fechaV,
                 "documento_cliente": row["documento_cliente"],
                 "nombre_cliente": row["nombre_cliente"],
                 "num_comprobante": row["num_comprobante"],

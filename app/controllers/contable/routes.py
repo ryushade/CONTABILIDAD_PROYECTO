@@ -1,6 +1,6 @@
 from flask import request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
-from app.models.contable_models import obtener_regla_por_id, obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, actualizar_reglas, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_compras
+from app.models.contable_models import obtener_regla_por_id, obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, actualizar_reglas, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas
 from . import accounting_bp
 import pandas as pd
 import io
@@ -53,7 +53,7 @@ def logout():
 def reportes():
     asientos, totales = obtener_asientos_agrupados()
     libro_mayor_data, total_debe, total_haber = obtener_libro_mayor_agrupado_por_fecha()
-    registro_compra_data, totale = obtener_registro_compras()
+    registro_compra_data, totale = obtener_registro_ventas()
     return render_template('contable/reportes/reportes.html', asientos=asientos, totales=totales, libro_mayor=libro_mayor_data, total_debe=total_debe, total_haber=total_haber,registros_compras = registro_compra_data, totale = totale)
 
 @accounting_bp.route('/cuentas', methods=['GET'])
@@ -644,3 +644,78 @@ def exportar_libro_mayor_pdf():
                 zf.writestr(archivo['filename'], archivo['content'])
         zip_output.seek(0)
         return send_file(zip_output, download_name="libro_mayor.zip", as_attachment=True)
+    
+@accounting_bp.route('/exportar_registro_ventas_excel', methods=['GET'])
+@jwt_required()
+def exportar_registro_ventas_excel():
+    from io import BytesIO
+    import openpyxl
+    from flask import send_file, current_app
+    from datetime import datetime
+    import os
+
+    # Path to the Excel template
+    template_path = os.path.join(current_app.root_path, 'templates', 'contable', 'plantillas', 'Registro_Ventas.xlsx')
+    
+    if not os.path.exists(template_path):
+        return "The Excel template was not found.", 404
+    
+    output = BytesIO()
+    
+    # Load the template workbook
+    workbook = openpyxl.load_workbook(template_path)
+    worksheet = workbook.active
+    
+    # Set the current period and company info
+    fecha_actual = datetime.now()
+    mes_anio_actual = fecha_actual.strftime('%m/%Y')
+    worksheet['B3'] = mes_anio_actual  # Period
+    worksheet['B4'] = '20610588981'    # RUC
+    worksheet['B5'] = 'Tormenta'       # Company name
+
+    # Fetch the purchase records
+    registros_compras, totales = obtener_registro_ventas()
+
+    # Define the starting row for data
+    start_row = 11
+    current_row = start_row
+
+    for registro in registros_compras:
+        worksheet[f'A{current_row}'] = registro["numero_correlativo"] #numero correlativo
+        worksheet[f'B{current_row}'] = registro["fecha"].strftime('%d/%m/%Y')  #fecha de emision
+        worksheet[f'C{current_row}'] = registro["fechaV"].strftime('%d/%m/%Y') #fecha de vencimiento
+        worksheet[f'D{current_row}'] = '' # tipo
+        worksheet[f'E{current_row}'] = registro["num_comprobante"] #serie
+        worksheet[f'F{current_row}'] = registro["num_comprobante"] #numero
+        worksheet[f'G{current_row}'] = '' #tipo
+        worksheet[f'H{current_row}'] = registro["documento_cliente"] #numero de dni o ruc
+        worksheet[f'I{current_row}'] = registro["nombre_cliente"] #nombres o razon social
+        worksheet[f'J{current_row}'] = ''# valor facturado de la exportacion
+        worksheet[f'K{current_row}'] = registro["importe"] #importe
+        worksheet[f'L{current_row}'] = ''
+        worksheet[f'M{current_row}'] = ''
+        worksheet[f'N{current_row}'] = ''
+        worksheet[f'O{current_row}'] = registro["igv"]  # IGV
+        worksheet[f'P{current_row}'] = ''
+        worksheet[f'Q{current_row}'] = registro["total"]  
+        worksheet[f'R{current_row}'] = ''
+        worksheet[f'S{current_row}'] = ''
+        worksheet[f'T{current_row}'] = ''
+        worksheet[f'U{current_row}'] = ''
+        worksheet[f'V{current_row}'] = ''
+
+        current_row += 1
+
+    # Adding totals row at the end
+    total_row = current_row
+    worksheet.merge_cells(f'H{total_row}:J{total_row}')
+    
+    worksheet[f'K{total_row}'] = totales["total_importe"]
+    worksheet[f'O{total_row}'] = totales["total_igv"]
+    worksheet[f'Q{total_row}'] = totales["total_general"]
+
+    # Save the updated workbook to a buffer
+    workbook.save(output)
+    output.seek(0)
+
+    return send_file(output, download_name="registro_ventas.xlsx", as_attachment=True)
