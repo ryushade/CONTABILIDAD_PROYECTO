@@ -610,3 +610,66 @@ def insertar_regla(nombre_regla, tipo_transaccion, cuenta_debito_id, cuenta_cred
             conexion.commit()
     finally:
         conexion.close()
+
+def obtener_registro_compras():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT 
+                    ROW_NUMBER() OVER (ORDER BY v.id_venta) AS numero_correlativo,
+                    v.f_venta AS fecha,
+                    vb.documento_cliente,
+                    vb.nombre_cliente,
+                    c.num_comprobante,
+                    vb.comprobante_pago,
+                    vb.totalImporte_venta AS importe,
+                    vb.igv,
+                    vb.total_t AS total
+                FROM venta v
+                INNER JOIN venta_boucher vb ON v.id_venta_boucher = vb.id_venta_boucher
+                INNER JOIN comprobante c ON c.id_comprobante = v.id_comprobante
+                ORDER BY v.id_venta
+            """)
+            resultados = cursor.fetchall()
+
+        # Inicializar variables para almacenar los totales
+        total_igv = 0.0
+        total_importe = 0.0
+        total_general = 0.0
+        registros_compras = []
+
+        for row in resultados:
+            # Convertir la fecha a formato datetime si es necesario
+            fecha = row["fecha"]
+            if isinstance(fecha, str):
+                fecha = datetime.strptime(fecha, '%Y-%m-%d')
+
+            # Agregar cada registro a la lista de registros de compras
+            registros_compras.append({
+                "numero_correlativo": row["numero_correlativo"],
+                "fecha": fecha,
+                "documento_cliente": row["documento_cliente"],
+                "nombre_cliente": row["nombre_cliente"],
+                "num_comprobante": row["num_comprobante"],
+                "comprobante_pago": row["comprobante_pago"],
+                "importe": float(row["importe"]),
+                "igv": float(row["igv"]),
+                "total": float(row["total"])
+            })
+
+            # Acumular los totales
+            total_importe += float(row["importe"])
+            total_igv += float(row["igv"])
+            total_general += float(row["total"])
+
+        # Diccionario con los totales
+        totales = {
+            "total_importe": total_importe,
+            "total_igv": total_igv,
+            "total_general": total_general
+        }
+
+        return registros_compras, totales
+    finally:
+        conexion.close()

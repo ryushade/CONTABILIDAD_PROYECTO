@@ -27,7 +27,7 @@
         <a class="nav-item nav-link" href="#libro-mayor" data-bs-toggle="tab">
             <i class="fas fa-book"></i> Libro Mayor
         </a>
-        
+
         <a class="nav-item nav-link" href="#libro-compras" data-bs-toggle="tab">
             <i class="fas fa-book"></i> Libro de compras
         </a>
@@ -56,13 +56,15 @@
                         Más acciones
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item d-flex flex-column" href="{{ url_for('contable.exportar_libro_diario_excel') }}">
+                        <a class="dropdown-item d-flex flex-column"
+                            href="{{ url_for('contable.exportar_libro_diario_excel') }}">
                             <span class="d-flex align-items-center">
                                 <i class="fa fa-file-excel mr-2"></i>
                                 <strong>Exportar a Excel</strong>
                             </span>
                         </a>
-                        <a class="dropdown-item d-flex flex-column" href="{{ url_for('contable.exportar_libro_diario_pdf') }}">
+                        <a class="dropdown-item d-flex flex-column"
+                            href="{{ url_for('contable.exportar_libro_diario_pdf') }}">
                             <span class="d-flex align-items-center">
                                 <i class="fa fa-file-pdf mr-2" style="color: red;"></i>
                                 <strong>Exportar a PDF</strong>
@@ -127,30 +129,32 @@
                     </thead>
                     <tbody>
                         {% for id_asiento, asiento in asientos.items() %}
-                            {% for detalle in asiento.detalles %}
-                            <tr>
-                                {% if loop.first %}
-                                <td style="padding-top: 20px;" class="text-center" rowspan="{{ asiento.detalles|length }}">
-                                    {{ asiento.numero_correlativo }}
-                                </td>
-                                <td style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">
-                                    {{ asiento.fecha_asiento.strftime('%d/%m/%Y') }}
-                                </td>
-                                <td style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">{{ asiento.glosa }}</td>
-                                <td style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">{{ asiento.num_comprobante }}</td>
-                                {% endif %}
-                                <td>{{ detalle.codigo_cuenta }}</td>
-                                <td>{{ detalle.nombre_cuenta }}</td>
-                                <td class="text-end">
-                                    {{ detalle.debe if detalle.debe != 0 else '' }}
-                                </td>
-                                <td class="text-end">
-                                    {{ detalle.haber if detalle.haber != 0 else '' }}
-                                </td>
-                            </tr>
-                            {% endfor %}
+                        {% for detalle in asiento.detalles %}
+                        <tr>
+                            {% if loop.first %}
+                            <td style="padding-top: 20px;" class="text-center" rowspan="{{ asiento.detalles|length }}">
+                                {{ asiento.numero_correlativo }}
+                            </td>
+                            <td style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">
+                                {{ asiento.fecha_asiento.strftime('%d/%m/%Y') }}
+                            </td>
+                            <td style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">{{ asiento.glosa }}
+                            </td>
+                            <td style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">{{
+                                asiento.num_comprobante }}</td>
+                            {% endif %}
+                            <td>{{ detalle.codigo_cuenta }}</td>
+                            <td>{{ detalle.nombre_cuenta }}</td>
+                            <td class="text-end">
+                                {{ detalle.debe if detalle.debe != 0 else '' }}
+                            </td>
+                            <td class="text-end">
+                                {{ detalle.haber if detalle.haber != 0 else '' }}
+                            </td>
+                        </tr>
                         {% endfor %}
-                    </tbody>                                       
+                        {% endfor %}
+                    </tbody>
                     <tfoot>
                         <tr>
                             <th colspan="6" class="text-end" style="font-weight: bold;">TOTALES (S/.)</th>
@@ -202,13 +206,15 @@
                         Más acciones
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item d-flex flex-column" href="{{ url_for('contable.exportar_libro_mayor_excel') }}">
+                        <a class="dropdown-item d-flex flex-column"
+                            href="{{ url_for('contable.exportar_libro_mayor_excel') }}">
                             <span class="d-flex align-items-center">
                                 <i class="fa fa-file-excel mr-2"></i>
                                 <strong>Exportar a Excel</strong>
                             </span>
                         </a>
-                        <a class="dropdown-item d-flex flex-column" href="{{ url_for('contable.exportar_libro_mayor_pdf') }}">
+                        <a class="dropdown-item d-flex flex-column"
+                            href="{{ url_for('contable.exportar_libro_mayor_pdf') }}">
                             <span class="d-flex align-items-center">
                                 <i class="fa fa-file-pdf mr-2" style="color: red;"></i>
                                 <strong>Exportar a PDF</strong>
@@ -356,16 +362,19 @@
                                 <i class="fa fa-file-excel mr-2"></i>
                                 <strong>Exportar a Excel</strong>
 
-                                <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-                                <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
-                                <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+                                <script
+                                    src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+                                <script
+                                    src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+                                <script
+                                    src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 
                                 <script>
                                     async function exportToExcel() {
                                         // Crear un nuevo libro de Excel y una hoja
                                         const workbook = new ExcelJS.Workbook();
                                         const worksheet = workbook.addWorksheet("Libro de Compras");
-                                
+
                                         // Datos empresa
                                         worksheet.mergeCells('A2');
                                         const datos = worksheet.getCell('A2');
@@ -379,13 +388,13 @@
                                         ruc.font = { bold: true, size: 12 };
                                         ruc.alignment = { horizontal: 'center' };
 
-                                        worksheet.mergeCells('B2','K2');
+                                        worksheet.mergeCells('B2', 'K2');
                                         const datos1 = worksheet.getCell('B2');
                                         datos1.value = "TEXTILES CREANDO MODA S.A.C.";
                                         datos1.font = { bold: true, size: 12 };
                                         datos1.alignment = { horizontal: 'center' };
 
-                                        worksheet.mergeCells('B3','K3');
+                                        worksheet.mergeCells('B3', 'K3');
                                         const ruc1 = worksheet.getCell('B3');
                                         ruc1.value = "20610588981";
                                         ruc1.font = { bold: true, size: 12 };
@@ -397,25 +406,25 @@
                                         titleCell.value = "LIBRO DE COMPRAS";
                                         titleCell.font = { bold: true, size: 20 };
                                         titleCell.alignment = { horizontal: 'center' };
-                                
+
                                         // Definir los encabezados nuevos
-                                        const headers = [   
+                                        const headers = [
                                             "N° CORRELATIVO", "FECHA EMISIÓN", "TIPO COMPROBANTE", "SERIE DEPENDENCIA",
                                             "N° COMPROBANTE", "TIPO PROVEEDOR", "NUMERO PROVEEDOR", "RAZÓN SOCIAL",
                                             "BASE IMPONIBLE", "IGV", "IMPORTE TOTAL"
                                         ];
-                                
+
                                         // Agregar una fila vacía después del título y luego los encabezados
                                         worksheet.addRow([]);
                                         const headerRow = worksheet.addRow(headers);
-                                
+
                                         // Aplicar estilo a los encabezados
                                         headerRow.eachCell(cell => {
                                             cell.font = { bold: true };
                                             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'F4A460' } };
                                             cell.alignment = { horizontal: 'center' };
                                         });
-                                
+
                                         // Obtener los datos de la tabla en HTML
                                         const table = document.getElementById("tabla_compras");
                                         const rows = Array.from(table.querySelectorAll("tbody tr")).map(row =>
@@ -424,7 +433,7 @@
                                                 return isNaN(value) ? value : parseFloat(value); // Convertir números
                                             })
                                         );
-                                
+
                                         // Agregar las filas de datos a la hoja de cálculo
                                         rows.forEach(rowData => {
                                             const row = worksheet.addRow(rowData);
@@ -432,7 +441,7 @@
                                             row.getCell(10).numFmt = '#,##0.00';
                                             row.getCell(11).numFmt = '#,##0.00';
                                         });
-                                
+
                                         // Calcular el total en la última columna y agregar la fila de totales
                                         const totalImporte = rows.reduce((sum, row) => sum + (row[10] || 0), 0);
                                         const totalsRow = worksheet.addRow(['', '', '', '', '', '', '', '', '', 'TOTALES', totalImporte]);
@@ -440,12 +449,12 @@
                                         totalsRow.getCell(11).font = { bold: true, color: { argb: 'FFFFFF' } };
                                         totalsRow.getCell(11).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD700' } };
                                         totalsRow.getCell(11).alignment = { horizontal: 'center' };
-                                
+
                                         // Ajuste automático del ancho de las columnas
                                         worksheet.columns.forEach(column => {
                                             column.width = 15;
                                         });
-                                
+
                                         // Generar y descargar el archivo .xlsx
                                         const buffer = await workbook.xlsx.writeBuffer();
                                         const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
@@ -465,24 +474,26 @@
                                 <i class="fa fa-file-pdf mr-2" style="color: red;"></i>
                                 <strong>Exportar a PDF</strong>
 
-                                <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
-                                <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
+                                <script
+                                    src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+                                <script
+                                    src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
 
                                 <script>
                                     function exportToPDF() {
                                         const { jsPDF } = window.jspdf;
                                         const doc = new jsPDF('landscape'); // Orientación horizontal
-                                
+
                                         // Encabezado alineado a la derecha
                                         doc.setFontSize(10);
                                         doc.text("REGISTRO LIBRO VENTAS ELECTRÓNICO", 270, 20, { align: "right" });
                                         doc.text("RAZÓN SOCIAL: TEXTILES CREANDO MODA S.A.C.", 270, 25, { align: "right" });
                                         doc.text("RUC: 20605560157", 270, 30, { align: "right" });
-                                
+
                                         // Título de la sección
                                         doc.setFontSize(12);
                                         doc.text("Detalle de Productos/Servicios", 14, 40);
-                                
+
                                         // Datos de la tabla de productos/servicios
                                         doc.autoTable({
                                             startY: 45,
@@ -508,7 +519,7 @@
                                                 10: { cellWidth: 30 }
                                             }
                                         });
-                                
+
                                         // Totales de la factura
                                         const finalY = doc.lastAutoTable.finalY + 10;
                                         doc.setFontSize(10);
@@ -519,12 +530,12 @@
                                         doc.text("Total:", 190, finalY + 10, { align: "right" });
                                         doc.setFontSize(12);
                                         doc.text("2950.00", 250, finalY + 10, { align: "right" });
-                                
+
                                         // Información de pie de página
                                         doc.setFontSize(8);
                                         doc.text("Esta es una representación impresa del libro de compras electrónico generado en el Sistema de SUNAT.", 14, finalY + 20);
                                         doc.text("Puede verificarla utilizando su clave SOL.", 14, finalY + 25);
-                                
+
                                         // Guardar el PDF
                                         doc.save("Libro_de_Compras_Electronico.pdf");
                                     }
@@ -536,7 +547,8 @@
             </header>
 
 
-            <p class="text-muted small mb-4">Registro detallado de todas las adquisiciones realizadas por la empresa, utilizado para control de gastos y cálculo de créditos fiscales.</p>
+            <p class="text-muted small mb-4">Registro detallado de todas las adquisiciones realizadas por la empresa,
+                utilizado para control de gastos y cálculo de créditos fiscales.</p>
             <div class="container">
 
                 <form class="row g-3 mb-3 align-items-end">
@@ -621,7 +633,7 @@
                         <tr>
                             <th colspan="10" class="text-end" style="font-weight: bold;">TOTALES</th>
                             <th class="text-center" style="font-weight: bold;">2950.00</th>
-                        </tr> 
+                        </tr>
                     </tfoot>
                 </table>
 
@@ -682,7 +694,8 @@
             </header>
 
 
-            <p class="text-muted small mb-4">Registro detallado de todas las adquisiciones realizadas por la empresa, utilizado para control de gastos y cálculo de créditos fiscales.</p>
+            <p class="text-muted small mb-4">Registro detallado de todas las adquisiciones realizadas por la empresa,
+                utilizado para control de gastos y cálculo de créditos fiscales.</p>
             <div class="container">
 
                 <form class="row g-3 mb-3 align-items-end">
@@ -718,10 +731,11 @@
                 <table class="table table-bordered table-hover">
                     <thead class="table-light">
                         <tr>
+                            <th class="text-center">N° CORRELATIVO</th>
                             <th class="text-center">FECHA</th>
-                            <th class="text-center">RUC</th>
-                            <th class="text-center">RAZON SOCIAL</th>
-                            <th class="text-center">DESCRIPCIÓN</th>
+                            <th class="text-center">DOCUMENTO</th>
+                            <th class="text-center">NOMBRE</th>
+                            <th class="text-center">N° COMPROBANTE</th>
                             <th class="text-center">COMPROBANTE</th>
                             <th class="text-center">MONTO</th>
                             <th class="text-center">IGV</th>
@@ -729,38 +743,31 @@
                         </tr>
                     </thead>
                     <tbody>
-
+                        {% for registro in registros_compras %}
                         <tr>
-                            <td class="text-center">01/01/2024</td>
-                            <td class="text-center">20605560157</td>
-                            <td class="text-center">PROVEEDOR A</td>
-                            <td class="text-center">Compra de mercaderia</td>
-                            <td class="text-center">Factura-001</td>
-                            <td class="text-center">1000.00</td>
-                            <td class="text-center">180.00</td>
-                            <td class="text-center">1180.00</td>
+                            <td class="text-center">{{ registro.numero_correlativo }}</td>
+                            <td class="text-center">{{ registro.fecha.strftime('%Y-%m-%d') }}</td>
+                            <td class="text-center">{{ registro.documento_cliente }}</td>
+                            <td class="text-center">{{ registro.nombre_cliente }}</td>
+                            <td class="text-center">{{ registro.num_comprobante }}</td>
+                            <td class="text-center">{{ registro.comprobante_pago }}</td>
+                            <td class="text-end">{{ registro.importe | round(2) }}</td>
+                            <td class="text-end">{{ registro.igv | round(2) }}</td>
+                            <td class="text-end">{{ registro.total | round(2) }}</td>
                         </tr>
-
-                        <tr>
-                            <td class="text-center">01/01/2024</td>
-                            <td class="text-center">20605560157</td>
-                            <td class="text-center">PROVEEDOR A</td>
-                            <td class="text-center">Compra de mercaderia</td>
-                            <td class="text-center">Factura-001</td>
-                            <td class="text-center">1000.00</td>
-                            <td class="text-center">180.00</td>
-                            <td class="text-center">1180.00</td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th colspan="7" class="text-end" style="font-weight: bold;">TOTALES</th>
-                            <th style="font-weight: bold;">1180.00</th>
-                        </tr> 
+                            <th colspan="6" class="text-end" style="font-weight: bold;">TOTALES</th>
+                            <th class="text-end" style="font-weight: bold;">{{ totale.total_importe | round(2) }}</th>
+                            <th class="text-end" style="font-weight: bold;">{{ totale.total_igv | round(2) }}</th>
+                            <th class="text-end" style="font-weight: bold;">{{ totale.total_general | round(2) }}</th>
+                        </tr>
                     </tfoot>
                 </table>
-
             </div>
+
 
             <nav aria-label="Navegación de páginas" class="d-flex justify-content-between align-items-center">
                 <ul class="pagination pagination-sm mb-0">
