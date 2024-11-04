@@ -4,7 +4,7 @@ from flask import current_app, make_response, render_template, send_file
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from flask import render_template, send_file, request, jsonify, redirect, url_for, flash
-from app.models.transaccional_models import obtener_productos, obtener_ventas, obtener_marcas, obtener_categorias, obtener_ingresos, obtener_nota_salida, obtener_inventario, obtener_subcategorias_por_categoria, agregar_producto, obtener_inventario_vigente, listarClientes, obtener_id_sucursal, obtener_ultimo_comprobante, obtener_ventas_con_detalles, obtener_proveedor, obtener_almacen
+from app.models.transaccional_models import obtener_productos, obtener_ventas, obtener_marcas, obtener_categorias, obtener_ingresos, obtener_nota_salida, obtener_inventario, obtener_subcategorias_por_categoria, agregar_producto, obtener_inventario_vigente, listarClientes, obtener_id_sucursal, obtener_ultimo_comprobante, obtener_ventas_con_detalles, obtener_proveedor, obtener_almacen, obtener_compras_con_detalles
 
 import app.models.transaccional_models as transac 
 from app.models.transaccional_models import generate_barcode
@@ -153,14 +153,14 @@ def add_venta():
 
 # Modulo de compras
 
-@transactional_bp.route('/compras')
+
+@transactional_bp.route('/compras', methods=['GET'])
 @jwt_required()
 def compras():
+    compras_con_detalles = obtener_compras_con_detalles()
     proveedor = obtener_proveedor()
     almacen = obtener_almacen()
-    categoria = obtener_categorias()
-    datos_inventario = obtener_inventario_vigente()
-    return render_template('transaccional/compras/compras.html', compras=compras, proveedor=proveedor, almacen=almacen, categoria=categoria, datos_inventario=datos_inventario)
+    return render_template('transaccional/compras/compras.html', proveedor=proveedor, almacen=almacen, compras=compras_con_detalles)
 
 
 @transactional_bp.route('/registrar_compra', methods=['POST'])

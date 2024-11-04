@@ -68,28 +68,61 @@
     }
 </style>
 
-<!-- Tabs de Reporte -->
 <div class="mb-4">
     <div class="nav nav-tabs">
-        <a class="nav-item nav-link active" href="#compra" data-toggle="tab">
-            <i class="fas fa-door-closed"></i> Compra productos
+        <a class="nav-item nav-link active" href="#listacompras" data-bs-toggle="tab">
+            <i class="fas fa-shopping-cart"></i> Lista de Compras
+        </a>
+        <a class="nav-item nav-link" href="#compranueva" data-bs-toggle="tab">
+            <i class="fas fa-shopping-cart"></i> Nueva Compra
         </a>
     </div>
 </div>
 
 <div class="tab-content">
-    <!-- Inventario -->
-    <div class="tab-pane fade" id="compra">
-        <!-- Detalles -->
-        <div class="mb-4">
-            <hr>
-            <p class="text-muted" style="font-size: 14px;">
-                Consulta las ventas realizadas en el sistema.
-            </p>
+    <div class="tab-pane fade show active" id="listacompras">
+        <div class="accordion accordion-flush mb-5" id="accordionCompras">
+            {% for id_compra, compra in compras.items() %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading{{ id_compra }}">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ id_compra }}" aria-expanded="false" aria-controls="collapse{{ id_compra }}">
+                        <span style="font-size: 1.1em; font-weight: bold;">Compra Nº {{ id_compra }}</span>
+                        <div class="mt-1 ms-5" style="font-size: 0.9em;">
+                            <b>F. Compra:</b> {{ compra.f_compra }}<br>
+                            <b>Monto Total:</b> S/ {{ compra.monto_total | round(2) if compra.monto_total is not none else 'No disponible' }}
+                        </div>
+                    </button>
+                </h2>
+                <div id="collapse{{ id_compra }}" class="accordion-collapse collapse" aria-labelledby="heading{{ id_compra }}" data-bs-parent="#accordionCompras">
+                    <div class="accordion-body">
+                        <table class="table table-border-light">
+                            <thead>
+                                <tr>
+                                    <th style="font-weight: bold">Producto</th>
+                                    <th style="font-weight: bold; text-align: center">Cantidad</th>
+                                    <th style="font-weight: bold; text-align: center">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for producto in compra.productos %}
+                                <tr class="border-light">
+                                    <td>{{ producto.descripcion }}</td>
+                                    <td style="text-align: center">{{ producto.cantidad }}</td>
+                                    <td style="text-align: center">S/ {{ producto.total | round(2) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
         </div>
+        
     </div>
 
-    <div class="tab-pane fade show active" id="compra">
+
+    <div class="tab-pane fade" id="compranueva">
         <div class="mb-4">
             <hr>
             <p class="text-muted" style="font-size: 14px;">
@@ -97,161 +130,149 @@
             </p>
         </div>
 
-    </div>
-
-    <form id="compraForm" method="post" action="{{ url_for('transaccional.registrar_compra') }}">
-        <div class="row align-items-center">
-            <div class="col-lg-4">
-                <div class="row">
-                    <div class="col-lg-4">
-                        <h6 class="mt-2"><b>Proveedor:</b></h6>
-                    </div>
-                    <div class="col-lg-8">
-                        <select class="form-control" aria-label="Default select example" name="proveedor" id="provider">
-                            <option selected>Seleccione...</option>
-                            {% for proveedor in proveedor %}
-                            <option value="{{proveedor.id_proveedor}}">{{proveedor.razon_social}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4">
-                <div class="row align-items-center">
-                    <div class="col-lg-4">
-                        <h6 class="mt-2"><b>Nro. Comprobante:</b></h6>
-                    </div>
-                    <div class="col-lg-8">
-                        <div>
-                            <!-- <span class="input-group-text" id="basic-addon1"><i class="fa-solid fa-magnifying-glass"></i></span> -->
-                            <input type="text" class="form-control" name="nro_comprobante" placeholder="B000-000000"
-                                aria-label="razonsosial" aria-describedby="basic-addon1">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4">
-                <div class="row align-items-center">
-                    <div class="col-lg-4">
-                        <h6 class="mt-2"><b>Forma de Pago:</b></h6>
-                    </div>
-                    <div class="col-lg-8">
-                        <select class="form-control" aria-label="Default select example" name="forma_pago"
-                            id="formaPago">
-                            <option selected>Seleccione...</option>
-                            <option value="1">Efectivo</option>
-                            <option value="2">Yape</option>
-                            <option value="3">Plin</option>
-                            <option value="3">Visa</option>
-                            <option value="4">America Express</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row align-items-center" style="margin-top: 10px;">
-            <div class="col-lg-4">
-                <div class="row">
-                    <div class="col-lg-4">
-                        <h6 class="mt-2"><b>Almacen:</b></h6>
-                    </div>
-                    <div class="col-lg-8">
-                        <select class="form-control" aria-label="Default select example" name="almacen" id="almacen">
-                            <option selected>Seleccione...</option>
-                            {% for almacen in almacen %}
-                            <option value="1">{{almacen.nom_almacen}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="row align-items-center">
-                    <div class="col-lg-4">
-                        <h6 class="mt-2"><b>Fecha:</b></h6>
-                    </div>
-                    <div class="col-lg-8">
-                        <div class="input-group input-group-md">
-                            <input type="date" class="form-control" name="fecha" id="date">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-lg-10">
-            </div>
-            <div class="col-lg-2 text-end">
-                <button type="button" class="btn btn-success mt-4" style="width: 100%;" data-bs-toggle="modal"
-                    data-bs-target="#productModal">Agregar</button>
-            </div>
-        </div>
-        <!------------------------------------------------------------------------------------------------>
-        <div class="row" style="margin-bottom: 7%;">
-            <div class="container mt-4">
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th class="text-center" style="font-weight: bolder;">Producto</th>
-                                <th class="text-center" style="font-weight: bolder;">Cantidad</th>
-                                <th class="text-center" style="font-weight: bolder;">Precio unitario</th>
-                                <th class="text-center" style="font-weight: bolder;">Subtotal</th>
-                                <th class="text-center" style="font-weight: bolder;">Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Aquí se agregarán los productos seleccionados del modal -->
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="flex justify-content-end container mt-4">
-                    <div class="flex flex-col w-100">
-                        <div class="flex justify-between y-1 items-center row justify-content-end">
-                            <span class="fw-bolder d-flex align-items-center span-title me-3">IMPORTE</span>
-                            <span class="inputs-montos" id="importe">S/. 0.00</span>
-                        </div>
-                        <div class="flex justify-between my-1 items-center row justify-content-end">
-                            <span class="fw-bolder d-flex align-items-center span-title me-3">IGV</span>
-                            <span class="inputs-montos">S/. <span id="igvDisplay">0.00</span></span>
-                            <input type="hidden" name="igv" id="igv" value="0.00">
-                        </div>
-
-                        <div class="flex justify-between my-1 items-center row justify-content-end">
-                            <span class="fw-bolder d-flex align-items-center span-title me-3">TOTAL</span>
-                            <span class="inputs-montos">S/. <span id="monto_totalDisplay">0.00</span></span>
-                            <input type="hidden" name="monto_total" id="monto_total" value="0.00">
-                        </div>
-                    </div>
-                </div>
-
-                <div>
+        <form id="compraForm" method="post" action="{{ url_for('transaccional.registrar_compra') }}">
+            <div class="row align-items-center">
+                <div class="col-lg-4">
                     <div class="row">
-                        <div class="col-lg-10">
+                        <div class="col-lg-4">
+                            <h6 class="mt-2"><b>Proveedor:</b></h6>
                         </div>
-                        <div class="col-lg-2 mt-4 text-end">
-                            <button type="submit" class="btn btn-success" style="width: 100%;">Guardar Compra</button>
+                        <div class="col-lg-8">
+                            <select class="form-control" aria-label="Default select example" name="proveedor" id="provider">
+                                <option selected>Seleccione...</option>
+                                {% for proveedor in proveedor %}
+                                <option value="{{proveedor.id_proveedor}}">{{proveedor.razon_social}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="col-lg-4">
+                    <div class="row align-items-center">
+                        <div class="col-lg-4">
+                            <h6 class="mt-2"><b>Nro. Comprobante:</b></h6>
+                        </div>
+                        <div class="col-lg-8">
+                            <div>
+                                <!-- <span class="input-group-text" id="basic-addon1"><i class="fa-solid fa-magnifying-glass"></i></span> -->
+                                <input type="text" class="form-control" name="nro_comprobante" placeholder="B000-000000"
+                                    aria-label="razonsosial" aria-describedby="basic-addon1">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="col-lg-4">
+                    <div class="row align-items-center">
+                        <div class="col-lg-4">
+                            <h6 class="mt-2"><b>Forma de Pago:</b></h6>
+                        </div>
+                        <div class="col-lg-8">
+                            <select class="form-control" aria-label="Default select example" name="forma_pago"
+                                id="formaPago">
+                                <option selected>Seleccione...</option>
+                                <option value="1">Efectivo</option>
+                                <option value="2">Yape</option>
+                                <option value="3">Plin</option>
+                                <option value="3">Visa</option>
+                                <option value="4">America Express</option>
+                            </select>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </form>
-
-    <!-- Sistema Contable -->
-    <div class="tab-pane fade" id="siscon">
-        <!-- Detalles -->
-        <div class="mb-4">
-            <hr>
-            <p class="text-muted" style="font-size: 14px;">
-                Podrás visualizar y registrar las notas de salidas.
-            </p>
-        </div>
+    
+            <div class="row align-items-center" style="margin-top: 10px;">
+                <div class="col-lg-4">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <h6 class="mt-2"><b>Almacen:</b></h6>
+                        </div>
+                        <div class="col-lg-8">
+                            <select class="form-control" aria-label="Default select example" name="almacen" id="almacen">
+                                <option selected>Seleccione...</option>
+                                {% for almacen in almacen %}
+                                <option value="1">{{almacen.nom_almacen}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="row align-items-center">
+                        <div class="col-lg-4">
+                            <h6 class="mt-2"><b>Fecha:</b></h6>
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="input-group input-group-md">
+                                <input type="date" class="form-control" name="fecha" id="date">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            <div class="row">
+                <div class="col-lg-10">
+                </div>
+                <div class="col-lg-2 text-end">
+                    <button type="button" class="btn btn-success mt-4" style="width: 100%;" data-bs-toggle="modal"
+                        data-bs-target="#productModal">Agregar</button>
+                </div>
+            </div>
+            <!------------------------------------------------------------------------------------------------>
+            <div class="row" style="margin-bottom: 7%;">
+                <div class="container mt-4">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="text-center" style="font-weight: bolder;">Producto</th>
+                                    <th class="text-center" style="font-weight: bolder;">Cantidad</th>
+                                    <th class="text-center" style="font-weight: bolder;">Precio unitario</th>
+                                    <th class="text-center" style="font-weight: bolder;">Subtotal</th>
+                                    <th class="text-center" style="font-weight: bolder;">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Aquí se agregarán los productos seleccionados del modal -->
+                            </tbody>
+                        </table>
+                    </div>
+    
+                    <div class="flex justify-content-end container mt-4">
+                        <div class="flex flex-col w-100">
+                            <div class="flex justify-between y-1 items-center row justify-content-end">
+                                <span class="fw-bolder d-flex align-items-center span-title me-3">IMPORTE</span>
+                                <span class="inputs-montos" id="importe">S/. 0.00</span>
+                            </div>
+                            <div class="flex justify-between my-1 items-center row justify-content-end">
+                                <span class="fw-bolder d-flex align-items-center span-title me-3">IGV</span>
+                                <span class="inputs-montos">S/. <span id="igvDisplay">0.00</span></span>
+                                <input type="hidden" name="igv" id="igv" value="0.00">
+                            </div>
+    
+                            <div class="flex justify-between my-1 items-center row justify-content-end">
+                                <span class="fw-bolder d-flex align-items-center span-title me-3">TOTAL</span>
+                                <span class="inputs-montos">S/. <span id="monto_totalDisplay">0.00</span></span>
+                                <input type="hidden" name="monto_total" id="monto_total" value="0.00">
+                            </div>
+                        </div>
+                    </div>
+    
+                    <div>
+                        <div class="row">
+                            <div class="col-lg-10">
+                            </div>
+                            <div class="col-lg-2 mt-4 text-end">
+                                <button type="submit" class="btn btn-success" style="width: 100%;">Guardar Compra</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 </div>
