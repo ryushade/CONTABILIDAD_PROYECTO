@@ -617,20 +617,24 @@ def obtener_registro_ventas():
         with conexion.cursor() as cursor:
             cursor.execute("""
                 SELECT 
-                    ROW_NUMBER() OVER (ORDER BY v.id_venta) AS numero_correlativo,
-                    v.f_venta AS fecha,
-                    vb.fecha as fechaVencimiento,
-                    vb.documento_cliente,
-                    vb.nombre_cliente,
-                    c.num_comprobante,
-                    vb.comprobante_pago,
-                    vb.totalImporte_venta AS importe,
-                    vb.igv,
-                    vb.total_t AS total
-                FROM venta v
-                INNER JOIN venta_boucher vb ON v.id_venta_boucher = vb.id_venta_boucher
-                INNER JOIN comprobante c ON c.id_comprobante = v.id_comprobante
-                ORDER BY v.id_venta
+                ROW_NUMBER() OVER (ORDER BY v.id_venta) AS numero_correlativo,
+                v.f_venta as fecha,
+                v.f_venta AS fechaVencimiento,
+                COALESCE(cl.dni, cl.ruc) AS documento_cliente,
+                COALESCE(CONCAT(cl.nombres, ' ', cl.apellidos), cl.razon_social) AS nombre_cliente,
+                c.num_comprobante as num_comprobante,
+                c.num_comprobante as comprobante_pago,
+                SUM((dv.cantidad * dv.precio) - dv.descuento) AS importe,
+                SUM((dv.cantidad * dv.precio) - dv.descuento) * 0.18 AS igv,
+                SUM((dv.cantidad * dv.precio) - dv.descuento) * 1.18 AS total
+            FROM venta v
+            INNER JOIN detalle_venta dv ON v.id_venta = dv.id_venta
+            INNER JOIN comprobante c ON c.id_comprobante = v.id_comprobante
+            INNER JOIN cliente cl ON cl.id_cliente = v.id_cliente
+            GROUP BY 
+                v.id_venta
+            ORDER BY 
+                v.id_venta;
             """)
             resultados = cursor.fetchall()
 
