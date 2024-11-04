@@ -330,14 +330,26 @@ def obtener_cuentas_excel():
 
 
 
-def obtener_usuarios():
+def obtener_usuarios(page, per_page):
     connection = obtener_conexion()       
     try: 
         with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-            sql = "SELECT id_usuario, U.id_rol, nom_rol, usua, contra, estado_usuario FROM usuario U INNER JOIN rol R ON U.id_rol = R.id_rol ORDER BY id_usuario desc"
-            cursor.execute(sql)
+            offset = (page - 1) * per_page
+            sql = """
+                SELECT id_usuario, U.id_rol, nom_rol, usua, contra, estado_usuario
+                FROM usuario U
+                INNER JOIN rol R ON U.id_rol = R.id_rol
+                ORDER BY id_usuario DESC
+                LIMIT %s OFFSET %s
+            """
+            cursor.execute(sql, (per_page, offset))
             usuarios = cursor.fetchall()
-            return usuarios
+            
+            # Consultar el total de resultados
+            cursor.execute("SELECT COUNT(*) as total FROM usuario")
+            total_results = cursor.fetchone()['total']
+            
+            return usuarios, total_results
     finally:
         connection.close()
 
@@ -383,10 +395,11 @@ def obtener_asientodiario():
         connection.close()
 
 
-def obtener_reglas():
+def obtener_reglas(page, per_page):
     connection = obtener_conexion()
     try:
         with connection.cursor() as cursor:
+            offset = (page - 1) * per_page
             sql = """
             SELECT 
                 r.id_regla, 
@@ -403,10 +416,16 @@ def obtener_reglas():
                 cuenta c_debe ON r.cuenta_debe = c_debe.id_cuenta
             LEFT JOIN 
                 cuenta c_haber ON r.cuenta_haber = c_haber.id_cuenta
+            LIMIT %s OFFSET %s
             """
-            cursor.execute(sql)
-            reglas = cursor.fetchall()  
-            return reglas  
+            cursor.execute(sql, (per_page, offset))
+            reglas = cursor.fetchall()
+            
+            # Obtener el total de resultados
+            cursor.execute("SELECT COUNT(*) as total FROM reglas_contabilizacion")
+            total_results = cursor.fetchone()['total']
+            
+            return reglas, total_results
     finally:
         connection.close()
 
@@ -576,5 +595,18 @@ def obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica():
             })
 
         return libro_mayor
+    finally:
+        conexion.close()
+
+def insertar_regla(nombre_regla, tipo_transaccion, cuenta_debito_id, cuenta_credito_id, estado):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            sql = """
+                INSERT INTO reglas_contabilizacion (nombre_regla, tipo_transaccion, cuenta_debe, cuenta_haber, estado)
+                VALUES (%s, %s, %s, %s, %s)
+            """
+            cursor.execute(sql, (nombre_regla, tipo_transaccion, cuenta_debito_id, cuenta_credito_id, estado))
+            conexion.commit()
     finally:
         conexion.close()

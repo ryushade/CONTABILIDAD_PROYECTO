@@ -24,6 +24,30 @@ function openEditUsu(usuarioId) {
     });
 }
 
+function openEditRegla(reglaId) {
+  fetch('/contable/reglas/detalles/' + reglaId)
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        alert('Error: ' + data.error);
+      } else {
+        // Verifica los datos que están siendo asignados
+        console.log("Datos recibidos:", data);
+        document.getElementById('nombre_regla').value = data.nombre_regla;
+        document.getElementById('tipo_transaccion').value = data.tipo_transaccion;
+        document.getElementById('cuenta_debito').value = data.cuenta_debito;
+        document.getElementById('cuenta_credito').value = data.cuenta_credito;
+        document.getElementById('estado').value = data.estado_regla;
+
+        document.getElementById('editReglaModal').style.display = 'flex';
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching rule data:', error);
+    }
+    );
+}
+
 
 
 function closeModal() {
@@ -100,9 +124,21 @@ function openModalDeleteUsu(idUsuario, nombreUsuario) {
   document.getElementById('deleteUsuInfo').innerText = `"${nombreUsuario}"`;
 }
 
+function openModalDeleteRegla(idRegla, nombreRegla) {
+  document.getElementById('deleteReglaModal').style.display = 'flex';
+  document.getElementById('deleteReglaId').value = idRegla;
+  document.getElementById('deleteReglaInfo').innerText = `"${nombreRegla}"`;
+}
+
+function closeModalDeleteRegla() {
+  document.getElementById('deleteReglaModal').style.display = 'none';
+}
+
 function closeModalDeleteUsuario() {
   document.getElementById('deleteUsuarioModal').style.display = 'none';
 }
+
+
 
 function openModalDelete(cuentaId, codigoCuenta, nombreCuenta) {
   // Mostrar el modal
@@ -126,6 +162,15 @@ function deleteCuenta() {
   var form = document.createElement('form');
   form.method = 'POST';
   form.action = '/contable/cuentas/eliminar/' + cuentaId;
+  document.body.appendChild(form);
+  form.submit();
+}
+
+function deleteRegla() {
+  var reglaId = document.getElementById('deleteReglaId').value;
+  var form = document.createElement('form');
+  form.method = 'POST';
+  form.action = '/contable/reglas/eliminar/' + reglaId;
   document.body.appendChild(form);
   form.submit();
 }
@@ -267,13 +312,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
-
-
-
-
-
-
-
 
 
 // Función para Cerrar el Modal

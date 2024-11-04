@@ -136,6 +136,7 @@ def obtener_cuenta(cuenta_id):
         return jsonify({'error': 'Cuenta no encontrada'}), 404
     
 
+
 @accounting_bp.route('/cuentas/editar/<int:cuenta_id>', methods=['POST'])
 def editar_cuenta(cuenta_id):
     codigo_cuenta = request.form['codigo_cuenta']
@@ -150,14 +151,48 @@ def editar_cuenta(cuenta_id):
 @accounting_bp.route('/reglas', methods=['GET'])
 @jwt_required()
 def reglas():
-    reglas = obtener_reglas()
-    return render_template('contable/reglas/reglas.html', reglas=reglas)
+    page = request.args.get('page', default=1, type=int)
+    per_page = request.args.get('per_page', default=50, type=int)
 
-@accounting_bp.route('/usuarios', methods = ['GET'])
+    reglas, total_results = obtener_reglas(page, per_page)
+
+    total_pages = (total_results + per_page - 1) // per_page
+
+    return render_template(
+        'contable/reglas/reglas.html',
+        reglas=reglas,
+        page=page,
+        per_page=per_page,
+        total_results=total_results,
+        total_pages=total_pages,
+        max = max,
+        min = min,
+    )
+
+
+@accounting_bp.route('/usuarios', methods=['GET'])
+@jwt_required()
 def usuarios():
-    usuarios = obtener_usuarios()
+    page = request.args.get('page', default=1, type=int)
+    per_page = request.args.get('per_page', default=50, type=int)
+
+    usuarios, total_results = obtener_usuarios(page, per_page)
     roles = obtener_roles()
-    return render_template('contable/usuarios/usuarios.html', usuarios=usuarios, roles=roles)
+
+    total_pages = (total_results + per_page - 1) // per_page
+
+    return render_template(
+        'contable/usuarios/usuarios.html',
+        usuarios=usuarios,
+        roles=roles,
+        page=page,
+        per_page=per_page,
+        total_results=total_results,
+        total_pages=total_pages,
+        max=max,  
+        min=min   
+    )
+
 
 @accounting_bp.route('/usuarios/obtener/<int:usuario_id>', methods=['GET'])
 def obtener_usuario(usuario_id):
@@ -247,6 +282,8 @@ def eliminar_cuenta(cuenta_id):
 def eliminar_regla(regla_id):
     eliminar_regla_bd(regla_id)  # Llama a la función separada
     return redirect(url_for('contable.reglas'))
+
+
 
 @accounting_bp.route('/reglas/editar/<int:regla_id>', methods=['POST'])
 def editar_regla(regla_id):
