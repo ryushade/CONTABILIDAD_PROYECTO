@@ -306,6 +306,10 @@ def ldpf():
 @jwt_required()
 def exportar_libro_diario_excel():
     from io import BytesIO
+    import openpyxl
+    from flask import send_file, current_app
+    from datetime import datetime
+    import os
 
     # Ruta de la plantilla
     template_path = os.path.join(current_app.root_path, 'templates', 'contable', 'plantillas', 'L,D.xlsx')
@@ -331,6 +335,7 @@ def exportar_libro_diario_excel():
     # Definir la fila inicial para insertar los datos en la tabla
     start_row = 11  # Comenzar desde la fila 11 como especificaste
 
+    # Suponiendo que obtienes los datos de una función llamada obtener_asientos_agrupados
     asientos, _ = obtener_asientos_agrupados()
     numero_correlativo = 1
 
@@ -347,8 +352,8 @@ def exportar_libro_diario_excel():
             worksheet[f'F{current_row}'] = asiento['num_comprobante']
             worksheet[f'G{current_row}'] = detalle['codigo_cuenta']
             worksheet[f'H{current_row}'] = detalle['nombre_cuenta']
-            worksheet[f'I{current_row}'] = detalle['debe']
-            worksheet[f'J{current_row}'] = detalle['haber']
+            worksheet[f'I{current_row}'] = detalle['debe'] if detalle['debe'] != 0 else None
+            worksheet[f'J{current_row}'] = detalle['haber'] if detalle['haber'] != 0 else None
             
             # Sumar los valores para el total
             total_debe += detalle['debe']
@@ -481,6 +486,11 @@ def exportar_libro_mayor_excel():
 @accounting_bp.route('/exportar_libro_diario_pdf', methods=['GET'])
 @jwt_required()
 def exportar_libro_diario_pdf():
+    from fpdf import FPDF
+    from flask import send_file
+    from datetime import datetime
+    from io import BytesIO
+
     # Crear un objeto FPDF en orientación horizontal
     pdf = FPDF(orientation='L', unit='mm', format='A4')
     pdf.add_page()
@@ -524,8 +534,8 @@ def exportar_libro_diario_pdf():
             pdf.set_font("Arial", size=10)  # Restaurar el tamaño de la fuente
             
             pdf.cell(30, 10, asiento['num_comprobante'], border=1, align='C')
-            pdf.cell(35, 10, f"{detalle['debe']:.2f}", border=1, align='R')
-            pdf.cell(35, 10, f"{detalle['haber']:.2f}", border=1, align='R')
+            pdf.cell(35, 10, f"{detalle['debe']:.2f}" if detalle['debe'] != 0 else '', border=1, align='R')
+            pdf.cell(35, 10, f"{detalle['haber']:.2f}" if detalle['haber'] != 0 else '', border=1, align='R')
             pdf.ln(10)
             
             total_debe += detalle['debe']
@@ -545,6 +555,7 @@ def exportar_libro_diario_pdf():
     output.seek(0)
 
     return send_file(output, download_name="libro_diario.pdf", as_attachment=True)
+
 
 @accounting_bp.route('/exportar_libro_mayor_pdf', methods=['GET'])
 @jwt_required()
