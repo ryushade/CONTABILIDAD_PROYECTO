@@ -141,12 +141,16 @@
                                 {% endif %}
                                 <td>{{ detalle.codigo_cuenta }}</td>
                                 <td>{{ detalle.nombre_cuenta }}</td>
-                                <td class="text-end">{{ detalle.debe | round(2) }}</td>
-                                <td class="text-end">{{ detalle.haber | round(2) }}</td>
+                                <td class="text-end">
+                                    {{ detalle.debe if detalle.debe != 0 else '' }}
+                                </td>
+                                <td class="text-end">
+                                    {{ detalle.haber if detalle.haber != 0 else '' }}
+                                </td>
                             </tr>
                             {% endfor %}
                         {% endfor %}
-                    </tbody>                    
+                    </tbody>                                       
                     <tfoot>
                         <tr>
                             <th colspan="6" class="text-end" style="font-weight: bold;">TOTALES (S/.)</th>
