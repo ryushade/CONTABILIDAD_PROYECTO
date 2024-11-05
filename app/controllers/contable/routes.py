@@ -18,8 +18,29 @@ from io import BytesIO
 from werkzeug.utils import secure_filename
 from flask_jwt_extended import get_jwt_identity
 
+def role_required(*roles):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            user_id = get_jwt_identity()
+            user = obtener_usuario_por_id(user_id)
+            
+            if not user:
+                print("Error: Usuario no encontrado")
+                session['show_permission_alert'] = True  # Activa el mensaje en la sesión
+                return abort(403)
+            
+            user_role = user['rol']['nom_rol'].strip().upper()
+            print(f"Usuario rol: {user_role}")
 
+            if user_role not in [role.upper() for role in roles]:
+                print("Error: Rol no permitido")
+                session['show_permission_alert'] = True  # Activa el mensaje en la sesión
+                return abort(403)
 
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
 
 @accounting_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -59,6 +80,7 @@ def logout():
 
 @accounting_bp.route('/reportes', methods=['GET'])
 @jwt_required()
+@role_required('ADMIN', 'CONTADOR')
 def reportes():
     tipo_registro = request.args.get('tipo_registro', 'Todas')
     daterange = request.args.get('daterange', '')
@@ -90,6 +112,7 @@ def reportes():
 import app.models.contable_models as conta
 @accounting_bp.route('/cuentas', methods=['GET'])
 @jwt_required()
+@role_required('ADMIN', 'CONTADOR')
 def cuentas():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 50, type=int)
@@ -168,27 +191,6 @@ def obtener_cuenta(cuenta_id):
     else:
         return jsonify({'error': 'Cuenta no encontrada'}), 404
     
-def role_required(*roles):
-    def decorator(f):
-        @wraps(f)
-        def decorated_function(*args, **kwargs):
-            user_id = get_jwt_identity()
-            user = obtener_usuario_por_id(user_id)
-            
-            if not user:
-                print("Error: Usuario no encontrado")
-                return abort(403)
-            
-            user_role = user['rol']['nom_rol'].strip().upper() 
-            print(f"Usuario rol: {user_role}")  
-
-            if user_role not in [role.upper() for role in roles]: 
-                print("Error: Rol no permitido")
-                return abort(403)  
-
-            return f(*args, **kwargs)
-        return decorated_function
-    return decorator
 
 
 
@@ -323,6 +325,7 @@ def actualizar_regla(id_regla):
 
 @accounting_bp.route('/reglas', methods=['GET'])
 @jwt_required()
+@role_required('ADMIN', 'CONTADOR')
 def reglas():
     page = request.args.get('page', default=1, type=int)
     per_page = request.args.get('per_page', default=50, type=int)
