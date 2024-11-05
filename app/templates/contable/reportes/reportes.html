@@ -751,6 +751,7 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                {% if lista_libro_caja %}
                                 {% for lista in lista_libro_caja %}
                                 <tr>
                                     <td>{{lista.fecha}}</td>
@@ -761,13 +762,18 @@
                                     <td>{{lista.haber | round(2)}}</td>
                                 </tr>
                                 {% endfor %}
+                                {% endif %}
                             </tbody>
                             <tfoot>
+                                {% if total_caja %}
                                 <tr>
+                                    
                                     <th colspan="4" class="text-end" style="font-weight: bold;">TOTALES</th>
                                     <th style="font-weight: bold;">{{total_caja.debe | round(2)}}</th>
                                     <th style="font-weight: bold;">{{total_caja.haber | round(2)}}</th>
+                                    
                                 </tr>
+                                {% endif %}
                             </tfoot>
                         </table>
 
@@ -797,6 +803,7 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                {% if lista_libro_caja_cuenta_corriente %}
                                 {% for lista in lista_libro_caja_cuenta_corriente %}
                                 <tr>
                                     <td>{{lista.fecha}}</td>
@@ -810,13 +817,16 @@
                                     <td>{{lista.haber | round(2)}}</td>
                                 </tr>
                                 {% endfor %}
+                                {% endif %}
                             </tbody>
                             <tfoot>
+                                {% if total_caja_corriente %}
                                 <tr>
                                     <th colspan="7" class="text-end" style="font-weight: bold;">TOTALES</th>
                                     <th style="font-weight: bold;">{{total_caja_corriente.debe | round(2)}}</th>
                                     <th style="font-weight: bold;">{{total_caja_corriente.haber | round(2)}}</th>
                                 </tr>
+                                {% endif %}
                             </tfoot>
                         </table>
 
