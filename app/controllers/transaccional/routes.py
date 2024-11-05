@@ -186,6 +186,17 @@ def compras():
     return render_template('transaccional/compras/compras.html', proveedor=proveedor, almacen=almacen, datos_inventario=datos_inventario,compras=compras_con_detalles)
 
 
+@transactional_bp.route('/compras2', methods=['GET'])
+@jwt_required()
+def compras2():
+    compras_con_detalles = obtener_compras_con_detalles()
+    proveedor = obtener_proveedor()
+    almacen = obtener_almacen()
+    datos_inventario = obtener_inventario_vigente()
+    return render_template('transaccional/compras/compras2.html', proveedor=proveedor, almacen=almacen, datos_inventario=datos_inventario,compras=compras_con_detalles)
+
+
+
 @transactional_bp.route('/registrar_compra', methods=['POST'])
 def registrar_compra():
     try:
