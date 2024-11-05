@@ -1,6 +1,6 @@
 from flask import json, request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
-from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, obtener_regla_por_id, obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas
+from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, obtener_regla_por_id, obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas,obtener_asientos_agrupados_excel,obtener_registro_compras
 
 from . import accounting_bp
 import pandas as pd
@@ -56,8 +56,9 @@ def reportes():
     tipo_registro = request.args.get('tipo_registro', 'Todas')
     asientos, totales = obtener_asientos_agrupados(tipo_registro)
     libro_mayor_data, total_debe, total_haber = obtener_libro_mayor_agrupado_por_fecha()
-    registro_compra_data, totale = obtener_registro_ventas()
-    return render_template('contable/reportes/reportes.html', asientos=asientos, totales=totales, libro_mayor=libro_mayor_data, total_debe=total_debe, total_haber=total_haber, registros_compras=registro_compra_data, totale=totale)
+    registro_venta_data, totale = obtener_registro_ventas()
+    registro_compra_data, totales_compra = obtener_registro_compras()
+    return render_template('contable/reportes/reportes.html', asientos=asientos, totales=totales, libro_mayor=libro_mayor_data, total_debe=total_debe, total_haber=total_haber, registros_ventas=registro_venta_data, totale=totale, registros_compras = registro_compra_data,totalesCompras = totales_compra)
 
 
 import app.models.contable_models as conta
@@ -772,8 +773,15 @@ def exportar_registro_ventas_excel():
             worksheet[f'D{current_row}'] = '03' # tipo
         else:
             worksheet[f'D{current_row}'] = '07' # tipo
-        worksheet[f'E{current_row}'] = registro["num_comprobante"] #serie
-        worksheet[f'F{current_row}'] = registro["num_comprobante"] #numero
+
+        comprobante = registro["num_comprobante"]
+
+        serie = comprobante.split("-")[0][1:]
+        numero = comprobante.split("-")[1]
+
+        worksheet[f'E{current_row}'] = serie  # la serie
+        worksheet[f'F{current_row}'] = numero # el número
+
         if len(str(registro["documento_cliente"])) == 8:
             worksheet[f'G{current_row}'] = '1' 
         else:
@@ -835,9 +843,9 @@ def exportar_registro_ventas_pdf():
     # Encabezados de la tabla
     pdf.set_font("Arial", style='B', size=9)
     headers = [
-        ('N°', 10), ('Fecha Emisión', 25), ('Fecha Vencimiento', 25), 
-        ('Tipo', 10), ('Serie', 15), ('Número', 20), ('Tipo Doc.', 15), 
-        ('Doc. Cliente', 25), ('Nombre Cliente', 50), ('Valor Exp.', 20), 
+        ('N°', 10), ('F. Emisión', 23), ('F. Vencimiento', 25), 
+        ('Tipo', 10), ('Serie', 13), ('Número', 20), ('Tipo Doc.', 15), 
+        ('N° Doc', 25), ('Nombre Cliente', 70), 
         ('Importe', 20), ('IGV', 20), ('Total', 20)
     ]
     for header, width in headers:
@@ -845,20 +853,31 @@ def exportar_registro_ventas_pdf():
     pdf.ln(10)
 
     # Obtener registros de ventas
-    registros_compras, totales = obtener_registro_ventas()
+    registros_ventas, totales = obtener_registro_ventas()
     
     pdf.set_font("Arial", size=9)
-    for registro in registros_compras:
+    for registro in registros_ventas:
         pdf.cell(10, 10, str(registro["numero_correlativo"]), border=1, align='C')
-        pdf.cell(25, 10, registro["fecha"].strftime('%d/%m/%Y'), border=1, align='C')
+        pdf.cell(23, 10, registro["fecha"].strftime('%d/%m/%Y'), border=1, align='C')
         pdf.cell(25, 10, registro["fechaV"].strftime('%d/%m/%Y'), border=1, align='C')
-        pdf.cell(10, 10, '01' if registro["num_comprobante"][0] == "F" else '03' if registro["num_comprobante"][0] == "B" else '07', border=1, align='C')
-        pdf.cell(15, 10, registro["num_comprobante"][:4], border=1, align='C')  # Serie
-        pdf.cell(20, 10, registro["num_comprobante"][4:], border=1, align='C')  # Número
-        pdf.cell(15, 10, '1' if len(str(registro["documento_cliente"])) == 8 else '6', border=1, align='C')
+        
+        tipo_documento = '01' if registro["num_comprobante"][0] == "F" else '03' if registro["num_comprobante"][0] == "B" else '07'
+        pdf.cell(10, 10, tipo_documento, border=1, align='C')
+
+        
+        num_comprobante = registro["num_comprobante"]
+        serie = num_comprobante.split("-")[0][1:]  #Serie
+        numero = num_comprobante.split("-")[1]      # Numero
+        
+        pdf.cell(13, 10, serie, border=1, align='C')   # Celda para la serie
+        pdf.cell(20, 10, numero, border=1, align='C')  # Celda para el número
+        
+        # Tipo de documento del cliente
+        tipo_doc_cliente = '1' if len(str(registro["documento_cliente"])) == 8 else '6'
+        pdf.cell(15, 10, tipo_doc_cliente, border=1, align='C')
+        
         pdf.cell(25, 10, str(registro["documento_cliente"]), border=1, align='C')
-        pdf.cell(50, 10, registro["nombre_cliente"], border=1)
-        pdf.cell(20, 10, '', border=1, align='R')  # Valor Exp.
+        pdf.cell(70, 10, registro["nombre_cliente"], border=1)
         pdf.cell(20, 10, f"{registro['importe']:.2f}", border=1, align='R')
         pdf.cell(20, 10, f"{registro['igv']:.2f}", border=1, align='R')
         pdf.cell(20, 10, f"{registro['total']:.2f}", border=1, align='R')
@@ -866,7 +885,7 @@ def exportar_registro_ventas_pdf():
 
     # Totales
     pdf.set_font("Arial", style='B', size=10)
-    pdf.cell(185, 10, 'Totales', border=1, align='R')
+    pdf.cell(211, 10, 'Totales', border=1, align='R')
     pdf.cell(20, 10, f"{totales['total_importe']:.2f}", border=1, align='R')
     pdf.cell(20, 10, f"{totales['total_igv']:.2f}", border=1, align='R')
     pdf.cell(20, 10, f"{totales['total_general']:.2f}", border=1, align='R')
@@ -878,3 +897,178 @@ def exportar_registro_ventas_pdf():
     output.seek(0)
 
     return send_file(output, download_name="registro_ventas.pdf", as_attachment=True)
+
+
+@accounting_bp.route('/exportar_registro_compras_excel', methods=['GET'])
+@jwt_required()
+def exportar_registro_compras_excel():
+    from io import BytesIO
+    import openpyxl
+    from flask import send_file, current_app
+    from datetime import datetime
+    import os
+
+    # Ruta de la plantilla de Excel
+    template_path = os.path.join(current_app.root_path, 'templates', 'contable', 'plantillas', 'Registro_Compras.xlsx')
+    
+    if not os.path.exists(template_path):
+        return "La plantilla de Excel no fue encontrada.", 404
+    
+    output = BytesIO()
+    
+    # Cargar el libro de trabajo de la plantilla
+    workbook = openpyxl.load_workbook(template_path)
+    worksheet = workbook.active
+    
+    # Configurar el periodo actual y la información de la empresa
+    fecha_actual = datetime.now()
+    mes_anio_actual = fecha_actual.strftime('%m/%Y')
+    worksheet['B3'] = mes_anio_actual  # Periodo
+    worksheet['B4'] = '20610588981'    # RUC
+    worksheet['B5'] = 'Tormenta'       # Nombre de la empresa
+
+    # Obtener los registros de compras
+    registros_compras, totales = obtener_registro_compras()
+    
+    # Definir la fila inicial para los datos
+    start_row = 14
+    current_row = start_row
+
+    for registro in registros_compras:
+        worksheet[f'A{current_row}'] = registro["numero_correlativo"] # Número correlativo
+        worksheet[f'B{current_row}'] = registro["fecha"].strftime('%d/%m/%Y')  # Fecha de emisión
+        worksheet[f'C{current_row}'] = registro["fechaV"].strftime('%d/%m/%Y') # Fecha de vencimiento
+
+        # Lógica para tipo de comprobante basado en el número
+        if str(registro["num_comprobante"])[0] == "F":
+            worksheet[f'D{current_row}'] = '01'  # Tipo
+        elif str(registro["num_comprobante"])[0] == "B":
+            worksheet[f'D{current_row}'] = '03'  # Tipo
+        else:
+            worksheet[f'D{current_row}'] = '07'  # Tipo
+
+        # Dividir el número de comprobante en serie y número
+        comprobante = registro["num_comprobante"]
+        serie = comprobante.split("-")[0][1:]
+        numero = comprobante.split("-")[1]
+
+        worksheet[f'E{current_row}'] = serie  # Serie
+        worksheet[f'F{current_row}'] = ''
+        worksheet[f'G{current_row}'] = numero # Número
+
+        # Tipo de documento del proveedor basado en el número de documento
+        if len(str(registro["documento_cliente"])) == 8:
+            worksheet[f'H{current_row}'] = '1' 
+        else:
+            worksheet[f'H{current_row}'] = '6'  # Tipo
+        worksheet[f'I{current_row}'] = registro["documento_cliente"]  # Número de documento
+        worksheet[f'J{current_row}'] = registro["nombre_cliente"]     # Razón social
+        worksheet[f'K{current_row}'] = registro["importe"]           # Importe
+        worksheet[f'L{current_row}'] = registro["igv"]
+        worksheet[f'M{current_row}'] = ''
+        worksheet[f'N{current_row}'] = ''  # Base imponible exonerada
+        worksheet[f'O{current_row}'] = ''  # Base imponible inafecta
+        worksheet[f'P{current_row}'] = ''  # Otros conceptos
+                     # IGV
+        worksheet[f'Q{current_row}'] = ''  # Impuesto ISC (si aplica)
+        worksheet[f'R{current_row}'] = ''           # Total
+        worksheet[f'S{current_row}'] = ''  # Valor de adquisición no gravada
+        worksheet[f'T{current_row}'] = registro["total"]
+        
+        current_row += 1
+
+    # Agregar la fila de totales al final
+    total_row = current_row
+    worksheet.merge_cells(f'H{total_row}:J{total_row}') 
+    worksheet[f'H{total_row}'] = 'Totales'
+    worksheet[f'K{total_row}'] = totales["total_importe"]
+    worksheet[f'L{total_row}'] = totales["total_igv"]
+    worksheet[f'T{total_row}'] = totales["total_general"]
+
+    # Guardar el libro actualizado en el buffer
+    workbook.save(output)
+    output.seek(0)
+
+    return send_file(output, download_name="registro_compras.xlsx", as_attachment=True)
+
+@accounting_bp.route('/exportar_registro_compras_pdf', methods=['GET'])
+@jwt_required()
+def exportar_registro_compras_pdf():
+    from fpdf import FPDF
+    from flask import send_file
+    from datetime import datetime
+    from io import BytesIO
+
+    # Crear un objeto FPDF en orientación horizontal
+    pdf = FPDF(orientation='L', unit='mm', format='A4')
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    
+    # Encabezado
+    pdf.set_font("Arial", style='B', size=14)
+    pdf.cell(0, 10, 'Registro de Compras', ln=True, align='C')
+    pdf.set_font("Arial", size=12)
+    pdf.cell(0, 10, f'Período: {datetime.now().strftime("%m/%Y")}', ln=True, align='C')
+    pdf.cell(0, 10, 'RUC: 20610588981', ln=True, align='C')
+    pdf.cell(0, 10, 'Razón Social: Tormenta', ln=True, align='C')
+
+    pdf.ln(10)  # Espacio vertical
+
+    # Encabezados de la tabla
+    pdf.set_font("Arial", style='B', size=9)
+    headers = [
+        ('N°', 10), ('F. Emisión', 23), ('F. Vencimiento', 25), 
+        ('Tipo', 10), ('Serie', 13), ('Número', 20), ('Tipo Doc.', 15), 
+        ('N° Doc', 25), ('Razón Social', 70), 
+        ('Importe', 20), ('IGV', 20), ('Total', 20)
+    ]
+    for header, width in headers:
+        pdf.cell(width, 10, header, border=1, align='C')
+    pdf.ln(10)
+
+    # Obtener registros de compras
+    registros_compras, totales = obtener_registro_compras()
+    
+    pdf.set_font("Arial", size=9)
+    for registro in registros_compras:
+        pdf.cell(10, 10, str(registro["numero_correlativo"]), border=1, align='C')
+        pdf.cell(23, 10, registro["fecha"].strftime('%d/%m/%Y'), border=1, align='C')
+        pdf.cell(25, 10, registro["fechaV"].strftime('%d/%m/%Y'), border=1, align='C')
+        
+        # Determinar el tipo de comprobante
+        tipo_documento = '01' if registro["num_comprobante"][0] == "F" else '03' if registro["num_comprobante"][0] == "B" else '07'
+        pdf.cell(10, 10, tipo_documento, border=1, align='C')
+
+        # Serie y número del comprobante
+        num_comprobante = registro["num_comprobante"]
+        serie = num_comprobante.split("-")[0][1:]  # Serie
+        numero = num_comprobante.split("-")[1]      # Número
+        
+        pdf.cell(13, 10, serie, border=1, align='C')   # Celda para la serie
+        pdf.cell(20, 10, numero, border=1, align='C')  # Celda para el número
+
+        # Tipo de documento del cliente
+        tipo_doc_cliente = '1' if len(str(registro["documento_cliente"])) == 8 else '6'
+        pdf.cell(15, 10, tipo_doc_cliente, border=1, align='C')
+        
+        pdf.cell(25, 10, str(registro["documento_cliente"]), border=1, align='C')
+        pdf.cell(70, 10, registro["nombre_cliente"], border=1)
+        pdf.cell(20, 10, f"{registro['importe']:.2f}", border=1, align='R')
+        pdf.cell(20, 10, f"{registro['igv']:.2f}", border=1, align='R')
+        pdf.cell(20, 10, f"{registro['total']:.2f}", border=1, align='R')
+        pdf.ln(10)
+
+    # Totales
+    pdf.set_font("Arial", style='B', size=10)
+    pdf.cell(211, 10, 'Totales', border=1, align='R')
+    pdf.cell(20, 10, f"{totales['total_importe']:.2f}", border=1, align='R')
+    pdf.cell(20, 10, f"{totales['total_igv']:.2f}", border=1, align='R')
+    pdf.cell(20, 10, f"{totales['total_general']:.2f}", border=1, align='R')
+
+    # Guardar el archivo PDF en un buffer de memoria
+    output = BytesIO()
+    pdf.output(dest='S').encode('latin1')
+    output.write(pdf.output(dest='S').encode('latin1'))
+    output.seek(0)
+
+    return send_file(output, download_name="registro_compras.pdf", as_attachment=True)
