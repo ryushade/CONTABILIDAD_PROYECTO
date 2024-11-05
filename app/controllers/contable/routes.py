@@ -1,6 +1,6 @@
 from flask import json, request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
-from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas, obtener_asientos_agrupados_excel
+from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas, obtener_asientos_agrupados_excel, obtener_libro_caja, obtener_libro_caja_cuenta_corriente
 
 from . import accounting_bp
 import pandas as pd
@@ -76,9 +76,11 @@ def reportes():
 
     asientos, totales = obtener_asientos_agrupados(tipo_registro, start_date, end_date)
     libro_mayor_data, total_debe, total_haber = obtener_libro_mayor_agrupado_por_fecha()
+    lista_libro_caja, total_caja = obtener_libro_caja()
+    lista_libro_caja_cuenta_corriente, total_caja_corriente = obtener_libro_caja_cuenta_corriente()
     registro_compra_data, totale = obtener_registro_ventas()
 
-    return render_template('contable/reportes/reportes.html', asientos=asientos, totales=totales, libro_mayor=libro_mayor_data, total_debe=total_debe, total_haber=total_haber, registros_compras=registro_compra_data, totale=totale)
+    return render_template('contable/reportes/reportes.html', asientos=asientos, totales=totales, libro_mayor=libro_mayor_data, total_debe=total_debe, total_haber=total_haber, registros_compras=registro_compra_data, totale=totale, lista_libro_caja=lista_libro_caja, total_caja=total_caja, lista_libro_caja_cuenta_corriente=lista_libro_caja_cuenta_corriente, total_caja_corriente=total_caja_corriente)
 
 
 import app.models.contable_models as conta

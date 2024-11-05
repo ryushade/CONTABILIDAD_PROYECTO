@@ -74,6 +74,10 @@
             <i class="fas fa-book"></i> Libro de ventas
         </a>
 
+        <a class="nav-item nav-link" href="#libro-caja" data-bs-toggle="tab">
+            <i class="fas fa-book"></i> Libro caja
+        </a>
+
     </div>
 </div>
 
@@ -845,48 +849,211 @@
         </div>
     </div>
 
+    <!-- Tab: Libro Caja -->
+    <div class="tab-pane fade" id="libro-caja">
+        <div class="card bg-white rounded custom-shadow p-4">
+            <header class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h4 mb-0 d-flex align-items-center" style="font-weight: bold;">
+                    <span></span>
+                    LIBRO CAJA
+                </h1>
+                <div class="dropdown me-2">
+                    <button class="btn btn-light border dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Más acciones
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item d-flex flex-column" href="#">
+                            <span class="d-flex align-items-center">
+                                <i class="fa fa-file-excel mr-2"></i>
+                                <strong>Exportar a Excel</strong>
+                            </span>
+                        </a>
+                        <a class="dropdown-item d-flex flex-column" href="#">
+                            <span class="d-flex align-items-center">
+                                <i class="fa fa-file-pdf mr-2" style="color: red;"></i>
+                                <strong>Exportar a PDF</strong>
+                            </span>
+                        </a>
+                    </div>
+                </div>
 
-</div>
+            </header>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-        popoverTriggerList.forEach(function (popoverTriggerEl) {
-            var isAcreedor = popoverTriggerEl.getAttribute("data-bs-content").includes("Saldo Acreedor");
-            var colorClass = isAcreedor ? "saldo-acreedor" : "saldo-deudor";
+            <p class="text-muted small mb-4">Registro detallado las operaciones que implican la entrada o salida de
+                efectivo en una empresa.</p>
 
-            var popover = new bootstrap.Popover(popoverTriggerEl, {
-                html: true,
-                content: function () {
-                    return '<span class="' + colorClass + '">' + popoverTriggerEl.getAttribute("data-bs-content") + '</span>';
-                }
+            <div class="nav nav-tabs">
+                <a class="nav-item nav-link active" href="#efectivo" data-bs-toggle="tab">
+                    <i class="fas fa-book"></i> Efectivo
+                </a>
+                <a class="nav-item nav-link" href="#cuenta-corriente" data-bs-toggle="tab">
+                    <i class="fas fa-book"></i> Cuenta corriente
+                </a>
+            </div>
+
+
+            <div class="container">
+
+                <form class="row g-3 mb-3 align-items-end">
+                    <div class="col-md-3">
+                        <style>
+                            .required-asterisk {
+                                color: red;
+                            }
+                        </style>
+
+                        <label for="daterange" class="form-label" style="font-size: 14px;">
+                            Período <span class="required-asterisk">*</span>
+                        </label>
+                        <div class="input-group" style="width: auto;">
+                            <input class="form-control" type="text" id="daterange"
+                                placeholder="Selecciona un rango de fecha">
+                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2 d-flex justify-content-end" style="margin-left: auto;">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-calendar-alt"></i> Realizar busqueda
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+            <div class="tab-content">
+                <!-- Tab: Libro Caja - Efectivo -->
+                <div class="tab-pane show active" id="efectivo">
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th rowspan="2" class="text-center">FECHA</th>
+                                    <th rowspan="2" class="text-center">DESCRIPCIÓN</th>
+                                    <th colspan="2" class="text-center">CUENTA CONTABLE ASOCIADA</th>
+                                    <th colspan="2" class="text-center">SALDOS Y MOVIMIENTOS</th>
+                                </tr>
+                                <tr>
+                                    <th class="text-center">CÓDIGO</th>
+                                    <th class="text-center">DENOMINACIÓN</th>
+                                    <th class="text-center">DEUDOR</th>
+                                    <th class="text-center">ACREEDOR</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for lista in lista_libro_caja %}
+                                <tr>
+                                    <td>{{lista.fecha}}</td>
+                                    <td>{{lista.glosa}}</td>
+                                    <td>{{lista.cod_cuenta}}</td>
+                                    <td>{{lista.nombre_cuenta}}</td>
+                                    <td>{{lista.debe | round(2)}}</td>
+                                    <td>{{lista.haber | round(2)}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="4" class="text-end" style="font-weight: bold;">TOTALES</th>
+                                    <th style="font-weight: bold;">{{total_caja.debe | round(2)}}</th>
+                                    <th style="font-weight: bold;">{{total_caja.haber | round(2)}}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                    </div>
+                </div>
+
+                <!-- Tab: Libro Caja - Cuenta Corriente -->
+                <div class="tab-pane fade" id="cuenta-corriente">
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th rowspan="2" class="text-center">FECHA</th>
+                                    <th colspan="4" class="text-center">OPERACIÓNES BANCARIAS</th>
+                                    <th colspan="2" class="text-center">CUENTA CONTABLE</th>
+                                    <th colspan="2" class="text-center">SALDOS Y MOVIMIENTOS</th>
+                                </tr>
+                                <tr>
+                                    <th class="text-center">MEDIO DE PAGO</th>
+                                    <th class="text-center">DESCRIPCIÓN</th>
+                                    <th class="text-center">RAZÓN SOCIAL</th>
+                                    <th class="text-center">COMPROBANTE</th>
+                                    <th class="text-center">CÓDIGO</th>
+                                    <th class="text-center">DENOMINACIÓN</th>
+                                    <th class="text-center">DEUDOR</th>
+                                    <th class="text-center">ACREEDOR</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for lista in lista_libro_caja_cuenta_corriente %}
+                                <tr>
+                                    <td>{{lista.fecha}}</td>
+                                    <td>{{lista.forma_pago}}</td>
+                                    <td>{{lista.nombre_cuenta}}</td>
+                                    <td>{{lista.nombre}}</td>
+                                    <td>{{lista.comprobante}}</td>
+                                    <td>{{lista.codigo}}</td>
+                                    <td>{{lista.denominacion}}</td>
+                                    <td>{{lista.debe | round(2)}}</td>
+                                    <td>{{lista.haber | round(2)}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="7" class="text-end" style="font-weight: bold;">TOTALES</th>
+                                    <th style="font-weight: bold;">{{total_caja_corriente.debe | round(2)}}</th>
+                                    <th style="font-weight: bold;">{{total_caja_corriente.haber | round(2)}}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+                popoverTriggerList.forEach(function (popoverTriggerEl) {
+                    var isAcreedor = popoverTriggerEl.getAttribute("data-bs-content").includes("Saldo Acreedor");
+                    var colorClass = isAcreedor ? "saldo-acreedor" : "saldo-deudor";
+
+                    var popover = new bootstrap.Popover(popoverTriggerEl, {
+                        html: true,
+                        content: function () {
+                            return '<span class="' + colorClass + '">' + popoverTriggerEl.getAttribute("data-bs-content") + '</span>';
+                        }
+                    });
+                });
             });
-        });
-    });
-</script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        flatpickr("#daterange", {
-            mode: "range",
-            dateFormat: "m/Y",
-            minDate: "01/1900",
-            maxDate: "04/2028",
-            plugins: [
-                new monthSelectPlugin({
+        </script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                flatpickr("#daterange", {
+                    mode: "range",
                     dateFormat: "m/Y",
-                    altFormat: "F Y",
-                    altInput: true
-                })
-            ],
-            onClose: function (selectedDates, dateStr, instance) {
-                if (selectedDates.length === 2) {
-                    document.getElementById('filterForm').submit();
-                }
-            }
-        });
-    });
-</script>
+                    minDate: "01/1900",
+                    maxDate: "04/2028",
+                    plugins: [
+                        new monthSelectPlugin({
+                            dateFormat: "m/Y",
+                            altFormat: "F Y",
+                            altInput: true
+                        })
+                    ],
+                    onClose: function (selectedDates, dateStr, instance) {
+                        if (selectedDates.length === 2) {
+                            document.getElementById('filterForm').submit();
+                        }
+                    }
+                });
+            });
+        </script>
 
-</div>
+    </div>
 
-{% endblock %}
+    {% endblock %}
