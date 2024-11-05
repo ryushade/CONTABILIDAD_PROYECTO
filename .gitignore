@@ -55,3 +55,5 @@ config.py
 
 # Ignorar la carpeta de imágenes subidas
 static/img/
+
+app/static/PDF/
