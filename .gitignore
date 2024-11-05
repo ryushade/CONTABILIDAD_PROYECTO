@@ -52,3 +52,6 @@ pip-log.txt
 *.zip
 
 config.py
+
+# Ignorar la carpeta de imágenes subidas
+static/img/
