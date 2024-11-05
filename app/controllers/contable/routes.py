@@ -195,30 +195,40 @@ def agregar_regla():
 @accounting_bp.route('/upload_photo', methods=['POST'])
 def upload_photo():
     if 'photo' not in request.files:
-        # Redirige a la página de inicio en caso de error
-        return render_template('index.html')    
+        return redirect(url_for('inicio'))
 
     file = request.files['photo']
     if file.filename == '':
-        # Redirige a la página de inicio en caso de error
-        return render_template('index.html')    
+        return redirect(url_for('inicio'))
+
     if file:
         filename = secure_filename(file.filename)
         upload_folder = current_app.config['UPLOAD_FOLDER']
 
+        # Crear la carpeta de subida si no existe
         if not os.path.exists(upload_folder):
             os.makedirs(upload_folder)
 
         filepath = os.path.join(upload_folder, filename)
         file.save(filepath)
 
+        # Imprimir la ruta del archivo físico y la URL para la base de datos
+        print(f"Ruta física del archivo: {filepath}")
+        
+        # Generar la ruta para guardar en la base de datos
+        foto_path = f"/static/img/{filename}"
+        print(f"Ruta URL para la base de datos: {foto_path}")
+
         user_id = request.form.get('user_id')
         if not user_id:
-            return render_template('index.html')    
+            return redirect(url_for('inicio'))
 
-        foto_path = f"/static/img/{filename}" 
+        # Guardar la ruta en la base de datos
         if guardar_foto_usuario(user_id, foto_path):
-            return render_template('index.html', foto_path=foto_path)
+            return redirect(url_for('inicio'))
+        else:
+            return redirect(url_for('inicio'))
+
 
 @accounting_bp.route('/reglas/editar/<int:regla_id>', methods=['POST'])
 def actualizar_regla(id_regla):

@@ -25,7 +25,7 @@ class Config:
     JWT_ACCESS_TOKEN_EXPIRES = int(os.getenv('JWT_ACCESS_TOKEN_EXPIRES', 3600))
     
     # Configuración de la carpeta de subidas
-    UPLOAD_FOLDER = os.path.join(basedir, 'static/img')
+    UPLOAD_FOLDER = os.path.join(basedir, 'static', 'img')
     
     @property
     def DATABASE_URI(self):

@@ -34,7 +34,7 @@ def create_app():
             
             # Construye la URL completa para la foto de perfil si existe
             if user and user.get('foto'):
-                user['foto'] = url_for('static', filename=f'img/{user["foto"]}')
+                user['foto'] = url_for('static', filename=f'img/{user["foto"].replace("/static/img/", "")}')
             return dict(user=user)
             
         except Exception as e:

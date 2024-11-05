@@ -90,7 +90,7 @@ def obtener_usuario_por_id(user_id):
         with conexion.cursor() as cursor:
             # Consulta que une la tabla usuario con rol e incluye la columna de foto
             sql = """
-                SELECT u.*, r.nom_rol, r.estado_rol
+                SELECT u.*, r.nom_rol, r.estado_rol, u.foto 
                 FROM usuario u
                 JOIN rol r ON u.id_rol = r.id_rol
                 WHERE u.id_usuario = %s
