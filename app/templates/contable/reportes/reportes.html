@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Tormenta - Libro Diario{% endblock %}
+{% block title %}Tormenta {% endblock %}
 
 
 {% block content %}
@@ -16,6 +16,44 @@
 
     .saldo-deudor {
         color: red;
+    }
+
+    .required-asterisk {
+        color: red;
+    }
+
+    .table-scroll thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .table-container {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    .table-scroll {
+        max-height: 400px;
+        /* Ajusta la altura máxima que desees */
+        overflow-y: auto;
+        overflow-x: hidden;
+        /* Evita el scroll horizontal si no es necesario */
+    }
+
+    /* Estilos responsivos */
+    @media (max-width: 768px) {
+        .table-scroll {
+            min-width: 100%;
+        }
+
+        .acciones {
+            min-width: auto;
+        }
+
+        .dropdown-menu {
+            width: 100%;
+        }
     }
 </style>
 
@@ -36,10 +74,14 @@
             <i class="fas fa-book"></i> Libro de ventas
         </a>
 
+        <a class="nav-item nav-link" href="#libro-caja" data-bs-toggle="tab">
+            <i class="fas fa-book"></i> Libro caja
+        </a>
+
     </div>
 </div>
 
-<div class="tab-content">
+<div class="tab-content mb-5">
 
     <!-- Tab: Libro Diario -->
     <div class="tab-pane fade show active" id="libro-diario">
@@ -80,30 +122,29 @@
                 que elijas.</p>
             <div class="container">
 
-                <form class="row g-3 mb-3 align-items-end" method="GET" action="{{ url_for('contable.reportes') }}">
+                <form id="filterForm" class="row g-3 mb-3 align-items-end" method="GET"
+                    action="{{ url_for('contable.reportes') }}">
                     <div class="col-md-3">
-                        <style>
-                            .required-asterisk {
-                                color: red;
-                            }
-                        </style>
-
                         <label for="daterange" class="form-label" style="font-size: 14px;">
                             Fecha<span class="required-asterisk">*</span>
                         </label>
                         <div class="input-group" style="width: auto;">
-                            <input class="form-control" type="text" id="daterange"
+                            <input class="form-control" type="text" id="daterange" name="daterange"
                                 placeholder="Selecciona un rango de fecha">
                             <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <label for="tipo-registro" style="font-size: 14px;" class="form-label">Tipo de registro</label>
-                        <select class="form-select" id="tipo-registro" name="tipo_registro" onchange="this.form.submit()">
-                            <option value="Todas" {% if request.args.get('tipo_registro') == 'Todas' %}selected{% endif %}>Todas</option>
-                            <option value="Ventas" {% if request.args.get('tipo_registro') == 'Ventas' %}selected{% endif %}>Ventas</option>
-                            <option value="Compras" {% if request.args.get('tipo_registro') == 'Compras' %}selected{% endif %}>Compras</option>
-                        </select>                        
+                        <select class="form-select" id="tipo-registro" name="tipo_registro"
+                            onchange="this.form.submit()">
+                            <option value="Todas" {% if request.args.get('tipo_registro')=='Todas' %}selected{% endif
+                                %}>Todas</option>
+                            <option value="Ventas" {% if request.args.get('tipo_registro')=='Ventas' %}selected{% endif
+                                %}>Ventas</option>
+                            <option value="Compras" {% if request.args.get('tipo_registro')=='Compras' %}selected{%
+                                endif %}>Compras</option>
+                        </select>
                     </div>
                     <div class="col-lg-2 d-flex justify-content-end" style="margin-left: auto;">
                         <button type="submit" class="btn btn-primary w-100">
@@ -114,7 +155,7 @@
 
             </div>
 
-            <div class="table-responsive mb-4">
+            <div class="table-responsive mt-4 mb-4" style="max-height: 400px; overflow-y: auto;">
                 <table class="table table-bordered table-hover">
                     <thead class="table-light">
                         <tr>
@@ -129,6 +170,7 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% if asientos %}
                         {% for id_asiento, asiento in asientos.items() %}
                         {% for detalle in asiento.detalles %}
                         <tr>
@@ -146,15 +188,17 @@
                             {% endif %}
                             <td>{{ detalle.codigo_cuenta }}</td>
                             <td>{{ detalle.nombre_cuenta }}</td>
-                            <td class="text-end">
-                                {{ detalle.debe if detalle.debe != 0 else '' }}
-                            </td>
-                            <td class="text-end">
-                                {{ detalle.haber if detalle.haber != 0 else '' }}
-                            </td>
+                            <td class="text-end">{{ detalle.debe if detalle.debe != 0 else '' }}</td>
+                            <td class="text-end">{{ detalle.haber if detalle.haber != 0 else '' }}</td>
                         </tr>
                         {% endfor %}
                         {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center">No se encontraron registros para el criterio
+                                seleccionado.</td>
+                        </tr>
+                        {% endif %}
                     </tbody>
                     <tfoot>
                         <tr>
@@ -170,28 +214,10 @@
                 </table>
             </div>
 
-            <nav aria-label="Navegación de páginas" class="d-flex justify-content-between align-items-center">
-                <ul class="pagination pagination-sm mb-0">
-                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
-                            aria-disabled="true">&laquo;</a></li>
-                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
-                            aria-disabled="true">&lsaquo;</a></li>
-                    <li class="page-item active" aria-current="page"><span class="page-link">1</span></li>
-                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
-                            aria-disabled="true">&rsaquo;</a></li>
-                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
-                            aria-disabled="true">&raquo;</a></li>
-                </ul>
-                <div class="d-flex align-items-center">
-                    <span class="text-muted small me-2">Mostrando 1-10 De 10</span>
-                    <select class="form-select form-select-sm" style="width: auto;">
-                        <option>10</option>
-                    </select>
-                </div>
-            </nav>
+
         </div>
     </div>
-
+    
     <!-- Tab: Libro Mayor -->
     <div class="tab-pane fade" id="libro-mayor">
         <div class="card bg-white rounded custom-shadow p-4">
@@ -263,9 +289,7 @@
 
             </div>
 
-
-
-            <div class="table-responsive mb-4">
+            <div class="table-responsive mt-4 mb-4">
                 <table class="table table-bordered table-hover">
                     <thead class="table-light">
                         <tr>
@@ -282,15 +306,18 @@
                         {% for detalle in cuenta.detalles %}
                         <tr>
                             {% if loop.first %}
-                            <td class="text-center align-middle" rowspan="{{ cuenta.detalles|length }}">{{ codigo_cuenta
+                            <td class="text-center align-middle" rowspan="{{ cuenta.detalles|length }}">{{
+                                codigo_cuenta
                                 }}</td>
                             <td class="text-center align-middle" rowspan="{{ cuenta.detalles|length }}">{{
                                 cuenta.nombre_cuenta }}</td>
                             {% endif %}
                             <td class="text-center">{{ detalle.fecha_asiento }}</td>
-                            <td class="text-center text-end">{{ detalle.debe | round(2) if detalle.debe is not none else
+                            <td class="text-center text-end">{{ detalle.debe | round(2) if detalle.debe is not none
+                                else
                                 '' }}</td>
-                            <td class="text-center text-end">{{ detalle.haber | round(2) if detalle.haber is not none
+                            <td class="text-center text-end">{{ detalle.haber | round(2) if detalle.haber is not
+                                none
                                 else '' }}</td>
 
                             {% if loop.first %}
@@ -310,7 +337,8 @@
                     <tfoot>
                         <tr>
                             <th colspan="3" class="text-end" style="font-weight: bold;">TOTALES (S/.)</th>
-                            <th class="text-center text-end" style="font-weight: bold;">{{ total_debe | round(2) }}</th>
+                            <th class="text-center text-end" style="font-weight: bold;">{{ total_debe | round(2) }}
+                            </th>
                             <th class="text-center text-end" style="font-weight: bold;">{{ total_haber | round(2) }}
                             </th>
                             <th></th>
@@ -376,7 +404,8 @@
             </header>
 
 
-            <p class="text-muted small mb-4">Registro detallado de todas las adquisiciones realizadas por la empresa,
+            <p class="text-muted small mb-4">Registro detallado de todas las adquisiciones realizadas por la
+                empresa,
                 utilizado para control de gastos y cálculo de créditos fiscales.</p>
             <div class="container">
 
@@ -409,7 +438,7 @@
 
 
 
-            <div class="table-responsive mb-4">
+            <div class="table-responsive mt-4 mb-4">
                 <table id="tabla_compras" class="table table-bordered table-hover">
                     <thead class="table-light">
                         <tr>
@@ -436,14 +465,49 @@
                             <td class="text-end">{{ registro.igv | round(2) }}</td>
                             <td class="text-end">{{ registro.total | round(2) }}</td>
                         </tr>
-                        {%endfor%}
-                    </tbody>
-                    <tfoot>
+
                         <tr>
-                            <th colspan="5" class="text-end" style="font-weight: bold;">TOTALES</th>
-                            <th class="text-end" style="font-weight: bold;">{{ totalesCompras.total_importe | round(2) }}</th>
-                            <th class="text-end" style="font-weight: bold;">{{ totalesCompras.total_igv | round(2) }}</th>
-                            <th class="text-end" style="font-weight: bold;">{{ totalesCompras.total_general | round(2) }}</th>
+                            <td class="text-center">2</td>
+                            <td class="text-center">01/01/2024</td>
+                            <td class="text-center">FACTURA</td>
+                            <td class="text-center">E002</td>
+                            <td class="text-center">854</td>
+                            <td class="text-center">P. NATURAL</td>
+                            <td class="text-center">10876543215</td>
+                            <td class="text-center">PROVEEDOR 02</td>
+                            <td class="text-center">1500.00</td>
+                            <td class="text-center">270.00</td>
+                            <td class="text-center">1770.00</td>
+                        </tr>
+
+                    </tbody>-->
+
+                    {% for registro in registros_compras %}
+                    <tr>
+                        <td class="text-center">{{ registro.numero_correlativo }}</td>
+                        <td class="text-center">{{ registro.fecha.strftime('%Y-%m-%d') }}</td>
+                        <td class="text-center">{{ registro.documento_cliente }}</td>
+                        <td class="text-center">{{ registro.nombre_cliente }}</td>
+                        <td class="text-center">{{ registro.id_tipocomprobante }}</td>
+                        <td class="text-center">{{ registro.num_comprobante }}</td><!--OK-->
+                        <td class="text-center">{{ registro.comprobante_pago }}</td>
+                        <td class="text-end">{{ registro.importe | round(2) }}</td>
+                        <td class="text-end">{{ registro.igv | round(2) }}</td>
+                        <td class="text-end">{{ registro.total | round(2) }}</td>
+                    </tr>
+                    {% endfor %}
+
+                    <tfoot>
+                        <!--<tr>
+                            <th colspan="10" class="text-end" style="font-weight: bold;">TOTALES</th>
+                            <th class="text-center" style="font-weight: bold;">2950.00</th>
+                        </tr>-->
+
+                        <tr>
+                            <th colspan="6" class="text-end" style="font-weight: bold;">TOTALES</th>
+                            <th class="text-end" style="font-weight: bold;">{{ totale.total_importe | round(2) }}</th>
+                            <th class="text-end" style="font-weight: bold;">{{ totale.total_igv | round(2) }}</th>
+                            <th class="text-end" style="font-weight: bold;">{{ totale.total_general | round(2) }}</th>
                         </tr>
                     </tfoot>
                 </table>
@@ -507,7 +571,8 @@
             </header>
 
 
-            <p class="text-muted small mb-4">Registro detallado de todas las adquisiciones realizadas por la empresa,
+            <p class="text-muted small mb-4">Registro detallado de todas las adquisiciones realizadas por la
+                empresa,
                 utilizado para control de gastos y cálculo de créditos fiscales.</p>
             <div class="container">
 
@@ -538,7 +603,9 @@
 
             </div>
 
-            <div class="table-responsive mb-4">
+
+
+            <div class="table-responsive mt-4 mb-4">
                 <table class="table table-bordered table-hover">
                     <thead class="table-light">
                         <tr>
@@ -568,10 +635,14 @@
                     </tbody>
                     <tfoot>
                         <tr>
+                            <th colspan="6" class="text-end" style="font-weight: bold;">TOTALES</th>
+                            <th class="text-end" style="font-weight: bold;">{{ totale.total_importe | round(2) }}
+                            </th>
                             <th colspan="5" class="text-end" style="font-weight: bold;">TOTALES</th>
                             <th class="text-end" style="font-weight: bold;">{{ totale.total_importe | round(2) }}</th>
                             <th class="text-end" style="font-weight: bold;">{{ totale.total_igv | round(2) }}</th>
-                            <th class="text-end" style="font-weight: bold;">{{ totale.total_general | round(2) }}</th>
+                            <th class="text-end" style="font-weight: bold;">{{ totale.total_general | round(2) }}
+                            </th>
                         </tr>
                     </tfoot>
                 </table>
@@ -600,26 +671,211 @@
         </div>
     </div>
 
+    <!-- Tab: Libro Caja -->
+    <div class="tab-pane fade" id="libro-caja">
+        <div class="card bg-white rounded custom-shadow p-4">
+            <header class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h4 mb-0 d-flex align-items-center" style="font-weight: bold;">
+                    <span></span>
+                    LIBRO CAJA
+                </h1>
+                <div class="dropdown me-2">
+                    <button class="btn btn-light border dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Más acciones
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item d-flex flex-column" href="#">
+                            <span class="d-flex align-items-center">
+                                <i class="fa fa-file-excel mr-2"></i>
+                                <strong>Exportar a Excel</strong>
+                            </span>
+                        </a>
+                        <a class="dropdown-item d-flex flex-column" href="#">
+                            <span class="d-flex align-items-center">
+                                <i class="fa fa-file-pdf mr-2" style="color: red;"></i>
+                                <strong>Exportar a PDF</strong>
+                            </span>
+                        </a>
+                    </div>
+                </div>
 
-</div>
+            </header>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-        popoverTriggerList.forEach(function (popoverTriggerEl) {
-            var isAcreedor = popoverTriggerEl.getAttribute("data-bs-content").includes("Saldo Acreedor");
-            var colorClass = isAcreedor ? "saldo-acreedor" : "saldo-deudor";
+            <p class="text-muted small mb-4">Registro detallado las operaciones que implican la entrada o salida de
+                efectivo en una empresa.</p>
 
-            var popover = new bootstrap.Popover(popoverTriggerEl, {
-                html: true,
-                content: function () {
-                    return '<span class="' + colorClass + '">' + popoverTriggerEl.getAttribute("data-bs-content") + '</span>';
-                }
+            <div class="nav nav-tabs">
+                <a class="nav-item nav-link active" href="#efectivo" data-bs-toggle="tab">
+                    <i class="fas fa-book"></i> Efectivo
+                </a>
+                <a class="nav-item nav-link" href="#cuenta-corriente" data-bs-toggle="tab">
+                    <i class="fas fa-book"></i> Cuenta corriente
+                </a>
+            </div>
+
+
+            <div class="container">
+
+                <form class="row g-3 mb-3 align-items-end">
+                    <div class="col-md-3">
+                        <style>
+                            .required-asterisk {
+                                color: red;
+                            }
+                        </style>
+
+                        <label for="daterange" class="form-label" style="font-size: 14px;">
+                            Período <span class="required-asterisk">*</span>
+                        </label>
+                        <div class="input-group" style="width: auto;">
+                            <input class="form-control" type="text" id="daterange"
+                                placeholder="Selecciona un rango de fecha">
+                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2 d-flex justify-content-end" style="margin-left: auto;">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-calendar-alt"></i> Realizar busqueda
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+            <div class="tab-content">
+                <!-- Tab: Libro Caja - Efectivo -->
+                <div class="tab-pane show active" id="efectivo">
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th rowspan="2" class="text-center">FECHA</th>
+                                    <th rowspan="2" class="text-center">DESCRIPCIÓN</th>
+                                    <th colspan="2" class="text-center">CUENTA CONTABLE ASOCIADA</th>
+                                    <th colspan="2" class="text-center">SALDOS Y MOVIMIENTOS</th>
+                                </tr>
+                                <tr>
+                                    <th class="text-center">CÓDIGO</th>
+                                    <th class="text-center">DENOMINACIÓN</th>
+                                    <th class="text-center">DEUDOR</th>
+                                    <th class="text-center">ACREEDOR</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for lista in lista_libro_caja %}
+                                <tr>
+                                    <td>{{lista.fecha}}</td>
+                                    <td>{{lista.glosa}}</td>
+                                    <td>{{lista.cod_cuenta}}</td>
+                                    <td>{{lista.nombre_cuenta}}</td>
+                                    <td>{{lista.debe | round(2)}}</td>
+                                    <td>{{lista.haber | round(2)}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="4" class="text-end" style="font-weight: bold;">TOTALES</th>
+                                    <th style="font-weight: bold;">{{total_caja.debe | round(2)}}</th>
+                                    <th style="font-weight: bold;">{{total_caja.haber | round(2)}}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                    </div>
+                </div>
+
+                <!-- Tab: Libro Caja - Cuenta Corriente -->
+                <div class="tab-pane fade" id="cuenta-corriente">
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th rowspan="2" class="text-center">FECHA</th>
+                                    <th colspan="4" class="text-center">OPERACIÓNES BANCARIAS</th>
+                                    <th colspan="2" class="text-center">CUENTA CONTABLE</th>
+                                    <th colspan="2" class="text-center">SALDOS Y MOVIMIENTOS</th>
+                                </tr>
+                                <tr>
+                                    <th class="text-center">MEDIO DE PAGO</th>
+                                    <th class="text-center">DESCRIPCIÓN</th>
+                                    <th class="text-center">RAZÓN SOCIAL</th>
+                                    <th class="text-center">COMPROBANTE</th>
+                                    <th class="text-center">CÓDIGO</th>
+                                    <th class="text-center">DENOMINACIÓN</th>
+                                    <th class="text-center">DEUDOR</th>
+                                    <th class="text-center">ACREEDOR</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for lista in lista_libro_caja_cuenta_corriente %}
+                                <tr>
+                                    <td>{{lista.fecha}}</td>
+                                    <td>{{lista.forma_pago}}</td>
+                                    <td>{{lista.nombre_cuenta}}</td>
+                                    <td>{{lista.nombre}}</td>
+                                    <td>{{lista.comprobante}}</td>
+                                    <td>{{lista.codigo}}</td>
+                                    <td>{{lista.denominacion}}</td>
+                                    <td>{{lista.debe | round(2)}}</td>
+                                    <td>{{lista.haber | round(2)}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="7" class="text-end" style="font-weight: bold;">TOTALES</th>
+                                    <th style="font-weight: bold;">{{total_caja_corriente.debe | round(2)}}</th>
+                                    <th style="font-weight: bold;">{{total_caja_corriente.haber | round(2)}}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+                popoverTriggerList.forEach(function (popoverTriggerEl) {
+                    var isAcreedor = popoverTriggerEl.getAttribute("data-bs-content").includes("Saldo Acreedor");
+                    var colorClass = isAcreedor ? "saldo-acreedor" : "saldo-deudor";
+
+                    var popover = new bootstrap.Popover(popoverTriggerEl, {
+                        html: true,
+                        content: function () {
+                            return '<span class="' + colorClass + '">' + popoverTriggerEl.getAttribute("data-bs-content") + '</span>';
+                        }
+                    });
+                });
             });
-        });
-    });
-</script>
+        </script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                flatpickr("#daterange", {
+                    mode: "range",
+                    dateFormat: "m/Y",
+                    minDate: "01/1900",
+                    maxDate: "04/2028",
+                    plugins: [
+                        new monthSelectPlugin({
+                            dateFormat: "m/Y",
+                            altFormat: "F Y",
+                            altInput: true
+                        })
+                    ],
+                    onClose: function (selectedDates, dateStr, instance) {
+                        if (selectedDates.length === 2) {
+                            document.getElementById('filterForm').submit();
+                        }
+                    }
+                });
+            });
+        </script>
 
-</div>
+    </div>
 
-{% endblock %}
+    {% endblock %}

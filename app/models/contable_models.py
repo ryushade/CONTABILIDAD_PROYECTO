@@ -88,9 +88,9 @@ def obtener_usuario_por_id(user_id):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
-            # Consulta que une la tabla usuario con rol
+            # Consulta que une la tabla usuario con rol e incluye la columna de foto
             sql = """
-                SELECT u.*, r.nom_rol, r.estado_rol
+                SELECT u.*, r.nom_rol, r.estado_rol, u.foto 
                 FROM usuario u
                 JOIN rol r ON u.id_rol = r.id_rol
                 WHERE u.id_usuario = %s
@@ -98,13 +98,14 @@ def obtener_usuario_por_id(user_id):
             cursor.execute(sql, (user_id,))
             resultado = cursor.fetchone()
             if resultado:
-                # Estructurar el resultado para incluir el rol como un diccionario
+                # Estructurar el resultado para incluir el rol y la foto como un diccionario
                 user = {
                     'id_usuario': resultado['id_usuario'],
                     'usua': resultado['usua'],
                     'contra': resultado['contra'],
                     'estado_usuario': resultado['estado_usuario'],
                     'id_rol': resultado['id_rol'],
+                    'foto': resultado['foto'],  # Agregar la foto al diccionario del usuario
                     'rol': {
                         'id_rol': resultado['id_rol'],
                         'nom_rol': resultado['nom_rol'],
@@ -114,6 +115,21 @@ def obtener_usuario_por_id(user_id):
                 return user
             else:
                 return None
+    finally:
+        conexion.close()
+
+
+def guardar_foto_usuario(user_id, foto_path):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            sql = "UPDATE usuario SET foto = %s WHERE id_usuario = %s"
+            cursor.execute(sql, (foto_path, user_id))
+            conexion.commit()
+            return True 
+    except Exception as e:
+        print(f"Error al actualizar la foto del usuario en la base de datos: {e}")
+        return False  
     finally:
         conexion.close()
 
@@ -469,7 +485,7 @@ def obtener_reglas(page, per_page):
     finally:
         connection.close()
 
-def obtener_asientos_agrupados(tipo_registro='Todas'):
+def obtener_asientos_agrupados(tipo_registro='Todas', start_date=None, end_date=None):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
@@ -490,19 +506,32 @@ def obtener_asientos_agrupados(tipo_registro='Todas'):
                 INNER JOIN detalle_asiento d ON a.id_asiento = d.id_asiento
                 INNER JOIN cuenta cu ON cu.id_cuenta = d.id_cuenta
                 INNER JOIN comprobante co ON co.id_comprobante = a.id_comprobante
+                WHERE TRUE
             """
 
+            params = []
+            
+            # Filtro por tipo de registro
             if tipo_registro == 'Ventas':
-                query += " WHERE LOWER(a.glosa) LIKE '%venta%'"
+                query += " AND LOWER(a.glosa) LIKE %s"
+                params.append('%venta%')
             elif tipo_registro == 'Compras':
-                query += " WHERE LOWER(a.glosa) LIKE '%compra%'"
-            elif tipo_registro == 'Todas':
-                query += " WHERE LOWER(a.glosa) LIKE '%venta%' OR LOWER(a.glosa) LIKE '%compra%'"
+                query += " AND LOWER(a.glosa) LIKE %s"
+                params.append('%compra%')
 
-            query += " ORDER BY a.id_asiento"
-            cursor.execute(query)
+            # Filtro por rango de fechas o por mes completo
+            if start_date and end_date:
+                if start_date == end_date:
+                    query += " AND a.fecha_asiento BETWEEN %s AND LAST_DAY(%s)"
+                    params.extend([start_date, start_date])
+                else:
+                    query += " AND a.fecha_asiento BETWEEN %s AND %s"
+                    params.extend([start_date, end_date])
+
+            cursor.execute(query, params)
             resultados = cursor.fetchall()
         
+        # Procesamiento de resultados
         asientos_agrupados = defaultdict(lambda: {"detalles": []})
         global_total_debe = 0.0
         global_total_haber = 0.0
@@ -540,6 +569,7 @@ def obtener_asientos_agrupados(tipo_registro='Todas'):
         return asientos_agrupados, totales
     finally:
         conexion.close()
+
 
 
 def obtener_asientos_agrupados_excel():
@@ -870,5 +900,84 @@ def obtener_registro_compras():
         }
 
         return registros_compras, totales
+    finally:
+        conexion.close()
+
+
+
+# xd
+def obtener_libro_caja():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor(DictCursor) as cursor:
+            cursor.execute("""
+                SELECT ac.fecha_asiento as fecha, ac.glosa as glosa, cu.codigo_cuenta as cod_cuenta, 
+                cu.nombre_cuenta as nombre_cuenta,
+                    CASE 
+                        WHEN ac.tipo_asiento = 'venta_contado' THEN SUM(da.debe) 
+                        ELSE 0 
+                    END AS debe,
+                    CASE 
+                    WHEN ac.tipo_asiento = 'compra_contado' THEN SUM(da.haber) 
+                        ELSE 0 
+                    END AS haber
+                FROM asiento_contable ac
+                INNER JOIN detalle_asiento da ON da.id_asiento = ac.id_asiento
+                INNER JOIN cuenta cu ON da.id_cuenta = cu.id_cuenta
+                GROUP BY ac.id_asiento, cu.id_cuenta, cu.nombre_cuenta
+                HAVING (debe > 0 OR haber > 0);
+            """)
+            resultados = cursor.fetchall()
+
+        total_debe_caja = Decimal("0.00")
+        total_haber_caja = Decimal("0.00")
+        
+        for row in resultados:
+            debe = row["debe"] or Decimal("0.00")
+            haber = row["haber"] or Decimal("0.00")
+            total_debe_caja += debe
+            total_haber_caja += haber
+
+            total_caja = {
+                "debe": total_debe_caja,
+                "haber": total_haber_caja
+            }
+
+        return  resultados, total_caja 
+    finally:
+        conexion.close()
+
+
+def obtener_libro_caja_cuenta_corriente():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor(DictCursor) as cursor:
+            cursor.execute("""
+                SELECT ac.fecha_asiento AS fecha, vb.formadepago AS forma_pago, cu.nombre_cuenta AS nombre_cuenta, vb.nombre_cliente AS nombre, c.num_comprobante AS comprobante,
+                cu.codigo_cuenta AS codigo, cu.nombre_cuenta AS denominacion, da.debe AS debe, da.haber AS haber FROM asiento_contable ac 
+                INNER JOIN comprobante c ON ac.id_comprobante = c.id_comprobante
+                INNER JOIN detalle_asiento da ON da.id_asiento = ac.id_asiento
+                INNER JOIN cuenta cu ON cu.id_cuenta = da.id_cuenta
+                INNER JOIN venta v ON v.id_comprobante = c.id_comprobante
+                INNER JOIN venta_boucher vb ON v.id_venta_boucher = vb.id_venta_boucher
+                WHERE vb.formadepago <> 'EFECTIVO' AND vb.formadepago <> 'YAPE' AND vb.formadepago <> 'PLIN';
+            """)
+            resultados = cursor.fetchall()
+
+        total_debe_caja = Decimal("0.00")
+        total_haber_caja = Decimal("0.00")
+        
+        for row in resultados:
+            debe = row["debe"] or Decimal("0.00")
+            haber = row["haber"] or Decimal("0.00")
+            total_debe_caja += debe
+            total_haber_caja += haber
+
+        total_caja_corriente = {
+            "debe": total_debe_caja,
+            "haber": total_haber_caja
+        }
+
+        return  resultados, total_caja_corriente
     finally:
         conexion.close()

@@ -1,6 +1,7 @@
 from flask import json, request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
 from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, obtener_regla_por_id, obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas,obtener_asientos_agrupados_excel,obtener_registro_compras
+from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas, obtener_asientos_agrupados_excel, obtener_libro_caja, obtener_libro_caja_cuenta_corriente
 
 from . import accounting_bp
 import pandas as pd
@@ -13,6 +14,10 @@ import openpyxl
 from openpyxl.styles import Border, Side, Alignment, Font
 from fpdf import FPDF
 from io import BytesIO
+from werkzeug.utils import secure_filename
+
+
+
 
 @accounting_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -54,7 +59,23 @@ def logout():
 @jwt_required()
 def reportes():
     tipo_registro = request.args.get('tipo_registro', 'Todas')
-    asientos, totales = obtener_asientos_agrupados(tipo_registro)
+    daterange = request.args.get('daterange', '')
+    start_date, end_date = None, None
+
+    if daterange:
+        try:
+            dates = daterange.split(' to ')
+            if len(dates) == 2:
+                start_date = datetime.strptime(dates[0].strip(), '%m/%Y').date()
+                end_date = datetime.strptime(dates[1].strip(), '%m/%Y').date()
+            elif len(dates) == 1:
+                # Si solo hay un mes, se usa como inicio y fin del mes
+                start_date = datetime.strptime(dates[0].strip(), '%m/%Y').date()
+                end_date = start_date
+        except (ValueError, IndexError) as e:
+            print(f"Error processing date range: {e}")
+
+    asientos, totales = obtener_asientos_agrupados(tipo_registro, start_date, end_date)
     libro_mayor_data, total_debe, total_haber = obtener_libro_mayor_agrupado_por_fecha()
     registro_venta_data, totale = obtener_registro_ventas()
     registro_compra_data, totales_compra = obtener_registro_compras()
@@ -189,6 +210,42 @@ def agregar_regla():
         return jsonify({"success": False, "message": "Error interno del servidor."}), 500
 
 
+@accounting_bp.route('/upload_photo', methods=['POST'])
+def upload_photo():
+    if 'photo' not in request.files:
+        return redirect(url_for('inicio'))
+
+    file = request.files['photo']
+    if file.filename == '':
+        return redirect(url_for('inicio'))
+
+    if file:
+        filename = secure_filename(file.filename)
+        upload_folder = current_app.config['UPLOAD_FOLDER']
+
+        # Crear la carpeta de subida si no existe
+        if not os.path.exists(upload_folder):
+            os.makedirs(upload_folder)
+
+        filepath = os.path.join(upload_folder, filename)
+        file.save(filepath)
+
+        # Imprimir la ruta del archivo físico y la URL para la base de datos
+        print(f"Ruta física del archivo: {filepath}")
+        
+        # Generar la ruta para guardar en la base de datos
+        foto_path = f"/static/img/{filename}"
+        print(f"Ruta URL para la base de datos: {foto_path}")
+
+        user_id = request.form.get('user_id')
+        if not user_id:
+            return redirect(url_for('inicio'))
+
+        # Guardar la ruta en la base de datos
+        if guardar_foto_usuario(user_id, foto_path):
+            return redirect(url_for('inicio'))
+        else:
+            return redirect(url_for('inicio'))
 
 
 @accounting_bp.route('/reglas/editar/<int:regla_id>', methods=['POST'])
