@@ -1,5 +1,6 @@
-from flask import request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app
+from flask import json, request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
+from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, obtener_regla_por_id, obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas
 from app.models.contable_models import actualizar_regla_en_db, obtener_regla_por_id, obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas, obtener_asientos_agrupados_excel
 from . import accounting_bp
 import pandas as pd
@@ -59,6 +60,7 @@ def reportes():
     return render_template('contable/reportes/reportes.html', asientos=asientos, totales=totales, libro_mayor=libro_mayor_data, total_debe=total_debe, total_haber=total_haber, registros_compras=registro_compra_data, totale=totale)
 
 
+import app.models.contable_models as conta
 @accounting_bp.route('/cuentas', methods=['GET'])
 @jwt_required()
 def cuentas():
@@ -66,14 +68,14 @@ def cuentas():
     per_page = request.args.get('per_page', 50, type=int)
     tipo_cuenta = request.args.get('tipo_cuenta')
     naturaleza = request.args.get('naturaleza')
-
-    cuentas = obtener_cuentas(page, per_page, tipo_cuenta=tipo_cuenta, naturaleza=naturaleza)
+    cuentas = conta.obtenerCuentas()
+    # print(json.dumps(estructura_cuentas, indent=2))
     total_cuentas = obtener_total_cuentas(tipo_cuenta=tipo_cuenta, naturaleza=naturaleza)
     total_pages = (total_cuentas + per_page - 1) // per_page
 
     return render_template(
-        'contable/cuentas/cuentas.html',
-        cuentas=cuentas,
+        'contable/cuentas/cuentas2.html',
+        cuentas = cuentas,
         page=page,
         total_pages=total_pages,
         per_page=per_page,
@@ -151,6 +153,42 @@ def editar_cuenta(cuenta_id):
     actualizar_cuenta(cuenta_id, codigo_cuenta, nombre_cuenta, naturaleza, estado_cuenta)
 
     return redirect(url_for('contable.cuentas'))
+
+@accounting_bp.route('/reglas/agregar', methods=['POST'])
+def agregar_regla():
+    data = request.get_json()
+
+    nombre_regla = data.get("nombre_regla")
+    tipo_transaccion = data.get("tipo_transaccion")
+    cuenta_debito = data.get("cuenta_debito")
+    cuenta_credito = data.get("cuenta_credito")
+    estado = data.get("estado")
+
+    print("Datos recibidos en agregar_regla:")
+    print("Nombre de la regla:", nombre_regla)
+    print("Tipo de transacción:", tipo_transaccion)
+    print("Cuenta débito:", cuenta_debito)
+    print("Cuenta crédito:", cuenta_credito)
+    print("Estado:", estado)
+    if tipo_transaccion is None:
+            print("Error: tipo_transaccion es None")
+            return jsonify({"success": False, "message": "El tipo de transacción no puede ser None"}), 400
+
+    try:
+        resultado = agregar_regla_en_db(nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado)
+        
+        if resultado:
+            return jsonify({"success": True})
+        else:
+            return jsonify({"success": False, "message": "No se pudo agregar la regla."}), 400
+        
+       
+    except Exception as e:
+        print("Error al agregar la regla:", e)  # Imprime el error en la consola
+        return jsonify({"success": False, "message": "Error interno del servidor."}), 500
+
+
+
 
 @accounting_bp.route('/reglas/editar/<int:regla_id>', methods=['POST'])
 def actualizar_regla(id_regla):

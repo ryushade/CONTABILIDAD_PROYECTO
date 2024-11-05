@@ -394,6 +394,26 @@ def obtener_asientodiario():
     finally:
         connection.close()
 
+def agregar_regla_en_db(nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado):
+    connection = obtener_conexion()  # Asegúrate de que esta función esté bien configurada
+    try:
+        with connection.cursor() as cursor:
+            sql = """
+            INSERT INTO reglas_contabilizacion (nombre_regla, tipo_transaccion, cuenta_debe, cuenta_haber, estado)
+            VALUES (%s, %s, %s, %s, %s)
+            """
+            print("Ejecutando SQL:", sql)
+            print("Valores:", (nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado))
+            cursor.execute(sql, (nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado))
+            connection.commit()
+            return cursor.rowcount > 0  # Retorna True si se agregó una fila
+    except Exception as e:
+        print("Error en agregar_regla_en_db:", e)  # Imprime el error específico en la consola
+        return False
+    finally:
+        connection.close()
+
+
 def actualizar_regla_en_db(id_regla, nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado):
     connection = obtener_conexion()
     try:
@@ -673,6 +693,35 @@ def obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica():
     finally:
         conexion.close()
 
+def obtenerCuentas():
+    try:
+        conexion = obtener_conexion()  # Establece conexión a la base de datos llamando a la función obtener_conexion.
+        with conexion.cursor() as cursor:  # Utiliza un cursor para ejecutar consultas, que se cierra automáticamente al terminar el bloque.
+            sql = """
+                SELECT id_cuenta, codigo_cuenta, nombre_cuenta AS Nombre, nivel, cuenta_padre, estado_cuenta
+                FROM cuenta
+                ORDER BY nivel, cuenta_padre, id_cuenta;
+                """  # Consulta SQL que selecciona y ordena las cuentas para facilitar la jerarquización.
+            cursor.execute(sql)  # Ejecuta la consulta SQL en la base de datos.
+            cuentas = cursor.fetchall()  # Obtiene todos los registros de la consulta y los almacena en la variable cuentas.
+            return construir_jerarquia(cuentas)  # Llama a la función para construir la jerarquía de cuentas con los datos obtenidos.
+    except Exception as e:
+        print("Error en obtenerCuentas:", str(e))  # Imprime un mensaje de error si ocurre una excepción.
+        raise  # Vuelve a lanzar la excepción para ser manejada por un controlador de excepciones superior o para detener el programa.
+
+def construir_jerarquia(cuentas):
+    from collections import defaultdict  # Importa defaultdict de collections para crear diccionarios con valores predeterminados.
+    estructura = defaultdict(list)  # Crea un diccionario donde cada clave se inicializa como una lista.
+    nodos = {cuenta['id_cuenta']: dict(cuenta, hijos=[]) for cuenta in cuentas}  # Crea un diccionario de nodos, cada uno con una lista de hijos.
+
+    for cuenta in cuentas:
+        nodo = nodos[cuenta['id_cuenta']]  # Obtiene el nodo para la cuenta actual basado en su ID.
+        if cuenta['cuenta_padre']:  # Verifica si la cuenta tiene un nodo padre.
+            nodos[cuenta['cuenta_padre']]['hijos'].append(nodo)  # Si tiene padre, agrega el nodo actual a la lista de hijos del padre.
+        else:
+            estructura[cuenta['nivel']].append(nodo)  # Si no tiene padre, agrega el nodo al nivel superior en la estructura jerárquica.
+
+    return estructura  # Devuelve la estructura jerárquica construida.
 def insertar_regla(nombre_regla, tipo_transaccion, cuenta_debito_id, cuenta_credito_id, estado):
     conexion = obtener_conexion()
     try:
