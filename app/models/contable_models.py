@@ -394,6 +394,26 @@ def obtener_asientodiario():
     finally:
         connection.close()
 
+def actualizar_regla_en_db(id_regla, nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado):
+    connection = obtener_conexion()
+    try:
+        with connection.cursor() as cursor:
+            sql = """
+            UPDATE reglas_contabilizacion
+            SET 
+                nombre_regla = %s,
+                tipo_transaccion = %s,
+                cuenta_debe = %s,
+                cuenta_haber = %s,
+                estado = %s
+            WHERE 
+                id_regla = %s
+            """
+            cursor.execute(sql, (nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado, id_regla))
+            connection.commit()
+            return cursor.rowcount > 0  
+    finally:
+        connection.close()
 
 def obtener_reglas(page, per_page):
     connection = obtener_conexion()
@@ -430,22 +450,6 @@ def obtener_reglas(page, per_page):
         connection.close()
 
 
-def actualizar_reglas(id_regla, nombre_regla, tipo_transaccion, cuenta_debe, cuenta_haber, estado):
-    connection = obtener_conexion()
-    try:
-        with connection.cursor() as cursor:
-            sql = """
-                UPDATE reglas_contabilizacion SET
-                    nombre_regla = %s,
-                    tipo_transaccion = %s,
-                    cuenta_debe = %s,
-                    cuenta_haber = %s,
-                    estado = %s
-                WHERE id_cuenta = %s
-            """
-            cursor.execute(sql, (nombre_regla, tipo_transaccion, cuenta_debe, cuenta_haber, estado, id_regla))
-    finally:
-        connection.close()
 
 def obtener_asientos_agrupados():
     conexion = obtener_conexion()

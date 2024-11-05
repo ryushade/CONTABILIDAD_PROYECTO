@@ -1,6 +1,6 @@
 from flask import request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
-from app.models.contable_models import obtener_regla_por_id, obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, actualizar_reglas, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas
+from app.models.contable_models import actualizar_regla_en_db, obtener_regla_por_id, obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas
 from . import accounting_bp
 import pandas as pd
 import io
@@ -149,6 +149,27 @@ def editar_cuenta(cuenta_id):
 
     return redirect(url_for('contable.cuentas'))
 
+@accounting_bp.route('/reglas/editar/<int:regla_id>', methods=['POST'])
+def actualizar_regla(id_regla):
+    data = request.get_json()
+
+    nombre_regla = data.get("nombre_regla")
+    tipo_transaccion = data.get("tipo_transaccion")
+    cuenta_debito = data.get("cuenta_debito")
+    cuenta_credito = data.get("cuenta_credito")
+    estado = data.get("estado")
+
+    try:
+        resultado = actualizar_regla_en_db(id_regla, nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado)
+        
+        if resultado:
+            return jsonify({"success": True})
+        else:
+            return jsonify({"success": False, "message": "No se encontró la regla o no se pudo actualizar."}), 404
+    except Exception as e:
+        print("Error al actualizar la regla:", e)
+        return jsonify({"success": False, "message": "Error interno del servidor."}), 500
+
 @accounting_bp.route('/reglas', methods=['GET'])
 @jwt_required()
 def reglas():
@@ -286,17 +307,7 @@ def eliminar_regla(regla_id):
 
 
 
-@accounting_bp.route('/reglas/editar/<int:regla_id>', methods=['POST'])
-def editar_regla(regla_id):
-    nombre_regla = request.form['nombre_regla']
-    tipo_transaccion = request.form['tipo_transaccion']
-    cuenta_debe = request.form['cuenta_debe']
-    cuenta_haber = request.form['cuenta_haber']
-    estado_regla = request.form['estado']
 
-    actualizar_reglas(regla_id, nombre_regla, tipo_transaccion, cuenta_debe, cuenta_haber, estado_regla)
-    
-    return redirect(url_for('contable.reglas'))
 
 @accounting_bp.route('/reportes/ldpdf')
 @jwt_required()

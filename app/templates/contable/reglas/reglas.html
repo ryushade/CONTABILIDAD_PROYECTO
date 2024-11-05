@@ -188,10 +188,17 @@
                             onclick="fetchReglaDetails({{ regla.id_regla }})">
                             <i class="fas fa-eye"></i>
                         </span>
-                        <span style="font-size: 14px;" class="action-button secondary edit"
-                            data-cuenta-id="{{ regla.id_regla }}">
+                        <span style="font-size: 14px;" class="action-button secondary edit" onclick="openEditModal(
+                            {{ regla.id_regla }}, 
+                            '{{ regla.nombre_regla }}', 
+                            '{{ regla.tipo_transaccion }}', 
+                            '{{ regla.cuenta_debe_codigo if regla.cuenta_debe_codigo else '' }}', 
+                            '{{ regla.cuenta_haber_codigo if regla.cuenta_haber_codigo else '' }}', 
+                            {{ regla.estado }}
+                        )">
                             <i class="fas fa-edit"></i>
                         </span>
+
                         <span style="font-size: 14px;" class="action-button secondary trash"
                             onclick="openModalDeleteRegla('{{ regla.id_regla }}', '{{ regla.nombre_regla }}')">
                             <i class="fas fa-trash"></i>
@@ -368,153 +375,81 @@
 </div>
 
 
-<!-- Edit Modal -->
-<form method="POST" id="editReglaModal" class="edit-form">
-    <div class="modal-overlay" style="display: none;">
-        <div class="content-modal">
-            <div class="modal-header">
-                <h3 class="modal-title">EDITAR CUENTA</h3>
-                <button type="button" class="modal-close" onclick="closeModal()"
-                    style="border: none; color: black; background-color: white; width: 15px; font-weight: bold;">
-                    &times;
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="w-full text-start mb-5">
-                    <!-- Campo de código de la cuenta -->
-                    <label for="nombre_regla" class="text-sm font-bold text-black mt-4 block"
-                        style="font-weight: bold;">
-                        Nombre:
-                    </label>
-                    <input type="text" id="codigo_cuenta" name="codigo_cuenta" value=""
-                        class="w-100 bg-gray-50 border-gray-300 text-gray-900 rounded-lg border p-2 text-sm"
-                        placeholder="Nombre de la cuenta" required />
+<div id="editReglaModal" class="modal-overlay"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1050;">
+    <div class="content-modal p-4"
+        style="background-color: white; max-width: 600px; max-height: 90vh; width: 100%; overflow-y: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+        <!-- Encabezado -->
+        <div class="modal-header d-flex justify-content-between align-items-center border-0 pb-3"
+            style="padding-right: 10px;">
+            <h3 class="modal-title m-0" style="font-weight: bold;">Editar Regla</h3>
+            <button type="button" class="modal-close" onclick="closeModalEdit()"
+                style="border: none; color: black; background-color: #e74c3c; font-weight: bold; font-size: 24px; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">&times;</button>
+        </div>
 
-                    <!-- Campo de nombre de la cuenta -->
-                    <label for="tipo_transaccion" class="text-sm font-bold text-black mt-4 block"
-                        style="font-weight: bold;">
-                        Tipo:
-                    </label>
-                    <input type="text" id="nombre_cuenta" name="nombre_cuenta" value=""
-                        class="w-100 bg-gray-50 border-gray-300 text-gray-900 rounded-lg border p-2 text-sm"
-                        placeholder="Tipo de la transacción" required />
+        <!-- Cuerpo del modal -->
+        <div class="modal-body">
+            <form id="editReglaForm" onsubmit="submitEditForm(event)">
+                <!-- Nombre de la regla -->
+                <div class="mb-4">
+                    <label for="nombre_regla_edit" class="form-label" style="font-weight: bold;">Nombre:</label>
+                    <input type="text" id="nombre_regla_edit" name="nombre_regla" class="form-control"
+                        placeholder="Ej: Registro de venta al contado" required />
+                </div>
 
+                <!-- Tipo de transacción -->
+                <div class="mb-4">
+                    <label for="tipo_transaccion_edit" class="form-label" style="font-weight: bold;">Tipo de
+                        transacción:</label>
+                    <select id="tipo_transaccion_edit" name="tipo_transaccion" class="form-select" required>
+                        <option value="venta_contado">Venta al contado</option>
+                        <option value="compra_contado">Compra al contado</option>
+                    </select>
+                </div>
 
+                <!-- Cuenta débito -->
+                <div class="mb-4">
+                    <label for="cuenta_debito_edit" class="form-label" style="font-weight: bold;">Cuenta débito:</label>
+                    <input type="text" id="cuenta_debito_edit" name="cuenta_debito" class="form-control"
+                        placeholder="Ej: 1212" required />
+                </div>
 
-                    <!-- Campo para estado de la cuenta -->
-                    <label for="estado_cuenta" class="text-sm font-bold text-black mt-4 block"
-                        style="font-weight: bold;">
-                        Estado de la cuenta:
-                    </label>
-                    <select id="estado_cuenta" name="estado_cuenta"
-                        class="w-100 text-sm bg-gray-50 border-gray-300 text-gray-900 rounded-lg border p-2" required>
+                <!-- Cuenta crédito -->
+                <div class="mb-4">
+                    <label for="cuenta_credito_edit" class="form-label" style="font-weight: bold;">Cuenta
+                        crédito:</label>
+                    <input type="text" id="cuenta_credito_edit" name="cuenta_credito" class="form-control"
+                        placeholder="Ej: 4010" required />
+                </div>
+
+                <!-- Estado de la cuenta -->
+                <div class="mb-4">
+                    <label for="estado_cuenta_edit" class="form-label" style="font-weight: bold;">Estado:</label>
+                    <select id="estado_cuenta_edit" name="estado_cuenta" class="form-select" required>
                         <option value="1">Activo</option>
                         <option value="0">Inactivo</option>
                     </select>
                 </div>
 
                 <!-- Botones de acción -->
-                <div class="modal-buttons d-flex justify-content-end">
-                    <button type="button" onclick="closeModal()" class="btn btn-secondary me-2">
+                <div class="d-flex justify-content-end mt-4" style="gap: 12px;">
+                    <button type="button" onclick="closeModalEdit()" class="btn btn-secondary me-2">
                         <i class="fas fa-times"></i> Cancelar
                     </button>
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> Guardar
                     </button>
                 </div>
-            </div>
-        </div>
-    </div>
-    </div>
-</form>
-
-
-<!-- Modal para Mostrar Detalles de la Regla -->
-<div id="openVerModal" class="modal-overlay"
-    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); align-items: center; justify-content: center; z-index: 1050;">
-    <div class="content-modal"
-        style="width: 90%; max-height: 90vh; overflow-y: auto; background-color: white; border-radius: 8px; padding: 20px;">
-
-        <!-- Modal Header -->
-        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center;">
-            <h3 class="modal-title" style="font-size: 36px;">DETALLES DE LA REGLA</h3>
-            <button type="button" class="modal-close" onclick="closeModalVer()"
-                style="border: none; color: black; background-color: #e74c3c; font-weight: bold; font-size: 24px; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-                &times;
-            </button>
-        </div>
-
-        <!-- Modal Body -->
-        <div class="modal-body">
-            <div class="w-full text-start mb-5">
-
-                <!-- Nombre de la Regla -->
-                <div class="card" style="margin-bottom: 20px;">
-                    <div class="card-body">
-                        <h6 class="card-title" style="font-weight: bold;">Nombre de la regla</h6>
-                        <p id="nombre_regla" style="font-size: 14px;" class="text-muted"></p>
-                        <div class="grid-container"
-                            style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
-
-                            <!-- Tipo de Transacción -->
-                            <div>
-                                <h6 style="font-weight: bold;">Tipo de transacción</h6>
-                                <span id="tipo_transaccion_info" class="badge bg-secondary"></span>
-                            </div>
-
-                            <!-- Estado -->
-                            <div>
-                                <h6 style="font-weight: bold;">Estado</h6>
-                                <span id="estado" class="badge bg-success"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Configuración de Cuentas -->
-                <div class="card" style="margin-bottom: 20px;">
-                    <div class="card-body">
-                        <h6 class="card-title" style="font-weight: bold;">Configuración de cuentas</h6>
-                        <div class="container bg-light rounded p-4" style="background-color: #F4F4F5;">
-                            <div class="row"
-                                style="display: flex; flex-direction: row; justify-content: space-between;">
-
-                                <!-- Cuenta Débito -->
-                                <div style="flex: 1; margin-right: 10px;">
-                                    <h6 style="font-weight: bold;">Cuenta débito</h6>
-                                    <p id="cuenta_debito" style="font-size: 16px; font-weight: bold; display: block;">
-                                    </p>
-                                </div>
-
-                                <!-- Cuenta Crédito -->
-                                <div style="flex: 1; margin-left: 10px;">
-                                    <h6 style="font-weight: bold;">Cuenta crédito</h6>
-                                    <p id="cuenta_credito" style="font-size: 16px; font-weight: bold; display: block;">
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Información Adicional -->
-                <div class="card" style="margin-bottom: 20px;">
-                    <div class="card-body">
-                        <h6 class="card-title" style="font-weight: bold;">Información adicional</h6>
-                        <ul class="text-muted" style="font-size: 14px; list-style-type: disc; padding-left: 20px;">
-                            <li>Esta regla se aplica automáticamente en transacciones de tipo</li>
-
-                        </ul>
-                    </div>
-                </div>
-
-            </div>
+            </form>
         </div>
     </div>
 </div>
 
 
 
+
+
+<!-- Tu modal existente -->
 <div id="addAccountModal" class="modal-overlay"
     style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1050;">
     <div class="content-modal p-4"
@@ -524,9 +459,7 @@
             style="padding-right: 10px;">
             <h3 class="modal-title m-0" style="font-weight: bold;">AGREGAR NUEVA REGLA</h3>
             <button type="button" class="modal-close" onclick="closeModalAdd()"
-                style="border: none; color: black; background-color: #e74c3c; font-weight: bold; font-size: 24px; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-                &times;
-            </button>
+                style="border: none; color: black; background-color: #e74c3c; font-weight: bold; font-size: 24px; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">&times;</button>
         </div>
 
         <!-- Cuerpo del modal -->
@@ -552,7 +485,7 @@
                 <!-- Cuenta débito -->
                 <div class="mb-4">
                     <label for="cuenta_debito" class="form-label" style="font-weight: bold;">Cuenta débito:</label>
-                    <input type="text" id="cuenta_debito" name="cuenta_debito" class="form-control"
+                    <input type="text" id="cuenta_debito_add" name="cuenta_debito" class="form-control"
                         placeholder="Ej: 1212" required />
                 </div>
 
@@ -588,7 +521,7 @@
                 <!-- Cuenta crédito -->
                 <div class="mb-4">
                     <label for="cuenta_credito" class="form-label" style="font-weight: bold;">Cuenta crédito:</label>
-                    <input type="text" id="cuenta_credito" name="cuenta_credito" class="form-control"
+                    <input type="text" id="cuenta_credito_add" name="cuenta_credito" class="form-control"
                         placeholder="Ej: 4010" required />
                 </div>
 
@@ -615,6 +548,9 @@
     </div>
 </div>
 
+
+
+
 <div id="deleteReglaModal" class="confirmation-modal-overlay" style="display: none;">
     <div class="confirmation-modal" style="text-align: center;">
         <div class="modal-icon" style="margin-bottom: 10px;">
@@ -640,6 +576,34 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const soloDebitoCheckbox = document.getElementById('solo_debito_checkbox');
+        const soloCreditoCheckbox = document.getElementById('solo_credito_checkbox');
+        const cuentaDebitoInput = document.getElementById('cuenta_debito_add');
+        const cuentaCreditoInput = document.getElementById('cuenta_credito_add');
+
+        function toggleCheckboxes() {
+            if (soloDebitoCheckbox.checked) {
+                soloCreditoCheckbox.checked = false;
+                cuentaCreditoInput.disabled = true;
+                cuentaDebitoInput.disabled = false;
+            } else if (soloCreditoCheckbox.checked) {
+                soloDebitoCheckbox.checked = false;
+                cuentaDebitoInput.disabled = true;
+                cuentaCreditoInput.disabled = false;
+            } else {
+                cuentaDebitoInput.disabled = false;
+                cuentaCreditoInput.disabled = false;
+            }
+        }
+
+        soloDebitoCheckbox.addEventListener('change', toggleCheckboxes);
+        soloCreditoCheckbox.addEventListener('change', toggleCheckboxes);
+    });
+</script>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -690,6 +654,7 @@
         window.fetchReglaDetails = fetchReglaDetails;
         window.closeModalVer = closeModalVer;
     });
+
 </script>
 
 {% endblock %}
