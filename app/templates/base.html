@@ -327,24 +327,28 @@
                         <button class="btn btn-light d-flex align-items-center" type="button" id="userDropdown"
                             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                             style="border: none; background: none;">
-                            <!-- Icono de usuario -->
+
+                            <!-- Foto de perfil o icono de usuario -->
                             <div
                                 style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; background-color: #e0e0e0; border-radius: 50%; border: 2px solid #b3b3b3;">
                                 <div
                                     style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background-color: #f0f0f0; border-radius: 50%;">
+                                    {% if user.foto %}
+                                    <img src="{{ user.foto }}" alt="Foto de perfil"
+                                        style="width: 100%; height: 100%; border-radius: 50%;">
+                                    {% else %}
                                     <i class="fas fa-user" style="font-size: 20px; color: #6e6e6e;"></i>
+                                    {% endif %}
                                 </div>
                             </div>
 
-
-
                             <!-- Nombre y Rol -->
                             <div class="ms-2 text-start">
-                                <span style="font-weight: bold; font-size: 16px;">{{user.usua}}</span><br>
+                                <span style="font-weight: bold; font-size: 16px;">{{ user.usua }}</span><br>
                                 <span style="font-size: 14px; color: gray;">
-                                    {% if user['rol'] and user['rol']['nom_rol'] == "ADMIN" %}
+                                    {% if user.rol and user.rol.nom_rol == "ADMIN" %}
                                     Administrador
-                                    {% elif user['rol'] and user['rol']['nom_rol'] == "EMPLEADO" %}
+                                    {% elif user.rol and user.rol.nom_rol == "EMPLEADO" %}
                                     Empleado
                                     {% else %}
                                     Rol desconocido
@@ -365,11 +369,11 @@
                                 <span>Cerrar sesión</span>
                             </a>
                         </div>
-
                     </div>
                     {% else %}
                     <a href="{{ url_for('contable.login') }}" class="btn btn-outline-primary">Iniciar Sesión</a>
                     {% endif %}
+
 
 
                 </div>
@@ -400,53 +404,58 @@
 
             <!-- Cuerpo del modal -->
             <div class="modal-body">
-                <form>
+                <form id="userConfigForm" method="POST" enctype="multipart/form-data"
+                    action="{{ url_for('contable.upload_photo') }}">
+                    <input type="hidden" name="user_id" value="{{ user.id_usuario }}">
+                    <!-- Campo oculto para el ID de usuario -->
+
                     <!-- Imagen de perfil -->
                     <div class="text-center mb-4">
                         <div class="card p-4" style="width: 100%;">
-                            <div
+                            <div id="profileImagePreview"
                                 style="width: 100px; height: 100px; background-color: #f0f0f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: auto;">
                                 <i class="fas fa-user-circle" style="font-size: 60px; color: #ccc;"></i>
                             </div>
                             <button type="button" class="btn btn-link mt-2"
-                                style="font-size: 14px; color: #6c757d; text-decoration: none;">
+                                style="font-size: 14px; color: #6c757d; text-decoration: none;"
+                                onclick="document.getElementById('photoInput').click();">
                                 <i class="fas fa-upload"></i> Cambiar foto
                             </button>
-
-                            <hr style="margin-bottom: 30px;">
-
-                            <!-- Nombre de usuario -->
-                            <div class="mb-4">
-                                <label for="username" class="form-label text-start"
-                                    style="font-weight: bold; display: block;">Nombre de usuario</label>
-                                <input type="text" id="username" name="username" class="form-control" value="marco"
-                                    required />
-                            </div>
-
-                            <!-- Rol -->
-                            <div class="mb-4">
-                                <label for="userRole" class="form-label text-start"
-                                    style="font-weight: bold; display: block;">Rol</label>
-                                <select id="userRole" name="userRole" class="form-select" required>
-                                    <option value="Administrador" selected>Administrador</option>
-                                    <option value="Empleado">Empleado</option>
-                                    <option value="Vendedor">Vendedor</option>
-                                    <option value="Contador">Contador</option>
-                                </select>
-                            </div>
-
-
-                            <!-- Botón de guardar cambios -->
-                            <div class="d-flex justify-content-center mt-4">
-                                <button type="submit" class="btn btn-primary" style="width: 100%; font-weight: 600;">
-                                    <i class="fas fa-save me-2"></i> Guardar cambios
-                                </button>
-                            </div>
+                            <input type="file" id="photoInput" name="photo" style="display: none;" accept="image/*"
+                                onchange="previewPhoto(event)">
                         </div>
+                    </div>
+
+                    <!-- Nombre de usuario -->
+                    <div class="mb-4">
+                        <label for="username" class="form-label text-start"
+                            style="font-weight: bold; display: block;">Nombre de usuario</label>
+                        <input type="text" id="username" name="username" class="form-control" value="marco" required />
+                    </div>
+
+                    <!-- Rol -->
+                    <div class="mb-4">
+                        <label for="userRole" class="form-label text-start"
+                            style="font-weight: bold; display: block;">Rol</label>
+                        <select id="userRole" name="userRole" class="form-select" required>
+                            <option value="Administrador" selected>Administrador</option>
+                            <option value="Empleado">Empleado</option>
+                            <option value="Vendedor">Vendedor</option>
+                            <option value="Contador">Contador</option>
+                        </select>
+                    </div>
+
+                    <!-- Botón de guardar cambios -->
+                    <div class="d-flex justify-content-center mt-4">
+                        <button type="submit" class="btn btn-primary" style="width: 100%; font-weight: 600;">
+                            <i class="fas fa-save me-2"></i> Guardar cambios
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
+
 
     <script>
         function openUserConfigModal() {

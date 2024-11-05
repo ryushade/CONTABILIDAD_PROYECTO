@@ -1,6 +1,6 @@
 from flask import json, request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
-from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, obtener_regla_por_id, obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas
+from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas
 
 from . import accounting_bp
 import pandas as pd
@@ -13,6 +13,10 @@ import openpyxl
 from openpyxl.styles import Border, Side, Alignment, Font
 from fpdf import FPDF
 from io import BytesIO
+from werkzeug.utils import secure_filename
+
+
+
 
 @accounting_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -207,7 +211,33 @@ def agregar_regla():
         return jsonify({"success": False, "message": "Error interno del servidor."}), 500
 
 
+@accounting_bp.route('/upload_photo', methods=['POST'])
+def upload_photo():
+    if 'photo' not in request.files:
+        # Redirige a la página de inicio en caso de error
+        return render_template('index.html')    
 
+    file = request.files['photo']
+    if file.filename == '':
+        # Redirige a la página de inicio en caso de error
+        return render_template('index.html')    
+    if file:
+        filename = secure_filename(file.filename)
+        upload_folder = current_app.config['UPLOAD_FOLDER']
+
+        if not os.path.exists(upload_folder):
+            os.makedirs(upload_folder)
+
+        filepath = os.path.join(upload_folder, filename)
+        file.save(filepath)
+
+        user_id = request.form.get('user_id')
+        if not user_id:
+            return render_template('index.html')    
+
+        foto_path = f"/static/img/{filename}" 
+        if guardar_foto_usuario(user_id, foto_path):
+            return render_template('index.html', foto_path=foto_path)
 
 @accounting_bp.route('/reglas/editar/<int:regla_id>', methods=['POST'])
 def actualizar_regla(id_regla):

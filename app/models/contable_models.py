@@ -88,7 +88,7 @@ def obtener_usuario_por_id(user_id):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
-            # Consulta que une la tabla usuario con rol
+            # Consulta que une la tabla usuario con rol e incluye la columna de foto
             sql = """
                 SELECT u.*, r.nom_rol, r.estado_rol
                 FROM usuario u
@@ -98,13 +98,14 @@ def obtener_usuario_por_id(user_id):
             cursor.execute(sql, (user_id,))
             resultado = cursor.fetchone()
             if resultado:
-                # Estructurar el resultado para incluir el rol como un diccionario
+                # Estructurar el resultado para incluir el rol y la foto como un diccionario
                 user = {
                     'id_usuario': resultado['id_usuario'],
                     'usua': resultado['usua'],
                     'contra': resultado['contra'],
                     'estado_usuario': resultado['estado_usuario'],
                     'id_rol': resultado['id_rol'],
+                    'foto': resultado['foto'],  # Agregar la foto al diccionario del usuario
                     'rol': {
                         'id_rol': resultado['id_rol'],
                         'nom_rol': resultado['nom_rol'],
@@ -114,6 +115,21 @@ def obtener_usuario_por_id(user_id):
                 return user
             else:
                 return None
+    finally:
+        conexion.close()
+
+
+def guardar_foto_usuario(user_id, foto_path):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            sql = "UPDATE usuario SET foto = %s WHERE id_usuario = %s"
+            cursor.execute(sql, (foto_path, user_id))
+            conexion.commit()
+            return True 
+    except Exception as e:
+        print(f"Error al actualizar la foto del usuario en la base de datos: {e}")
+        return False  
     finally:
         conexion.close()
 
