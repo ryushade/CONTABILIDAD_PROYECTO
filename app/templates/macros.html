@@ -53,11 +53,14 @@
         </span>
 
         <span
-          style="font-size: 14px"
           class="action-button secondary edit"
           data-cuenta-id="{{ cuenta.id_cuenta }}"
-          ><i class="fas fa-edit"></i
-        ></span>
+          onclick="openEditModal2('{{ cuenta.id_cuenta }}')"
+          style="font-size: 14px; cursor: pointer;"
+        >
+          <i class="fas fa-edit"></i>
+        </span>
+
         <span
           style="font-size: 14px"
           class="action-button secondary trash"
