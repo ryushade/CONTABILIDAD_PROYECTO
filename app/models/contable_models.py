@@ -519,10 +519,14 @@ def obtener_asientos_agrupados(tipo_registro='Todas', start_date=None, end_date=
                 query += " AND LOWER(a.glosa) LIKE %s"
                 params.append('%compra%')
 
-            # Filtro por rango de fechas
+            # Filtro por rango de fechas o por mes completo
             if start_date and end_date:
-                query += " AND a.fecha_asiento BETWEEN %s AND %s"
-                params.extend([start_date, end_date])
+                if start_date == end_date:
+                    query += " AND a.fecha_asiento BETWEEN %s AND LAST_DAY(%s)"
+                    params.extend([start_date, start_date])
+                else:
+                    query += " AND a.fecha_asiento BETWEEN %s AND %s"
+                    params.extend([start_date, end_date])
 
             cursor.execute(query, params)
             resultados = cursor.fetchall()
