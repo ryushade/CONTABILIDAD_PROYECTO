@@ -578,3 +578,33 @@ def obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica():
         return libro_mayor
     finally:
         conexion.close()
+
+def obtenerCuentas():
+    try:
+        conexion = obtener_conexion()  # Establece conexión a la base de datos llamando a la función obtener_conexion.
+        with conexion.cursor() as cursor:  # Utiliza un cursor para ejecutar consultas, que se cierra automáticamente al terminar el bloque.
+            sql = """
+                SELECT id_cuenta, codigo_cuenta, nombre_cuenta AS Nombre, nivel, cuenta_padre, estado_cuenta
+                FROM cuenta
+                ORDER BY nivel, cuenta_padre, id_cuenta;
+                """  # Consulta SQL que selecciona y ordena las cuentas para facilitar la jerarquización.
+            cursor.execute(sql)  # Ejecuta la consulta SQL en la base de datos.
+            cuentas = cursor.fetchall()  # Obtiene todos los registros de la consulta y los almacena en la variable cuentas.
+            return construir_jerarquia(cuentas)  # Llama a la función para construir la jerarquía de cuentas con los datos obtenidos.
+    except Exception as e:
+        print("Error en obtenerCuentas:", str(e))  # Imprime un mensaje de error si ocurre una excepción.
+        raise  # Vuelve a lanzar la excepción para ser manejada por un controlador de excepciones superior o para detener el programa.
+
+def construir_jerarquia(cuentas):
+    from collections import defaultdict  # Importa defaultdict de collections para crear diccionarios con valores predeterminados.
+    estructura = defaultdict(list)  # Crea un diccionario donde cada clave se inicializa como una lista.
+    nodos = {cuenta['id_cuenta']: dict(cuenta, hijos=[]) for cuenta in cuentas}  # Crea un diccionario de nodos, cada uno con una lista de hijos.
+
+    for cuenta in cuentas:
+        nodo = nodos[cuenta['id_cuenta']]  # Obtiene el nodo para la cuenta actual basado en su ID.
+        if cuenta['cuenta_padre']:  # Verifica si la cuenta tiene un nodo padre.
+            nodos[cuenta['cuenta_padre']]['hijos'].append(nodo)  # Si tiene padre, agrega el nodo actual a la lista de hijos del padre.
+        else:
+            estructura[cuenta['nivel']].append(nodo)  # Si no tiene padre, agrega el nodo al nivel superior en la estructura jerárquica.
+
+    return estructura  # Devuelve la estructura jerárquica construida.
