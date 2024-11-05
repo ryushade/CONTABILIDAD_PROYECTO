@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+
     <title>{% block title %}Mi Proyecto{% endblock %}</title>
     <!-- CSS de Bootstrap -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -34,12 +35,15 @@
         }
 
         .main-content {
-            margin-left: 13rem; /* Valor inicial del margen */
-            transition: margin-left 0.3s ease; /* Asegura una transición suave */
-            position: relative; /* Asegura que el contenido no afecte al botón */
+            margin-left: 13rem;
+            /* Valor inicial del margen */
+            transition: margin-left 0.3s ease;
+            /* Asegura una transición suave */
+            position: relative;
+            /* Asegura que el contenido no afecte al botón */
         }
 
-        .sidebar.collapsed + .main-content {
+        .sidebar.collapsed+.main-content {
             margin-left: 55px;
         }
 
@@ -93,17 +97,22 @@
             border-radius: 5px;
             color: #4069e5ff;
             z-index: 1050;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5); /* Ajusta la sombra aquí */
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+            /* Ajusta la sombra aquí */
             font-size: 18px;
-            position: absolute; /* Asegura que esté por encima del contenido */
-            top: 1rem; /* Ajusta según tu diseño */
-            right: -15px; /* Ajusta para posicionarlo justo al borde del sidebar */
+            position: absolute;
+            /* Asegura que esté por encima del contenido */
+            top: 1rem;
+            /* Ajusta según tu diseño */
+            right: -15px;
+            /* Ajusta para posicionarlo justo al borde del sidebar */
             transition: transform 0.3s;
         }
 
         .sidebar.collapsed .toggle-button {
             right: -10px;
-            margin-top: 40px; /* Asegura que siga visible cuando colapsado */
+            margin-top: 40px;
+            /* Asegura que siga visible cuando colapsado */
         }
 
         .sidebar-nav {
@@ -111,7 +120,8 @@
         }
 
         .sidebar.collapsed .sidebar-nav {
-            margin-top: 2rem; /* Margen superior adicional solo cuando el sidebar está colapsado */
+            margin-top: 2rem;
+            /* Margen superior adicional solo cuando el sidebar está colapsado */
         }
 
         .nav-item {
@@ -311,32 +321,57 @@
                             <a class="nav-link" href="{{ url_for('contable.cuentas') }}">Contabilidad</a>
                         </li>
                     </ul>
-
                     <!-- User Dropdown -->
                     {% if user %}
                     <div class="dropdown me-3">
-                        <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button"
-                            id="userDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-user-circle" style="font-size: 20px; color: gray;"></i>
-                            <span class="ms-2">
-                                {{ user.usua }} -
-                                {% if user and user['rol']['nom_rol'] == "ADMIN" %}
-                                Administrador
-                                {% elif user['rol']['nom_rol'] == "EMPLEADO" %}
-                                Empleado
-                                {% else %}
-                                Rol desconocido
-                                {% endif %}
-                            </span>
+                        <button class="btn btn-light d-flex align-items-center" type="button" id="userDropdown"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                            style="border: none; background: none;">
+                            <!-- Icono de usuario -->
+                            <div
+                                style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; background-color: #e0e0e0; border-radius: 50%; border: 2px solid #b3b3b3;">
+                                <div
+                                    style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background-color: #f0f0f0; border-radius: 50%;">
+                                    <i class="fas fa-user" style="font-size: 20px; color: #6e6e6e;"></i>
+                                </div>
+                            </div>
+
+
+
+                            <!-- Nombre y Rol -->
+                            <div class="ms-2 text-start">
+                                <span style="font-weight: bold; font-size: 16px;">{{user.usua}}</span><br>
+                                <span style="font-size: 14px; color: gray;">
+                                    {% if user['rol'] and user['rol']['nom_rol'] == "ADMIN" %}
+                                    Administrador
+                                    {% elif user['rol'] and user['rol']['nom_rol'] == "EMPLEADO" %}
+                                    Empleado
+                                    {% else %}
+                                    Rol desconocido
+                                    {% endif %}
+                                </span>
+                            </div>
                         </button>
-                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                            <a class="dropdown-item text-danger" href="{{ url_for('contable.logout') }}">Cerrar
-                                sesión</a>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown"
+                            style="min-width: 200px; max-width: 250px; white-space: nowrap;">
+                            <a class="dropdown-item d-flex align-items-center" href="#" onclick="openUserConfigModal()"
+                                style="padding: 8px 12px;">
+                                <i class="fas fa-cog" style="color: rgb(155, 149, 149); margin-right: 8px;"></i>
+                                <span>Configuración de usuario</span>
+                            </a>
+                            <a class="dropdown-item d-flex align-items-center text-danger"
+                                href="{{ url_for('contable.logout') }}" style="padding: 8px 12px;">
+                                <i class="fas fa-sign-out-alt" style="color: red; margin-right: 8px;"></i>
+                                <span>Cerrar sesión</span>
+                            </a>
                         </div>
+
                     </div>
                     {% else %}
                     <a href="{{ url_for('contable.login') }}" class="btn btn-outline-primary">Iniciar Sesión</a>
                     {% endif %}
+
+
                 </div>
             </nav>
 
@@ -347,6 +382,92 @@
             </div>
         </div>
     </div>
+
+    <div id="userConfigModal" class="modal-overlay"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1050;">
+        <div style="width: auto;" class="content-modal p-4"
+            style="background-color: white; max-width: 400px; max-height: 90vh; width: 100%; overflow-y: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+
+            <!-- Encabezado -->
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 class="modal-title" style="font-weight: bold; font-size: 24px; margin: 0;">CONFIGURACIÓN DE USUARIO
+                </h3>
+                <button type="button" class="modal-close" onclick="closeUserConfigModal()"
+                    style="border: none; color: white; background-color: #e74c3c; font-size: 20px; width: 32px; height: 32px; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                    &times;
+                </button>
+            </div>
+
+            <!-- Cuerpo del modal -->
+            <div class="modal-body">
+                <form>
+                    <!-- Imagen de perfil -->
+                    <div class="text-center mb-4">
+                        <div class="card p-4" style="width: 100%;">
+                            <div
+                                style="width: 100px; height: 100px; background-color: #f0f0f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: auto;">
+                                <i class="fas fa-user-circle" style="font-size: 60px; color: #ccc;"></i>
+                            </div>
+                            <button type="button" class="btn btn-link mt-2"
+                                style="font-size: 14px; color: #6c757d; text-decoration: none;">
+                                <i class="fas fa-upload"></i> Cambiar foto
+                            </button>
+
+                            <hr style="margin-bottom: 30px;">
+
+                            <!-- Nombre de usuario -->
+                            <div class="mb-4">
+                                <label for="username" class="form-label text-start"
+                                    style="font-weight: bold; display: block;">Nombre de usuario</label>
+                                <input type="text" id="username" name="username" class="form-control" value="marco"
+                                    required />
+                            </div>
+
+                            <!-- Rol -->
+                            <div class="mb-4">
+                                <label for="userRole" class="form-label text-start"
+                                    style="font-weight: bold; display: block;">Rol</label>
+                                <select id="userRole" name="userRole" class="form-select" required>
+                                    <option value="Administrador" selected>Administrador</option>
+                                    <option value="Empleado">Empleado</option>
+                                    <option value="Vendedor">Vendedor</option>
+                                    <option value="Contador">Contador</option>
+                                </select>
+                            </div>
+
+
+                            <!-- Botón de guardar cambios -->
+                            <div class="d-flex justify-content-center mt-4">
+                                <button type="submit" class="btn btn-primary" style="width: 100%; font-weight: 600;">
+                                    <i class="fas fa-save me-2"></i> Guardar cambios
+                                </button>
+                            </div>
+                        </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openUserConfigModal() {
+            const modal = document.getElementById('userConfigModal');
+            modal.style.display = 'flex';
+        }
+
+        function closeUserConfigModal() {
+            const modal = document.getElementById('userConfigModal');
+            modal.style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('userConfigModal').addEventListener('click', function (e) {
+            if (e.target === this) {
+                closeUserConfigModal();
+            }
+        });
+    </script>
+
+
 
     <!-- JS de Bootstrap y scripts personalizados -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"

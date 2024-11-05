@@ -811,3 +811,41 @@ def registrar_compra(proveedor, nro_comprobante, almacen, fecha, igv, monto_tota
         return {'success': False, 'message': str(e)}
     finally:
         conexion.close()
+
+
+def obtener_compras_con_detalles():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            sql = """
+                SELECT co.id_compra, co.f_compra, co.monto_total, 
+                       pr.descripcion, dc.cantidad, dc.total
+                FROM compra AS co
+                INNER JOIN detalle_compra AS dc ON co.id_compra = dc.id_compra
+                INNER JOIN producto AS pr ON pr.id_producto = dc.id_producto
+                ORDER BY co.id_compra
+            """
+            cursor.execute(sql)
+            resultados = cursor.fetchall()
+
+            compras = {}
+            for row in resultados:
+                id_compra = row['id_compra']
+                if id_compra not in compras:
+                    compras[id_compra] = {
+                        'id_compra': id_compra,
+                        'f_compra': row['f_compra'],
+                        'monto_total': row['monto_total'],
+                        'productos': []
+                    }
+                compras[id_compra]['productos'].append({
+                    'descripcion': row['descripcion'],
+                    'cantidad': row['cantidad'],
+                    'total': row['total']
+                })
+            return compras
+    except Exception as e:
+        print(f"Error en obtener_compras_con_detalles: {e}")
+        return {}
+    finally:
+        conexion.close()

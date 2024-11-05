@@ -330,14 +330,26 @@ def obtener_cuentas_excel():
 
 
 
-def obtener_usuarios():
+def obtener_usuarios(page, per_page):
     connection = obtener_conexion()       
     try: 
         with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-            sql = "SELECT id_usuario, U.id_rol, nom_rol, usua, contra, estado_usuario FROM usuario U INNER JOIN rol R ON U.id_rol = R.id_rol ORDER BY id_usuario desc"
-            cursor.execute(sql)
+            offset = (page - 1) * per_page
+            sql = """
+                SELECT id_usuario, U.id_rol, nom_rol, usua, contra, estado_usuario
+                FROM usuario U
+                INNER JOIN rol R ON U.id_rol = R.id_rol
+                ORDER BY id_usuario DESC
+                LIMIT %s OFFSET %s
+            """
+            cursor.execute(sql, (per_page, offset))
             usuarios = cursor.fetchall()
-            return usuarios
+            
+            # Consultar el total de resultados
+            cursor.execute("SELECT COUNT(*) as total FROM usuario")
+            total_results = cursor.fetchone()['total']
+            
+            return usuarios, total_results
     finally:
         connection.close()
 
@@ -382,11 +394,32 @@ def obtener_asientodiario():
     finally:
         connection.close()
 
-
-def obtener_reglas():
+def actualizar_regla_en_db(id_regla, nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado):
     connection = obtener_conexion()
     try:
         with connection.cursor() as cursor:
+            sql = """
+            UPDATE reglas_contabilizacion
+            SET 
+                nombre_regla = %s,
+                tipo_transaccion = %s,
+                cuenta_debe = %s,
+                cuenta_haber = %s,
+                estado = %s
+            WHERE 
+                id_regla = %s
+            """
+            cursor.execute(sql, (nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado, id_regla))
+            connection.commit()
+            return cursor.rowcount > 0  
+    finally:
+        connection.close()
+
+def obtener_reglas(page, per_page):
+    connection = obtener_conexion()
+    try:
+        with connection.cursor() as cursor:
+            offset = (page - 1) * per_page
             sql = """
             SELECT 
                 r.id_regla, 
@@ -403,30 +436,20 @@ def obtener_reglas():
                 cuenta c_debe ON r.cuenta_debe = c_debe.id_cuenta
             LEFT JOIN 
                 cuenta c_haber ON r.cuenta_haber = c_haber.id_cuenta
+            LIMIT %s OFFSET %s
             """
-            cursor.execute(sql)
-            reglas = cursor.fetchall()  
-            return reglas  
+            cursor.execute(sql, (per_page, offset))
+            reglas = cursor.fetchall()
+            
+            # Obtener el total de resultados
+            cursor.execute("SELECT COUNT(*) as total FROM reglas_contabilizacion")
+            total_results = cursor.fetchone()['total']
+            
+            return reglas, total_results
     finally:
         connection.close()
 
 
-def actualizar_reglas(id_regla, nombre_regla, tipo_transaccion, cuenta_debe, cuenta_haber, estado):
-    connection = obtener_conexion()
-    try:
-        with connection.cursor() as cursor:
-            sql = """
-                UPDATE reglas_contabilizacion SET
-                    nombre_regla = %s,
-                    tipo_transaccion = %s,
-                    cuenta_debe = %s,
-                    cuenta_haber = %s,
-                    estado = %s
-                WHERE id_cuenta = %s
-            """
-            cursor.execute(sql, (nombre_regla, tipo_transaccion, cuenta_debe, cuenta_haber, estado, id_regla))
-    finally:
-        connection.close()
 
 def obtener_asientos_agrupados():
     conexion = obtener_conexion()
@@ -608,3 +631,86 @@ def construir_jerarquia(cuentas):
             estructura[cuenta['nivel']].append(nodo)  # Si no tiene padre, agrega el nodo al nivel superior en la estructura jerárquica.
 
     return estructura  # Devuelve la estructura jerárquica construida.
+def insertar_regla(nombre_regla, tipo_transaccion, cuenta_debito_id, cuenta_credito_id, estado):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            sql = """
+                INSERT INTO reglas_contabilizacion (nombre_regla, tipo_transaccion, cuenta_debe, cuenta_haber, estado)
+                VALUES (%s, %s, %s, %s, %s)
+            """
+            cursor.execute(sql, (nombre_regla, tipo_transaccion, cuenta_debito_id, cuenta_credito_id, estado))
+            conexion.commit()
+    finally:
+        conexion.close()
+
+def obtener_registro_ventas():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT 
+                ROW_NUMBER() OVER (ORDER BY v.id_venta) AS numero_correlativo,
+                v.f_venta as fecha,
+                v.f_venta AS fechaVencimiento,
+                COALESCE(cl.dni, cl.ruc) AS documento_cliente,
+                COALESCE(CONCAT(cl.nombres, ' ', cl.apellidos), cl.razon_social) AS nombre_cliente,
+                c.num_comprobante as num_comprobante,
+                c.num_comprobante as comprobante_pago,
+                SUM((dv.cantidad * dv.precio) - dv.descuento) AS importe,
+                SUM((dv.cantidad * dv.precio) - dv.descuento) * 0.18 AS igv,
+                SUM((dv.cantidad * dv.precio) - dv.descuento) * 1.18 AS total
+            FROM venta v
+            INNER JOIN detalle_venta dv ON v.id_venta = dv.id_venta
+            INNER JOIN comprobante c ON c.id_comprobante = v.id_comprobante
+            INNER JOIN cliente cl ON cl.id_cliente = v.id_cliente
+            GROUP BY 
+                v.id_venta
+            ORDER BY 
+                v.id_venta;
+            """)
+            resultados = cursor.fetchall()
+
+        # Inicializar variables para almacenar los totales
+        total_igv = 0.0
+        total_importe = 0.0
+        total_general = 0.0
+        registros_compras = []
+
+        for row in resultados:
+            # Convertir la fecha a formato datetime si es necesario
+            fecha = row["fecha"]
+            if isinstance(fecha, str):
+                fecha = datetime.strptime(fecha, '%Y-%m-%d')
+            fechaV = row["fechaVencimiento"]
+            if isinstance(fechaV, str):
+                fechaV = datetime.strptime(fechaV, '%Y-%m-%d')
+            # Agregar cada registro a la lista de registros de compras
+            registros_compras.append({
+                "numero_correlativo": row["numero_correlativo"],
+                "fecha": fecha,
+                "fechaV":fechaV,
+                "documento_cliente": row["documento_cliente"],
+                "nombre_cliente": row["nombre_cliente"],
+                "num_comprobante": row["num_comprobante"],
+                "comprobante_pago": row["comprobante_pago"],
+                "importe": float(row["importe"]),
+                "igv": float(row["igv"]),
+                "total": float(row["total"])
+            })
+            
+            # Acumular los totales
+            total_importe += float(row["importe"])
+            total_igv += float(row["igv"])
+            total_general += float(row["total"])
+
+        # Diccionario con los totales
+        totales = {
+            "total_importe": total_importe,
+            "total_igv": total_igv,
+            "total_general": total_general
+        }
+
+        return registros_compras, totales
+    finally:
+        conexion.close()

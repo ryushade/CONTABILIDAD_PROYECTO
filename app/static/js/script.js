@@ -24,6 +24,30 @@ function openEditUsu(usuarioId) {
     });
 }
 
+function openEditRegla(reglaId) {
+  fetch('/contable/reglas/detalles/' + reglaId)
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        alert('Error: ' + data.error);
+      } else {
+        // Verifica los datos que están siendo asignados
+        console.log("Datos recibidos:", data);
+        document.getElementById('nombre_regla').value = data.nombre_regla;
+        document.getElementById('tipo_transaccion').value = data.tipo_transaccion;
+        document.getElementById('cuenta_debito').value = data.cuenta_debito;
+        document.getElementById('cuenta_credito').value = data.cuenta_credito;
+        document.getElementById('estado').value = data.estado_regla;
+
+        document.getElementById('editReglaModal').style.display = 'flex';
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching rule data:', error);
+    }
+    );
+}
+
 
 
 function closeModal() {
@@ -94,15 +118,30 @@ function closeModalUsuEdit() {
   document.getElementById('editUsuarioModal').style.display = 'none';
 }
 
-function openModalDeleteUsu(idUsuario, nombreUsuario) {
+function openModalDeleteUsu(idUsuario, nombreRol, nombreUsuario) {
   document.getElementById('deleteUsuarioModal').style.display = 'flex';
   document.getElementById('deleteUsuarioId').value = idUsuario;
-  document.getElementById('deleteUsuInfo').innerText = `"${nombreUsuario}"`;
+  document.getElementById('deleteUsuarioInfo').innerText = `${nombreRol} - ${nombreUsuario}`;
+}
+
+
+
+
+function openModalDeleteRegla(idRegla, nombreRegla) {
+  document.getElementById('deleteReglaModal').style.display = 'flex';
+  document.getElementById('deleteReglaId').value = idRegla;
+  document.getElementById('deleteReglaInfo').innerText = `"${nombreRegla}"`;
+}
+
+function closeModalDeleteRegla() {
+  document.getElementById('deleteReglaModal').style.display = 'none';
 }
 
 function closeModalDeleteUsuario() {
   document.getElementById('deleteUsuarioModal').style.display = 'none';
 }
+
+  
 
 function openModalDelete(cuentaId, codigoCuenta, nombreCuenta) {
   // Mostrar el modal
@@ -126,6 +165,15 @@ function deleteCuenta() {
   var form = document.createElement('form');
   form.method = 'POST';
   form.action = '/contable/cuentas/eliminar/' + cuentaId;
+  document.body.appendChild(form);
+  form.submit();
+}
+
+function deleteRegla() {
+  var reglaId = document.getElementById('deleteReglaId').value;
+  var form = document.createElement('form');
+  form.method = 'POST';
+  form.action = '/contable/reglas/eliminar/' + reglaId;
   document.body.appendChild(form);
   form.submit();
 }
@@ -243,40 +291,70 @@ document.getElementById('codigo_cuenta').addEventListener('input', function () {
 });
 
 
-document.addEventListener("DOMContentLoaded", function () {
-  const soloDebitoCheckbox = document.getElementById('solo_debito_checkbox');
-  const soloCreditoCheckbox = document.getElementById('solo_credito_checkbox');
-  const cuentaDebitoInput = document.getElementById('cuenta_debito');
-  const cuentaCreditoInput = document.getElementById('cuenta_credito');
-
-  soloDebitoCheckbox.addEventListener('change', () => {
-    if (soloDebitoCheckbox.checked) {
-      cuentaCreditoInput.disabled = true;
-      soloCreditoCheckbox.checked = false;
-    } else {
-      cuentaCreditoInput.disabled = false;
-    }
-  });
-
-  soloCreditoCheckbox.addEventListener('change', () => {
-    if (soloCreditoCheckbox.checked) {
-      cuentaDebitoInput.disabled = true;
-      soloDebitoCheckbox.checked = false;
-    } else {
-      cuentaDebitoInput.disabled = false;
-    }
-  });
-});
-
-
-
-
-
-
-
 
 
 // Función para Cerrar el Modal
 function closeModalVer() {
   document.getElementById('openVerModal').style.display = 'none';
+}
+
+
+let currentReglaId = null; // Almacena el ID de la regla que se está editando
+
+function openEditModal(reglaId, nombre, tipoTransaccion, cuentaDebito, cuentaCredito, estado) {
+    currentReglaId = reglaId; // Guarda el ID de la regla actual
+
+    // Llena los campos del formulario con los datos actuales de la regla
+    document.getElementById("nombre_regla_edit").value = nombre;
+    document.getElementById("tipo_transaccion_edit").value = tipoTransaccion;
+    document.getElementById("cuenta_debito_edit").value = cuentaDebito || ""; // Si es nulo, poner ""
+    document.getElementById("cuenta_credito_edit").value = cuentaCredito || ""; // Si es nulo, poner ""
+    document.getElementById("estado_cuenta_edit").value = estado;
+
+    // Muestra el modal
+    document.getElementById("editReglaModal").style.display = "flex";
+}
+
+function closeModalEdit() {
+    document.getElementById("editReglaModal").style.display = "none";
+}
+
+function submitEditForm(event) {
+    event.preventDefault(); // Evita el envío del formulario
+
+    // Obtiene los valores del formulario
+    const nombreRegla = document.getElementById("nombre_regla_edit").value;
+    const tipoTransaccion = document.getElementById("tipo_transaccion_edit").value;
+    const cuentaDebito = document.getElementById("cuenta_debito_edit").value;
+    const cuentaCredito = document.getElementById("cuenta_credito_edit").value;
+    const estado = document.getElementById("estado_cuenta_edit").value;
+
+    // Realiza una petición al servidor para actualizar la regla
+    fetch(`/contable/reglas/editar/${currentReglaId}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            nombre_regla: nombreRegla,
+            tipo_transaccion: tipoTransaccion,
+            cuenta_debito: cuentaDebito,
+            cuenta_credito: cuentaCredito,
+            estado: estado,
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Regla actualizada correctamente.");
+            closeModalEdit(); // Cierra el modal
+            location.reload(); // Recarga la página para mostrar los cambios
+        } else {
+            alert("Hubo un problema al actualizar la regla.");
+        }
+    })
+    .catch(error => {
+        console.error("Error al actualizar la regla:", error);
+        alert("Error al actualizar la regla.");
+    });
 }

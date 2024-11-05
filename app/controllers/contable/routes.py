@@ -1,6 +1,6 @@
 from flask import json, request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
-from app.models.contable_models import obtener_regla_por_id, obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, actualizar_reglas, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica
+from app.models.contable_models import actualizar_regla_en_db, obtener_regla_por_id, obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas
 from . import accounting_bp
 import pandas as pd
 import io
@@ -53,7 +53,8 @@ def logout():
 def reportes():
     asientos, totales = obtener_asientos_agrupados()
     libro_mayor_data, total_debe, total_haber = obtener_libro_mayor_agrupado_por_fecha()
-    return render_template('contable/reportes/reportes.html', asientos=asientos, totales=totales, libro_mayor=libro_mayor_data, total_debe=total_debe, total_haber=total_haber)
+    registro_compra_data, totale = obtener_registro_ventas()
+    return render_template('contable/reportes/reportes.html', asientos=asientos, totales=totales, libro_mayor=libro_mayor_data, total_debe=total_debe, total_haber=total_haber,registros_compras = registro_compra_data, totale = totale)
 
 import app.models.contable_models as conta
 @accounting_bp.route('/cuentas', methods=['GET'])
@@ -137,6 +138,7 @@ def obtener_cuenta(cuenta_id):
         return jsonify({'error': 'Cuenta no encontrada'}), 404
     
 
+
 @accounting_bp.route('/cuentas/editar/<int:cuenta_id>', methods=['POST'])
 def editar_cuenta(cuenta_id):
     codigo_cuenta = request.form['codigo_cuenta']
@@ -148,17 +150,72 @@ def editar_cuenta(cuenta_id):
 
     return redirect(url_for('contable.cuentas'))
 
+@accounting_bp.route('/reglas/editar/<int:regla_id>', methods=['POST'])
+def actualizar_regla(id_regla):
+    data = request.get_json()
+
+    nombre_regla = data.get("nombre_regla")
+    tipo_transaccion = data.get("tipo_transaccion")
+    cuenta_debito = data.get("cuenta_debito")
+    cuenta_credito = data.get("cuenta_credito")
+    estado = data.get("estado")
+
+    try:
+        resultado = actualizar_regla_en_db(id_regla, nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado)
+        
+        if resultado:
+            return jsonify({"success": True})
+        else:
+            return jsonify({"success": False, "message": "No se encontró la regla o no se pudo actualizar."}), 404
+    except Exception as e:
+        print("Error al actualizar la regla:", e)
+        return jsonify({"success": False, "message": "Error interno del servidor."}), 500
+
 @accounting_bp.route('/reglas', methods=['GET'])
 @jwt_required()
 def reglas():
-    reglas = obtener_reglas()
-    return render_template('contable/reglas/reglas.html', reglas=reglas)
+    page = request.args.get('page', default=1, type=int)
+    per_page = request.args.get('per_page', default=50, type=int)
 
-@accounting_bp.route('/usuarios', methods = ['GET'])
+    reglas, total_results = obtener_reglas(page, per_page)
+
+    total_pages = (total_results + per_page - 1) // per_page
+
+    return render_template(
+        'contable/reglas/reglas.html',
+        reglas=reglas,
+        page=page,
+        per_page=per_page,
+        total_results=total_results,
+        total_pages=total_pages,
+        max = max,
+        min = min,
+    )
+
+
+@accounting_bp.route('/usuarios', methods=['GET'])
+@jwt_required()
 def usuarios():
-    usuarios = obtener_usuarios()
+    page = request.args.get('page', default=1, type=int)
+    per_page = request.args.get('per_page', default=50, type=int)
+
+    usuarios, total_results = obtener_usuarios(page, per_page)
     roles = obtener_roles()
-    return render_template('contable/usuarios/usuarios.html', usuarios=usuarios, roles=roles)
+
+    total_pages = (total_results + per_page - 1) // per_page
+
+    return render_template(
+        'contable/usuarios/usuarios.html',
+        usuarios=usuarios,
+        roles=roles,
+        page=page,
+        per_page=per_page,
+        total_results=total_results,
+        total_pages=total_pages,
+        max=max,  
+        min=min   
+    )
+
 
 @accounting_bp.route('/usuarios/obtener/<int:usuario_id>', methods=['GET'])
 def obtener_usuario(usuario_id):
@@ -249,17 +306,9 @@ def eliminar_regla(regla_id):
     eliminar_regla_bd(regla_id)  # Llama a la función separada
     return redirect(url_for('contable.reglas'))
 
-@accounting_bp.route('/reglas/editar/<int:regla_id>', methods=['POST'])
-def editar_regla(regla_id):
-    nombre_regla = request.form['nombre_regla']
-    tipo_transaccion = request.form['tipo_transaccion']
-    cuenta_debe = request.form['cuenta_debe']
-    cuenta_haber = request.form['cuenta_haber']
-    estado_regla = request.form['estado']
 
-    actualizar_reglas(regla_id, nombre_regla, tipo_transaccion, cuenta_debe, cuenta_haber, estado_regla)
-    
-    return redirect(url_for('contable.reglas'))
+
+
 
 @accounting_bp.route('/reportes/ldpdf')
 @jwt_required()
@@ -270,6 +319,10 @@ def ldpf():
 @jwt_required()
 def exportar_libro_diario_excel():
     from io import BytesIO
+    import openpyxl
+    from flask import send_file, current_app
+    from datetime import datetime
+    import os
 
     # Ruta de la plantilla
     template_path = os.path.join(current_app.root_path, 'templates', 'contable', 'plantillas', 'L,D.xlsx')
@@ -295,6 +348,7 @@ def exportar_libro_diario_excel():
     # Definir la fila inicial para insertar los datos en la tabla
     start_row = 11  # Comenzar desde la fila 11 como especificaste
 
+    # Suponiendo que obtienes los datos de una función llamada obtener_asientos_agrupados
     asientos, _ = obtener_asientos_agrupados()
     numero_correlativo = 1
 
@@ -311,8 +365,8 @@ def exportar_libro_diario_excel():
             worksheet[f'F{current_row}'] = asiento['num_comprobante']
             worksheet[f'G{current_row}'] = detalle['codigo_cuenta']
             worksheet[f'H{current_row}'] = detalle['nombre_cuenta']
-            worksheet[f'I{current_row}'] = detalle['debe']
-            worksheet[f'J{current_row}'] = detalle['haber']
+            worksheet[f'I{current_row}'] = detalle['debe'] if detalle['debe'] != 0 else None
+            worksheet[f'J{current_row}'] = detalle['haber'] if detalle['haber'] != 0 else None
             
             # Sumar los valores para el total
             total_debe += detalle['debe']
@@ -445,6 +499,11 @@ def exportar_libro_mayor_excel():
 @accounting_bp.route('/exportar_libro_diario_pdf', methods=['GET'])
 @jwt_required()
 def exportar_libro_diario_pdf():
+    from fpdf import FPDF
+    from flask import send_file
+    from datetime import datetime
+    from io import BytesIO
+
     # Crear un objeto FPDF en orientación horizontal
     pdf = FPDF(orientation='L', unit='mm', format='A4')
     pdf.add_page()
@@ -488,8 +547,8 @@ def exportar_libro_diario_pdf():
             pdf.set_font("Arial", size=10)  # Restaurar el tamaño de la fuente
             
             pdf.cell(30, 10, asiento['num_comprobante'], border=1, align='C')
-            pdf.cell(35, 10, f"{detalle['debe']:.2f}", border=1, align='R')
-            pdf.cell(35, 10, f"{detalle['haber']:.2f}", border=1, align='R')
+            pdf.cell(35, 10, f"{detalle['debe']:.2f}" if detalle['debe'] != 0 else '', border=1, align='R')
+            pdf.cell(35, 10, f"{detalle['haber']:.2f}" if detalle['haber'] != 0 else '', border=1, align='R')
             pdf.ln(10)
             
             total_debe += detalle['debe']
@@ -509,6 +568,7 @@ def exportar_libro_diario_pdf():
     output.seek(0)
 
     return send_file(output, download_name="libro_diario.pdf", as_attachment=True)
+
 
 @accounting_bp.route('/exportar_libro_mayor_pdf', methods=['GET'])
 @jwt_required()
@@ -596,3 +656,155 @@ def exportar_libro_mayor_pdf():
                 zf.writestr(archivo['filename'], archivo['content'])
         zip_output.seek(0)
         return send_file(zip_output, download_name="libro_mayor.zip", as_attachment=True)
+    
+@accounting_bp.route('/exportar_registro_ventas_excel', methods=['GET'])
+@jwt_required()
+def exportar_registro_ventas_excel():
+    from io import BytesIO
+    import openpyxl
+    from flask import send_file, current_app
+    from datetime import datetime
+    import os
+
+    # Path to the Excel template
+    template_path = os.path.join(current_app.root_path, 'templates', 'contable', 'plantillas', 'Registro_Ventas.xlsx')
+    
+    if not os.path.exists(template_path):
+        return "The Excel template was not found.", 404
+    
+    output = BytesIO()
+    
+    # Load the template workbook
+    workbook = openpyxl.load_workbook(template_path)
+    worksheet = workbook.active
+    
+    # Set the current period and company info
+    fecha_actual = datetime.now()
+    mes_anio_actual = fecha_actual.strftime('%m/%Y')
+    worksheet['B3'] = mes_anio_actual  # Period
+    worksheet['B4'] = '20610588981'    # RUC
+    worksheet['B5'] = 'Tormenta'       # Company name
+
+    # Fetch the purchase records
+    registros_compras, totales = obtener_registro_ventas()
+    print(registros_compras)
+    # Define the starting row for data
+    start_row = 11
+    current_row = start_row
+
+    for registro in registros_compras:
+        worksheet[f'A{current_row}'] = registro["numero_correlativo"] #numero correlativo
+        worksheet[f'B{current_row}'] = registro["fecha"].strftime('%d/%m/%Y')  #fecha de emision
+        worksheet[f'C{current_row}'] = registro["fechaV"].strftime('%d/%m/%Y') #fecha de vencimiento
+        if str(registro["num_comprobante"])[0] == "F":
+            worksheet[f'D{current_row}'] = '01'  # tipo
+        elif str(registro["num_comprobante"])[0] =="B":
+            worksheet[f'D{current_row}'] = '03' # tipo
+        else:
+            worksheet[f'D{current_row}'] = '07' # tipo
+        worksheet[f'E{current_row}'] = registro["num_comprobante"] #serie
+        worksheet[f'F{current_row}'] = registro["num_comprobante"] #numero
+        if len(str(registro["documento_cliente"])) == 8:
+            worksheet[f'G{current_row}'] = '1' 
+        else:
+            worksheet[f'G{current_row}'] = '6' #tipo
+        worksheet[f'H{current_row}'] = registro["documento_cliente"] #numero de dni o ruc
+        worksheet[f'I{current_row}'] = registro["nombre_cliente"] #nombres o razon social
+        worksheet[f'J{current_row}'] = ''# valor facturado de la exportacion
+        worksheet[f'K{current_row}'] = registro["importe"] #importe
+        worksheet[f'L{current_row}'] = ''
+        worksheet[f'M{current_row}'] = ''
+        worksheet[f'N{current_row}'] = ''
+        worksheet[f'O{current_row}'] = registro["igv"]  # IGV
+        worksheet[f'P{current_row}'] = ''
+        worksheet[f'Q{current_row}'] = registro["total"]  
+        worksheet[f'R{current_row}'] = ''
+        worksheet[f'S{current_row}'] = ''
+        worksheet[f'T{current_row}'] = ''
+        worksheet[f'U{current_row}'] = ''
+        worksheet[f'V{current_row}'] = ''
+        current_row += 1
+
+    # Adding totals row at the end
+    total_row = current_row
+    worksheet.merge_cells(f'H{total_row}:J{total_row}') 
+    worksheet[f'H{total_row}'] = 'Totales'
+    worksheet[f'K{total_row}'] = totales["total_importe"]
+    worksheet[f'O{total_row}'] = totales["total_igv"]
+    worksheet[f'Q{total_row}'] = totales["total_general"]
+
+    # Save the updated workbook to a buffer
+    workbook.save(output)
+    output.seek(0)
+
+    return send_file(output, download_name="registro_ventas.xlsx", as_attachment=True)
+
+@accounting_bp.route('/exportar_registro_ventas_pdf', methods=['GET'])
+@jwt_required()
+def exportar_registro_ventas_pdf():
+    from fpdf import FPDF
+    from flask import send_file
+    from datetime import datetime
+    from io import BytesIO
+
+    # Crear un objeto FPDF en orientación horizontal
+    pdf = FPDF(orientation='L', unit='mm', format='A4')
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    
+    # Encabezado
+    pdf.set_font("Arial", style='B', size=14)
+    pdf.cell(0, 10, 'Registro de Ventas', ln=True, align='C')
+    pdf.set_font("Arial", size=12)
+    pdf.cell(0, 10, f'Período: {datetime.now().strftime("%m/%Y")}', ln=True, align='C')
+    pdf.cell(0, 10, 'RUC: 20610588981', ln=True, align='C')
+    pdf.cell(0, 10, 'Razón Social: Tormenta', ln=True, align='C')
+
+    pdf.ln(10)  # Espacio vertical
+
+    # Encabezados de la tabla
+    pdf.set_font("Arial", style='B', size=9)
+    headers = [
+        ('N°', 10), ('Fecha Emisión', 25), ('Fecha Vencimiento', 25), 
+        ('Tipo', 10), ('Serie', 15), ('Número', 20), ('Tipo Doc.', 15), 
+        ('Doc. Cliente', 25), ('Nombre Cliente', 50), ('Valor Exp.', 20), 
+        ('Importe', 20), ('IGV', 20), ('Total', 20)
+    ]
+    for header, width in headers:
+        pdf.cell(width, 10, header, border=1, align='C')
+    pdf.ln(10)
+
+    # Obtener registros de ventas
+    registros_compras, totales = obtener_registro_ventas()
+    
+    pdf.set_font("Arial", size=9)
+    for registro in registros_compras:
+        pdf.cell(10, 10, str(registro["numero_correlativo"]), border=1, align='C')
+        pdf.cell(25, 10, registro["fecha"].strftime('%d/%m/%Y'), border=1, align='C')
+        pdf.cell(25, 10, registro["fechaV"].strftime('%d/%m/%Y'), border=1, align='C')
+        pdf.cell(10, 10, '01' if registro["num_comprobante"][0] == "F" else '03' if registro["num_comprobante"][0] == "B" else '07', border=1, align='C')
+        pdf.cell(15, 10, registro["num_comprobante"][:4], border=1, align='C')  # Serie
+        pdf.cell(20, 10, registro["num_comprobante"][4:], border=1, align='C')  # Número
+        pdf.cell(15, 10, '1' if len(str(registro["documento_cliente"])) == 8 else '6', border=1, align='C')
+        pdf.cell(25, 10, str(registro["documento_cliente"]), border=1, align='C')
+        pdf.cell(50, 10, registro["nombre_cliente"], border=1)
+        pdf.cell(20, 10, '', border=1, align='R')  # Valor Exp.
+        pdf.cell(20, 10, f"{registro['importe']:.2f}", border=1, align='R')
+        pdf.cell(20, 10, f"{registro['igv']:.2f}", border=1, align='R')
+        pdf.cell(20, 10, f"{registro['total']:.2f}", border=1, align='R')
+        pdf.ln(10)
+
+    # Totales
+    pdf.set_font("Arial", style='B', size=10)
+    pdf.cell(185, 10, 'Totales', border=1, align='R')
+    pdf.cell(20, 10, f"{totales['total_importe']:.2f}", border=1, align='R')
+    pdf.cell(20, 10, f"{totales['total_igv']:.2f}", border=1, align='R')
+    pdf.cell(20, 10, f"{totales['total_general']:.2f}", border=1, align='R')
+
+    # Guardar el archivo PDF en un buffer de memoria
+    output = BytesIO()
+    pdf.output(dest='S').encode('latin1')
+    output.write(pdf.output(dest='S').encode('latin1'))
+    output.seek(0)
+
+    return send_file(output, download_name="registro_ventas.pdf", as_attachment=True)
