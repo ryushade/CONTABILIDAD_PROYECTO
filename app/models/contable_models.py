@@ -777,7 +777,6 @@ def obtener_registro_ventas():
                 COALESCE(cl.dni, cl.ruc) AS documento_cliente,
                 COALESCE(CONCAT(cl.nombres, ' ', cl.apellidos), cl.razon_social) AS nombre_cliente,
                 c.num_comprobante as num_comprobante,
-                c.num_comprobante as comprobante_pago,
                 SUM((dv.cantidad * dv.precio) - dv.descuento) AS importe,
                 SUM((dv.cantidad * dv.precio) - dv.descuento) * 0.18 AS igv,
                 SUM((dv.cantidad * dv.precio) - dv.descuento) * 1.18 AS total
@@ -796,7 +795,7 @@ def obtener_registro_ventas():
         total_igv = 0.0
         total_importe = 0.0
         total_general = 0.0
-        registros_compras = []
+        registros_ventas = []
 
         for row in resultados:
             # Convertir la fecha a formato datetime si es necesario
@@ -807,14 +806,82 @@ def obtener_registro_ventas():
             if isinstance(fechaV, str):
                 fechaV = datetime.strptime(fechaV, '%Y-%m-%d')
             # Agregar cada registro a la lista de registros de compras
-            registros_compras.append({
+            registros_ventas.append({
                 "numero_correlativo": row["numero_correlativo"],
                 "fecha": fecha,
                 "fechaV":fechaV,
                 "documento_cliente": row["documento_cliente"],
                 "nombre_cliente": row["nombre_cliente"],
                 "num_comprobante": row["num_comprobante"],
-                "comprobante_pago": row["comprobante_pago"],
+                "importe": float(row["importe"]),
+                "igv": float(row["igv"]),
+                "total": float(row["total"])
+            })
+            
+            # Acumular los totales
+            total_importe += float(row["importe"])
+            total_igv += float(row["igv"])
+            total_general += float(row["total"])
+
+        # Diccionario con los totales
+        totales = {
+            "total_importe": total_importe,
+            "total_igv": total_igv,
+            "total_general": total_general
+        }
+
+        return registros_ventas, totales
+    finally:
+        conexion.close()
+
+def obtener_registro_compras():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT 
+                    ROW_NUMBER() OVER (ORDER BY co.id_compra) AS numero_correlativo,
+                    co.f_compra as fecha,
+                    co.f_compra AS fechaVencimiento,
+                    pr.ruc AS documento_cliente,
+                    pr.razon_social AS nombre_cliente,
+                    co.nro_comprobante as num_comprobante,
+                    SUM(dc.cantidad * dc.precio) AS importe,
+                    SUM(dc.cantidad * dc.precio) * 0.18 AS igv,
+                    SUM(dc.cantidad * dc.precio) * 1.18 AS total
+                FROM compra co
+                INNER JOIN detalle_compra dc ON co.id_compra = dc.id_compra
+                INNER JOIN proveedor pr ON pr.id_proveedor = co.id_compra
+                GROUP BY 
+                    co.id_compra
+                ORDER BY 
+                    co.id_compra;
+            """)
+            resultados = cursor.fetchall()
+
+        # Inicializar variables para almacenar los totales
+        total_igv = 0.0
+        total_importe = 0.0
+        total_general = 0.0
+        registros_compras = []
+
+        for row in resultados:
+            # Convertir la fecha a formato datetime si es necesario
+            fecha = row["fecha"]
+            if isinstance(fecha, str):
+                fecha = datetime.strptime(fecha, '%Y-%m-%d')
+            fechaV = row["fechaVencimiento"]
+            if isinstance(fechaV, str):
+                fechaV = datetime.strptime(fechaV, '%Y-%m-%d')
+            
+            # Agregar cada registro a la lista de registros de compras
+            registros_compras.append({
+                "numero_correlativo": row["numero_correlativo"],
+                "fecha": fecha,
+                "fechaV": fechaV,
+                "documento_cliente": row["documento_cliente"],
+                "nombre_cliente": row["nombre_cliente"],
+                "num_comprobante": row["num_comprobante"],
                 "importe": float(row["importe"]),
                 "igv": float(row["igv"]),
                 "total": float(row["total"])
