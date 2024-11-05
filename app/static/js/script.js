@@ -253,11 +253,11 @@ function openModalAddUsu() {
 
 function openModalVer(codigo_cuenta, nombre_cuenta, naturaleza, nivel, estado_cuenta) {
   document.getElementById('verCuentaModal').style.display = 'flex';
-  document.getElementById('codigo_cuenta').textContent = codigo_cuenta;
-  document.getElementById('nombre_cuenta').textContent = nombre_cuenta;
-  document.getElementById('naturaleza').textContent = naturaleza;
-  document.getElementById('nivel_cuenta').textContent = nivel == 1 ? 'Elemento' : nivel == 2 ? 'Cuenta' : nivel == 3 ? 'Subcuenta' : 'Divisionaria ? Subdivisionaria';
-  document.getElementById('estado_cuenta').textContent = estado_cuenta == 1 ? 'Activo' : 'Inactivo';
+  document.getElementById('codigo_cuenta2').textContent = codigo_cuenta;
+  document.getElementById('nombre_cuenta2').textContent = nombre_cuenta;
+  document.getElementById('naturaleza2').textContent = naturaleza;
+  document.getElementById('nivel_cuenta2').textContent = nivel == 1 ? 'Elemento' : nivel == 2 ? 'Cuenta' : nivel == 3 ? 'Subcuenta' : 'Divisionaria ? Subdivisionaria';
+  document.getElementById('estado_cuenta2').textContent = estado_cuenta == 1 ? 'Activo' : 'Inactivo';
 }
 
 

@@ -753,7 +753,7 @@ def obtenerCuentas():
         conexion = obtener_conexion()  # Establece conexión a la base de datos llamando a la función obtener_conexion.
         with conexion.cursor() as cursor:  # Utiliza un cursor para ejecutar consultas, que se cierra automáticamente al terminar el bloque.
             sql = """
-                SELECT id_cuenta, codigo_cuenta, nombre_cuenta AS Nombre, nivel, cuenta_padre, estado_cuenta
+                SELECT id_cuenta, codigo_cuenta, nombre_cuenta AS Nombre, nivel, cuenta_padre, estado_cuenta, naturaleza
                 FROM cuenta
                 ORDER BY nivel, cuenta_padre, id_cuenta;
                 """  # Consulta SQL que selecciona y ordena las cuentas para facilitar la jerarquización.
