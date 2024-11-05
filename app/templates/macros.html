@@ -1,7 +1,7 @@
 {% macro render_cuenta(cuenta) %}
 <style>
     .accordion-active {
-        background-color: #b3e5fc; /* Celeste claro */
+        background-color: #cff0ff; /* Celeste claro */
         border: blue 1px solid;
       }
       
@@ -16,7 +16,7 @@
       aria-expanded="false"
       aria-controls="collapse{{ cuenta['codigo_cuenta'] }}" 
       onclick="toggleActive('{{ cuenta['codigo_cuenta'] }}')"
-    ><i class="fa fa-chevron-down" aria-hidden="true"></i>
+    ><i class="fa fa-chevron-down chevron-icon" aria-hidden="true"></i>
     </a>
 
       <div class="text-center col-1">

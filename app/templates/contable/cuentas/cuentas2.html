@@ -183,34 +183,43 @@
         var itemId = 'item' + codigoCuenta;
         var currentItem = document.getElementById(itemId);
         var isActive = currentItem.classList.contains('accordion-active');
-      
-        // Si se activa un elemento, activa todos sus padres también
-        if (!isActive) {
-          let parentItem = currentItem;
-          while (parentItem) {
-            parentItem.classList.add('accordion-active');
-            const parentId = parentItem.getAttribute('data-bs-parent');
-            parentItem = parentId ? document.querySelector(parentId) : null;
-          }
-        }
-      
-        // Si se desactiva un elemento, desactiva todos sus hijos también
+        var chevronIcon = currentItem.querySelector('.chevron-icon');  // Asumimos que el ícono tiene esta clase.
+    
+        // Toggle the active class and chevron icon
         if (isActive) {
-          removeActiveFromChildren(currentItem);
-          currentItem.classList.remove('accordion-active');
+            currentItem.classList.remove('accordion-active');
+            chevronIcon.classList.replace('fa-chevron-up', 'fa-chevron-down'); // Cambia a ícono hacia abajo
+            removeActiveFromChildren(currentItem); // Desactiva todos los hijos también
         } else {
-          currentItem.classList.add('accordion-active');
+            currentItem.classList.add('accordion-active');
+            chevronIcon.classList.replace('fa-chevron-down', 'fa-chevron-up'); // Cambia a ícono hacia arriba
+            let parentItem = currentItem;
+            // Activa todos los padres también y cambia sus íconos
+            while (parentItem) {
+                parentItem.classList.add('accordion-active');
+                const parentId = parentItem.getAttribute('data-bs-parent');
+                const parentIcon = parentId ? document.querySelector(parentId + ' .chevron-icon') : null;
+                if (parentIcon) {
+                    parentIcon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+                }
+                parentItem = parentId ? document.querySelector(parentId) : null;
+            }
         }
-      }
-      
-      // Función auxiliar para desactivar todos los hijos recursivamente
-      function removeActiveFromChildren(parentItem) {
+    }
+    
+    // Función auxiliar para desactivar todos los hijos recursivamente y cambiar su ícono
+    function removeActiveFromChildren(parentItem) {
         const children = parentItem.querySelectorAll('.accordion-item');
         children.forEach((child) => {
-          child.classList.remove('accordion-active');
-          removeActiveFromChildren(child); // Recursividad para todos los niveles de hijos
+            child.classList.remove('accordion-active');
+            const icon = child.querySelector('.chevron-icon');
+            if (icon) {
+                icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+            }
+            removeActiveFromChildren(child); // Recursividad para todos los niveles de hijos
         });
-      }
+    }
+    
         
 </script>
 
