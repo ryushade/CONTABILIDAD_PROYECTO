@@ -77,9 +77,12 @@ def reportes():
 
     asientos, totales = obtener_asientos_agrupados(tipo_registro, start_date, end_date)
     libro_mayor_data, total_debe, total_haber = obtener_libro_mayor_agrupado_por_fecha()
+    lista_libro_caja, total_caja = obtener_libro_caja()
+    lista_libro_caja_cuenta_corriente, total_caja_corriente = obtener_libro_caja_cuenta_corriente()
+
     registro_venta_data, totale = obtener_registro_ventas()
     registro_compra_data, totales_compra = obtener_registro_compras()
-    return render_template('contable/reportes/reportes.html', asientos=asientos, totales=totales, libro_mayor=libro_mayor_data, total_debe=total_debe, total_haber=total_haber, registros_ventas=registro_venta_data, totale=totale, registros_compras = registro_compra_data,totalesCompras = totales_compra)
+    return render_template('contable/reportes/reportes.html', asientos=asientos, totales=totales, libro_mayor=libro_mayor_data, total_debe=total_debe, total_haber=total_haber, registros_ventas=registro_venta_data, totale=totale, registros_compras = registro_compra_data,totalesCompras = totales_compra,lista_libro_caja=lista_libro_caja, total_caja=total_caja, lista_libro_caja_cuenta_corriente=lista_libro_caja_cuenta_corriente, total_caja_corriente=total_caja_corriente)
 
 
 import app.models.contable_models as conta

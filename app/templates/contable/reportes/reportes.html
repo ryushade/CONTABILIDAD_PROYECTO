@@ -465,43 +465,10 @@
                             <td class="text-end">{{ registro.igv | round(2) }}</td>
                             <td class="text-end">{{ registro.total | round(2) }}</td>
                         </tr>
-
-                        <tr>
-                            <td class="text-center">2</td>
-                            <td class="text-center">01/01/2024</td>
-                            <td class="text-center">FACTURA</td>
-                            <td class="text-center">E002</td>
-                            <td class="text-center">854</td>
-                            <td class="text-center">P. NATURAL</td>
-                            <td class="text-center">10876543215</td>
-                            <td class="text-center">PROVEEDOR 02</td>
-                            <td class="text-center">1500.00</td>
-                            <td class="text-center">270.00</td>
-                            <td class="text-center">1770.00</td>
-                        </tr>
-
-                    </tbody>-->
-
-                    {% for registro in registros_compras %}
-                    <tr>
-                        <td class="text-center">{{ registro.numero_correlativo }}</td>
-                        <td class="text-center">{{ registro.fecha.strftime('%Y-%m-%d') }}</td>
-                        <td class="text-center">{{ registro.documento_cliente }}</td>
-                        <td class="text-center">{{ registro.nombre_cliente }}</td>
-                        <td class="text-center">{{ registro.id_tipocomprobante }}</td>
-                        <td class="text-center">{{ registro.num_comprobante }}</td><!--OK-->
-                        <td class="text-center">{{ registro.comprobante_pago }}</td>
-                        <td class="text-end">{{ registro.importe | round(2) }}</td>
-                        <td class="text-end">{{ registro.igv | round(2) }}</td>
-                        <td class="text-end">{{ registro.total | round(2) }}</td>
-                    </tr>
-                    {% endfor %}
+                        {% endfor %}
+                    </tbody>
 
                     <tfoot>
-                        <!--<tr>
-                            <th colspan="10" class="text-end" style="font-weight: bold;">TOTALES</th>
-                            <th class="text-center" style="font-weight: bold;">2950.00</th>
-                        </tr>-->
 
                         <tr>
                             <th colspan="6" class="text-end" style="font-weight: bold;">TOTALES</th>
