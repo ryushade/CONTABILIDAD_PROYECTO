@@ -209,7 +209,7 @@
                             <span class="input-group-text" id="basic-addon1">
                                 <i class="fas fa-calendar-alt"></i>
                             </span>
-                            <input type="text" class="form-control" id="daterange" placeholder="Selecciona mes y año"
+                            <input type="text" class="form-control" id="daterange" name="daterange" placeholder="Selecciona mes y año"
                                 aria-label="Fecha" aria-describedby="basic-addon1">
                         </div>
                     </div>
@@ -851,6 +851,27 @@
         });
     </script>
     <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            flatpickr("#daterangeprueba", {
+                mode: "range",
+                dateFormat: "m/Y",
+                minDate: "01/1900",
+                maxDate: "04/2028",
+                plugins: [
+                    new monthSelectPlugin({
+                        dateFormat: "m/Y",
+                        altFormat: "F Y",
+                        altInput: true
+                    })
+                ],
+                onClose: function (selectedDates, dateStr, instance) {
+                    if (selectedDates.length === 2) {
+                        document.getElementById('filterForm').submit();
+                    }
+                }
+            });
+        });
+
         document.addEventListener("DOMContentLoaded", function () {
             flatpickr("#daterange", {
                 mode: "range",
