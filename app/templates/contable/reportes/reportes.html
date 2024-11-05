@@ -80,7 +80,7 @@
                 que elijas.</p>
             <div class="container">
 
-                <form class="row g-3 mb-3 align-items-end">
+                <form class="row g-3 mb-3 align-items-end" method="GET" action="{{ url_for('contable.reportes') }}">
                     <div class="col-md-3">
                         <style>
                             .required-asterisk {
@@ -98,11 +98,12 @@
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <label for="tipo-registro" style="font-size: 14px;" class="form-label">Tipo de
-                            registro</label>
-                        <select class="form-select" id="tipo-registro">
-                            <option selected>Todas</option>
-                        </select>
+                        <label for="tipo-registro" style="font-size: 14px;" class="form-label">Tipo de registro</label>
+                        <select class="form-select" id="tipo-registro" name="tipo_registro" onchange="this.form.submit()">
+                            <option value="Todas" {% if request.args.get('tipo_registro') == 'Todas' %}selected{% endif %}>Todas</option>
+                            <option value="Ventas" {% if request.args.get('tipo_registro') == 'Ventas' %}selected{% endif %}>Ventas</option>
+                            <option value="Compras" {% if request.args.get('tipo_registro') == 'Compras' %}selected{% endif %}>Compras</option>
+                        </select>                        
                     </div>
                     <div class="col-lg-2 d-flex justify-content-end" style="margin-left: auto;">
                         <button type="submit" class="btn btn-primary w-100">

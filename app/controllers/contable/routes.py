@@ -1,6 +1,7 @@
 from flask import json, request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
 from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas
+
 from . import accounting_bp
 import pandas as pd
 import io
@@ -8,7 +9,8 @@ import os
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font, Alignment, PatternFill
 from datetime import datetime
-import openpyxl
+import openpyxl 
+from openpyxl.styles import Border, Side, Alignment, Font
 from fpdf import FPDF
 from io import BytesIO
 from werkzeug.utils import secure_filename
@@ -55,10 +57,12 @@ def logout():
 @accounting_bp.route('/reportes', methods=['GET'])
 @jwt_required()
 def reportes():
-    asientos, totales = obtener_asientos_agrupados()
+    tipo_registro = request.args.get('tipo_registro', 'Todas')
+    asientos, totales = obtener_asientos_agrupados(tipo_registro)
     libro_mayor_data, total_debe, total_haber = obtener_libro_mayor_agrupado_por_fecha()
     registro_compra_data, totale = obtener_registro_ventas()
-    return render_template('contable/reportes/reportes.html', asientos=asientos, totales=totales, libro_mayor=libro_mayor_data, total_debe=total_debe, total_haber=total_haber,registros_compras = registro_compra_data, totale = totale)
+    return render_template('contable/reportes/reportes.html', asientos=asientos, totales=totales, libro_mayor=libro_mayor_data, total_debe=total_debe, total_haber=total_haber, registros_compras=registro_compra_data, totale=totale)
+
 
 import app.models.contable_models as conta
 @accounting_bp.route('/cuentas', methods=['GET'])
@@ -359,9 +363,6 @@ def eliminar_usu(usuario_id):
     eliminar_usuario(usuario_id)
     return redirect(url_for('contable.usuarios'))
 
-
-
-
 @accounting_bp.route('/cuentas/eliminar/<int:cuenta_id>', methods=['POST'])
 def eliminar_cuenta(cuenta_id):
     eliminar_cuenta(cuenta_id)
@@ -372,10 +373,6 @@ def eliminar_regla(regla_id):
     eliminar_regla_bd(regla_id)  # Llama a la función separada
     return redirect(url_for('contable.reglas'))
 
-
-
-
-
 @accounting_bp.route('/reportes/ldpdf')
 @jwt_required()
 def ldpf():
@@ -384,11 +381,6 @@ def ldpf():
 @accounting_bp.route('/exportar_libro_diario_excel', methods=['GET'])
 @jwt_required()
 def exportar_libro_diario_excel():
-    from io import BytesIO
-    import openpyxl
-    from flask import send_file, current_app
-    from datetime import datetime
-    import os
 
     # Ruta de la plantilla
     template_path = os.path.join(current_app.root_path, 'templates', 'contable', 'plantillas', 'L,D.xlsx')
@@ -415,11 +407,25 @@ def exportar_libro_diario_excel():
     start_row = 11  # Comenzar desde la fila 11 como especificaste
 
     # Suponiendo que obtienes los datos de una función llamada obtener_asientos_agrupados
-    asientos, _ = obtener_asientos_agrupados()
+    asientos, _ = obtener_asientos_agrupados_excel()
     numero_correlativo = 1
 
     total_debe = 0
     total_haber = 0
+
+    # Crear un borde negro
+    thin_border = Border(
+        left=Side(style='thin', color='000000'),
+        right=Side(style='thin', color='000000'),
+        top=Side(style='thin', color='000000'),
+        bottom=Side(style='thin', color='000000')
+    )
+
+    # Crear un estilo de fuente sin negrita
+    normal_font = Font(bold=False)
+
+    # Crear un estilo de alineación centrada
+    center_alignment = Alignment(horizontal='center', vertical='center')
 
     # Insertar los datos en la tabla, fila por fila
     current_row = start_row
@@ -428,11 +434,27 @@ def exportar_libro_diario_excel():
             worksheet[f'A{current_row}'] = numero_correlativo
             worksheet[f'B{current_row}'] = asiento['fecha_asiento'].strftime('%d/%m/%Y')
             worksheet[f'C{current_row}'] = asiento['glosa']
+            
+            # Determinar el valor para la columna D
+            if 'venta' in asiento['glosa'].lower():
+                worksheet[f'D{current_row}'] = 14
+            elif 'compra' in asiento['glosa'].lower():
+                worksheet[f'D{current_row}'] = 8
+            else:
+                worksheet[f'D{current_row}'] = ''
+            
             worksheet[f'F{current_row}'] = asiento['num_comprobante']
             worksheet[f'G{current_row}'] = detalle['codigo_cuenta']
             worksheet[f'H{current_row}'] = detalle['nombre_cuenta']
             worksheet[f'I{current_row}'] = detalle['debe'] if detalle['debe'] != 0 else None
             worksheet[f'J{current_row}'] = detalle['haber'] if detalle['haber'] != 0 else None
+            
+            # Aplicar estilo a todas las celdas
+            for col in ['A', 'B', 'C', 'D', 'F', 'G', 'H', 'I', 'J']:
+                cell = worksheet[f'{col}{current_row}']
+                cell.border = thin_border
+                cell.font = normal_font
+                cell.alignment = center_alignment
             
             # Sumar los valores para el total
             total_debe += detalle['debe']
@@ -445,11 +467,23 @@ def exportar_libro_diario_excel():
     total_row = current_row
     worksheet.merge_cells(f'A{total_row}:H{total_row}')
     worksheet[f'A{total_row}'] = "Total"
-    worksheet[f'A{total_row}'].alignment = openpyxl.styles.Alignment(horizontal='right')
+    worksheet[f'A{total_row}'].alignment = Alignment(horizontal='right')  # Alinear a la izquierda
+    worksheet[f'A{total_row}'].border = thin_border  # Aplicar borde negro
 
-    # Insertar los totales en las columnas I y J
     worksheet[f'I{total_row}'] = total_debe
     worksheet[f'J{total_row}'] = total_haber
+    
+    # Aplicar borde y estilo a las celdas de total
+    for col in ['A', 'I', 'J']:
+        cell = worksheet[f'{col}{total_row}']
+        cell.border = thin_border
+        cell.font = normal_font
+        cell.alignment = center_alignment
+
+    # Asegurar que todas las columnas tengan un ancho adecuado
+    column_widths = {'A': 40, 'B': 15, 'C': 65, 'D': 10, 'F': 20, 'G': 15, 'H': 30, 'I': 15, 'J': 15}
+    for column, width in column_widths.items():
+        worksheet.column_dimensions[column].width = width
 
     # Guardar el archivo modificado en un buffer de memoria
     workbook.save(output)
