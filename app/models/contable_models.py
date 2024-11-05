@@ -516,14 +516,12 @@ def obtener_asientos_agrupados(tipo_registro='Todas', start_date=None, end_date=
                 query += " AND LOWER(a.glosa) LIKE %s"
                 params.append('%venta%')
             elif tipo_registro == 'Compras':
-                query += " AND (LOWER(a.glosa) LIKE %s OR LOWER(a.glosa) LIKE %s OR LOWER(a.glosa) LIKE %s OR LOWER(a.glosa) LIKE %s OR LOWER(a.glosa) LIKE %s OR LOWER(a.glosa) LIKE %s OR LOWER(a.glosa) LIKE %s)"
+                query += " AND (LOWER(a.glosa) LIKE %s OR LOWER(a.glosa) LIKE %s OR LOWER(a.glosa) LIKE %s OR LOWER(a.glosa) LIKE %s OR LOWER(a.glosa) LIKE %s)"
                 params.extend([
                     '%compra%',
-                    '%mercader%',
                     '%ingreso%',
                     '%almacen%', 
                     '%pago%',
-                    '%factura%',
                     '%proveedor%'
                 ])
             
