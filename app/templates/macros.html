@@ -1,13 +1,13 @@
 {% macro render_cuenta(cuenta) %}
 <style>
-    .accordion-active {
-        background-color: #b3e5fc; /* Celeste claro */
-        border: blue 1px solid;
-      }
-      
+  .accordion-active {
+    background-color: #cff0ff; /* Celeste claro */
+    border: blue 1px solid;
+  }
 </style>
 <div class="accordion-item" id="item{{ cuenta['codigo_cuenta'] }}" data-bs-parent="#item{{ cuenta['cuenta_padre'] if cuenta['cuenta_padre'] else '' }}">
-  <div class="row pb-3" >
+  <div class="row pb-3">
+    {% if cuenta['hijos'] %}
     <a 
       class="col-1 collapsed"
       type="button"
@@ -16,60 +16,31 @@
       aria-expanded="false"
       aria-controls="collapse{{ cuenta['codigo_cuenta'] }}" 
       onclick="toggleActive('{{ cuenta['codigo_cuenta'] }}')"
-    ><i class="fa fa-chevron-down" aria-hidden="true"></i>
+    ><i class="fa fa-chevron-down chevron-icon" aria-hidden="true"></i>
     </a>
+    {% else %}
+    <span class="col-1"><i class="fa fa-minus" aria-hidden="true"></i></span>
+    {% endif %}
 
-      <div class="text-center col-1">
-        {{ cuenta['codigo_cuenta'] }}
-      </div>
-      <div class="text-align col-4">
-        {{ cuenta['Nombre'] }}
-      </div>
-      <div class="text-center col-2">
-        <span
-          style="font-size: 14px"
-          class="estado {% if cuenta.naturaleza == 'Deudora' %} deudora {% else %} acreedora {% endif %}"
-        >
-          {% if cuenta['naturaleza'] == 'Deudora' %} Deudora {% else %} Acreedora
-          {% endif %}
-        </span>
-      </div>
-      <div class="text-center col-1">
-        <span
-          style="font-size: 14px"
-          class="status {% if cuenta.estado_cuenta == 1 %} active-c {% else %} inactive {% endif %}"
-        >
-          {% if cuenta['estado_cuenta'] == 1 %} Activo {% else %} Inactivo {% endif
-          %}
-        </span>
-      </div>
-
-      <div class="text-center actions col-1" style="font-size: 14px">
-        <span
-          class="action-button secondary eye"
-          onclick="openModalVer('{{ cuenta.id_cuenta }}', '{{ cuenta.codigo_cuenta }}', '{{ cuenta.nombre_cuenta }}', '{{ cuenta.naturaleza }}', '{{ cuenta.nivel }}', '{{ cuenta.estado_cuenta }}')"
-        >
-          <i class="fas fa-eye"></i>
-        </span>
-
-        <span
-          class="action-button secondary edit"
-          data-cuenta-id="{{ cuenta.id_cuenta }}"
-          onclick="openEditModal2('{{ cuenta.id_cuenta }}')"
-          style="font-size: 14px; cursor: pointer;"
-        >
-          <i class="fas fa-edit"></i>
-        </span>
-
-        <span
-          style="font-size: 14px"
-          class="action-button secondary trash"
-          onclick='openModalDelete({{ cuenta['id_cuenta'] }}, "{{ cuenta.codigo_cuenta }}", "{{ cuenta.nombre_cuenta }}")'
-        >
-          <i class="fas fa-trash"></i>
-        </span>
-      </div>
+    <div class="text-center col-1">{{ cuenta['codigo_cuenta'] }}</div>
+    <div class="text-align col-4">{{ cuenta['Nombre'] }}</div>
+    <div class="text-center col-2">
+      <span class="estado {% if cuenta.naturaleza == 'Deudora' %} deudora {% else %} acreedora {% endif %}">
+        {% if cuenta['naturaleza'] == 'Deudora' %} Deudora {% else %} Acreedora {% endif %}
+      </span>
+    </div>
+    <div class="text-center col-1">
+      <span class="status {% if cuenta.estado_cuenta == 1 %} active-c {% else %} inactive {% endif %}">
+        {% if cuenta['estado_cuenta'] == 1 %} Activo {% else %} Inactivo {% endif %}
+      </span>
+    </div>
+    <div class="text-center actions col-1" style="font-size: 14px">
+      <span class="action-button secondary eye" onclick="openModalVer('{{ cuenta.id_cuenta }}', '{{ cuenta.codigo_cuenta }}', '{{ cuenta.nombre_cuenta }}', '{{ cuenta.naturaleza }}', '{{ cuenta.nivel }}', '{{ cuenta.estado_cuenta }}')"><i class="fas fa-eye"></i></span>
+      <span class="action-button secondary edit" data-cuenta-id="{{ cuenta.id_cuenta }}" onclick="openEditModal2('{{ cuenta.id_cuenta }}')"><i class="fas fa-edit"></i></span>
+      <span class="action-button secondary trash" onclick='openModalDelete({{ cuenta['id_cuenta'] }}, "{{ cuenta.codigo_cuenta }}", "{{ cuenta.nombre_cuenta }}")'><i class="fas fa-trash"></i></span>
+    </div>
   </div>
+  {% if cuenta['hijos'] %}
   <div
     id="collapse{{ cuenta['codigo_cuenta'] }}"
     class="accordion-collapse collapse"
@@ -77,15 +48,11 @@
     data-bs-parent="#accordion{{ cuenta['codigo_cuenta']|replace('.', '_') }}"
   >
     <div class="accordion-body p-2">
-      {% if cuenta['hijos'] %}
-      <div
-        class="accordion"
-        id="accordion{{ cuenta['codigo_cuenta']|replace('.', '_') }}"
-      >
+      <div class="accordion" id="accordion{{ cuenta['codigo_cuenta']|replace('.', '_') }}">
         {% for hijo in cuenta['hijos'] %} {{ render_cuenta(hijo) }} {% endfor %}
       </div>
-      {% else %} No hay más subcuentas. {% endif %}
     </div>
   </div>
+  {% endif %}
 </div>
 {% endmacro %}

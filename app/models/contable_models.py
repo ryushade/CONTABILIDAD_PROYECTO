@@ -519,10 +519,14 @@ def obtener_asientos_agrupados(tipo_registro='Todas', start_date=None, end_date=
                 query += " AND LOWER(a.glosa) LIKE %s"
                 params.append('%compra%')
 
-            # Filtro por rango de fechas
+            # Filtro por rango de fechas o por mes completo
             if start_date and end_date:
-                query += " AND a.fecha_asiento BETWEEN %s AND %s"
-                params.extend([start_date, end_date])
+                if start_date == end_date:
+                    query += " AND a.fecha_asiento BETWEEN %s AND LAST_DAY(%s)"
+                    params.extend([start_date, start_date])
+                else:
+                    query += " AND a.fecha_asiento BETWEEN %s AND %s"
+                    params.extend([start_date, end_date])
 
             cursor.execute(query, params)
             resultados = cursor.fetchall()
@@ -829,5 +833,84 @@ def obtener_registro_ventas():
         }
 
         return registros_compras, totales
+    finally:
+        conexion.close()
+
+
+
+# xd
+def obtener_libro_caja():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor(DictCursor) as cursor:
+            cursor.execute("""
+                SELECT ac.fecha_asiento as fecha, ac.glosa as glosa, cu.codigo_cuenta as cod_cuenta, 
+                cu.nombre_cuenta as nombre_cuenta,
+                    CASE 
+                        WHEN ac.tipo_asiento = 'venta_contado' THEN SUM(da.debe) 
+                        ELSE 0 
+                    END AS debe,
+                    CASE 
+                    WHEN ac.tipo_asiento = 'compra_contado' THEN SUM(da.haber) 
+                        ELSE 0 
+                    END AS haber
+                FROM asiento_contable ac
+                INNER JOIN detalle_asiento da ON da.id_asiento = ac.id_asiento
+                INNER JOIN cuenta cu ON da.id_cuenta = cu.id_cuenta
+                GROUP BY ac.id_asiento, cu.id_cuenta, cu.nombre_cuenta
+                HAVING (debe > 0 OR haber > 0);
+            """)
+            resultados = cursor.fetchall()
+
+        total_debe_caja = Decimal("0.00")
+        total_haber_caja = Decimal("0.00")
+        
+        for row in resultados:
+            debe = row["debe"] or Decimal("0.00")
+            haber = row["haber"] or Decimal("0.00")
+            total_debe_caja += debe
+            total_haber_caja += haber
+
+            total_caja = {
+                "debe": total_debe_caja,
+                "haber": total_haber_caja
+            }
+
+        return  resultados, total_caja 
+    finally:
+        conexion.close()
+
+
+def obtener_libro_caja_cuenta_corriente():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor(DictCursor) as cursor:
+            cursor.execute("""
+                SELECT ac.fecha_asiento AS fecha, vb.formadepago AS forma_pago, cu.nombre_cuenta AS nombre_cuenta, vb.nombre_cliente AS nombre, c.num_comprobante AS comprobante,
+                cu.codigo_cuenta AS codigo, cu.nombre_cuenta AS denominacion, da.debe AS debe, da.haber AS haber FROM asiento_contable ac 
+                INNER JOIN comprobante c ON ac.id_comprobante = c.id_comprobante
+                INNER JOIN detalle_asiento da ON da.id_asiento = ac.id_asiento
+                INNER JOIN cuenta cu ON cu.id_cuenta = da.id_cuenta
+                INNER JOIN venta v ON v.id_comprobante = c.id_comprobante
+                INNER JOIN venta_boucher vb ON v.id_venta_boucher = vb.id_venta_boucher
+                WHERE vb.formadepago <> 'EFECTIVO' AND vb.formadepago <> 'YAPE' AND vb.formadepago <> 'PLIN';
+            """)
+            resultados = cursor.fetchall()
+
+        total_debe_caja = Decimal("0.00")
+        total_haber_caja = Decimal("0.00")
+        
+        for row in resultados:
+            debe = row["debe"] or Decimal("0.00")
+            haber = row["haber"] or Decimal("0.00")
+            total_debe_caja += debe
+            total_haber_caja += haber
+
+        total_caja_corriente = {
+            "debe": total_debe_caja,
+            "haber": total_haber_caja
+        }
+
+        return  resultados, total_caja_corriente
     finally:
         conexion.close()
