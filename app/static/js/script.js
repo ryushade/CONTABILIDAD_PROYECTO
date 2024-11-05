@@ -430,3 +430,12 @@ function submitAddForm(event) {
       alert("Error al agregar la regla. Revisa la consola para más detalles.");
     });
 }
+
+function previewPhoto(event) {
+  const reader = new FileReader();
+  reader.onload = function() {
+      const profileImagePreview = document.getElementById('profileImagePreview');
+      profileImagePreview.innerHTML = `<img src="${reader.result}" alt="Foto de perfil" style="width: 100%; height: 100%; border-radius: 50%;">`;
+  };
+  reader.readAsDataURL(event.target.files[0]);
+}

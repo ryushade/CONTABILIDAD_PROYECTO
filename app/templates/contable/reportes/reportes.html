@@ -17,6 +17,10 @@
     .saldo-deudor {
         color: red;
     }
+
+    .required-asterisk {
+        color: red;
+    }
 </style>
 
 <div class="mb-4">
@@ -80,29 +84,24 @@
                 que elijas.</p>
             <div class="container">
 
-                <form class="row g-3 mb-3 align-items-end">
+                <form id="filterForm" class="row g-3 mb-3 align-items-end" method="GET" action="{{ url_for('contable.reportes') }}">
                     <div class="col-md-3">
-                        <style>
-                            .required-asterisk {
-                                color: red;
-                            }
-                        </style>
-
                         <label for="daterange" class="form-label" style="font-size: 14px;">
                             Fecha<span class="required-asterisk">*</span>
                         </label>
                         <div class="input-group" style="width: auto;">
-                            <input class="form-control" type="text" id="daterange"
+                            <input class="form-control" type="text" id="daterange" name="daterange"
                                 placeholder="Selecciona un rango de fecha">
                             <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <label for="tipo-registro" style="font-size: 14px;" class="form-label">Tipo de
-                            registro</label>
-                        <select class="form-select" id="tipo-registro">
-                            <option selected>Todas</option>
-                        </select>
+                        <label for="tipo-registro" style="font-size: 14px;" class="form-label">Tipo de registro</label>
+                        <select class="form-select" id="tipo-registro" name="tipo_registro" onchange="this.form.submit()">
+                            <option value="Todas" {% if request.args.get('tipo_registro') == 'Todas' %}selected{% endif %}>Todas</option>
+                            <option value="Ventas" {% if request.args.get('tipo_registro') == 'Ventas' %}selected{% endif %}>Ventas</option>
+                            <option value="Compras" {% if request.args.get('tipo_registro') == 'Compras' %}selected{% endif %}>Compras</option>
+                        </select>                        
                     </div>
                     <div class="col-lg-2 d-flex justify-content-end" style="margin-left: auto;">
                         <button type="submit" class="btn btn-primary w-100">
@@ -128,32 +127,32 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for id_asiento, asiento in asientos.items() %}
-                        {% for detalle in asiento.detalles %}
-                        <tr>
-                            {% if loop.first %}
-                            <td style="padding-top: 20px;" class="text-center" rowspan="{{ asiento.detalles|length }}">
-                                {{ asiento.numero_correlativo }}
-                            </td>
-                            <td style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">
-                                {{ asiento.fecha_asiento.strftime('%d/%m/%Y') }}
-                            </td>
-                            <td style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">{{ asiento.glosa }}
-                            </td>
-                            <td style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">{{
-                                asiento.num_comprobante }}</td>
-                            {% endif %}
-                            <td>{{ detalle.codigo_cuenta }}</td>
-                            <td>{{ detalle.nombre_cuenta }}</td>
-                            <td class="text-end">
-                                {{ detalle.debe if detalle.debe != 0 else '' }}
-                            </td>
-                            <td class="text-end">
-                                {{ detalle.haber if detalle.haber != 0 else '' }}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                        {% endfor %}
+                        {% if asientos %}
+                            {% for id_asiento, asiento in asientos.items() %}
+                                {% for detalle in asiento.detalles %}
+                                <tr>
+                                    {% if loop.first %}
+                                    <td style="padding-top: 20px;" class="text-center" rowspan="{{ asiento.detalles|length }}">
+                                        {{ asiento.numero_correlativo }}
+                                    </td>
+                                    <td style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">
+                                        {{ asiento.fecha_asiento.strftime('%d/%m/%Y') }}
+                                    </td>
+                                    <td style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">{{ asiento.glosa }}</td>
+                                    <td style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">{{ asiento.num_comprobante }}</td>
+                                    {% endif %}
+                                    <td>{{ detalle.codigo_cuenta }}</td>
+                                    <td>{{ detalle.nombre_cuenta }}</td>
+                                    <td class="text-end">{{ detalle.debe if detalle.debe != 0 else '' }}</td>
+                                    <td class="text-end">{{ detalle.haber if detalle.haber != 0 else '' }}</td>
+                                </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center">No se encontraron registros para el criterio seleccionado.</td>
+                            </tr>
+                        {% endif %}
                     </tbody>
                     <tfoot>
                         <tr>
@@ -809,6 +808,28 @@
                     return '<span class="' + colorClass + '">' + popoverTriggerEl.getAttribute("data-bs-content") + '</span>';
                 }
             });
+        });
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        flatpickr("#daterange", {
+            mode: "range",
+            dateFormat: "m/Y",
+            minDate: "01/1900",
+            maxDate: "04/2028",
+            plugins: [
+                new monthSelectPlugin({
+                    dateFormat: "m/Y",
+                    altFormat: "F Y",
+                    altInput: true
+                })
+            ],
+            onClose: function(selectedDates, dateStr, instance) {
+                if (selectedDates.length === 2) {
+                    document.getElementById('filterForm').submit();
+                }
+            }
         });
     });
 </script>
