@@ -141,7 +141,7 @@ function closeModalDeleteUsuario() {
   document.getElementById('deleteUsuarioModal').style.display = 'none';
 }
 
-  
+
 
 function openModalDelete(cuentaId, codigoCuenta, nombreCuenta) {
   // Mostrar el modal
@@ -302,59 +302,131 @@ function closeModalVer() {
 let currentReglaId = null; // Almacena el ID de la regla que se está editando
 
 function openEditModal(reglaId, nombre, tipoTransaccion, cuentaDebito, cuentaCredito, estado) {
-    currentReglaId = reglaId; // Guarda el ID de la regla actual
+  currentReglaId = reglaId; // Guarda el ID de la regla actual
 
-    // Llena los campos del formulario con los datos actuales de la regla
-    document.getElementById("nombre_regla_edit").value = nombre;
-    document.getElementById("tipo_transaccion_edit").value = tipoTransaccion;
-    document.getElementById("cuenta_debito_edit").value = cuentaDebito || ""; // Si es nulo, poner ""
-    document.getElementById("cuenta_credito_edit").value = cuentaCredito || ""; // Si es nulo, poner ""
-    document.getElementById("estado_cuenta_edit").value = estado;
+  // Llena los campos del formulario con los datos actuales de la regla
+  document.getElementById("nombre_regla_edit").value = nombre;
+  document.getElementById("tipo_transaccion_edit").value = tipoTransaccion;
+  document.getElementById("cuenta_debito_edit").value = cuentaDebito || ""; // Si es nulo, poner ""
+  document.getElementById("cuenta_credito_edit").value = cuentaCredito || ""; // Si es nulo, poner ""
+  document.getElementById("estado_cuenta_edit").value = estado;
 
-    // Muestra el modal
-    document.getElementById("editReglaModal").style.display = "flex";
+  // Muestra el modal
+  document.getElementById("editReglaModal").style.display = "flex";
 }
 
 function closeModalEdit() {
-    document.getElementById("editReglaModal").style.display = "none";
+  document.getElementById("editReglaModal").style.display = "none";
 }
 
 function submitEditForm(event) {
-    event.preventDefault(); // Evita el envío del formulario
+  event.preventDefault(); // Evita el envío del formulario
 
-    // Obtiene los valores del formulario
-    const nombreRegla = document.getElementById("nombre_regla_edit").value;
-    const tipoTransaccion = document.getElementById("tipo_transaccion_edit").value;
-    const cuentaDebito = document.getElementById("cuenta_debito_edit").value;
-    const cuentaCredito = document.getElementById("cuenta_credito_edit").value;
-    const estado = document.getElementById("estado_cuenta_edit").value;
+  // Obtiene los valores del formulario
+  const nombreRegla = document.getElementById("nombre_regla_edit").value;
+  const tipoTransaccion = document.getElementById("tipo_transaccion_edit").value;
+  const cuentaDebito = document.getElementById("cuenta_debito_edit").value;
+  const cuentaCredito = document.getElementById("cuenta_credito_edit").value;
+  const estado = document.getElementById("estado_cuenta_edit").value;
 
-    // Realiza una petición al servidor para actualizar la regla
-    fetch(`/contable/reglas/editar/${currentReglaId}`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            nombre_regla: nombreRegla,
-            tipo_transaccion: tipoTransaccion,
-            cuenta_debito: cuentaDebito,
-            cuenta_credito: cuentaCredito,
-            estado: estado,
-        }),
-    })
+  // Realiza una petición al servidor para actualizar la regla
+  fetch(`/contable/reglas/editar/${currentReglaId}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      nombre_regla: nombreRegla,
+      tipo_transaccion: tipoTransaccion,
+      cuenta_debito: cuentaDebito,
+      cuenta_credito: cuentaCredito,
+      estado: estado,
+    }),
+  })
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
-            alert("Regla actualizada correctamente.");
-            closeModalEdit(); // Cierra el modal
-            location.reload(); // Recarga la página para mostrar los cambios
-        } else {
-            alert("Hubo un problema al actualizar la regla.");
-        }
+      if (data.success) {
+        alert("Regla actualizada correctamente.");
+        closeModalEdit(); // Cierra el modal
+        location.reload(); // Recarga la página para mostrar los cambios
+      } else {
+        alert("Hubo un problema al actualizar la regla.");
+      }
     })
     .catch(error => {
-        console.error("Error al actualizar la regla:", error);
-        alert("Error al actualizar la regla.");
+      console.error("Error al actualizar la regla:", error);
+      alert("Error al actualizar la regla.");
+    });
+}
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const addForm = document.getElementById('addForm');
+  if (addForm) {
+    addForm.addEventListener('submit', submitAddForm);
+  }
+
+  // Monitor select changes
+  const tipoTransaccionSelect = document.getElementById('tipo_transaccion');
+  if (tipoTransaccionSelect) {
+    tipoTransaccionSelect.addEventListener('change', (e) => {
+      console.log('Select changed:', e.target.value);
+    });
+  }
+});
+function submitAddForm(event) {
+  event.preventDefault();
+
+  // Get form elements
+  const nombreRegla = document.getElementById("codigo_cuenta").value;
+  const tipoTransaccion = document.getElementById("tipo_transaccion_add").value;
+  const cuentaDebito = document.getElementById("cuenta_debito_add").value || null;
+  const cuentaCredito = document.getElementById("cuenta_credito_add").value || null;
+  const estado = document.getElementById("estado_cuenta").value;
+
+  // Log form data
+  console.log("Datos del formulario:", {
+    nombreRegla,
+    tipoTransaccion,
+    cuentaDebito,
+    cuentaCredito,
+    estado
+  });
+
+  // Create request body
+  const requestBody = {
+    nombre_regla: nombreRegla,
+    tipo_transaccion: tipoTransaccion,
+    cuenta_debito: cuentaDebito,
+    cuenta_credito: cuentaCredito,
+    estado: estado,
+  };
+
+  // Send request
+  fetch(`/contable/reglas/agregar`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(requestBody),
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.success) {
+        alert("Regla agregada correctamente.");
+        closeModalAdd();
+        location.reload();
+      } else {
+        alert("Hubo un problema al agregar la regla: " + (data.message || ''));
+      }
+    })
+    .catch(error => {
+      console.error("Error al agregar la regla:", error);
+      alert("Error al agregar la regla. Revisa la consola para más detalles.");
     });
 }

@@ -394,6 +394,26 @@ def obtener_asientodiario():
     finally:
         connection.close()
 
+def agregar_regla_en_db(nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado):
+    connection = obtener_conexion()  # Asegúrate de que esta función esté bien configurada
+    try:
+        with connection.cursor() as cursor:
+            sql = """
+            INSERT INTO reglas_contabilizacion (nombre_regla, tipo_transaccion, cuenta_debe, cuenta_haber, estado)
+            VALUES (%s, %s, %s, %s, %s)
+            """
+            print("Ejecutando SQL:", sql)
+            print("Valores:", (nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado))
+            cursor.execute(sql, (nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado))
+            connection.commit()
+            return cursor.rowcount > 0  # Retorna True si se agregó una fila
+    except Exception as e:
+        print("Error en agregar_regla_en_db:", e)  # Imprime el error específico en la consola
+        return False
+    finally:
+        connection.close()
+
+
 def actualizar_regla_en_db(id_regla, nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado):
     connection = obtener_conexion()
     try:
