@@ -1,7 +1,8 @@
-from flask import json, request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app
+from flask import json, abort, request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
 from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, obtener_id_cuenta, obtener_regla_por_id, obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas,obtener_asientos_agrupados_excel,obtener_registro_compras
 from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas, obtener_asientos_agrupados_excel, obtener_libro_caja, obtener_libro_caja_cuenta_corriente
+from functools import wraps
 
 from . import accounting_bp
 import pandas as pd
@@ -15,6 +16,7 @@ from openpyxl.styles import Border, Side, Alignment, Font
 from fpdf import FPDF
 from io import BytesIO
 from werkzeug.utils import secure_filename
+from flask_jwt_extended import get_jwt_identity
 
 
 
@@ -166,6 +168,29 @@ def obtener_cuenta(cuenta_id):
     else:
         return jsonify({'error': 'Cuenta no encontrada'}), 404
     
+def role_required(*roles):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            user_id = get_jwt_identity()
+            user = obtener_usuario_por_id(user_id)
+            
+            if not user:
+                print("Error: Usuario no encontrado")
+                return abort(403)
+            
+            user_role = user['rol']['nom_rol'].strip().upper() 
+            print(f"Usuario rol: {user_role}")  
+
+            if user_role not in [role.upper() for role in roles]: 
+                print("Error: Rol no permitido")
+                return abort(403)  
+
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+
 
 
 @accounting_bp.route('/cuentas/editar/<int:cuenta_id>', methods=['POST'])
@@ -185,19 +210,27 @@ def agregar_regla():
 
     nombre_regla = data.get("nombre_regla")
     tipo_transaccion = data.get("tipo_transaccion")
-    cuenta_debito = data.get("cuenta_debito")
-    cuenta_credito = data.get("cuenta_credito")
+    cuenta_debito_codigo = data.get("cuenta_debito") or None
+    cuenta_credito_codigo = data.get("cuenta_credito") or None
     estado = data.get("estado")
 
     print("Datos recibidos en agregar_regla:")
     print("Nombre de la regla:", nombre_regla)
     print("Tipo de transacción:", tipo_transaccion)
-    print("Cuenta débito:", cuenta_debito)
-    print("Cuenta crédito:", cuenta_credito)
+    print("Cuenta débito código:", cuenta_debito_codigo)
+    print("Cuenta crédito código:", cuenta_credito_codigo)
     print("Estado:", estado)
+
     if tipo_transaccion is None:
-            print("Error: tipo_transaccion es None")
-            return jsonify({"success": False, "message": "El tipo de transacción no puede ser None"}), 400
+        print("Error: tipo_transaccion es None")
+        return jsonify({"success": False, "message": "El tipo de transacción no puede ser None"}), 400
+
+    # Convertir los códigos de cuenta a id_cuenta antes de agregar la regla
+    cuenta_debito = obtener_id_cuenta(cuenta_debito_codigo) if cuenta_debito_codigo else None
+    cuenta_credito = obtener_id_cuenta(cuenta_credito_codigo) if cuenta_credito_codigo else None
+
+    print("Cuenta Débito ID:", cuenta_debito)
+    print("Cuenta Crédito ID:", cuenta_credito)
 
     try:
         resultado = agregar_regla_en_db(nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado)
@@ -206,7 +239,11 @@ def agregar_regla():
             return jsonify({"success": True})
         else:
             return jsonify({"success": False, "message": "No se pudo agregar la regla."}), 400
-        
+       
+    except Exception as e:
+        print("Error al agregar la regla:", e)
+        return jsonify({"success": False, "message": "Error interno del servidor."}), 500
+
        
     except Exception as e:
         print("Error al agregar la regla:", e)  # Imprime el error en la consola
@@ -308,6 +345,7 @@ def reglas():
 
 @accounting_bp.route('/usuarios', methods=['GET'])
 @jwt_required()
+@role_required('ADMIN')
 def usuarios():
     page = request.args.get('page', default=1, type=int)
     per_page = request.args.get('per_page', default=50, type=int)

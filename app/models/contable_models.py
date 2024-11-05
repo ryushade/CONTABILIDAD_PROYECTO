@@ -963,10 +963,10 @@ def obtener_libro_caja():
             total_debe_caja += debe
             total_haber_caja += haber
 
-            total_caja = {
-                "debe": total_debe_caja,
-                "haber": total_haber_caja
-            }
+        total_caja = {
+            "debe": total_debe_caja,
+            "haber": total_haber_caja
+        }
 
         return  resultados, total_caja 
     finally:
