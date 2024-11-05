@@ -299,7 +299,7 @@ function closeModalVer() {
 }
 
 
-let currentReglaId = null; // Almacena el ID de la regla que se está editando
+let currentReglaId = null;
 
 function openEditModal(reglaId, nombre, tipoTransaccion, cuentaDebito, cuentaCredito, estado) {
   currentReglaId = reglaId; // Guarda el ID de la regla actual
@@ -325,12 +325,12 @@ function submitEditForm(event) {
   // Obtiene los valores del formulario
   const nombreRegla = document.getElementById("nombre_regla_edit").value;
   const tipoTransaccion = document.getElementById("tipo_transaccion_edit").value;
-  const cuentaDebito = document.getElementById("cuenta_debito_edit").value;
-  const cuentaCredito = document.getElementById("cuenta_credito_edit").value;
+  const cuentaDebito = document.getElementById("cuenta_debito_edit").value || null;
+  const cuentaCredito = document.getElementById("cuenta_credito_edit").value || null;
   const estado = document.getElementById("estado_cuenta_edit").value;
 
   // Realiza una petición al servidor para actualizar la regla
-  fetch(`/contable/reglas/editar/${currentReglaId}`, {
+  fetch(`/contable/reglas/actualizar_regla/${currentReglaId}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -350,14 +350,24 @@ function submitEditForm(event) {
         closeModalEdit(); // Cierra el modal
         location.reload(); // Recarga la página para mostrar los cambios
       } else {
-        alert("Hubo un problema al actualizar la regla.");
+        // Imprime los datos enviados y el mensaje de error recibido
+        console.log("Datos enviados:", {
+          nombre_regla: nombreRegla,
+          tipo_transaccion: tipoTransaccion,
+          cuenta_debito: cuentaDebito,
+          cuenta_credito: cuentaCredito,
+          estado: estado,
+        });
+        console.log("Error en la respuesta del servidor:", data.message);
+        alert("Error al actualizar la regla: " + data.message);
       }
     })
     .catch(error => {
-      console.error("Error al actualizar la regla:", error);
-      alert("Error al actualizar la regla.");
+      console.error("Error en la solicitud:", error);
+      alert("Ocurrió un error al intentar actualizar la regla.");
     });
 }
+
 
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -1,6 +1,6 @@
 from flask import json, request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
-from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, obtener_regla_por_id, obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas,obtener_asientos_agrupados_excel,obtener_registro_compras
+from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, obtener_id_cuenta, obtener_regla_por_id, obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas,obtener_asientos_agrupados_excel,obtener_registro_compras
 from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas, obtener_asientos_agrupados_excel, obtener_libro_caja, obtener_libro_caja_cuenta_corriente
 
 from . import accounting_bp
@@ -251,26 +251,38 @@ def upload_photo():
             return redirect(url_for('inicio'))
 
 
-@accounting_bp.route('/reglas/editar/<int:regla_id>', methods=['POST'])
+@accounting_bp.route('/reglas/actualizar_regla/<int:id_regla>', methods=['POST'])
 def actualizar_regla(id_regla):
     data = request.get_json()
 
     nombre_regla = data.get("nombre_regla")
     tipo_transaccion = data.get("tipo_transaccion")
-    cuenta_debito = data.get("cuenta_debito")
-    cuenta_credito = data.get("cuenta_credito")
+    cuenta_debito_codigo = data.get("cuenta_debito") or None
+    cuenta_credito_codigo = data.get("cuenta_credito") or None
     estado = data.get("estado")
 
-    try:
-        resultado = actualizar_regla_en_db(id_regla, nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado)
-        
-        if resultado:
-            return jsonify({"success": True})
-        else:
-            return jsonify({"success": False, "message": "No se encontró la regla o no se pudo actualizar."}), 404
-    except Exception as e:
-        print("Error al actualizar la regla:", e)
-        return jsonify({"success": False, "message": "Error interno del servidor."}), 500
+    # Añade estos prints
+    print("Datos recibidos:")
+    print("ID Regla:", id_regla)
+    print("Nombre Regla:", nombre_regla)
+    print("Tipo Transacción:", tipo_transaccion)
+    print("Cuenta Débito Código:", cuenta_debito_codigo)
+    print("Cuenta Crédito Código:", cuenta_credito_codigo)
+    print("Estado:", estado)
+
+       # Convertir los códigos de cuenta a id_cuenta antes de actualizar
+    cuenta_debito = obtener_id_cuenta(cuenta_debito_codigo) if cuenta_debito_codigo else None
+    cuenta_credito = obtener_id_cuenta(cuenta_credito_codigo) if cuenta_credito_codigo else None
+
+    print("Cuenta Débito ID:", cuenta_debito)
+    print("Cuenta Crédito ID:", cuenta_credito)
+
+    resultado = actualizar_regla_en_db(id_regla, nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado)
+
+    if resultado:
+        return jsonify({"success": True})
+    else:
+        return jsonify({"success": False, "message": "No se encontró la regla o no se pudo actualizar."}), 404
 
 @accounting_bp.route('/reglas', methods=['GET'])
 @jwt_required()

@@ -41,6 +41,29 @@
         /* Evita el scroll horizontal si no es necesario */
     }
 
+    .confirmation-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1050;
+    }
+
+    .confirmation-modal {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        text-align: center;
+    }
+
     /* Estilos responsivos */
     @media (max-width: 768px) {
         .table-scroll {
@@ -54,6 +77,8 @@
         .dropdown-menu {
             width: 100%;
         }
+
+
     }
 </style>
 
@@ -81,6 +106,60 @@
     </div>
 </div>
 
+<div id="downloadExcelModal" class="confirmation-modal-overlay" style="display: none">
+    <div class="confirmation-modal" style="text-align: center;">
+        <div class="modal-icon" style="margin-bottom: 10px;">
+            <!-- Icono de descarga -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                stroke="green" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+        </div>
+        <h2 class="confirmation-modal-title" style="color: rgb(30, 30, 30);">DESCARGAR ARCHIVO EXCEL</h2>
+        <p class="confirmation-modal-message">¿Estás seguro que deseas descargar el libro diario en formato
+            Excel?</p>
+        <div class="confirmation-modal-buttons"
+            style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
+            <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" class="btn btn-secondary"
+                onclick="closeModalDownloadExcel()">No, Cancelar</button>
+            <button
+                style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600; background-color: #1F6E43; border: none;"
+                class="btn btn-primary" onclick="downloadExcel()">Sí, Descargar</button>
+        </div>
+    </div>
+</div>
+
+
+<div id="downloadPDFModal" class="confirmation-modal-overlay" style="display: none;">
+    <div class="confirmation-modal" style="text-align: center;">
+        <div class="modal-icon" style="margin-bottom: 10px;">
+            <!-- Icono de descarga en rojo para PDF -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="red"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+        </div>
+        <h2 class="confirmation-modal-title" style="color: rgb(30, 30, 30);">DESCARGAR ARCHIVO PDF</h2>
+        <p class="confirmation-modal-message">¿Estás seguro que deseas descargar el plan contable en formato PDF?</p>
+        <div class="confirmation-modal-buttons"
+            style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
+            <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" class="btn btn-secondary"
+                onclick="closeModalDownloadPDF()">No, Cancelar</button>
+            <button
+                style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600; background-color: #0B5ED7; border: none; transition: background-color 0.3s;"
+                class="btn btn-primary" onclick="downloadPDF()" onmouseover="this.style.backgroundColor='#1D4ED8'"
+                onmouseout="this.style.backgroundColor='#0B5ED7'">
+                Sí, Descargar
+            </button>
+
+        </div>
+    </div>
+</div>
+
 <div class="tab-content mb-5">
 
     <!-- Tab: Libro Diario -->
@@ -98,15 +177,14 @@
                         Más acciones
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item d-flex flex-column"
-                            href="{{ url_for('contable.exportar_libro_diario_excel') }}">
+                        <a class="dropdown-item d-flex flex-column" href="#" onclick="openModalDownloadExcel()">
                             <span class="d-flex align-items-center">
                                 <i class="fa fa-file-excel mr-2"></i>
                                 <strong>Exportar a Excel</strong>
                             </span>
                         </a>
-                        <a class="dropdown-item d-flex flex-column"
-                            href="{{ url_for('contable.exportar_libro_diario_pdf') }}">
+
+                        <a class="dropdown-item d-flex flex-column" href="#" onclick="openModalDownloadPDF()">
                             <span class="d-flex align-items-center">
                                 <i class="fa fa-file-pdf mr-2" style="color: red;"></i>
                                 <strong>Exportar a PDF</strong>
@@ -118,40 +196,48 @@
             </header>
 
 
-            <p class="text-muted small mb-4">Consulta los asientos contables de tu empresa en el período de tiempo
+            <p class="text-muted small mb-4">Consulta los asientos contables de tu empresa en el periodo de tiempo
                 que elijas.</p>
             <div class="container">
-
-                <form id="filterForm" class="row g-3 mb-3 align-items-end" method="GET"
-                    action="{{ url_for('contable.reportes') }}">
+                <form id="filterForm" class="row g-3 mb-3" method="GET" action="{{ url_for('contable.reportes') }}">
+                    <!-- First column -->
                     <div class="col-md-3">
                         <label for="daterange" class="form-label" style="font-size: 14px;">
                             Fecha<span class="required-asterisk">*</span>
                         </label>
-                        <div class="input-group" style="width: auto;">
-                            <input class="form-control" type="text" id="daterange" name="daterange"
-                                placeholder="Selecciona un rango de fecha">
-                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                        <div class="input-group">
+                            <span class="input-group-text" id="basic-addon1">
+                                <i class="fas fa-calendar-alt"></i>
+                            </span>
+                            <input type="text" class="form-control" id="daterange" placeholder="Selecciona mes y año"
+                                aria-label="Fecha" aria-describedby="basic-addon1">
                         </div>
                     </div>
+
+                    <!-- Second column -->
                     <div class="col-md-3">
-                        <label for="tipo-registro" style="font-size: 14px;" class="form-label">Tipo de registro</label>
+                        <label for="tipo-registro" class="form-label" style="font-size: 14px;">
+                            Tipo de registro
+                        </label>
                         <select class="form-select" id="tipo-registro" name="tipo_registro"
                             onchange="this.form.submit()">
                             <option value="Todas" {% if request.args.get('tipo_registro')=='Todas' %}selected{% endif
-                                %}>Todas</option>
+                                %}>
+                                Todas
+                            </option>
                             <option value="Ventas" {% if request.args.get('tipo_registro')=='Ventas' %}selected{% endif
-                                %}>Ventas</option>
+                                %}>
+                                Ventas
+                            </option>
                             <option value="Compras" {% if request.args.get('tipo_registro')=='Compras' %}selected{%
-                                endif %}>Compras</option>
+                                endif %}>
+                                Compras
+                            </option>
                         </select>
                     </div>
-                    <div class="col-lg-2 d-flex justify-content-end" style="margin-left: auto;">
-
-                    </div>
                 </form>
-
             </div>
+
 
             <div class="table-responsive mt-4 mb-4" style="max-height: 400px; overflow-y: auto;">
                 <table class="table table-bordered table-hover">
@@ -252,37 +338,31 @@
             <p class="text-muted small mb-4">Consulta el detalle de los movimientos registrados, clasificados por
                 cuentas, mostrando los debe, haber y saldos</p>
             <div class="container">
-
-                <form class="row g-3 mb-3 align-items-end">
+                <form class="row g-3">
+                    <!-- First column -->
                     <div class="col-md-3">
-                        <style>
-                            .required-asterisk {
-                                color: red;
-                            }
-                        </style>
-
-                        <label for="daterange" class="form-label" style="font-size: 14px;">
-                            Período <span class="required-asterisk">*</span>
+                        <label for="daterange" class="form-label">
+                            Fecha <span class="required-asterisk">*</span>
                         </label>
-                        <div class="input-group" style="width: auto;">
-                            <input class="form-control" type="text" id="daterange"
-                                placeholder="Selecciona un rango de fecha">
-                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                        <div class="input-group">
+                            <span class="input-group-text" id="basic-addon1">
+                                <i class="fas fa-calendar-alt"></i>
+                            </span>
+                            <input type="text" class="form-control" id="daterange" placeholder="Selecciona mes y año"
+                                aria-label="Fecha" aria-describedby="basic-addon1">
                         </div>
                     </div>
+
+                    <!-- Second column -->
                     <div class="col-md-3">
-                        <label for="tipo-registro" style="font-size: 14px;" class="form-label">Tipo de
-                            registro</label>
+                        <label for="tipo-registro" class="form-label">
+                            Tipo de registro
+                        </label>
                         <select class="form-select" id="tipo-registro">
                             <option selected>Todas</option>
                         </select>
                     </div>
-
-                    <div class="col-lg-2 d-flex justify-content-end" style="margin-left: auto; margin-right: 20px;">
-
-                    </div>
                 </form>
-
             </div>
 
             <div class="table-responsive mt-4 mb-4">
@@ -344,25 +424,7 @@
 
             </div>
 
-            <nav aria-label="Navegación de páginas" class="d-flex justify-content-between align-items-center">
-                <ul class="pagination pagination-sm mb-0">
-                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
-                            aria-disabled="true">&laquo;</a></li>
-                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
-                            aria-disabled="true">&lsaquo;</a></li>
-                    <li class="page-item active" aria-current="page"><span class="page-link">1</span></li>
-                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
-                            aria-disabled="true">&rsaquo;</a></li>
-                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
-                            aria-disabled="true">&raquo;</a></li>
-                </ul>
-                <div class="d-flex align-items-center">
-                    <span class="text-muted small me-2">Mostrando 1-10 De 10</span>
-                    <select class="form-select form-select-sm" style="width: auto;">
-                        <option>10</option>
-                    </select>
-                </div>
-            </nav>
+
         </div>
     </div>
 
@@ -414,12 +476,14 @@
                         </style>
 
                         <label for="daterange" class="form-label" style="font-size: 14px;">
-                            Período <span class="required-asterisk">*</span>
+                            Fecha <span class="required-asterisk">*</span>
                         </label>
-                        <div class="input-group" style="width: auto;">
-                            <input class="form-control" type="text" id="daterange"
-                                placeholder="Selecciona un rango de fecha">
-                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">
+                                <i class="fas fa-calendar-alt"></i>
+                            </span>
+                            <input type="text" class="form-control" id="daterange" placeholder="Selecciona mes y año"
+                                aria-label="Fecha" aria-describedby="basic-addon1">
                         </div>
                     </div>
 
@@ -475,25 +539,7 @@
 
             </div>
 
-            <nav aria-label="Navegación de páginas" class="d-flex justify-content-between align-items-center">
-                <ul class="pagination pagination-sm mb-0">
-                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
-                            aria-disabled="true">&laquo;</a></li>
-                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
-                            aria-disabled="true">&lsaquo;</a></li>
-                    <li class="page-item active" aria-current="page"><span class="page-link">1</span></li>
-                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
-                            aria-disabled="true">&rsaquo;</a></li>
-                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
-                            aria-disabled="true">&raquo;</a></li>
-                </ul>
-                <div class="d-flex align-items-center">
-                    <span class="text-muted small me-2">Mostrando 1-10 De 10</span>
-                    <select class="form-select form-select-sm" style="width: auto;">
-                        <option>10</option>
-                    </select>
-                </div>
-            </nav>
+
         </div>
     </div>
 
@@ -546,20 +592,18 @@
                         </style>
 
                         <label for="daterange" class="form-label" style="font-size: 14px;">
-                            Período <span class="required-asterisk">*</span>
+                            Fecha <span class="required-asterisk">*</span>
                         </label>
-                        <div class="input-group" style="width: auto;">
-                            <input class="form-control" type="text" id="daterange"
-                                placeholder="Selecciona un rango de fecha">
-                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">
+                                <i class="fas fa-calendar-alt"></i>
+                            </span>
+                            <input type="text" class="form-control" id="daterange" placeholder="Selecciona mes y año"
+                                aria-label="Fecha" aria-describedby="basic-addon1">
                         </div>
                     </div>
 
-                    <div class="col-lg-2 d-flex justify-content-end" style="margin-left: auto;">
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="fas fa-calendar-alt"></i> Realizar busqueda
-                        </button>
-                    </div>
+
                 </form>
 
             </div>
@@ -610,25 +654,7 @@
             </div>
 
 
-            <nav aria-label="Navegación de páginas" class="d-flex justify-content-between align-items-center">
-                <ul class="pagination pagination-sm mb-0">
-                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
-                            aria-disabled="true">&laquo;</a></li>
-                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
-                            aria-disabled="true">&lsaquo;</a></li>
-                    <li class="page-item active" aria-current="page"><span class="page-link">1</span></li>
-                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
-                            aria-disabled="true">&rsaquo;</a></li>
-                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"
-                            aria-disabled="true">&raquo;</a></li>
-                </ul>
-                <div class="d-flex align-items-center">
-                    <span class="text-muted small me-2">Mostrando 1-10 De 10</span>
-                    <select class="form-select form-select-sm" style="width: auto;">
-                        <option>10</option>
-                    </select>
-                </div>
-            </nav>
+
         </div>
     </div>
 
@@ -687,20 +713,21 @@
                         </style>
 
                         <label for="daterange" class="form-label" style="font-size: 14px;">
-                            Período <span class="required-asterisk">*</span>
+                            Fecha <span class="required-asterisk">*</span>
                         </label>
-                        <div class="input-group" style="width: auto;">
-                            <input class="form-control" type="text" id="daterange"
-                                placeholder="Selecciona un rango de fecha">
-                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">
+                                <i class="fas fa-calendar-alt"></i>
+                            </span>
+                            <input type="text" class="form-control" id="daterange" placeholder="Selecciona mes y año"
+                                aria-label="Fecha" aria-describedby="basic-addon1">
                         </div>
+
+
+
                     </div>
 
-                    <div class="col-lg-2 d-flex justify-content-end" style="margin-left: auto;">
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="fas fa-calendar-alt"></i> Realizar busqueda
-                        </button>
-                    </div>
+
                 </form>
 
             </div>
@@ -798,45 +825,79 @@
             </div>
         </div>
 
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-                popoverTriggerList.forEach(function (popoverTriggerEl) {
-                    var isAcreedor = popoverTriggerEl.getAttribute("data-bs-content").includes("Saldo Acreedor");
-                    var colorClass = isAcreedor ? "saldo-acreedor" : "saldo-deudor";
 
-                    var popover = new bootstrap.Popover(popoverTriggerEl, {
-                        html: true,
-                        content: function () {
-                            return '<span class="' + colorClass + '">' + popoverTriggerEl.getAttribute("data-bs-content") + '</span>';
-                        }
-                    });
-                });
-            });
-        </script>
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                flatpickr("#daterange", {
-                    mode: "range",
-                    dateFormat: "m/Y",
-                    minDate: "01/1900",
-                    maxDate: "04/2028",
-                    plugins: [
-                        new monthSelectPlugin({
-                            dateFormat: "m/Y",
-                            altFormat: "F Y",
-                            altInput: true
-                        })
-                    ],
-                    onClose: function (selectedDates, dateStr, instance) {
-                        if (selectedDates.length === 2) {
-                            document.getElementById('filterForm').submit();
-                        }
+
+
+
+
+
+    </div>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+            popoverTriggerList.forEach(function (popoverTriggerEl) {
+                var isAcreedor = popoverTriggerEl.getAttribute("data-bs-content").includes("Saldo Acreedor");
+                var colorClass = isAcreedor ? "saldo-acreedor" : "saldo-deudor";
+
+                var popover = new bootstrap.Popover(popoverTriggerEl, {
+                    html: true,
+                    content: function () {
+                        return '<span class="' + colorClass + '">' + popoverTriggerEl.getAttribute("data-bs-content") + '</span>';
                     }
                 });
             });
-        </script>
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            flatpickr("#daterange", {
+                mode: "range",
+                dateFormat: "m/Y",
+                minDate: "01/1900",
+                maxDate: "04/2028",
+                plugins: [
+                    new monthSelectPlugin({
+                        dateFormat: "m/Y",
+                        altFormat: "F Y",
+                        altInput: true
+                    })
+                ],
+                onClose: function (selectedDates, dateStr, instance) {
+                    if (selectedDates.length === 2) {
+                        document.getElementById('filterForm').submit();
+                    }
+                }
+            });
+        });
 
-    </div>
+        function openModalDownloadExcel() {
+            document.getElementById("downloadExcelModal").style.display = "flex";
+        }
+
+        function closeModalDownloadExcel() {
+            document.getElementById("downloadExcelModal").style.display = "none";
+        }
+
+        function downloadExcel() {
+            window.location.href = "{{ url_for('contable.exportar_libro_diario_excel') }}";
+            closeModalDownloadExcel();
+        }
+
+        function closeModalDownloadPDF() {
+            document.getElementById("downloadPDFModal").style.display = "none";
+        }
+
+        function openModalDownloadPDF() {
+            document.getElementById("downloadPDFModal").style.display = "flex";
+        }
+
+        function downloadPDF() {
+            // Redirecciona a la URL de descarga de PDF después de la confirmación
+            window.location.href = "{{ url_for('contable.exportar_libro_diario_pdf') }}";
+            closeModalDownloadPDF();
+        }
+    </script>
 
     {% endblock %}

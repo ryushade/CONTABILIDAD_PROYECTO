@@ -434,22 +434,40 @@ def actualizar_regla_en_db(id_regla, nombre_regla, tipo_transaccion, cuenta_debi
     connection = obtener_conexion()
     try:
         with connection.cursor() as cursor:
-            sql = """
-            UPDATE reglas_contabilizacion
-            SET 
-                nombre_regla = %s,
-                tipo_transaccion = %s,
-                cuenta_debe = %s,
-                cuenta_haber = %s,
-                estado = %s
-            WHERE 
-                id_regla = %s
-            """
-            cursor.execute(sql, (nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado, id_regla))
+            # Construir dinámicamente la consulta SQL
+            campos = ["nombre_regla = %s", "tipo_transaccion = %s", "estado = %s"]
+            valores = [nombre_regla, tipo_transaccion, int(estado)]
+
+            if cuenta_debito is not None:
+                campos.append("cuenta_debe = %s")
+                valores.append(cuenta_debito)
+            else:
+                campos.append("cuenta_debe = NULL")
+
+            if cuenta_credito is not None:
+                campos.append("cuenta_haber = %s")
+                valores.append(cuenta_credito)
+            else:
+                campos.append("cuenta_haber = NULL")
+
+            sql = f"UPDATE reglas_contabilizacion SET {', '.join(campos)} WHERE id_regla = %s"
+            valores.append(id_regla)
+
+            print("Ejecutando consulta SQL:", sql)
+            print("Con parámetros:", valores)
+
+            cursor.execute(sql, valores)
             connection.commit()
-            return cursor.rowcount > 0  
+            print("Filas afectadas:", cursor.rowcount)
+            return True  
+    except Exception as e:
+        print("Error al ejecutar la consulta UPDATE:", e)
+        return False
     finally:
         connection.close()
+
+
+
 
 def obtener_reglas(page, per_page):
     connection = obtener_conexion()
@@ -986,5 +1004,17 @@ def obtener_libro_caja_cuenta_corriente():
         }
 
         return  resultados, total_caja_corriente
+    finally:
+        conexion.close()
+
+def obtener_id_cuenta(codigo_cuenta):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            query = "SELECT id_cuenta FROM cuenta WHERE codigo_cuenta = %s"
+            cursor.execute(query, (codigo_cuenta,))
+            result = cursor.fetchone()
+            print("Resultado de obtener_id_cuenta:", result)
+            return result['id_cuenta'] if result else None
     finally:
         conexion.close()
