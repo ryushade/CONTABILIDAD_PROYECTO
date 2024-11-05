@@ -449,9 +449,80 @@ def obtener_reglas(page, per_page):
     finally:
         connection.close()
 
+def obtener_asientos_agrupados(tipo_registro='Todas'):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            query = """
+                SELECT 
+                    ROW_NUMBER() OVER (ORDER BY a.id_asiento) AS numero_correlativo,
+                    a.id_asiento, 
+                    a.fecha_asiento, 
+                    a.glosa, 
+                    co.num_comprobante, 
+                    cu.codigo_cuenta, 
+                    cu.nombre_cuenta, 
+                    d.debe, 
+                    d.haber,
+                    a.total_debe, 
+                    a.total_haber
+                FROM asiento_contable a
+                INNER JOIN detalle_asiento d ON a.id_asiento = d.id_asiento
+                INNER JOIN cuenta cu ON cu.id_cuenta = d.id_cuenta
+                INNER JOIN comprobante co ON co.id_comprobante = a.id_comprobante
+            """
+
+            if tipo_registro == 'Ventas':
+                query += " WHERE LOWER(a.glosa) LIKE '%venta%'"
+            elif tipo_registro == 'Compras':
+                query += " WHERE LOWER(a.glosa) LIKE '%compra%'"
+            elif tipo_registro == 'Todas':
+                query += " WHERE LOWER(a.glosa) LIKE '%venta%' OR LOWER(a.glosa) LIKE '%compra%'"
+
+            query += " ORDER BY a.id_asiento"
+            cursor.execute(query)
+            resultados = cursor.fetchall()
+        
+        asientos_agrupados = defaultdict(lambda: {"detalles": []})
+        global_total_debe = 0.0
+        global_total_haber = 0.0
+        
+        for row in resultados:
+            id_asiento = row["id_asiento"]
+            if id_asiento not in asientos_agrupados:
+                fecha_asiento = row["fecha_asiento"]
+                if isinstance(fecha_asiento, str):
+                    fecha_asiento = datetime.strptime(fecha_asiento, '%Y-%m-%d')
+                asientos_agrupados[id_asiento].update({
+                    "numero_correlativo": row["numero_correlativo"],
+                    "fecha_asiento": fecha_asiento,
+                    "glosa": row["glosa"],
+                    "num_comprobante": row["num_comprobante"],
+                    "detalles": [],
+                    "total_debe": float(row["total_debe"]),
+                    "total_haber": float(row["total_haber"])
+                })
+                global_total_debe += float(row["total_debe"])
+                global_total_haber += float(row["total_haber"])
+            
+            asientos_agrupados[id_asiento]["detalles"].append({
+                "codigo_cuenta": row["codigo_cuenta"],
+                "nombre_cuenta": row["nombre_cuenta"],
+                "debe": float(row["debe"]),
+                "haber": float(row["haber"]),
+            })
+        
+        totales = {
+            "total_debe": global_total_debe,
+            "total_haber": global_total_haber
+        }
+        
+        return asientos_agrupados, totales
+    finally:
+        conexion.close()
 
 
-def obtener_asientos_agrupados():
+def obtener_asientos_agrupados_excel():
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
