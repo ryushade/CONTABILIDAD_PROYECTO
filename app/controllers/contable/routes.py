@@ -54,10 +54,29 @@ def logout():
 @jwt_required()
 def reportes():
     tipo_registro = request.args.get('tipo_registro', 'Todas')
-    asientos, totales = obtener_asientos_agrupados(tipo_registro)
+    daterange = request.args.get('daterange', '')
+    start_date, end_date = None, None
+
+    if daterange:
+        try:
+            # Split by custom separator based on actual output from flatpickr
+            if ' to ' in daterange:
+                dates = daterange.split(' to ')
+            else:
+                dates = daterange.split(' - ')
+            
+            start_date = datetime.strptime(dates[0].strip(), '%m/%Y').date()
+            end_date = datetime.strptime(dates[1].strip(), '%m/%Y').date()
+        except (ValueError, IndexError):
+            print(f"Error al convertir las fechas: {e}")
+            pass
+
+    asientos, totales = obtener_asientos_agrupados(tipo_registro, start_date, end_date)
     libro_mayor_data, total_debe, total_haber = obtener_libro_mayor_agrupado_por_fecha()
     registro_compra_data, totale = obtener_registro_ventas()
+
     return render_template('contable/reportes/reportes.html', asientos=asientos, totales=totales, libro_mayor=libro_mayor_data, total_debe=total_debe, total_haber=total_haber, registros_compras=registro_compra_data, totale=totale)
+
 
 
 import app.models.contable_models as conta

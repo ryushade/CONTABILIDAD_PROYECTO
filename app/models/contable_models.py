@@ -469,7 +469,7 @@ def obtener_reglas(page, per_page):
     finally:
         connection.close()
 
-def obtener_asientos_agrupados(tipo_registro='Todas'):
+def obtener_asientos_agrupados(tipo_registro='Todas', start_date=None, end_date=None):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
@@ -490,19 +490,28 @@ def obtener_asientos_agrupados(tipo_registro='Todas'):
                 INNER JOIN detalle_asiento d ON a.id_asiento = d.id_asiento
                 INNER JOIN cuenta cu ON cu.id_cuenta = d.id_cuenta
                 INNER JOIN comprobante co ON co.id_comprobante = a.id_comprobante
+                WHERE TRUE
             """
 
+            params = []
+            
+            # Filtro por tipo de registro
             if tipo_registro == 'Ventas':
-                query += " WHERE LOWER(a.glosa) LIKE '%venta%'"
+                query += " AND LOWER(a.glosa) LIKE %s"
+                params.append('%venta%')
             elif tipo_registro == 'Compras':
-                query += " WHERE LOWER(a.glosa) LIKE '%compra%'"
-            elif tipo_registro == 'Todas':
-                query += " WHERE LOWER(a.glosa) LIKE '%venta%' OR LOWER(a.glosa) LIKE '%compra%'"
+                query += " AND LOWER(a.glosa) LIKE %s"
+                params.append('%compra%')
 
-            query += " ORDER BY a.id_asiento"
-            cursor.execute(query)
+            # Filtro por rango de fechas
+            if start_date and end_date:
+                query += " AND a.fecha_asiento BETWEEN %s AND %s"
+                params.extend([start_date, end_date])
+
+            cursor.execute(query, params)
             resultados = cursor.fetchall()
         
+        # Procesamiento de resultados
         asientos_agrupados = defaultdict(lambda: {"detalles": []})
         global_total_debe = 0.0
         global_total_haber = 0.0
@@ -540,6 +549,7 @@ def obtener_asientos_agrupados(tipo_registro='Todas'):
         return asientos_agrupados, totales
     finally:
         conexion.close()
+
 
 
 def obtener_asientos_agrupados_excel():
