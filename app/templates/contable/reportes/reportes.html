@@ -30,6 +30,11 @@
         padding: 0;
     }
 
+    tr td {
+        border-bottom: 1px solid #ccc;
+        /* Define el color y estilo de la línea */
+    }
+
 
     .table-scroll thead th {
         position: sticky;
@@ -77,11 +82,42 @@
 
 
     }
-    
-    
+
+    .table-container {
+        border: 1px solid #ccc;
+    }
+
+    .table-scroll table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .table-scroll th,
+    .table-scroll td {
+        padding: 10px 15px;
+        /* Padding uniforme para todas las celdas */
+        border-bottom: 1px solid #ddd;
+        /* Línea divisoria entre filas */
+    }
+
+    .table-scroll th {
+        text-align: center;
+        background-color: #f9f9f9;
+        font-weight: bold;
+    }
+
+    .table-scroll td.text-end {
+        text-align: right;
+        /* Alineación derecha para celdas numéricas */
+    }
+
+    .table-scroll td.text-center {
+        text-align: center;
+        /* Alineación central */
+    }
 </style>
 
-<div class="mb-4">
+<div class="mb-2">
     <div class="nav nav-tabs">
         <a class="nav-item nav-link active" href="#libro-diario" data-bs-toggle="tab">
             <i class="fas fa-book"></i> Libro diario
@@ -164,16 +200,15 @@
     <!-- Tab: Libro Diario -->
     <div class="tab-pane fade show active" id="libro-diario">
         <div class="card bg-white rounded custom-shadow p-4">
-            <header class="d-flex justify-content-between align-items-center mb-4">
+            <header class="d-flex justify-content-between align-items-center mb-2">
                 <h1 class="h4 mb-0 d-flex align-items-center" style="font-weight: bold;">
-                    <span></span>
                     LIBRO DIARIO
                 </h1>
 
                 <div class="dropdown me-2">
                     <button class="btn btn-light border dropdown-toggle" type="button" id="dropdownMenuButton"
                         data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Más acciones
+                        Exportar datos
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         <a class="dropdown-item d-flex flex-column" href="#" onclick="openModalDownloadExcel()">
@@ -195,7 +230,7 @@
             </header>
 
 
-            <p class="text-muted small mb-4">Consulta los asientos contables de tu empresa en el periodo de tiempo
+            <p class="text-muted small mb-2">Consulta los asientos contables de tu empresa en el periodo de tiempo
                 que elijas.</p>
             <div class="container">
                 <form id="filterForm" class="row g-3 mb-3" method="GET" action="{{ url_for('contable.reportes') }}">
@@ -237,76 +272,87 @@
                     </div>
                     <div class="col-md-2">
                         <div class="mt-4">
-                            <a href="{{ url_for('contable.reportes') }}" class="btn btn-secondary mt-2">
-                                Borrar filtros <i class="fa-solid fa-filter"></i>
+                            <a href="{{ url_for('contable.reportes') }}" class="btn btn-secondary mt-2"
+                                style="background-color: rgb(226, 39, 39); border: none; color: white;"
+                                onmouseover="this.style.backgroundColor='rgb(180, 20, 20)';"
+                                onmouseout="this.style.backgroundColor='rgb(226, 39, 39)';">
+                                <i class="fa-solid fa-filter"></i> Borrar filtros
                             </a>
+
                         </div>
                     </div>
                 </form>
             </div>
 
 
-            <div class="table-container mt-2">
-                <div class="table-scroll">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th class="text-center">NÚMERO CORRELATIVO</th>
-                                <th class="text-center">FECHA DE LA OPERACIÓN</th>
-                                <th class="text-center">GLOSA O DESCRIPCIÓN</th>
-                                <th class="text-center">NÚMERO DEL DOCUMENTO</th>
-                                <th class="text-center">CÓDIGO</th>
-                                <th class="text-center">DENOMINACIÓN</th>
-                                <th class="text-center">DEBE</th>
-                                <th class="text-center">HABER</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% if asientos %}
-                            {% for id_asiento, asiento in asientos.items() %}
-                            {% for detalle in asiento.detalles %}
-                            <tr>
-                                {% if loop.first %}
-                                <td style="padding-top: 20px;" class="text-center"
-                                    rowspan="{{ asiento.detalles|length }}">
-                                    {{ asiento.numero_correlativo }}
-                                </td>
-                                <td class="text-center" style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">
-                                    {{ asiento.fecha_asiento.strftime('%d/%m/%Y') }}
-                                </td>
-                                <td class="text-center" style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">{{ asiento.glosa
-                                    }}
-                                </td>
-                                <td class="text-center" style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">{{
-                                    asiento.num_comprobante }}</td>
-                                {% endif %}
-                                <td>{{ detalle.codigo_cuenta }}</td>
-                                <td class="text-center">{{ detalle.nombre_cuenta }}</td>
-                                <td class="text-end">{{ detalle.debe if detalle.debe != 0 else '' }}</td>
-                                <td class="text-end">{{ detalle.haber if detalle.haber != 0 else '' }}</td>
-                            </tr>
-                            {% endfor %}
-                            {% endfor %}
-                            {% else %}
-                            <tr>
-                                <td colspan="8" class="text-center">No se encontraron registros para el criterio
-                                    seleccionado.</td>
-                            </tr>
+            <div class="table-container mt-2" style="border: 1px solid #ccc;">
+                <style>
+                    /* Estilo de hover para resaltar todo el grupo de filas de un asiento */
+                    .asiento-group:hover {
+                        background-color: #e4ebf7;
+                    }
+                </style>
+                <table style="border: #000; width: 100%; font-size: 13px;">
+                    <thead>
+                        <tr>
+                            <th class="text-center">NÚMERO CORRELATIVO</th>
+                            <th class="text-center">FECHA DE LA OPERACIÓN</th>
+                            <th class="text-center">GLOSA O DESCRIPCIÓN</th>
+                            <th class="text-center">NÚMERO DEL DOCUMENTO</th>
+                            <th class="text-center">CÓDIGO</th>
+                            <th class="text-center">DENOMINACIÓN</th>
+                            <th class="text-center">DEBE</th>
+                            <th class="text-left">HABER</th>
+                        </tr>
+                    </thead>
+                    {% if asientos %}
+                    {% for id_asiento, asiento in asientos.items() %}
+                    <tbody class="asiento-group">
+                        {% for detalle in asiento.detalles %}
+                        <tr>
+                            {% if loop.first %}
+                            <td style="padding-top: 10px;" class="text-center" rowspan="{{ asiento.detalles|length }}">
+                                {{ asiento.numero_correlativo }}
+                            </td>
+                            <td class="text-center" style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">
+                                {{ asiento.fecha_asiento.strftime('%d/%m/%Y') }}
+                            </td>
+                            <td class="text-center" style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">
+                                {{ asiento.glosa }}
+                            </td>
+                            <td class="text-center" style="padding: 20px 40px; white-space: nowrap;"
+                                rowspan="{{ asiento.detalles|length }}">
+                                {{ asiento.num_comprobante }}
+                            </td>
                             {% endif %}
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <th colspan="6" class="text-end" style="font-weight: bold; color: #000;">TOTAL (S/.)</th>
-                                <th style="font-weight: bold; font-size: 15px; color: #000;" class="text-end">
-                                    {{ totales.total_debe | round(2) }}
-                                </th>
-                                <th style="font-weight: bold; font-size: 15px; color: #000;" class="text-end">
-                                    {{ totales.total_haber | round(2) }}
-                                </th>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
+                            <td>{{ detalle.codigo_cuenta }}</td>
+                            <td class="text-center" style="padding: 15px 15px;">{{ detalle.nombre_cuenta }}</td>
+                            <td class="text-end">{{ detalle.debe if detalle.debe != 0 else '-' }}</td>
+                            <td class="text-end">{{ detalle.haber if detalle.haber != 0 else '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% endfor %}
+                    {% else %}
+                    <tbody>
+                        <tr>
+                            <td colspan="8" class="text-center">No se encontraron registros para el criterio
+                                seleccionado.</td>
+                        </tr>
+                    </tbody>
+                    {% endif %}
+                    <tfoot>
+                        <tr>
+                            <th colspan="6" class="text-end" style="font-weight: bold; color: #000; font-size: 14px;">TOTAL (S/.)</th>
+                            <th style="font-weight: bold; font-size: 14px; color: #000;" class="text-end">
+                                {{ totales.total_debe | round(2) }}
+                            </th>
+                            <th style="font-weight: bold; font-size: 14px; color: #000;" class="text-end">
+                                {{ totales.total_haber | round(2) }}
+                            </th>
+                        </tr>
+                    </tfoot>
+                </table>
             </div>
         </div>
     </div>
@@ -314,7 +360,7 @@
     <!-- Tab: Libro Mayor -->
     <div class="tab-pane fade" id="libro-mayor">
         <div class="card bg-white rounded custom-shadow p-4">
-            <header class="d-flex justify-content-between align-items-center mb-4">
+            <header class="d-flex justify-content-between align-items-center mb-2">
                 <h1 class="h4 mb-0 d-flex align-items-center" style="font-weight: bold;">
                     <span></span>
                     LIBRO MAYOR
@@ -323,7 +369,7 @@
                 <div class="dropdown me-2">
                     <button class="btn btn-light border dropdown-toggle" type="button" id="dropdownMenuButton"
                         data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Más acciones
+                        Exportar datos
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         <a class="dropdown-item d-flex flex-column"
@@ -344,7 +390,7 @@
                 </div>
             </header>
 
-            <p class="text-muted small mb-4">Consulta el detalle de los movimientos registrados, clasificados por
+            <p class="text-muted small mb-3">Consulta el detalle de los movimientos registrados, clasificados por
                 cuentas, mostrando los debe, haber y saldos</p>
             <div class="container">
                 <form class="row g-3">
@@ -449,7 +495,7 @@
                 <div class="dropdown me-2">
                     <button class="btn btn-light border dropdown-toggle" type="button" id="dropdownMenuButton"
                         data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Más acciones
+                        Exportar datos
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         <a class="dropdown-item d-flex flex-column"
@@ -471,7 +517,7 @@
             </header>
 
 
-            <p class="text-muted small mb-4">Registro detallado de todas las adquisiciones realizadas por la
+            <p class="text-muted small mb-2">Registro detallado de todas las adquisiciones realizadas por la
                 empresa,
                 utilizado para control de gastos y cálculo de créditos fiscales.</p>
             <div class="container">
@@ -505,7 +551,7 @@
 
 
 
-            <div class="table-responsive mt-4 mb-4">
+            <div class="table-responsive mt-2 mb-2">
                 <table id="tabla_compras" class="table table-bordered table-hover">
                     <thead class="table-light">
                         <tr>
@@ -566,7 +612,7 @@
                 <div class="dropdown me-2">
                     <button class="btn btn-light border dropdown-toggle" type="button" id="dropdownMenuButton"
                         data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Más acciones
+                        Exportar datos
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         <a class="dropdown-item d-flex flex-column"
@@ -589,7 +635,7 @@
             </header>
 
 
-            <p class="text-muted small mb-4">Registro detallado de todas las adquisiciones realizadas por la
+            <p class="text-muted small mb-3">Registro detallado de todas las adquisiciones realizadas por la
                 empresa,
                 utilizado para control de gastos y cálculo de créditos fiscales.</p>
             <div class="container">
@@ -621,7 +667,7 @@
 
 
 
-            <div class="table-responsive mt-4 mb-4">
+            <div class="table-responsive mt-2 mb-2">
                 <table class="table table-bordered table-hover">
                     <thead class="table-light">
                         <tr>
@@ -681,7 +727,7 @@
                 <div class="dropdown me-2">
                     <button class="btn btn-light border dropdown-toggle" type="button" id="dropdownMenuButton"
                         data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Más acciones
+                        Exportar datos
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         <a class="dropdown-item d-flex flex-column" href="#">
