@@ -91,8 +91,10 @@ def reportes():
     tipo_registro = request.args.get('tipo_registro', 'Todas')
     daterange = request.args.get('daterange', '')
     daterange_mayor = request.args.get('daterangemayor', '')  # Segundo rango de fechas específico para el Libro Mayor
+    daterange_caja = request.args.get('daterangecaja', '')
     start_date, end_date = None, None
     start_date_mayor, end_date_mayor = None, None
+    start_date_caja, end_date_caja = None, None
 
     from datetime import datetime, timedelta
 
@@ -132,10 +134,27 @@ def reportes():
         except (ValueError, IndexError) as e:
             print(f"Error processing date range for Libro Mayor: {e}")
 
+    if daterange_caja:
+        try:
+            dates_caja = daterange_caja.split(' to ')
+            if len(dates_caja) == 2:
+                start_date_caja = datetime.strptime(dates_caja[0].strip(), '%m/%Y').date()
+                end_date_caja = datetime.strptime(dates_caja[1].strip(), '%m/%Y').date()
+                # Calcular el último día del mes para el segundo mes
+                end_date_caja = end_date_caja.replace(day=1) + timedelta(days=31)
+                end_date_caja = end_date_caja.replace(day=1) - timedelta(days=1)
+            elif len(dates_caja) == 1:
+                # Si solo hay un mes, se usa como inicio y fin del mes
+                start_date_caja = datetime.strptime(dates_caja[0].strip(), '%m/%Y').date()
+                end_date_caja = start_date_caja.replace(day=1) + timedelta(days=31)
+                end_date_caja = end_date_caja.replace(day=1) - timedelta(days=1)
+        except (ValueError, IndexError) as e:
+            print(f"Error processing date range for Libro Caja: {e}")
+
     # Obtiene los datos aplicando el filtro de fechas correspondiente
     asientos, totales = obtener_asientos_agrupados(tipo_registro, start_date, end_date)
     libro_mayor_data, total_debe, total_haber = obtener_libro_mayor_agrupado_por_fecha(start_date_mayor, end_date_mayor)
-    lista_libro_caja, total_caja = obtener_libro_caja()
+    lista_libro_caja, total_caja = obtener_libro_caja(start_date_caja, end_date_caja)
     lista_libro_caja_cuenta_corriente, total_caja_corriente = obtener_libro_caja_cuenta_corriente()
 
     registro_venta_data, totale = obtener_registro_ventas()

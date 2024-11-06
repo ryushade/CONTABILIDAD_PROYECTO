@@ -850,155 +850,155 @@
                         </a>
                     </div>
                 </div>
-
             </header>
 
-            <p class="text-muted small mb-4">Registro detallado las operaciones que implican la entrada o salida de
+            <p class="text-muted small mb-4">Registro detallado de las operaciones que implican la entrada o salida de
                 efectivo en una empresa.</p>
 
-            <div class="nav nav-tabs">
-                <a class="nav-item nav-link active" href="#efectivo" data-bs-toggle="tab">
-                    <i class="fas fa-book"></i> Efectivo
-                </a>
-                <a class="nav-item nav-link" href="#cuenta-corriente" data-bs-toggle="tab">
-                    <i class="fas fa-book"></i> Cuenta corriente
-                </a>
-            </div>
-
-
+            <!-- Filtro y selección de fecha -->
             <div class="container">
+                <form id="filterFormCaja" class="row g-3 mb-3" method="GET" action="{{ url_for('contable.reportes') }}">
+                    <input type="hidden" name="active_tab" id="activeTabInput" value="libro-caja">
+                    <!-- Aquí aseguramos que la pestaña "Efectivo" esté seleccionada -->
 
-                <form class="row g-3 mb-3 align-items-end">
                     <div class="col-md-3">
-                        <style>
-                            .required-asterisk {
-                                color: red;
-                            }
-                        </style>
-
-                        <label for="daterange" class="form-label" style="font-size: 14px;">
-                            Fecha <span class="required-asterisk">*</span>
+                        <label for="daterangecaja" class="form-label" style="font-size: 14px;">
+                            Fecha<span class="required-asterisk">*</span>
                         </label>
-                        <div class="input-group mb-3">
+                        <div class="input-group">
                             <span class="input-group-text" id="basic-addon1">
                                 <i class="fas fa-calendar-alt"></i>
                             </span>
-                            <input type="text" class="form-control" id="daterange" placeholder="Selecciona mes y año"
-                                aria-label="Fecha" aria-describedby="basic-addon1">
+                            <input type="text" class="form-control" id="daterangecaja" name="daterangecaja"
+                                placeholder="Selecciona mes y año" aria-label="Fecha" aria-describedby="basic-addon1"
+                                value="{{ request.args.get('daterangecaja', '') }}">
                         </div>
-
-
-
                     </div>
 
-
+                    <div class="col-md-2">
+                        <div class="mt-4">
+                            <a href="{{ url_for('contable.reportes', active_tab='libro-caja') }}"
+                                class="btn btn-secondary mt-2"
+                                style="background-color: rgb(226, 39, 39); border: none; color: white;"
+                                onmouseover="this.style.backgroundColor='rgb(180, 20, 20)';"
+                                onmouseout="this.style.backgroundColor='rgb(226, 39, 39)';">
+                                <i class="fa-solid fa-filter"></i> Borrar filtros
+                            </a>
+                        </div>
+                    </div>
                 </form>
 
-            </div>
-            <div class="tab-content">
-                <!-- Tab: Libro Caja - Efectivo -->
-                <div class="tab-pane show active" id="efectivo">
-                    <div class="table-responsive mb-4">
-                        <table class="table table-bordered table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th rowspan="2" class="text-center">FECHA</th>
-                                    <th rowspan="2" class="text-center">DESCRIPCIÓN</th>
-                                    <th colspan="2" class="text-center">CUENTA CONTABLE ASOCIADA</th>
-                                    <th colspan="2" class="text-center">SALDOS Y MOVIMIENTOS</th>
-                                </tr>
-                                <tr>
-                                    <th class="text-center">CÓDIGO</th>
-                                    <th class="text-center">DENOMINACIÓN</th>
-                                    <th class="text-center">DEUDOR</th>
-                                    <th class="text-center">ACREEDOR</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% if lista_libro_caja %}
-                                {% for lista in lista_libro_caja %}
-                                <tr>
-                                    <td>{{lista.fecha}}</td>
-                                    <td>{{lista.glosa}}</td>
-                                    <td>{{lista.cod_cuenta}}</td>
-                                    <td>{{lista.nombre_cuenta}}</td>
-                                    <td>{{lista.debe | round(2)}}</td>
-                                    <td>{{lista.haber | round(2)}}</td>
-                                </tr>
-                                {% endfor %}
-                                {% endif %}
-                            </tbody>
-                            <tfoot>
-                                {% if total_caja %}
-                                <tr>
+                <!-- Pestañas de navegación -->
+                <ul class="nav nav-tabs" id="myTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link {% if active_tab == 'libro-caja' %}active{% endif %}" id="efectivo-tab" data-bs-toggle="tab" href="#efectivo" role="tab" aria-controls="efectivo" aria-selected="true">Efectivo</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link {% if active_tab == 'cuenta-corriente' %}active{% endif %}" id="cuenta-corriente-tab" data-bs-toggle="tab" href="#cuenta-corriente" role="tab" aria-controls="cuenta-corriente" aria-selected="false">Cuenta Corriente</a>
+                    </li>
+                </ul>
 
-                                    <th colspan="4" class="text-end" style="font-weight: bold;">TOTALES</th>
-                                    <th style="font-weight: bold;">{{total_caja.debe | round(2)}}</th>
-                                    <th style="font-weight: bold;">{{total_caja.haber | round(2)}}</th>
-
-                                </tr>
-                                {% endif %}
-                            </tfoot>
-                        </table>
-
+                <!-- Contenido de las pestañas -->
+                <div class="tab-content">
+                    <!-- Tab: Libro Caja - Efectivo -->
+                    <div class="tab-pane show active" id="efectivo">
+                        <div class="table-responsive mb-4">
+                            <table class="table table-bordered table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th rowspan="2" class="text-center">FECHA</th>
+                                        <th rowspan="2" class="text-center">DESCRIPCIÓN</th>
+                                        <th colspan="2" class="text-center">CUENTA CONTABLE ASOCIADA</th>
+                                        <th colspan="2" class="text-center">SALDOS Y MOVIMIENTOS</th>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-center">CÓDIGO</th>
+                                        <th class="text-center">DENOMINACIÓN</th>
+                                        <th class="text-center">DEUDOR</th>
+                                        <th class="text-center">ACREEDOR</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if lista_libro_caja %}
+                                    {% for lista in lista_libro_caja %}
+                                    <tr>
+                                        <td>{{ lista.fecha }}</td>
+                                        <td>{{ lista.glosa }}</td>
+                                        <td>{{ lista.cod_cuenta }}</td>
+                                        <td>{{ lista.nombre_cuenta }}</td>
+                                        <td>{{ lista.debe | round(2) }}</td>
+                                        <td>{{ lista.haber | round(2) }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% endif %}
+                                </tbody>
+                                <tfoot>
+                                    {% if total_caja %}
+                                    <tr>
+                                        <th colspan="4" class="text-end" style="font-weight: bold;">TOTALES</th>
+                                        <th style="font-weight: bold;">{{ total_caja.debe | round(2) }}</th>
+                                        <th style="font-weight: bold;">{{ total_caja.haber | round(2) }}</th>
+                                    </tr>
+                                    {% endif %}
+                                </tfoot>
+                            </table>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Tab: Libro Caja - Cuenta Corriente -->
-                <div class="tab-pane fade" id="cuenta-corriente">
-                    <div class="table-responsive mb-4">
-                        <table class="table table-bordered table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th rowspan="2" class="text-center">FECHA</th>
-                                    <th colspan="4" class="text-center">OPERACIÓNES BANCARIAS</th>
-                                    <th colspan="2" class="text-center">CUENTA CONTABLE</th>
-                                    <th colspan="2" class="text-center">SALDOS Y MOVIMIENTOS</th>
-                                </tr>
-                                <tr>
-                                    <th class="text-center">MEDIO DE PAGO</th>
-                                    <th class="text-center">DESCRIPCIÓN</th>
-                                    <th class="text-center">RAZÓN SOCIAL</th>
-                                    <th class="text-center">COMPROBANTE</th>
-                                    <th class="text-center">CÓDIGO</th>
-                                    <th class="text-center">DENOMINACIÓN</th>
-                                    <th class="text-center">DEUDOR</th>
-                                    <th class="text-center">ACREEDOR</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% if lista_libro_caja_cuenta_corriente %}
-                                {% for lista in lista_libro_caja_cuenta_corriente %}
-                                <tr>
-                                    <td>{{lista.fecha}}</td>
-                                    <td>{{lista.forma_pago}}</td>
-                                    <td>{{lista.nombre_cuenta}}</td>
-                                    <td>{{lista.nombre}}</td>
-                                    <td>{{lista.comprobante}}</td>
-                                    <td>{{lista.codigo}}</td>
-                                    <td>{{lista.denominacion}}</td>
-                                    <td>{{lista.debe | round(2)}}</td>
-                                    <td>{{lista.haber | round(2)}}</td>
-                                </tr>
-                                {% endfor %}
-                                {% endif %}
-                            </tbody>
-                            <tfoot>
-                                {% if total_caja_corriente %}
-                                <tr>
-                                    <th colspan="7" class="text-end" style="font-weight: bold;">TOTALES</th>
-                                    <th style="font-weight: bold;">{{total_caja_corriente.debe | round(2)}}</th>
-                                    <th style="font-weight: bold;">{{total_caja_corriente.haber | round(2)}}</th>
-                                </tr>
-                                {% endif %}
-                            </tfoot>
-                        </table>
-
+                    <!-- Tab: Libro Caja - Cuenta Corriente -->
+                    <div class="tab-pane fade" id="cuenta-corriente">
+                        <div class="table-responsive mb-4">
+                            <table class="table table-bordered table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th rowspan="2" class="text-center">FECHA</th>
+                                        <th colspan="4" class="text-center">OPERACIÓNES BANCARIAS</th>
+                                        <th colspan="2" class="text-center">CUENTA CONTABLE</th>
+                                        <th colspan="2" class="text-center">SALDOS Y MOVIMIENTOS</th>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-center">MEDIO DE PAGO</th>
+                                        <th class="text-center">DESCRIPCIÓN</th>
+                                        <th class="text-center">RAZÓN SOCIAL</th>
+                                        <th class="text-center">COMPROBANTE</th>
+                                        <th class="text-center">CÓDIGO</th>
+                                        <th class="text-center">DENOMINACIÓN</th>
+                                        <th class="text-center">DEUDOR</th>
+                                        <th class="text-center">ACREEDOR</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if lista_libro_caja_cuenta_corriente %}
+                                    {% for lista in lista_libro_caja_cuenta_corriente %}
+                                    <tr>
+                                        <td>{{ lista.fecha }}</td>
+                                        <td>{{ lista.forma_pago }}</td>
+                                        <td>{{ lista.nombre_cuenta }}</td>
+                                        <td>{{ lista.nombre }}</td>
+                                        <td>{{ lista.comprobante }}</td>
+                                        <td>{{ lista.codigo }}</td>
+                                        <td>{{ lista.denominacion }}</td>
+                                        <td>{{ lista.debe | round(2) }}</td>
+                                        <td>{{ lista.haber | round(2) }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% endif %}
+                                </tbody>
+                                <tfoot>
+                                    {% if total_caja_corriente %}
+                                    <tr>
+                                        <th colspan="6" class="text-end" style="font-weight: bold;">TOTALES</th>
+                                        <th style="font-weight: bold;">{{ total_caja_corriente.debe | round(2) }}</th>
+                                        <th style="font-weight: bold;">{{ total_caja_corriente.haber | round(2) }}</th>
+                                    </tr>
+                                    {% endif %}
+                                </tfoot>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 
 
@@ -1193,6 +1193,25 @@
                 onClose: function (selectedDates, dateStr, instance) {
                     if (selectedDates.length === 2) {
                         document.getElementById('filterFormMayor').submit();
+                    }
+                }
+            });
+
+            flatpickr("#daterangecaja", {
+                mode: "range",
+                dateFormat: "m/Y",
+                minDate: "01/1900",
+                maxDate: "04/2028",
+                plugins: [
+                    new monthSelectPlugin({
+                        dateFormat: "m/Y",
+                        altFormat: "F Y",
+                        altInput: true
+                    })
+                ],
+                onClose: function (selectedDates, dateStr, instance) {
+                    if (selectedDates.length === 2) {
+                        document.getElementById('filterFormCaja').submit();
                     }
                 }
             });

@@ -933,11 +933,11 @@ def obtener_registro_compras():
 
 
 # xd
-def obtener_libro_caja():
+def obtener_libro_caja(start_date=None, end_date=None):
     conexion = obtener_conexion()
     try:
         with conexion.cursor(DictCursor) as cursor:
-            cursor.execute("""
+            query = """
                 SELECT ac.fecha_asiento as fecha, ac.glosa as glosa, cu.codigo_cuenta as cod_cuenta, 
                 cu.nombre_cuenta as nombre_cuenta,
                     CASE 
@@ -945,15 +945,20 @@ def obtener_libro_caja():
                         ELSE 0 
                     END AS debe,
                     CASE 
-                    WHEN ac.tipo_asiento = 'compra_contado' THEN SUM(da.haber) 
+                        WHEN ac.tipo_asiento = 'compra_contado' THEN SUM(da.haber) 
                         ELSE 0 
                     END AS haber
                 FROM asiento_contable ac
                 INNER JOIN detalle_asiento da ON da.id_asiento = ac.id_asiento
                 INNER JOIN cuenta cu ON da.id_cuenta = cu.id_cuenta
+                WHERE (%(start_date)s IS NULL OR ac.fecha_asiento >= %(start_date)s)
+                AND (%(end_date)s IS NULL OR ac.fecha_asiento <= %(end_date)s)
                 GROUP BY ac.id_asiento, cu.id_cuenta, cu.nombre_cuenta
-                HAVING (debe > 0 OR haber > 0);
-            """)
+                HAVING (debe > 0 OR haber > 0)
+                ORDER BY ac.fecha_asiento, cu.codigo_cuenta;
+            """
+            params = {'start_date': start_date, 'end_date': end_date}
+            cursor.execute(query, params)
             resultados = cursor.fetchall()
 
         total_debe_caja = Decimal("0.00")
