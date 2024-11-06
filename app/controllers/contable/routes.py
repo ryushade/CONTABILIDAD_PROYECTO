@@ -345,7 +345,7 @@ def actualizar_regla(id_regla):
 @role_required('ADMIN', 'CONTADOR')
 def reglas():
     page = request.args.get('page', default=1, type=int)
-    per_page = request.args.get('per_page', default=50, type=int)
+    per_page = request.args.get('per_page', default=5, type=int)
 
     reglas, total_results = obtener_reglas(page, per_page)
 
@@ -368,7 +368,7 @@ def reglas():
 @role_required('ADMIN')
 def usuarios():
     page = request.args.get('page', default=1, type=int)
-    per_page = request.args.get('per_page', default=50, type=int)
+    per_page = request.args.get('per_page', default=5, type=int)
 
     usuarios, total_results = obtener_usuarios(page, per_page)
     roles = obtener_roles()
