@@ -1224,3 +1224,101 @@ def exportar_registro_compras_pdf():
     output.seek(0)
 
     return send_file(output, download_name="registro_compras.pdf", as_attachment=True)
+
+
+@accounting_bp.route('/exportar_libro_caja_excel', methods=['GET'])
+def exportar_libro_caja_excel():
+    # Define la ruta de la plantilla de Excel
+    template_path = os.path.join(current_app.root_path, 'templates', 'contable', 'plantillas', 'libro_caja.xlsx')
+    
+    # Verifica si la plantilla existe
+    if not os.path.exists(template_path):
+        return "La plantilla de Excel no se encontró.", 404
+    
+    output = BytesIO()
+    workbook = load_workbook(template_path)
+    worksheet = workbook.active
+    
+    # Obtener la fecha actual y formatearla
+    fecha_actual = datetime.now()
+    mes_anio_actual = fecha_actual.strftime('%m/%Y')
+    
+    # Llenar las celdas con los datos de encabezado
+    worksheet['B3'] = mes_anio_actual
+    worksheet['B4'] = '20610588981'  # Ejemplo de RUC
+    worksheet['B5'] = 'Tormenta'  # Nombre de la empresa
+    
+    # Define la fila inicial para los datos (ajustado para evitar filas extra)
+    start_row = 9  # Cambiado a la fila 9 para evitar la fila adicional
+    lista_libro_caja, total_caja = obtener_libro_caja()
+
+    # Borde delgado para las celdas
+    thin_border = Border(
+        left=Side(style='thin', color='000000'),
+        right=Side(style='thin', color='000000'),
+        top=Side(style='thin', color='000000'),
+        bottom=Side(style='thin', color='000000')
+    )
+
+    # Estilo de fuente y alineación
+    normal_font = Font(bold=False)
+    right_alignment = Alignment(horizontal='right', vertical='center')
+    left_alignment = Alignment(horizontal='left', vertical='center')
+    center_alignment = Alignment(horizontal='center', vertical='center')
+
+    # Variable para el número correlativo
+    numero_correlativo = 1
+
+    # Itera sobre los datos y llénalos en el Excel
+    current_row = start_row
+    for row in lista_libro_caja:
+        worksheet[f'A{current_row}'] = numero_correlativo
+        worksheet[f'B{current_row}'] = row['fecha']
+        worksheet[f'C{current_row}'] = row['glosa']
+        worksheet[f'D{current_row}'] = row['cod_cuenta']
+        worksheet[f'E{current_row}'] = row['nombre_cuenta']
+        worksheet[f'F{current_row}'] = row['debe']
+        worksheet[f'G{current_row}'] = row['haber']
+
+        # Aplica bordes y alineación
+        for col in ['A', 'B', 'C', 'D', 'E', 'F', 'G']:
+            cell = worksheet[f'{col}{current_row}']
+            cell.border = thin_border
+            cell.font = normal_font
+
+        # Alineación específica para columnas
+        worksheet[f'A{current_row}'].alignment = center_alignment
+        worksheet[f'B{current_row}'].alignment = center_alignment
+        worksheet[f'C{current_row}'].alignment = left_alignment
+        worksheet[f'D{current_row}'].alignment = center_alignment
+        worksheet[f'E{current_row}'].alignment = left_alignment
+        worksheet[f'F{current_row}'].alignment = right_alignment
+        worksheet[f'G{current_row}'].alignment = right_alignment
+
+        # Incrementa el número correlativo y la fila actual
+        numero_correlativo += 1
+        current_row += 1
+
+    # Agrega los totales en la última fila
+    total_row = current_row
+    worksheet.merge_cells(f'A{total_row}:E{total_row}')
+    worksheet[f'A{total_row}'] = "Total"
+    worksheet[f'F{total_row}'] = total_caja['debe']
+    worksheet[f'G{total_row}'] = total_caja['haber']
+
+    # Aplica formato y bordes a los totales
+    for col in ['A', 'F', 'G']:
+        cell = worksheet[f'{col}{total_row}']
+        cell.border = thin_border
+        cell.alignment = right_alignment
+
+    # Asegura el ancho de las columnas para mejor visibilidad
+    column_widths = {'A': 38, 'B': 15, 'C': 60, 'D': 15, 'E': 30, 'F': 15, 'G': 15}
+    for column, width in column_widths.items():
+        worksheet.column_dimensions[column].width = width
+
+    # Guarda el archivo en el buffer y lo envía
+    workbook.save(output)
+    output.seek(0)
+    
+    return send_file(output, download_name="libro_caja.xlsx", as_attachment=True)
