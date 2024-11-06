@@ -9,85 +9,26 @@
 
 
 <header class="mb-4">
-    {{ breadcrumb([
-    {'label': 'Inicio', 'url': url_for('inicio'), 'icon': 'M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0
-    001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0
-    001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z'},
-    {'label': 'Productos', 'url': url_for('transaccional.productos')}
-    ]) }}
+
 </header>
 <!-- Tabs de Reporte -->
 <div class="mb-4">
     <div class="nav nav-tabs">
-        <a class="nav-item nav-link active" href="#productos" data-toggle="tab">
-            <i class="fas fa-box-open"></i> Productos
-        </a>
-        <a class="nav-item nav-link" href="#marcas" data-toggle="tab">
+        
+        <| class="nav-item nav-link" href="#marcas" data-bs-toggle="tab">
             <i class="fas fa-tags"></i> Marcas
         </a>
-        <a class="nav-item nav-link" href="#categorias" data-toggle="tab">
+        <a class="nav-item nav-link" href="#categorias" data-bs-toggle="tab">
             <i class="fas fa-th-large"></i> Categorias
         </a>
-        <a class="nav-item nav-link" href="#subcategorias" data-toggle="tab">
+        <a class="nav-item nav-link" href="#subcategorias" data-bs-toggle="tab">
             <i class="fas fa-th-list"></i> Subcategorias
         </a>
     </div>
 </div>
 <div class="tab-content">
     <!-- Sistema Transaccional -->
-    <div class="tab-pane fade show active" id="productos">
-        <!-- Detalles -->
-        <div class="mb-4">
-            <hr>
-            <h1 class="font-weight-bold display-8 text-left" style="font-size: 28px;">LISTADO DE PRODUCTOS</h1>
-        </div>
-        <div class="table-container" style="margin-top: 20px;">
-            <table>
-                <thead>
-                    <tr>
-                        <th class="text-center">DESCRIPCIÓN</th>
-                        <th class="text-center">LÍNEA</th>
-                        <th class="text-center">SUB-LÍNEA</th>
-                        <th class="text-center">PRECIO (S/.)</th>
-                        <th class="text-center">COD BARRAS</th>
-                        <th class="text-center">ESTADO</th>
-                        <th class="text-center acciones">ACCIONES</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for producto in productos %}
-                    <tr>
-                        <td class="text-align">{{ producto.descripcion}}</td>
-                        <td class="text-align">{{producto.nom_marca}}</td>
-                        <td class="text-center">{{producto.nom_subcat}}</td>
-                        <td class="text-center">{{producto.precio}}</td>
-                        <td class="text-center">{{producto.cod_barras}}</td>
-                        <td class="text-center"><span class="
-                            status 
-                            {% if producto.estado_producto == 1 %}
-                                active-c                            
-                            {% else %}
-                                inactive
-                            {% endif %}
-                        ">
-                                {% if producto.estado_producto == 1 %}
-                                Activo
-                                {% else %}
-                                Inactivo
-                                {% endif %}
-                            </span>
-                        </td>
-
-                        <td class="text-center actions">
-                            <span class="action-button secondary edit"><i class="fas fa-edit"></i></span>
-                            <span class="action-button secondary delete"><i class="fas fa-trash-alt"></i></span>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+    <!--  -->
     <!-- Sistema Contable -->
     <div class="tab-pane fade" id="marcas">
         <div class="mb-4">
