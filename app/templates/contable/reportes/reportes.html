@@ -584,11 +584,11 @@
                     <tfoot>
 
                         <tr>
-                            <th colspan="6" class="text-end" style="font-weight: bold;">TOTALES</th>
-                            <th class="text-end" style="font-weight: bold;">{{ totale.total_importe | round(2) }}
+                            <th colspan="5" class="text-end" style="font-weight: bold;">TOTALES</th>
+                            <th class="text-end" style="font-weight: bold;">{{ totalesCompras.total_importe | round(2) }}
                             </th>
-                            <th class="text-end" style="font-weight: bold;">{{ totale.total_igv | round(2) }}</th>
-                            <th class="text-end" style="font-weight: bold;">{{ totale.total_general | round(2) }}
+                            <th class="text-end" style="font-weight: bold;">{{ totalesCompras.total_igv | round(2) }}</th>
+                            <th class="text-end" style="font-weight: bold;">{{ totalesCompras.total_general | round(2) }}
                             </th>
                         </tr>
                     </tfoot>
@@ -697,9 +697,7 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th colspan="6" class="text-end" style="font-weight: bold;">TOTALES</th>
-                            <th class="text-end" style="font-weight: bold;">{{ totale.total_importe | round(2) }}
-                            </th>
+                            
                             <th colspan="5" class="text-end" style="font-weight: bold;">TOTALES</th>
                             <th class="text-end" style="font-weight: bold;">{{ totale.total_importe | round(2) }}
                             </th>
