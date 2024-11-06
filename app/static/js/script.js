@@ -241,14 +241,7 @@ function submitAddUsuario(event) {
     });
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-  // Verifica si el mensaje de alerta debe mostrarse
-  {% if session.get('show_permission_alert') %}
-      document.getElementById("permissionAlert").style.display = "flex";
-      // Limpia la variable de la sesión después de mostrar el mensaje
-      {% set session['show_permission_alert'] = None %}
-  {% endif %}
-});
+
 
 function openModalAdd() {
   document.getElementById('addAccountModal').style.display = 'flex';

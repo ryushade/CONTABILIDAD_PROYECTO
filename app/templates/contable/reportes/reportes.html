@@ -22,24 +22,21 @@
         color: red;
     }
 
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+        line-height: 1.5;
+        color: var(--text-color);
+        margin: 0;
+        padding: 0;
+    }
+
+
     .table-scroll thead th {
         position: sticky;
         top: 0;
         z-index: 1;
     }
 
-    .table-container {
-        max-width: 100%;
-        overflow-x: auto;
-    }
-
-    .table-scroll {
-        max-height: 400px;
-        /* Ajusta la altura máxima que desees */
-        overflow-y: auto;
-        overflow-x: hidden;
-        /* Evita el scroll horizontal si no es necesario */
-    }
 
     .confirmation-modal-overlay {
         position: fixed;
@@ -80,6 +77,8 @@
 
 
     }
+    
+    
 </style>
 
 <div class="mb-4">
@@ -209,8 +208,9 @@
                             <span class="input-group-text" id="basic-addon1">
                                 <i class="fas fa-calendar-alt"></i>
                             </span>
-                            <input type="text" class="form-control" id="daterange" name="daterange" placeholder="Selecciona mes y año"
-                            aria-label="Fecha" aria-describedby="basic-addon1" value="{{ request.args.get('daterange', '') }}">                        
+                            <input type="text" class="form-control" id="daterange" name="daterange"
+                                placeholder="Selecciona mes y año" aria-label="Fecha" aria-describedby="basic-addon1"
+                                value="{{ request.args.get('daterange', '') }}">
                         </div>
                     </div>
 
@@ -237,7 +237,7 @@
                     </div>
                     <div class="col-md-2">
                         <div class="mt-4">
-                            <a href="{{ url_for('contable.reportes') }}"  class="btn btn-secondary mt-2">
+                            <a href="{{ url_for('contable.reportes') }}" class="btn btn-secondary mt-2">
                                 Borrar filtros <i class="fa-solid fa-filter"></i>
                             </a>
                         </div>
@@ -246,66 +246,68 @@
             </div>
 
 
-            <div class="table-responsive mt-4 mb-4" style="max-height: 400px; overflow-y: auto;">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="text-center">NÚMERO CORRELATIVO</th>
-                            <th class="text-center">FECHA DE LA OPERACIÓN</th>
-                            <th class="text-center">GLOSA O DESCRIPCIÓN</th>
-                            <th class="text-center">NÚMERO DEL DOCUMENTO</th>
-                            <th class="text-center">CÓDIGO</th>
-                            <th class="text-center">DENOMINACIÓN</th>
-                            <th class="text-center">DEBE</th>
-                            <th class="text-center">HABER</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if asientos %}
-                        {% for id_asiento, asiento in asientos.items() %}
-                        {% for detalle in asiento.detalles %}
-                        <tr>
-                            {% if loop.first %}
-                            <td style="padding-top: 20px;" class="text-center" rowspan="{{ asiento.detalles|length }}">
-                                {{ asiento.numero_correlativo }}
-                            </td>
-                            <td style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">
-                                {{ asiento.fecha_asiento.strftime('%d/%m/%Y') }}
-                            </td>
-                            <td style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">{{ asiento.glosa }}
-                            </td>
-                            <td style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">{{
-                                asiento.num_comprobante }}</td>
+            <div class="table-container mt-2">
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="text-center">NÚMERO CORRELATIVO</th>
+                                <th class="text-center">FECHA DE LA OPERACIÓN</th>
+                                <th class="text-center">GLOSA O DESCRIPCIÓN</th>
+                                <th class="text-center">NÚMERO DEL DOCUMENTO</th>
+                                <th class="text-center">CÓDIGO</th>
+                                <th class="text-center">DENOMINACIÓN</th>
+                                <th class="text-center">DEBE</th>
+                                <th class="text-center">HABER</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if asientos %}
+                            {% for id_asiento, asiento in asientos.items() %}
+                            {% for detalle in asiento.detalles %}
+                            <tr>
+                                {% if loop.first %}
+                                <td style="padding-top: 20px;" class="text-center"
+                                    rowspan="{{ asiento.detalles|length }}">
+                                    {{ asiento.numero_correlativo }}
+                                </td>
+                                <td class="text-center" style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">
+                                    {{ asiento.fecha_asiento.strftime('%d/%m/%Y') }}
+                                </td>
+                                <td class="text-center" style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">{{ asiento.glosa
+                                    }}
+                                </td>
+                                <td class="text-center" style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">{{
+                                    asiento.num_comprobante }}</td>
+                                {% endif %}
+                                <td>{{ detalle.codigo_cuenta }}</td>
+                                <td class="text-center">{{ detalle.nombre_cuenta }}</td>
+                                <td class="text-end">{{ detalle.debe if detalle.debe != 0 else '' }}</td>
+                                <td class="text-end">{{ detalle.haber if detalle.haber != 0 else '' }}</td>
+                            </tr>
+                            {% endfor %}
+                            {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center">No se encontraron registros para el criterio
+                                    seleccionado.</td>
+                            </tr>
                             {% endif %}
-                            <td>{{ detalle.codigo_cuenta }}</td>
-                            <td>{{ detalle.nombre_cuenta }}</td>
-                            <td class="text-end">{{ detalle.debe if detalle.debe != 0 else '' }}</td>
-                            <td class="text-end">{{ detalle.haber if detalle.haber != 0 else '' }}</td>
-                        </tr>
-                        {% endfor %}
-                        {% endfor %}
-                        {% else %}
-                        <tr>
-                            <td colspan="8" class="text-center">No se encontraron registros para el criterio
-                                seleccionado.</td>
-                        </tr>
-                        {% endif %}
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th colspan="6" class="text-end" style="font-weight: bold;">TOTALES (S/.)</th>
-                            <th style="font-weight: bold; font-size: 15px;" class="text-end">
-                                {{ totales.total_debe | round(2) }}
-                            </th>
-                            <th style="font-weight: bold; font-size: 15px;" class="text-end">
-                                {{ totales.total_haber | round(2) }}
-                            </th>
-                        </tr>
-                    </tfoot>
-                </table>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="6" class="text-end" style="font-weight: bold; color: #000;">TOTAL (S/.)</th>
+                                <th style="font-weight: bold; font-size: 15px; color: #000;" class="text-end">
+                                    {{ totales.total_debe | round(2) }}
+                                </th>
+                                <th style="font-weight: bold; font-size: 15px; color: #000;" class="text-end">
+                                    {{ totales.total_haber | round(2) }}
+                                </th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
             </div>
-
-
         </div>
     </div>
 
@@ -537,9 +539,11 @@
 
                         <tr>
                             <th colspan="6" class="text-end" style="font-weight: bold;">TOTALES</th>
-                            <th class="text-end" style="font-weight: bold;">{{ totale.total_importe | round(2) }}</th>
+                            <th class="text-end" style="font-weight: bold;">{{ totale.total_importe | round(2) }}
+                            </th>
                             <th class="text-end" style="font-weight: bold;">{{ totale.total_igv | round(2) }}</th>
-                            <th class="text-end" style="font-weight: bold;">{{ totale.total_general | round(2) }}</th>
+                            <th class="text-end" style="font-weight: bold;">{{ totale.total_general | round(2) }}
+                            </th>
                         </tr>
                     </tfoot>
                 </table>
@@ -651,7 +655,8 @@
                             <th class="text-end" style="font-weight: bold;">{{ totale.total_importe | round(2) }}
                             </th>
                             <th colspan="5" class="text-end" style="font-weight: bold;">TOTALES</th>
-                            <th class="text-end" style="font-weight: bold;">{{ totale.total_importe | round(2) }}</th>
+                            <th class="text-end" style="font-weight: bold;">{{ totale.total_importe | round(2) }}
+                            </th>
                             <th class="text-end" style="font-weight: bold;">{{ totale.total_igv | round(2) }}</th>
                             <th class="text-end" style="font-weight: bold;">{{ totale.total_general | round(2) }}
                             </th>
@@ -774,11 +779,11 @@
                             <tfoot>
                                 {% if total_caja %}
                                 <tr>
-                                    
+
                                     <th colspan="4" class="text-end" style="font-weight: bold;">TOTALES</th>
                                     <th style="font-weight: bold;">{{total_caja.debe | round(2)}}</th>
                                     <th style="font-weight: bold;">{{total_caja.haber | round(2)}}</th>
-                                    
+
                                 </tr>
                                 {% endif %}
                             </tfoot>

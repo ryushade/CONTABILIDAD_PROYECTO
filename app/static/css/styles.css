@@ -2,10 +2,15 @@
 
 * {
   font-family: 'Inter', sans-serif;
-  
+
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: 'Inter', sans-serif;
 }
 
@@ -59,11 +64,13 @@ p {
 }
 
 .text-sm {
-  font-size: 0.875rem; /* 14px */
+  font-size: 0.875rem;
+  /* 14px */
 }
 
 .text-gray-500 {
-  color: #6b7280; /* Gray color */
+  color: #6b7280;
+  /* Gray color */
 }
 
 /* styles.css */
@@ -95,7 +102,7 @@ h1.text-5xl {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
   letter-spacing: 2px;
   background: rgb(2, 0, 36);
-  background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(7,6,89,1) 5%, rgba(0,212,255,1) 59%, rgb(7, 123, 168) 100%);
+  background: linear-gradient(90deg, rgba(2, 0, 36, 1) 0%, rgba(7, 6, 89, 1) 5%, rgba(0, 212, 255, 1) 59%, rgb(7, 123, 168) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   transition: all 0.3s ease;
@@ -378,11 +385,10 @@ h1.text-5xl {
 
 .table-container {
   width: 100%;
-  /* Ajusta el ancho al 100% del contenedor */
   margin: 0 auto;
   background-color: white;
   border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
@@ -996,10 +1002,15 @@ tr:hover {
 
 .table-scroll {
   max-height: 400px;
-  /* Adjust the height as needed */
+  /* Ajusta según el espacio que necesites */
   overflow-y: auto;
+  /* Habilita el scroll vertical */
   border: 1px solid var(--border-color);
   border-radius: 8px;
+  padding: 0;
+  /* Remueve cualquier espacio adicional que pueda afectar el scroll */
+  margin: 0;
+  /* Asegura que el contenedor ocupe el espacio adecuado */
 }
 
 .table-scroll::-webkit-scrollbar {
@@ -1056,5 +1067,3 @@ tr:hover {
   background-color: #f8f9fa;
   text-decoration: none;
 }
-
-

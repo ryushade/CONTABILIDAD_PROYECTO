@@ -181,7 +181,6 @@ def ventas():
 
 
 @transactional_bp.route('/addVenta', methods=['POST'])
-@role_required('ADMIN', 'EMPLEADO')
 def add_venta():
     try:
         venta_data = request.cookies.get('ventaData')
