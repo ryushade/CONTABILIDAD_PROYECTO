@@ -1,7 +1,7 @@
 {% macro render_cuenta(cuenta) %}
 <style>
   .accordion-active {
-    background-color: #cff0ff; /* Celeste claro */
+    background-color: #f3fbff; /* Celeste claro */
     border: blue 1px solid;
   }
 </style>
@@ -25,15 +25,16 @@
     <div class="text-center col-1">{{ cuenta['codigo_cuenta'] }}</div>
     <div class="text-align col-4">{{ cuenta['Nombre'] }}</div>
     <div class="text-center col-2">
-      <span class="estado {% if cuenta.naturaleza == 'Deudora' %} deudora {% else %} acreedora {% endif %}">
+      <span class="estado d-block w-75 {% if cuenta.naturaleza == 'Deudora' %} deudora {% else %} acreedora {% endif %}">
         {% if cuenta['naturaleza'] == 'Deudora' %} Deudora {% else %} Acreedora {% endif %}
       </span>
     </div>
-    <div class="text-center col-1">
-      <span class="status {% if cuenta.estado_cuenta == 1 %} active-c {% else %} inactive {% endif %}">
+    <div class="text-center col-1 px-0">
+      <span class="status {% if cuenta.estado_cuenta == 1 %} active-c {% else %} inactive {% endif %} w-100 d-block">
         {% if cuenta['estado_cuenta'] == 1 %} Activo {% else %} Inactivo {% endif %}
       </span>
     </div>
+    
     <div class="text-center actions col-1" style="font-size: 14px">
       <span class="action-button secondary eye" onclick="openModalVer('{{ cuenta['codigo_cuenta'] }}', '{{ cuenta['Nombre'] }}', '{{ cuenta['naturaleza'] }}', '{{ cuenta['nivel'] }}', '{{ cuenta['estado_cuenta'] }}')"><i class="fas fa-eye"></i></span>
       <span class="action-button secondary edit" data-cuenta-id="{{ cuenta['id_cuenta'] }}" onclick="openEditModal2('{{ cuenta.id_cuenta }}')"><i class="fas fa-edit"></i></span>
