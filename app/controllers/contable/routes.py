@@ -87,12 +87,16 @@ def logout():
 @jwt_required()
 @role_required('ADMIN', 'CONTADOR')
 def reportes():
+    active_tab = request.args.get('active_tab', 'libro-diario')
     tipo_registro = request.args.get('tipo_registro', 'Todas')
     daterange = request.args.get('daterange', '')
+    daterange_mayor = request.args.get('daterangemayor', '')  # Segundo rango de fechas específico para el Libro Mayor
     start_date, end_date = None, None
+    start_date_mayor, end_date_mayor = None, None
 
     from datetime import datetime, timedelta
 
+    # Procesa el rango de fechas para el Libro Diario
     if daterange:
         try:
             dates = daterange.split(' to ')
@@ -108,16 +112,53 @@ def reportes():
                 end_date = start_date.replace(day=1) + timedelta(days=31)
                 end_date = end_date.replace(day=1) - timedelta(days=1)
         except (ValueError, IndexError) as e:
-            print(f"Error processing date range: {e}")
+            print(f"Error processing date range for Libro Diario: {e}")
 
+    # Procesa el rango de fechas para el Libro Mayor
+    if daterange_mayor:
+        try:
+            dates_mayor = daterange_mayor.split(' to ')
+            if len(dates_mayor) == 2:
+                start_date_mayor = datetime.strptime(dates_mayor[0].strip(), '%m/%Y').date()
+                end_date_mayor = datetime.strptime(dates_mayor[1].strip(), '%m/%Y').date()
+                # Calcular el último día del mes para el segundo mes
+                end_date_mayor = end_date_mayor.replace(day=1) + timedelta(days=31)
+                end_date_mayor = end_date_mayor.replace(day=1) - timedelta(days=1)
+            elif len(dates_mayor) == 1:
+                # Si solo hay un mes, se usa como inicio y fin del mes
+                start_date_mayor = datetime.strptime(dates_mayor[0].strip(), '%m/%Y').date()
+                end_date_mayor = start_date_mayor.replace(day=1) + timedelta(days=31)
+                end_date_mayor = end_date_mayor.replace(day=1) - timedelta(days=1)
+        except (ValueError, IndexError) as e:
+            print(f"Error processing date range for Libro Mayor: {e}")
+
+    # Obtiene los datos aplicando el filtro de fechas correspondiente
     asientos, totales = obtener_asientos_agrupados(tipo_registro, start_date, end_date)
-    libro_mayor_data, total_debe, total_haber = obtener_libro_mayor_agrupado_por_fecha()
+    libro_mayor_data, total_debe, total_haber = obtener_libro_mayor_agrupado_por_fecha(start_date_mayor, end_date_mayor)
     lista_libro_caja, total_caja = obtener_libro_caja()
     lista_libro_caja_cuenta_corriente, total_caja_corriente = obtener_libro_caja_cuenta_corriente()
 
     registro_venta_data, totale = obtener_registro_ventas()
     registro_compra_data, totales_compra = obtener_registro_compras()
-    return render_template('contable/reportes/reportes.html', asientos=asientos, totales=totales, libro_mayor=libro_mayor_data, total_debe=total_debe, total_haber=total_haber, registros_ventas=registro_venta_data, totale=totale, registros_compras = registro_compra_data,totalesCompras = totales_compra,lista_libro_caja=lista_libro_caja, total_caja=total_caja, lista_libro_caja_cuenta_corriente=lista_libro_caja_cuenta_corriente, total_caja_corriente=total_caja_corriente)
+    
+    return render_template(
+        'contable/reportes/reportes.html', 
+        asientos=asientos, 
+        totales=totales, 
+        libro_mayor=libro_mayor_data, 
+        total_debe=total_debe, 
+        total_haber=total_haber, 
+        registros_ventas=registro_venta_data, 
+        totale=totale, 
+        registros_compras=registro_compra_data,
+        totalesCompras=totales_compra,
+        lista_libro_caja=lista_libro_caja, 
+        total_caja=total_caja, 
+        lista_libro_caja_cuenta_corriente=lista_libro_caja_cuenta_corriente, 
+        total_caja_corriente=total_caja_corriente,
+        active_tab=active_tab
+    )
+
 
 
 import app.models.contable_models as conta
@@ -360,7 +401,7 @@ def actualizar_regla(id_regla):
 @role_required('ADMIN', 'CONTADOR')
 def reglas():
     page = request.args.get('page', default=1, type=int)
-    per_page = request.args.get('per_page', default=50, type=int)
+    per_page = request.args.get('per_page', default=5, type=int)
 
     reglas, total_results = obtener_reglas(page, per_page)
 
@@ -383,7 +424,7 @@ def reglas():
 @role_required('ADMIN')
 def usuarios():
     page = request.args.get('page', default=1, type=int)
-    per_page = request.args.get('per_page', default=50, type=int)
+    per_page = request.args.get('per_page', default=5, type=int)
 
     usuarios, total_results = obtener_usuarios(page, per_page)
     roles = obtener_roles()
@@ -558,8 +599,10 @@ def exportar_libro_diario_excel():
             # Determinar el valor para la columna D
             if 'venta' in asiento['glosa'].lower() or 'ingreso' in asiento['glosa'].lower():
                 worksheet[f'D{current_row}'] = 14
-            elif 'compra' in asiento['glosa'].lower() or 'pago' in asiento['glosa'].lower():
+            elif 'compra' in asiento['glosa'].lower():
                 worksheet[f'D{current_row}'] = 8
+            elif 'pago' in asiento['glosa'].lower():
+                worksheet[f'D{current_row}'] = 1
             else:
                 worksheet[f'D{current_row}'] = ''
             
@@ -1239,3 +1282,101 @@ def exportar_registro_compras_pdf():
     output.seek(0)
 
     return send_file(output, download_name="registro_compras.pdf", as_attachment=True)
+
+
+@accounting_bp.route('/exportar_libro_caja_excel', methods=['GET'])
+def exportar_libro_caja_excel():
+    # Define la ruta de la plantilla de Excel
+    template_path = os.path.join(current_app.root_path, 'templates', 'contable', 'plantillas', 'libro_caja.xlsx')
+    
+    # Verifica si la plantilla existe
+    if not os.path.exists(template_path):
+        return "La plantilla de Excel no se encontró.", 404
+    
+    output = BytesIO()
+    workbook = load_workbook(template_path)
+    worksheet = workbook.active
+    
+    # Obtener la fecha actual y formatearla
+    fecha_actual = datetime.now()
+    mes_anio_actual = fecha_actual.strftime('%m/%Y')
+    
+    # Llenar las celdas con los datos de encabezado
+    worksheet['B3'] = mes_anio_actual
+    worksheet['B4'] = '20610588981'  # Ejemplo de RUC
+    worksheet['B5'] = 'Tormenta'  # Nombre de la empresa
+    
+    # Define la fila inicial para los datos (ajustado para evitar filas extra)
+    start_row = 9  # Cambiado a la fila 9 para evitar la fila adicional
+    lista_libro_caja, total_caja = obtener_libro_caja()
+
+    # Borde delgado para las celdas
+    thin_border = Border(
+        left=Side(style='thin', color='000000'),
+        right=Side(style='thin', color='000000'),
+        top=Side(style='thin', color='000000'),
+        bottom=Side(style='thin', color='000000')
+    )
+
+    # Estilo de fuente y alineación
+    normal_font = Font(bold=False)
+    right_alignment = Alignment(horizontal='right', vertical='center')
+    left_alignment = Alignment(horizontal='left', vertical='center')
+    center_alignment = Alignment(horizontal='center', vertical='center')
+
+    # Variable para el número correlativo
+    numero_correlativo = 1
+
+    # Itera sobre los datos y llénalos en el Excel
+    current_row = start_row
+    for row in lista_libro_caja:
+        worksheet[f'A{current_row}'] = numero_correlativo
+        worksheet[f'B{current_row}'] = row['fecha']
+        worksheet[f'C{current_row}'] = row['glosa']
+        worksheet[f'D{current_row}'] = row['cod_cuenta']
+        worksheet[f'E{current_row}'] = row['nombre_cuenta']
+        worksheet[f'F{current_row}'] = row['debe']
+        worksheet[f'G{current_row}'] = row['haber']
+
+        # Aplica bordes y alineación
+        for col in ['A', 'B', 'C', 'D', 'E', 'F', 'G']:
+            cell = worksheet[f'{col}{current_row}']
+            cell.border = thin_border
+            cell.font = normal_font
+
+        # Alineación específica para columnas
+        worksheet[f'A{current_row}'].alignment = center_alignment
+        worksheet[f'B{current_row}'].alignment = center_alignment
+        worksheet[f'C{current_row}'].alignment = left_alignment
+        worksheet[f'D{current_row}'].alignment = center_alignment
+        worksheet[f'E{current_row}'].alignment = left_alignment
+        worksheet[f'F{current_row}'].alignment = right_alignment
+        worksheet[f'G{current_row}'].alignment = right_alignment
+
+        # Incrementa el número correlativo y la fila actual
+        numero_correlativo += 1
+        current_row += 1
+
+    # Agrega los totales en la última fila
+    total_row = current_row
+    worksheet.merge_cells(f'A{total_row}:E{total_row}')
+    worksheet[f'A{total_row}'] = "Total"
+    worksheet[f'F{total_row}'] = total_caja['debe']
+    worksheet[f'G{total_row}'] = total_caja['haber']
+
+    # Aplica formato y bordes a los totales
+    for col in ['A', 'F', 'G']:
+        cell = worksheet[f'{col}{total_row}']
+        cell.border = thin_border
+        cell.alignment = right_alignment
+
+    # Asegura el ancho de las columnas para mejor visibilidad
+    column_widths = {'A': 38, 'B': 15, 'C': 60, 'D': 15, 'E': 30, 'F': 15, 'G': 15}
+    for column, width in column_widths.items():
+        worksheet.column_dimensions[column].width = width
+
+    # Guarda el archivo en el buffer y lo envía
+    workbook.save(output)
+    output.seek(0)
+    
+    return send_file(output, download_name="libro_caja.xlsx", as_attachment=True)

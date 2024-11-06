@@ -656,22 +656,27 @@ def obtener_asientos_agrupados_excel():
     finally:
         conexion.close()
 
-def obtener_libro_mayor_agrupado_por_fecha():
+def obtener_libro_mayor_agrupado_por_fecha(start_date=None, end_date=None):
     conexion = obtener_conexion()
     try:
         with conexion.cursor(DictCursor) as cursor:
-            cursor.execute("""
+            # Modificar la consulta para incluir el filtro de fechas
+            query = """
                 SELECT cu.codigo_cuenta, cu.nombre_cuenta, a.fecha_asiento, 
                     SUM(d.debe) AS total_debe, SUM(d.haber) AS total_haber
                 FROM asiento_contable a
                 INNER JOIN detalle_asiento d ON a.id_asiento = d.id_asiento
                 INNER JOIN cuenta cu ON cu.id_cuenta = d.id_cuenta
+                WHERE (%(start_date)s IS NULL OR a.fecha_asiento >= %(start_date)s)
+                AND (%(end_date)s IS NULL OR a.fecha_asiento <= %(end_date)s)
                 GROUP BY cu.codigo_cuenta, cu.nombre_cuenta, a.fecha_asiento
                 ORDER BY cu.codigo_cuenta, a.fecha_asiento
-            """)
+            """
+            params = {'start_date': start_date, 'end_date': end_date}
+            cursor.execute(query, params)
             resultados = cursor.fetchall()
 
-        # Agrupar y calcular el saldo por cuenta
+        # Procesamiento de resultados, como agrupar y calcular el saldo por cuenta
         total_debe_global = Decimal("0.00")
         total_haber_global = Decimal("0.00")
         libro_mayor = defaultdict(lambda: {"detalles": [], "saldo": Decimal("0.00")})
@@ -703,6 +708,7 @@ def obtener_libro_mayor_agrupado_por_fecha():
         return libro_mayor, total_debe_global, total_haber_global
     finally:
         conexion.close()
+
 
 
 def obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica():
@@ -872,7 +878,7 @@ def obtener_registro_compras():
                     SUM(dc.cantidad * dc.precio) * 1.18 AS total
                 FROM compra co
                 INNER JOIN detalle_compra dc ON co.id_compra = dc.id_compra
-                INNER JOIN proveedor pr ON pr.id_proveedor = co.id_compra
+                INNER JOIN proveedor pr ON pr.id_proveedor = co.id_proveedor
                 GROUP BY 
                     co.id_compra
                 ORDER BY 
