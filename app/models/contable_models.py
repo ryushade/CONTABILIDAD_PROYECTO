@@ -1014,3 +1014,22 @@ def obtener_id_cuenta(codigo_cuenta):
             return result['id_cuenta'] if result else None
     finally:
         conexion.close()
+        
+def insertar_cuenta(codigo_cuenta, nombre, naturaleza, estado_cuenta):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            sql_cuenta_padre = f"SELECT id_cuenta, nivel, tipo_cuenta FROM cuenta WHERE codigo_cuenta LIKE '{codigo_cuenta[:-1]}%'"
+            cursor.execute(sql_cuenta_padre)
+            result = cursor.fetchone()
+            cuenta_padre = result['id_cuenta']
+            tipo_cuenta = result['tipo_cuenta']
+            nivel = int(result['nivel']) + 1
+            
+            query = """INSERT INTO cuenta (codigo_cuenta, nombre_cuenta, tipo_cuenta, naturaleza, estado_cuenta, cuenta_padre, nivel) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+            cursor.execute(query, (codigo_cuenta, nombre, tipo_cuenta, naturaleza, estado_cuenta, cuenta_padre, nivel))
+            conexion.commit()
+            
+    finally:
+        conexion.close()

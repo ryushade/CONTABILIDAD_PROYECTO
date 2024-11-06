@@ -217,6 +217,21 @@ def editar_cuenta(cuenta_id):
 
     return redirect(url_for('contable.cuentas'))
 
+@accounting_bp.route('/cuentas/registrar', methods=['POST'])
+def registrar_cuenta():
+    codigo_cuenta = request.form['codigo_cuenta_agregar']
+    nombre_cuenta = request.form['nombre_cuenta_agregar']
+    naturaleza = request.form['naturaleza_agregar']
+    estado_cuenta = request.form['estado_cuenta_agregar']
+    print(codigo_cuenta)
+    print(nombre_cuenta)
+    print(naturaleza)
+    print(estado_cuenta)
+    conta.insertar_cuenta(codigo_cuenta, nombre_cuenta, naturaleza, estado_cuenta)
+
+
+    return redirect(url_for('contable.cuentas'))
+
 @accounting_bp.route('/reglas/agregar', methods=['POST'])
 def agregar_regla():
     data = request.get_json()
