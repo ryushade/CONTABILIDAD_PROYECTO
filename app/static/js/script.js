@@ -449,3 +449,4 @@ function previewPhoto(event) {
   };
   reader.readAsDataURL(event.target.files[0]);
 }
+

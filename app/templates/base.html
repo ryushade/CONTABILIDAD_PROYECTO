@@ -218,6 +218,42 @@
                 display: none;
             }
         }
+
+        .circular-button {
+            width: 40px;
+            height: 40px;
+            background-color: #0B5ED7;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .circular-button.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+
+        .circular-button:hover {
+            background-color: #1D4ED8;
+        }
+
+        .circular-button::before {
+            content: "↓";
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -334,9 +370,11 @@
                                 <div
                                     style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background-color: #f0f0f0; border-radius: 50%;">
                                     {% if session.get('username') %}
-                                    <img src="{{ url_for('static', filename='fotos_perfil/' ~ session['username'] ~ '.jpg') }}" alt="{{ session['username'] }}'s image" style="width: 100%; height: 100%; border-radius: 50%;" />
+                                    <img src="{{ url_for('static', filename='fotos_perfil/' ~ session['username'] ~ '.jpg') }}"
+                                        alt="{{ session['username'] }}'s image"
+                                        style="width: 100%; height: 100%; border-radius: 50%;" />
                                     {% else %}
-                                        <i class="fas fa-user" style="font-size: 20px; color: #6e6e6e;"></i>
+                                    <i class="fas fa-user" style="font-size: 20px; color: #6e6e6e;"></i>
                                     {% endif %}
                                 </div>
                             </div>
@@ -453,8 +491,10 @@
                 </form>
             </div>
         </div>
+
     </div>
 
+    <button class="circular-button" onclick="scrollDown()"></button>
 
     <script>
         function openUserConfigModal() {
@@ -479,8 +519,8 @@
 
     <!-- JS de Bootstrap y scripts personalizados -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-    crossorigin="anonymous"></script>
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
@@ -532,13 +572,53 @@
                 });
             });
         });
-        
+
     </script>
 </body>
 <!-- <div id="permissionAlert" style="display: none; width: 250px; padding: 10px; background-color: #f8d7da; color: #e74c3c; border-radius: 5px; border: 1px solid #f5c6cb; display: flex; align-items: center; font-family: Arial, sans-serif; font-size: 14px; filter: drop-shadow(-2px 2px 5px #b8adad); position: fixed; top: 20px; right: 20px; z-index: 1050;">
     <p style="font-size: 18px; margin-right: 10px;">🚫</p>
     <p style="margin: 0;">No tienes permisos para acceder a esta página</p>
 </div> -->
+<script>
+    function scrollDown() {
+        window.scrollBy({
+            top: window.innerHeight,
+            behavior: 'smooth' // Desplazamiento suave
+        });
+    }
 
+    function toggleButtonVisibility() {
+        const button = document.querySelector('.circular-button');
+        if (!button) return;
+
+        const documentHeight = document.documentElement.scrollHeight;
+        const viewportHeight = window.innerHeight;
+        const scrollable = documentHeight > viewportHeight;
+
+        // Muestra u oculta el botón basado en si hay contenido desplazable
+        if (scrollable) {
+            button.classList.add('show');
+        } else {
+            button.classList.remove('show');
+        }
+    }
+
+    // Llama a la función al cargar la página, al hacer scroll, y al redimensionar la ventana
+    window.addEventListener('scroll', toggleButtonVisibility);
+    window.addEventListener('resize', toggleButtonVisibility);
+    document.addEventListener('DOMContentLoaded', toggleButtonVisibility);
+
+    // Asegúrate de llamar a toggleButtonVisibility después de cualquier cambio dinámico en el contenido
+    setTimeout(toggleButtonVisibility, 500); // Espera 500ms después de cargar
+
+
+
+    // Llama a la función al cargar la página y cuando se redimensiona la ventana
+    window.addEventListener('scroll', toggleButtonVisibility);
+    window.addEventListener('resize', toggleButtonVisibility);
+    document.addEventListener('DOMContentLoaded', toggleButtonVisibility);
+
+
+</script>
 
 </html>
