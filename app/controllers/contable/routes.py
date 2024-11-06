@@ -42,6 +42,8 @@ def role_required(*roles):
         return decorated_function
     return decorator
 
+from flask import Flask, request, redirect, url_for, render_template, flash, make_response
+
 @accounting_bp.route('/login', methods=['GET', 'POST'])
 def login():
     try:
@@ -63,8 +65,11 @@ def login():
         if user and verificar_contraseña(user, password):
             # Generar el token de acceso JWT
             access_token = create_access_token(identity=user['id_usuario'])
-            response = redirect(url_for('inicio'))
+            response = make_response(redirect(url_for('inicio')))
             set_access_cookies(response, access_token)  # Guardar el token en una cookie segura
+            response.set_cookie('username', username, httponly=True)  # Guarda el username en una cookie
+            session['username'] = username
+            print(session.get('username'))
             return response
         else:
             flash("Usuario o contraseña incorrectos", "error")
@@ -267,33 +272,43 @@ def upload_photo():
     if file.filename == '':
         return redirect(url_for('inicio'))
 
-    if file:
-        filename = secure_filename(file.filename)
-        upload_folder = current_app.config['UPLOAD_FOLDER']
+    username = request.cookies.get('username', None)
+    if not username:
+        return redirect(url_for('inicio'))  # Si no hay cookie, redireccionar al inicio
 
-        # Crear la carpeta de subida si no existe
-        if not os.path.exists(upload_folder):
-            os.makedirs(upload_folder)
+    filename = secure_filename(username)  # Usar username como el nombre del archivo
+    if not filename:  # Verificar que el nombre de usuario sea válido para un nombre de archivo
+        return redirect(url_for('inicio'))
 
-        filepath = os.path.join(upload_folder, filename)
-        file.save(filepath)
+    # Añadir la extensión del archivo original al nombre de usuario seguro
+    file_extension = os.path.splitext(file.filename)[1]
+    filename += file_extension
 
-        # Imprimir la ruta del archivo físico y la URL para la base de datos
-        print(f"Ruta física del archivo: {filepath}")
-        
-        # Generar la ruta para guardar en la base de datos
-        foto_path = f"/static/img/{filename}"
-        print(f"Ruta URL para la base de datos: {foto_path}")
+    upload_folder = current_app.config['UPLOAD_FOLDER']
 
-        user_id = request.form.get('user_id')
-        if not user_id:
-            return redirect(url_for('inicio'))
+    # Crear la carpeta de subida si no existe
+    if not os.path.exists(upload_folder):
+        os.makedirs(upload_folder)
 
-        # Guardar la ruta en la base de datos
-        if guardar_foto_usuario(user_id, foto_path):
-            return redirect(url_for('inicio'))
-        else:
-            return redirect(url_for('inicio'))
+    filepath = os.path.join(upload_folder, filename)
+    file.save(filepath)
+
+    # Imprimir la ruta del archivo físico y la URL para la base de datos
+    print(f"Ruta física del archivo: {filepath}")
+
+    # Generar la ruta para guardar en la base de datos
+    foto_path = f"./static/img/{filename}"
+    print(f"Ruta URL para la base de datos: {foto_path}")
+
+    user_id = request.form.get('user_id')
+    if not user_id:
+        return redirect(url_for('inicio'))
+
+    # Guardar la ruta en la base de datos
+    if guardar_foto_usuario(user_id, foto_path):
+        return redirect(url_for('inicio'))
+    else:
+        return redirect(url_for('inicio'))
 
 
 @accounting_bp.route('/reglas/actualizar_regla/<int:id_regla>', methods=['POST'])

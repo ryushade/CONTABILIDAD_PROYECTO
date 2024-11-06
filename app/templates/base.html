@@ -333,11 +333,10 @@
                                 style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; background-color: #e0e0e0; border-radius: 50%; border: 2px solid #b3b3b3;">
                                 <div
                                     style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background-color: #f0f0f0; border-radius: 50%;">
-                                    {% if user.foto %}
-                                    <img src="{{ user.foto }}" alt="Foto de perfil"
-                                        style="width: 100%; height: 100%; border-radius: 50%;">
+                                    {% if session.get('username') %}
+                                    <img src="{{ url_for('static', filename='fotos_perfil/' ~ session['username'] ~ '.jpg') }}" alt="{{ session['username'] }}'s image" style="width: 100%; height: 100%; border-radius: 50%;" />
                                     {% else %}
-                                    <i class="fas fa-user" style="font-size: 20px; color: #6e6e6e;"></i>
+                                        <i class="fas fa-user" style="font-size: 20px; color: #6e6e6e;"></i>
                                     {% endif %}
                                 </div>
                             </div>
