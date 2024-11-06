@@ -476,7 +476,7 @@
                             {% if loop.first %}
                             <td class="text-center align-middle" rowspan="{{ cuenta.detalles|length }}">
                                 <span tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
-                                      data-bs-content="{% if cuenta.saldo >= 0 %}Saldo Acreedor: S/ {{ cuenta.saldo | round(2) }}{% else %}Saldo Deudor: S/ {{ cuenta.saldo | abs | round(2) }}{% endif %}">
+                                    data-bs-content="{% if cuenta.saldo >= 0 %}Saldo Acreedor: S/ {{ cuenta.saldo | round(2) }}{% else %}Saldo Deudor: S/ {{ cuenta.saldo | abs | round(2) }}{% endif %}">
                                     {{ cuenta.saldo | round(2) }}
                                 </span>
                             </td>
@@ -568,57 +568,73 @@
 
                     </div>
                 </form>
-
             </div>
-
-
-
-            <div class="table-responsive mt-2 mb-2">
-                <table id="tabla_compras" class="table table-bordered table-hover">
-                    <thead class="table-light">
+            <div class="table-container mt-2 mb-2" style="border: 1px solid #ccc;">
+                <style>
+                    /* Estilo de hover para resaltar la fila */
+                    #tabla_compras tr:hover {
+                        background-color: #e4ebf7;
+                    }
+            
+                    /* Ajuste de padding para filas compactas */
+                    table {
+                        width: 100%;
+                        font-size: 13px;
+                        border: #000;
+                    }
+            
+                    th, td {
+                        padding: 20px 10px; /* Ajuste del padding para reducir el tamaño de las filas */
+                        font-size: 13px;
+                    }
+            
+                    th {
+                        font-weight: bold;
+                        background-color: #f8f9fa;
+                        text-align: center;
+                    }
+            
+                    td {
+                        text-align: center;
+                    }
+                </style>
+                <table id="tabla_compras">
+                    <thead>
                         <tr>
-                            <th class="text-center">N° CORRELATIVO</th>
-                            <th class="text-center">FECHA</th>
-                            <th class="text-center">RUC</th>
-                            <th class="text-center">RAZON SOCIAL</th>
-                            <th class="text-center">COMPROBANTE</th>
-                            <th class="text-center">MONTO</th>
-                            <th class="text-center">IGV</th>
-                            <th class="text-center">TOTAL</th>
-
+                            <th>N° CORRELATIVO</th>
+                            <th>FECHA</th>
+                            <th>RUC</th>
+                            <th>RAZON SOCIAL</th>
+                            <th>COMPROBANTE</th>
+                            <th>MONTO</th>
+                            <th>IGV</th>
+                            <th>TOTAL</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for registro in registros_compras %}
                         <tr>
-                            <td class="text-center">{{ registro.numero_correlativo }}</td>
-                            <td class="text-center">{{ registro.fecha.strftime('%Y-%m-%d') }}</td>
-                            <td class="text-center">{{ registro.documento_cliente }}</td>
-                            <td class="text-center">{{ registro.nombre_cliente }}</td>
-                            <td class="text-center">{{ registro.num_comprobante }}</td>
+                            <td>{{ registro.numero_correlativo }}</td>
+                            <td>{{ registro.fecha.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ registro.documento_cliente }}</td>
+                            <td>{{ registro.nombre_cliente }}</td>
+                            <td>{{ registro.num_comprobante }}</td>
                             <td class="text-end">{{ registro.importe | round(2) }}</td>
                             <td class="text-end">{{ registro.igv | round(2) }}</td>
                             <td class="text-end">{{ registro.total | round(2) }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
-
                     <tfoot>
-
                         <tr>
-                            <th colspan="5" class="text-end" style="font-weight: bold;">TOTALES</th>
-                            <th class="text-end" style="font-weight: bold;">{{ totalesCompras.total_importe | round(2) }}
-                            </th>
-                            <th class="text-end" style="font-weight: bold;">{{ totalesCompras.total_igv | round(2) }}</th>
-                            <th class="text-end" style="font-weight: bold;">{{ totalesCompras.total_general | round(2) }}
-                            </th>
+                            <th colspan="5" style="text-align: right; font-weight: bold; color: #000; font-size: 14px;">TOTALES</th>
+                            <th class="text-end" style="font-weight: bold; font-size: 14px;">{{ totalesCompras.total_importe | round(2) }}</th>
+                            <th class="text-end" style="font-weight: bold; font-size: 14px;">{{ totalesCompras.total_igv | round(2) }}</th>
+                            <th class="text-end" style="font-weight: bold; font-size: 14px;">{{ totalesCompras.total_general | round(2) }}</th>
                         </tr>
                     </tfoot>
                 </table>
-
             </div>
-
-
         </div>
     </div>
 
@@ -682,13 +698,8 @@
                         </div>
                     </div>
 
-
                 </form>
-
             </div>
-
-
-
             <div class="table-responsive mt-2 mb-2">
                 <table class="table table-bordered table-hover">
                     <thead class="table-light">
