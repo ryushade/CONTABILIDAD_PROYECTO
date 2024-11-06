@@ -132,43 +132,42 @@
 </div>
 
 
-<div class="table-container mt-4">
-    <div class="table-scroll">
-        <table>
-            <thead>
-                <tr>
-                    <th class="text-center" style="font-weight: bolder;">Nombre</th>
-                    <th class="text-center" style="font-weight: bolder;">Tipo de transacción</th>
-                    <th class="text-center" style="font-weight: bolder;">Cuenta débito</th>
-                    <th class="text-center" style="font-weight: bolder;">Cuenta crédito</th>
-                    <th class="text-center" style="font-weight: bolder;">Estado</th>
-                    <th class="text-center" style="font-weight: bolder;">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for regla in reglas %}
-                <tr>
-                    <td class="text-align" style="font-size: 14px;">{{ regla.nombre_regla }}</td>
-                    {% if regla.tipo_transaccion == 'venta_contado' %}
-                    <td class="text-center" style="font-size: 14px;">Venta al contado</td>
-                    {% else %}
-                    <td class="text-center" style="font-size: 14px;">Compra al contado</td>
-                    {% endif %}
+<div class="table-container mt-2" style="border: 1px solid #ccc;">
+    <table style="border: #000; width: 100%; font-size: 13px;">
+        <thead>
+            <tr>
+                <th class="text-center" style="font-weight: bolder;">Nombre</th>
+                <th class="text-center" style="font-weight: bolder;">Tipo de transacción</th>
+                <th class="text-center" style="font-weight: bolder;">Cuenta débito</th>
+                <th class="text-center" style="font-weight: bolder;">Cuenta crédito</th>
+                <th class="text-center" style="font-weight: bolder;">Estado</th>
+                <th class="text-center" style="font-weight: bolder;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for regla in reglas %}
+            <tr>
+                <td class="text-align" style="font-size: 14px;">{{ regla.nombre_regla }}</td>
+                {% if regla.tipo_transaccion == 'venta_contado' %}
+                <td class="text-center" style="font-size: 14px;">Venta al contado</td>
+                {% else %}
+                <td class="text-center" style="font-size: 14px;">Compra al contado</td>
+                {% endif %}
 
-                    {% if regla.cuenta_debe_codigo %}
-                    <td class="text-center" style="font-size: 14px;">{{ regla.cuenta_debe_codigo }}</td>
-                    {% else %}
-                    <td class="text-center" style="font-size: 14px;">Ninguna</td>
-                    {% endif %}
+                {% if regla.cuenta_debe_codigo %}
+                <td class="text-center" style="font-size: 14px;">{{ regla.cuenta_debe_codigo }}</td>
+                {% else %}
+                <td class="text-center" style="font-size: 14px;">Ninguna</td>
+                {% endif %}
 
-                    {% if regla.cuenta_haber_codigo %}
-                    <td class="text-center" style="font-size: 14px;">{{ regla.cuenta_haber_codigo }}</td>
-                    {% else %}
-                    <td class="text-center" style="font-size: 14px;">Ninguna</td>
-                    {% endif %}
+                {% if regla.cuenta_haber_codigo %}
+                <td class="text-center" style="font-size: 14px;">{{ regla.cuenta_haber_codigo }}</td>
+                {% else %}
+                <td class="text-center" style="font-size: 14px;">Ninguna</td>
+                {% endif %}
 
-                    <td class="text-center">
-                        <span style="font-size: 14px;" class="
+                <td class="text-center">
+                    <span style="font-size: 14px;" class="
                         estado 
                         {% if regla.estado == 1 %}
                             active-c
@@ -176,20 +175,20 @@
                             inactive
                         {% endif %}
                         ">
-                            {% if regla.estado == 1 %}
-                            Activo
-                            {% else %}
-                            Inactivo
-                            {% endif %}
-                        </span>
-                    </td>
+                        {% if regla.estado == 1 %}
+                        Activo
+                        {% else %}
+                        Inactivo
+                        {% endif %}
+                    </span>
+                </td>
 
-                    <td class="text-center acciones">
-                        <span style="font-size: 14px; color: #1e40af;" class="action-button secondary view"
-                            onclick="fetchReglaDetails({{ regla.id_regla }})">
-                            <i class="fas fa-eye"></i>
-                        </span>
-                        <span style="font-size: 14px;" class="action-button secondary edit" onclick="openEditModal(
+                <td class="text-center acciones">
+                    <span style="font-size: 14px; color: #1e40af;" class="action-button secondary view"
+                        onclick="fetchReglaDetails({{ regla.id_regla }})">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                    <span style="font-size: 14px;" class="action-button secondary edit" onclick="openEditModal(
                             {{ regla.id_regla }}, 
                             '{{ regla.nombre_regla }}', 
                             '{{ regla.tipo_transaccion }}', 
@@ -197,19 +196,18 @@
                             '{{ regla.cuenta_haber_codigo if regla.cuenta_haber_codigo else '' }}', 
                             {{ regla.estado }}
                         )">
-                            <i class="fas fa-edit"></i>
-                        </span>
+                        <i class="fas fa-edit"></i>
+                    </span>
 
-                        <span style="font-size: 14px;" class="action-button secondary trash"
-                            onclick="openModalDeleteRegla('{{ regla.id_regla }}', '{{ regla.nombre_regla }}')">
-                            <i class="fas fa-trash"></i>
-                        </span>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                    <span style="font-size: 14px;" class="action-button secondary trash"
+                        onclick="openModalDeleteRegla('{{ regla.id_regla }}', '{{ regla.nombre_regla }}')">
+                        <i class="fas fa-trash"></i>
+                    </span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 
 <div class="row mt-4 align-items-center">
@@ -271,19 +269,19 @@
     <!-- Selector de Cantidad -->
     <div class="col-md-4 text-end mt-3 mt-md-0">
         <select style="font-size: 14px;" class="form-select w-auto d-inline" onchange="location = this.value;">
-            <option value="{{ url_for('contable.reglas', page=page, per_page=50) }}" {% if per_page==50 %}selected{%
-                endif %}>50</option>
-            <option value="{{ url_for('contable.reglas', page=page, per_page=100) }}" {% if per_page==100 %}selected{%
-                endif %}>100</option>
-            <option value="{{ url_for('contable.reglas', page=page, per_page=200) }}" {% if per_page==200 %}selected{%
-                endif %}>200</option>
+            <option value="{{ url_for('contable.reglas', page=page, per_page=5) }}" {% if per_page==5 %}selected{% endif
+                %}>5</option>
+            <option value="{{ url_for('contable.reglas', page=page, per_page=10) }}" {% if per_page==10 %}selected{%
+                endif %}>10</option>
+            <option value="{{ url_for('contable.reglas', page=page, per_page=20) }}" {% if per_page==20 %}selected{%
+                endif %}>20</option>
             <option value="{{ url_for('contable.reglas', page=page, per_page=100000) }}" {% if per_page==100000
                 %}selected{% endif %}>Todos</option>
         </select>
     </div>
 
-    <!-- Rango de resultados -->
-    <div class="mt-1 text-center" style="font-size: 14px;">
+
+    <div class="text-center" style="font-size: 14px; margin-top: -20px;">
         {% set start_result = (page - 1) * per_page + 1 %}
         {% set end_result = min(page * per_page, total_results) %}
         <p><strong>{{ start_result }}-{{ end_result }}</strong> de <strong>{{ total_results }}</strong> resultados</p>

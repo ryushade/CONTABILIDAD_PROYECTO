@@ -80,11 +80,7 @@
         justify-content: flex-end;
     }
 
-    .table-scroll thead th {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-    }
+
 
     .confirmation-modal-overlay {
         position: fixed;
@@ -123,27 +119,25 @@
         </a>
     </div>
 </div>
-<div class="table-container mt-4">
-    <div class="table-scroll">
-
-        <table>
-            <thead>
-                <tr>
-                    <th class="text-center" style="font-weight: bolder;">rol</th>
-                    <th class="text-center" style="font-weight: bolder;">usuario</th>
-                    <th class="text-center" style="font-weight: bolder;">contraseña</th>
-                    <th class="text-center" style="font-weight: bolder;">estado</th>
-                    <th class="text-center" style="font-weight: bolder;">ACCIONES</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for usuario in usuarios %}
-                <tr>
-                    <td class="text-center" style="padding: 20px;">{{ usuario.nom_rol }}</td>
-                    <td class="text-center">{{ usuario.usua }}</td>
-                    <td class="text-center">{{ usuario.contra }}</td>
-                    <td class="text-center">
-                        <span style="font-size: 14px;" class="
+<div class="table-container mt-2" style="border: 1px solid #ccc;">
+    <table style="border: #000; width: 100%; font-size: 13px;">
+        <thead>
+            <tr>
+                <th class="text-center" style="font-weight: bolder;">rol</th>
+                <th class="text-center" style="font-weight: bolder;">usuario</th>
+                <th class="text-center" style="font-weight: bolder;">contraseña</th>
+                <th class="text-center" style="font-weight: bolder;">estado</th>
+                <th class="text-center" style="font-weight: bolder;">ACCIONES</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for usuario in usuarios %}
+            <tr>
+                <td class="text-center" style="padding: 17px;">{{ usuario.nom_rol }}</td>
+                <td class="text-center">{{ usuario.usua }}</td>
+                <td class="text-center">{{ usuario.contra }}</td>
+                <td class="text-center">
+                    <span style="font-size: 14px;" class="
                 status 
                 {% if usuario.estado_usuario == 1 %}
                     active-c
@@ -151,33 +145,32 @@
                     inactive
                 {% endif %}
             ">
-                            {% if usuario.estado_usuario == 1 %}
-                            Activo
-                            {% else %}
-                            Inactivo
-                            {% endif %}
-                        </span>
+                        {% if usuario.estado_usuario == 1 %}
+                        Activo
+                        {% else %}
+                        Inactivo
+                        {% endif %}
+                    </span>
 
-                    </td>
-                    <td class="text-center" style="font-size: 14px;">
+                </td>
+                <td class="text-center" style="font-size: 14px;">
 
-                        <span style="font-size: 14px;" class="action-button secondary edit"
-                            onclick="openEditUsu({{ usuario.id_usuario }})">
-                            <i class="fas fa-edit"></i>
-                        </span>
+                    <span style="font-size: 14px;" class="action-button secondary edit"
+                        onclick="openEditUsu({{ usuario.id_usuario }})">
+                        <i class="fas fa-edit"></i>
+                    </span>
 
-                        <span style="font-size: 14px;" class="action-button secondary trash"
-                            onclick="openModalDeleteUsu('{{ usuario.id_usuario }}', '{{usuario.nom_rol}}' , '{{ usuario.usua }}')">
-                            <i class="fas fa-trash"></i>
-                        </span>
+                    <span style="font-size: 14px;" class="action-button secondary trash"
+                        onclick="openModalDeleteUsu('{{ usuario.id_usuario }}', '{{usuario.nom_rol}}' , '{{ usuario.usua }}')">
+                        <i class="fas fa-trash"></i>
+                    </span>
 
 
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 
 <div class="row mt-4 align-items-center">
@@ -239,19 +232,19 @@
     <!-- Selector de Cantidad -->
     <div class="col-md-4 text-end mt-3 mt-md-0">
         <select style="font-size: 14px;" class="form-select w-auto d-inline" onchange="location = this.value;">
-            <option value="{{ url_for('contable.usuarios', page=page, per_page=50) }}" {% if per_page==50 %}selected{%
-                endif %}>50</option>
-            <option value="{{ url_for('contable.usuarios', page=page, per_page=100) }}" {% if per_page==100 %}selected{%
-                endif %}>100</option>
-            <option value="{{ url_for('contable.usuarios', page=page, per_page=200) }}" {% if per_page==200 %}selected{%
-                endif %}>200</option>
+            <option value="{{ url_for('contable.usuarios', page=page, per_page=5) }}" {% if per_page==5 %}selected{%
+                endif %}>5</option>
+            <option value="{{ url_for('contable.usuarios', page=page, per_page=10) }}" {% if per_page==10 %}selected{%
+                endif %}>10</option>
+            <option value="{{ url_for('contable.usuarios', page=page, per_page=20) }}" {% if per_page==20 %}selected{%
+                endif %}>20</option>
             <option value="{{ url_for('contable.usuarios', page=page, per_page=100000) }}" {% if per_page==100000
                 %}selected{% endif %}>Todos</option>
         </select>
     </div>
 
     <!-- Rango de resultados -->
-    <div class="mt-1 text-center" style="font-size: 14px;">
+    <div class="text-center" style="font-size: 14px; margin-top: -20px;">
         {% set start_result = (page - 1) * per_page + 1 %}
         {% set end_result = min(page * per_page, total_results) %}
         <p><strong>{{ start_result }}-{{ end_result }}</strong> de <strong>{{ total_results }}</strong> resultados</p>
@@ -334,9 +327,7 @@
             <div class="modal-header">
                 <h5 class="modal-title" style="font-size: 32px;">EDITAR USUARIO</h5>
                 <button type="button" class="modal-close" onclick="closeModalUsuEdit()"
-                    style="border: none; background: none;">
-                    <i class="fas fa-times"></i>
-                </button>
+                    style="border: none; color: black; background-color: #e74c3c; font-weight: bold; font-size: 24px; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">&times;</button>
             </div>
 
             <!-- Body -->
@@ -380,12 +371,11 @@
 
                 <!-- Botones de acción -->
                 <div class="d-flex justify-content-end mt-4" style="gap: 10px;">
-                    <button style="width: 122px; height: 45px;" type="button" onclick="closeModalUsuEdit()"
-                        class="btn btn-secondary me-2">
-                        <i style="height: 25px; width: 25px;" class="fas fa-times"></i> Cerrar
+                    <button type="button" onclick="closeModalUsuEdit()" class="btn btn-secondary me-2">
+                        <i class="fas fa-times"></i> Cerrar
                     </button>
-                    <button style="width: 122px; height: 45px;" type="submit" class="btn btn-primary">
-                        <i style="height: 25px; width: 25px;" class="fas fa-save"></i> Guardar
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar
                     </button>
                 </div>
             </div>
