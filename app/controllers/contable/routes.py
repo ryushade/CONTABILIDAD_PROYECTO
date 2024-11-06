@@ -785,21 +785,22 @@ def exportar_libro_mayor_excel():
 
             current_row += 1
 
-        # Añadir el total al final de la tabla
-        worksheet[f'C{current_row}'] = "Total"
-        worksheet[f'C{current_row}'].font = openpyxl.styles.Font(size=10, bold=True)
-        
-        # Sumar las columnas D (Deudor) y E (Acreedor)
-        total_debe_formula = f'=SUM(D{start_row}:D{current_row - 1})'
-        total_haber_formula = f'=SUM(E{start_row}:E{current_row - 1})'
-        
-        worksheet[f'D{current_row}'] = total_debe_formula
-        worksheet[f'D{current_row}'].number_format = '0.00#################'
-        worksheet[f'D{current_row}'].font = openpyxl.styles.Font(size=10, bold=True)
-        
-        worksheet[f'E{current_row}'] = total_haber_formula
-        worksheet[f'E{current_row}'].number_format = '0.00#################'
-        worksheet[f'E{current_row}'].font = openpyxl.styles.Font(size=10, bold=True)
+            # Añadir el total al final de la tabla
+            worksheet[f'C{current_row}'] = "Total"
+            worksheet[f'C{current_row}'].font = openpyxl.styles.Font(size=10, bold=True)
+
+            # Sumar las columnas D (Deudor) y E (Acreedor)
+            total_debe_formula = f'=SUM(D{start_row}:D{current_row - 1})'
+            total_haber_formula = f'=SUM(E{start_row}:E{current_row - 1})'
+
+            worksheet[f'D{current_row}'] = total_debe_formula
+            worksheet[f'D{current_row}'].number_format = '0.00'
+            worksheet[f'D{current_row}'].font = openpyxl.styles.Font(size=10, bold=True)
+
+            worksheet[f'E{current_row}'] = total_haber_formula
+            worksheet[f'E{current_row}'].number_format = '0.00'
+            worksheet[f'E{current_row}'].font = openpyxl.styles.Font(size=10, bold=True)
+
         
         # Guardar el archivo modificado en un buffer de memoria
         workbook.save(output)
