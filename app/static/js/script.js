@@ -241,7 +241,14 @@ function submitAddUsuario(event) {
     });
 }
 
-
+document.addEventListener("DOMContentLoaded", function() {
+  // Verifica si el mensaje de alerta debe mostrarse
+  {% if session.get('show_permission_alert') %}
+      document.getElementById("permissionAlert").style.display = "flex";
+      // Limpia la variable de la sesión después de mostrar el mensaje
+      {% set session['show_permission_alert'] = None %}
+  {% endif %}
+});
 
 function openModalAdd() {
   document.getElementById('addAccountModal').style.display = 'flex';
@@ -443,9 +450,9 @@ function submitAddForm(event) {
 
 function previewPhoto(event) {
   const reader = new FileReader();
-  reader.onload = function() {
-      const profileImagePreview = document.getElementById('profileImagePreview');
-      profileImagePreview.innerHTML = `<img src="${reader.result}" alt="Foto de perfil" style="width: 100%; height: 100%; border-radius: 50%;">`;
+  reader.onload = function () {
+    const profileImagePreview = document.getElementById('profileImagePreview');
+    profileImagePreview.innerHTML = `<img src="${reader.result}" alt="Foto de perfil" style="width: 100%; height: 100%; border-radius: 50%;">`;
   };
   reader.readAsDataURL(event.target.files[0]);
 }

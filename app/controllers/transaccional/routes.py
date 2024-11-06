@@ -1,20 +1,47 @@
 import json
 import os
 from urllib import response
-from flask import current_app, make_response, render_template, send_file, session
+from app.models.contable_models import obtener_usuario_por_id
+from flask import abort, current_app, make_response, render_template, send_file, session
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from flask import render_template, send_file, request, jsonify, redirect, url_for, flash
 from app.models.transaccional_models import obtener_productos, obtener_ventas, obtener_marcas, obtener_categorias, obtener_ingresos, obtener_nota_salida, obtener_inventario, obtener_subcategorias_por_categoria, agregar_producto, obtener_inventario_vigente, listarClientes, obtener_id_sucursal, obtener_ultimo_comprobante, obtener_ventas_con_detalles, obtener_proveedor, obtener_almacen, obtener_compras_con_detalles
+from functools import wraps
+from flask_jwt_extended import get_jwt_identity
 
 import app.models.transaccional_models as transac 
 from app.models.transaccional_models import generate_barcode
 from . import transactional_bp
 
+def role_required(*roles):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            user_id = get_jwt_identity()
+            user = obtener_usuario_por_id(user_id)
+            
+            if not user:
+                print("Error: Usuario no encontrado")
+                return abort(403)
+            
+            user_role = user['rol']['nom_rol'].strip().upper() 
+            print(f"Usuario rol: {user_role}")  
+
+            if user_role not in [role.upper() for role in roles]: 
+                print("Error: Rol no permitido")
+                return abort(403)  
+
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+
 
 # Modulo de almacen
 @transactional_bp.route('/almacen', methods=['GET'])
 @jwt_required()
+@role_required('ADMIN', 'EMPLEADO')
 def almacen():
     datos_almacen_entrada = obtener_ingresos()
     datos_almacen_salida = obtener_nota_salida()
@@ -77,6 +104,7 @@ def barcode(code):
 
 @transactional_bp.route('/nueva_nota', methods=['GET'])
 @jwt_required()
+
 def nueva_nota():
     return render_template('transaccional/almacen/nueva_nota.html')
 #----------------------------------------------
@@ -86,16 +114,19 @@ def nueva_nota():
 
 @transactional_bp.route('/marcas')
 @jwt_required()
+@role_required('ADMIN', 'EMPLEADO')
 def marcas():
     return render_template('transaccional/productos/marcas.html')
 
 @transactional_bp.route('/categorias')
 @jwt_required()
+@role_required('ADMIN', 'EMPLEADO')
 def categorias():
     return render_template('transaccional/productos/categorias.html')
 
 @transactional_bp.route('/subcategorias')
 @jwt_required()
+@role_required('ADMIN', 'EMPLEADO')
 def subcategorias():
     return render_template('transaccional/productos/subcategorias.html')
 
@@ -104,6 +135,7 @@ def subcategorias():
 
 @transactional_bp.route('/productos', methods=['GET'])
 @jwt_required()
+@role_required('ADMIN', 'EMPLEADO')
 def productos():
     productos = obtener_productos()
     marcas = obtener_marcas()
@@ -119,6 +151,7 @@ def descargar_pdf(filename):
 
 @transactional_bp.route('/ventas', methods=['GET'])
 @jwt_required()
+@role_required('ADMIN', 'EMPLEADO')
 def ventas():
     pdf_filename = session.pop('pdf_filename', None)
     total_ventas = obtener_ventas()
@@ -148,6 +181,7 @@ def ventas():
 
 
 @transactional_bp.route('/addVenta', methods=['POST'])
+@role_required('ADMIN', 'EMPLEADO')
 def add_venta():
     try:
         venta_data = request.cookies.get('ventaData')
@@ -178,6 +212,7 @@ def add_venta():
 
 @transactional_bp.route('/compras', methods=['GET'])
 @jwt_required()
+@role_required('ADMIN', 'EMPLEADO')
 def compras():
     compras_con_detalles = obtener_compras_con_detalles()
     proveedor = obtener_proveedor()
@@ -185,15 +220,6 @@ def compras():
     datos_inventario = obtener_inventario_vigente()
     return render_template('transaccional/compras/compras.html', proveedor=proveedor, almacen=almacen, datos_inventario=datos_inventario,compras=compras_con_detalles)
 
-
-@transactional_bp.route('/compras2', methods=['GET'])
-@jwt_required()
-def compras2():
-    compras_con_detalles = obtener_compras_con_detalles()
-    proveedor = obtener_proveedor()
-    almacen = obtener_almacen()
-    datos_inventario = obtener_inventario_vigente()
-    return render_template('transaccional/compras/compras2.html', proveedor=proveedor, almacen=almacen, datos_inventario=datos_inventario,compras=compras_con_detalles)
 
 
 
