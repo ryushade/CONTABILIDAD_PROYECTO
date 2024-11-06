@@ -229,7 +229,7 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
+            transition: opacity 0.3s ease, visibility 0.3s ease, background-color 0.3s ease;
             opacity: 0;
             visibility: hidden;
             position: fixed;
@@ -243,13 +243,21 @@
             visibility: visible;
         }
 
-
         .circular-button:hover {
             background-color: #1D4ED8;
         }
 
-        .circular-button::before {
+        .circular-button.down::before {
             content: "↓";
+            /* Flecha hacia abajo */
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .circular-button.up::before {
+            content: "↑";
+            /* Flecha hacia arriba */
             color: white;
             font-size: 24px;
             font-weight: bold;
@@ -535,7 +543,6 @@
         });
     </script>
     <script>
-        // Lógica para manejar el sidebar
         document.addEventListener('DOMContentLoaded', function () {
             const sidebar = document.querySelector('.sidebar');
             const toggleButton = document.querySelector('.toggle-button');
@@ -556,7 +563,6 @@
                     }
                 });
             } else {
-                // Si no hay sidebar, asegura que main-content no tenga margen-left
                 mainContent.style.marginLeft = '0';
             }
 
@@ -575,16 +581,16 @@
 
     </script>
 </body>
-<!-- <div id="permissionAlert" style="display: none; width: 250px; padding: 10px; background-color: #f8d7da; color: #e74c3c; border-radius: 5px; border: 1px solid #f5c6cb; display: flex; align-items: center; font-family: Arial, sans-serif; font-size: 14px; filter: drop-shadow(-2px 2px 5px #b8adad); position: fixed; top: 20px; right: 20px; z-index: 1050;">
-    <p style="font-size: 18px; margin-right: 10px;">🚫</p>
-    <p style="margin: 0;">No tienes permisos para acceder a esta página</p>
-</div> -->
+
 <script>
-    function scrollDown() {
-        window.scrollBy({
-            top: window.innerHeight,
-            behavior: 'smooth' // Desplazamiento suave
-        });
+    function scrollToPosition() {
+        const button = document.querySelector('.circular-button');
+
+        if (button.classList.contains('up')) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+            window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
+        }
     }
 
     function toggleButtonVisibility() {
@@ -593,30 +599,29 @@
 
         const documentHeight = document.documentElement.scrollHeight;
         const viewportHeight = window.innerHeight;
+        const scrollPosition = window.scrollY;
         const scrollable = documentHeight > viewportHeight;
 
-        // Muestra u oculta el botón basado en si hay contenido desplazable
         if (scrollable) {
             button.classList.add('show');
+
+            if (scrollPosition + viewportHeight >= documentHeight - 100) {
+                button.classList.remove('down');
+                button.classList.add('up');
+            } else {
+                button.classList.remove('up');
+                button.classList.add('down');
+            }
         } else {
             button.classList.remove('show');
         }
     }
 
-    // Llama a la función al cargar la página, al hacer scroll, y al redimensionar la ventana
     window.addEventListener('scroll', toggleButtonVisibility);
     window.addEventListener('resize', toggleButtonVisibility);
     document.addEventListener('DOMContentLoaded', toggleButtonVisibility);
+    document.querySelector('.circular-button').addEventListener('click', scrollToPosition);
 
-    // Asegúrate de llamar a toggleButtonVisibility después de cualquier cambio dinámico en el contenido
-    setTimeout(toggleButtonVisibility, 500); // Espera 500ms después de cargar
-
-
-
-    // Llama a la función al cargar la página y cuando se redimensiona la ventana
-    window.addEventListener('scroll', toggleButtonVisibility);
-    window.addEventListener('resize', toggleButtonVisibility);
-    document.addEventListener('DOMContentLoaded', toggleButtonVisibility);
 
 
 </script>
