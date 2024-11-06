@@ -276,28 +276,25 @@ def upload_photo():
     if not username:
         return redirect(url_for('inicio'))  # Si no hay cookie, redireccionar al inicio
 
-    filename = secure_filename(username)  # Usar username como el nombre del archivo
-    if not filename:  # Verificar que el nombre de usuario sea válido para un nombre de archivo
+    filename = secure_filename(username)
+    if not filename:
         return redirect(url_for('inicio'))
 
-    # Añadir la extensión del archivo original al nombre de usuario seguro
     file_extension = os.path.splitext(file.filename)[1]
     filename += file_extension
 
+    # Asegura que estás usando el directorio correcto
     upload_folder = current_app.config['UPLOAD_FOLDER']
-
-    # Crear la carpeta de subida si no existe
+    print("upload_folder", upload_folder)
+    # Crea la carpeta si no existe
     if not os.path.exists(upload_folder):
         os.makedirs(upload_folder)
 
     filepath = os.path.join(upload_folder, filename)
     file.save(filepath)
 
-    # Imprimir la ruta del archivo físico y la URL para la base de datos
-    print(f"Ruta física del archivo: {filepath}")
-
-    # Generar la ruta para guardar en la base de datos
-    foto_path = f"./static/img/{filename}"
+    # Genera la ruta para almacenar en la base de datos
+    foto_path = f"/app/static/fotos_perfil/{filename}"
     print(f"Ruta URL para la base de datos: {foto_path}")
 
     user_id = request.form.get('user_id')
@@ -309,7 +306,6 @@ def upload_photo():
         return redirect(url_for('inicio'))
     else:
         return redirect(url_for('inicio'))
-
 
 @accounting_bp.route('/reglas/actualizar_regla/<int:id_regla>', methods=['POST'])
 def actualizar_regla(id_regla):

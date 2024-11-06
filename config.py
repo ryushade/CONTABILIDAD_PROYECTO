@@ -13,7 +13,7 @@ class Config:
     DATABASE_HOST = os.getenv('DATABASE_HOST', 'localhost')
     DATABASE_PORT = os.getenv('DATABASE_PORT', '3306')
     DATABASE_USER = os.getenv('DATABASE_USER', 'root')
-    DATABASE_PASSWORD = os.getenv('DATABASE_PASSWORD', '123456')
+    DATABASE_PASSWORD = os.getenv('DATABASE_PASSWORD', '')
     DATABASE_NAME = os.getenv('DATABASE_NAME', 'db_tormenta')
     
     # Configuración de JWT
@@ -25,7 +25,7 @@ class Config:
     JWT_ACCESS_TOKEN_EXPIRES = int(os.getenv('JWT_ACCESS_TOKEN_EXPIRES', 3600))
     
     # Configuración de la carpeta de subidas
-    UPLOAD_FOLDER = os.path.join(basedir, 'static', 'img')
+    UPLOAD_FOLDER = os.path.join(basedir, 'app/static', 'fotos_perfil')
     
     @property
     def DATABASE_URI(self):

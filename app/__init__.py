@@ -6,7 +6,7 @@ from app.models.contable_models import obtener_usuario_por_id
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-
+    app.config['UPLOAD_FOLDER'] = Config.UPLOAD_FOLDER
     jwt = JWTManager(app)
 
     @jwt.unauthorized_loader
