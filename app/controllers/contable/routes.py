@@ -1,4 +1,4 @@
-from flask import json, abort, request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app
+from flask import json, abort, request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app, send_from_directory
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
 from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, obtener_id_cuenta, obtener_regla_por_id, obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas,obtener_asientos_agrupados_excel,obtener_registro_compras
 from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas, obtener_asientos_agrupados_excel, obtener_libro_caja, obtener_libro_caja_cuenta_corriente
@@ -254,8 +254,16 @@ def exportar_excel():
 
 
 # routes.py
+@accounting_bp.route('/exportar_pdf', methods=['GET'], endpoint='exportar_pdf')
+@jwt_required()
+def descargar_pdf():
+    return send_from_directory(
+        directory='static/files',  
+        path='PCGE.pdf',
+        as_attachment=True,
+        download_name="PCGE.pdf"
+    )
 
-@accounting_bp.route('/exportar_pdf', methods=['GET'])
 
 @accounting_bp.route('/cuentas/obtener/<int:cuenta_id>', methods=['GET'])
 def obtener_cuenta(cuenta_id):

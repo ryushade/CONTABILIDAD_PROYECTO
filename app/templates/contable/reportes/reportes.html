@@ -120,23 +120,21 @@
 <div class="mb-2">
     <div class="nav nav-tabs">
         <a class="nav-item nav-link active" href="#libro-diario" data-bs-toggle="tab">
-            <i class="fas fa-book"></i> Libro diario
+            <i class="fas fa-journal-whills"></i> Libro diario
         </a>
         <a class="nav-item nav-link" href="#libro-mayor" data-bs-toggle="tab">
-            <i class="fas fa-book"></i> Libro mayor
+            <i class="fas fa-scroll"></i> Libro mayor
         </a>
-
         <a class="nav-item nav-link" href="#libro-compras" data-bs-toggle="tab">
-            <i class="fas fa-book"></i> Libro de compras
+            <i class="fas fa-receipt"></i> Libro de compras
         </a>
-
         <a class="nav-item nav-link" href="#libro-ventas" data-bs-toggle="tab">
-            <i class="fas fa-book"></i> Libro de ventas
+            <i class="fas fa-file-invoice-dollar"></i> Libro de ventas
+        </a>
+        <a class="nav-item nav-link" href="#libro-caja" data-bs-toggle="tab">
+            <i class="fas fa-cash-register"></i> Libro caja
         </a>
 
-        <a class="nav-item nav-link" href="#libro-caja" data-bs-toggle="tab">
-            <i class="fas fa-book"></i> Libro caja
-        </a>
 
     </div>
 </div>
@@ -578,7 +576,7 @@
     <!-- Tab: Libro Compras -->
     <div class="tab-pane fade" id="libro-compras">
         <div class="card bg-white rounded custom-shadow p-4">
-            <header class="d-flex justify-content-between align-items-center mb-4">
+            <header class="d-flex justify-content-between align-items-center mb-2">
                 <h1 class="h4 mb-0 d-flex align-items-center" style="font-weight: bold;">
                     <span></span>
                     LIBRO REGISTRO DE COMPRAS
@@ -644,6 +642,14 @@
                         background-color: #e4ebf7;
                     }
 
+                    #tabla_caja tr:hover {
+                        background-color: #e4ebf7;
+                    }
+
+                    #tabla_corriente tr:hover {
+                        background-color: #e4ebf7;
+                    }
+
                     /* Ajuste de padding para filas compactas */
                     table {
                         width: 100%;
@@ -698,12 +704,13 @@
                     <tfoot>
                         <tr>
                             <th colspan="5" style="text-align: right; font-weight: bold; color: #000; font-size: 14px;">
-                                TOTALES</th>
-                            <th class="text-end" style="font-weight: bold; font-size: 14px;">{{
+                                TOTAL (S/.)</th>
+                            <th style="font-weight: bold; font-size: 14px; color: #000;" class="text-end">{{
                                 totalesCompras.total_importe | round(2) }}</th>
-                            <th class="text-end" style="font-weight: bold; font-size: 14px;">{{ totalesCompras.total_igv
+                            <th style="font-weight: bold; font-size: 14px; color: #000;" class="text-end">{{
+                                totalesCompras.total_igv
                                 | round(2) }}</th>
-                            <th class="text-end" style="font-weight: bold; font-size: 14px;">{{
+                            <th style="font-weight: bold; font-size: 14px; color: #000;" class="text-end">{{
                                 totalesCompras.total_general | round(2) }}</th>
                         </tr>
                     </tfoot>
@@ -715,13 +722,12 @@
     <!-- Tab: Libro Ventas -->
     <div class="tab-pane fade" id="libro-ventas">
         <div class="card bg-white rounded custom-shadow p-4">
-            <header class="d-flex justify-content-between align-items-center mb-4">
+            <header class="d-flex justify-content-between align-items-center mb-2">
                 <h1 class="h4 mb-0 d-flex align-items-center" style="font-weight: bold;">
-                    <span></span>
                     LIBRO REGISTRO DE VENTAS
                 </h1>
 
-                <div class="dropdown me-2">
+                <div class="dropdown me-1">
                     <button class="btn btn-light border dropdown-toggle" type="button" id="dropdownMenuButton"
                         data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Exportar datos
@@ -745,7 +751,7 @@
             </header>
 
 
-            <p class="text-muted small mb-3">Registro detallado de todas las adquisiciones realizadas por la
+            <p class="text-muted small mb-2">Registro detallado de todas las adquisiciones realizadas por la
                 empresa,
                 utilizado para control de gastos y cálculo de créditos fiscales.</p>
             <div class="container">
@@ -772,9 +778,14 @@
 
                 </form>
             </div>
-            <div class="table-responsive mt-2 mb-2">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-light">
+            <style>
+                #tabla_ventas tr:hover {
+                    background-color: #e4ebf7;
+                }
+            </style>
+            <div class="table-container mt-2" style="border: 1px solid #ccc;">
+                <table id="tabla_ventas" style="border: #000; width: 100%; font-size: 13px;">
+                    <thead>
                         <tr>
                             <th class="text-center">N° CORRELATIVO</th>
                             <th class="text-center">FECHA</th>
@@ -802,19 +813,19 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th colspan="6" class="text-end" style="font-weight: bold;">TOTALES</th>
-                            <th class="text-end" style="font-weight: bold;">{{ totale.total_importe | round(2) }}
-                            </th>
-                            <th colspan="5" class="text-end" style="font-weight: bold;">TOTALES</th>
-                            <th class="text-end" style="font-weight: bold;">{{ totale.total_importe | round(2) }}
-                            </th>
-                            <th class="text-end" style="font-weight: bold;">{{ totale.total_igv | round(2) }}</th>
-                            <th class="text-end" style="font-weight: bold;">{{ totale.total_general | round(2) }}
-                            </th>
+                            <th colspan="5" class="text-end" style="font-weight: bold; color: #000; font-size: 14px;">
+                                TOTALES (S/.)</th>
+                            <th style="font-weight: bold; font-size: 14px; color: #000;" class="text-end">{{
+                                totale.total_importe | round(2) }}</th>
+                            <th style="font-weight: bold; font-size: 14px; color: #000;" class="text-end">{{
+                                totale.total_igv | round(2) }}</th>
+                            <th style="font-weight: bold; font-size: 14px; color: #000;" class="text-end">{{
+                                totale.total_general | round(2) }}</th>
                         </tr>
                     </tfoot>
                 </table>
             </div>
+
 
 
 
@@ -824,7 +835,7 @@
     <!-- Tab: Libro Caja -->
     <div class="tab-pane fade" id="libro-caja">
         <div class="card bg-white rounded custom-shadow p-4">
-            <header class="d-flex justify-content-between align-items-center mb-4">
+            <header class="d-flex justify-content-between align-items-center mb-2">
                 <h1 class="h4 mb-0 d-flex align-items-center" style="font-weight: bold;">
                     <span></span>
                     LIBRO CAJA
@@ -836,7 +847,7 @@
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         <a class="dropdown-item d-flex flex-column"
-                            href="{{ url_for('contable.exportar_libro_caja_excel') }}">
+                            href="#" onclick="openModalDownloadExcelCaja()">
                             <span class="d-flex align-items-center">
                                 <i class="fa fa-file-excel mr-2"></i>
                                 <strong>Exportar a Excel</strong>
@@ -852,8 +863,9 @@
                 </div>
             </header>
 
-            <p class="text-muted small mb-4">Registro detallado de las operaciones que implican la entrada o salida de
-                efectivo en una empresa.</p>
+            <p class="text-muted small mb-2">Selecciona una pestaña para ver el registro
+                detallado de las operaciones de entradas y salidas de efectivo.</p>
+
 
             <!-- Filtro y selección de fecha -->
             <div class="container">
@@ -889,55 +901,87 @@
                 </form>
 
                 <!-- Pestañas de navegación -->
-                <ul class="nav nav-tabs" id="myTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <a class="nav-link {% if active_tab == 'libro-caja' %}active{% endif %}" id="efectivo-tab" data-bs-toggle="tab" href="#efectivo" role="tab" aria-controls="efectivo" aria-selected="true">Efectivo</a>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <a class="nav-link {% if active_tab == 'cuenta-corriente' %}active{% endif %}" id="cuenta-corriente-tab" data-bs-toggle="tab" href="#cuenta-corriente" role="tab" aria-controls="cuenta-corriente" aria-selected="false">Cuenta Corriente</a>
-                    </li>
-                </ul>
+                <!-- Navegación de pestañas -->
+                <div class="nav nav-tabs" id="myTabs" role="tablist">
+                    <a class="nav-item nav-link {% if active_tab == 'libro-caja' %}active{% endif %}" id="efectivo-tab"
+                        data-bs-toggle="tab" href="#efectivo" role="tab" aria-controls="efectivo" aria-selected="true">
+                        <i class="fas fa-wallet me-2"></i> Efectivo
+                    </a>
+                    <a class="nav-item nav-link {% if active_tab == 'cuenta-corriente' %}active{% endif %}"
+                        id="cuenta-corriente-tab" data-bs-toggle="tab" href="#cuenta-corriente" role="tab"
+                        aria-controls="cuenta-corriente" aria-selected="false">
+                        <i class="fas fa-university me-2"></i> Cuenta corriente
+                    </a>
+                </div>
 
                 <!-- Contenido de las pestañas -->
                 <div class="tab-content">
                     <!-- Tab: Libro Caja - Efectivo -->
-                    <div class="tab-pane show active" id="efectivo">
-                        <div class="table-responsive mb-4">
-                            <table class="table table-bordered table-hover">
-                                <thead class="table-light">
+                    <div class="tab-pane fade {% if active_tab == 'libro-caja' %}show active{% endif %}" id="efectivo">
+                        <div class="table-container mt-2"
+                            style="border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); overflow: hidden;">
+                            <table id="tabla_caja" style="width: 100%; font-size: 13px; border-collapse: collapse;">
+                                <thead style="background-color: #f7f9fc; border-bottom: 2px solid #dee2e6;">
                                     <tr>
-                                        <th rowspan="2" class="text-center">FECHA</th>
-                                        <th rowspan="2" class="text-center">DESCRIPCIÓN</th>
-                                        <th colspan="2" class="text-center">CUENTA CONTABLE ASOCIADA</th>
-                                        <th colspan="2" class="text-center">SALDOS Y MOVIMIENTOS</th>
+                                        <th rowspan="2" class="text-center"
+                                            style="padding: 10px; border: 1px solid #dee2e6;">FECHA</th>
+                                        <th rowspan="2" class="text-center"
+                                            style="padding: 10px; border: 1px solid #dee2e6;">DESCRIPCIÓN</th>
+                                        <th colspan="2" class="text-center"
+                                            style="padding: 10px; border: 1px solid #dee2e6;">CUENTA CONTABLE ASOCIADA
+                                        </th>
+                                        <th colspan="2" class="text-center"
+                                            style="padding: 10px; border: 1px solid #dee2e6;">SALDOS Y MOVIMIENTOS</th>
                                     </tr>
                                     <tr>
-                                        <th class="text-center">CÓDIGO</th>
-                                        <th class="text-center">DENOMINACIÓN</th>
-                                        <th class="text-center">DEUDOR</th>
-                                        <th class="text-center">ACREEDOR</th>
+                                        <th class="text-center" style="padding: 10px; border: 1px solid #dee2e6;">CÓDIGO
+                                        </th>
+                                        <th class="text-center" style="padding: 10px; border: 1px solid #dee2e6;">
+                                            DENOMINACIÓN</th>
+                                        <th class="text-center" style="padding: 10px; border: 1px solid #dee2e6;">DEUDOR
+                                        </th>
+                                        <th class="text-center" style="padding: 10px; border: 1px solid #dee2e6;">
+                                            ACREEDOR</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% if lista_libro_caja %}
                                     {% for lista in lista_libro_caja %}
                                     <tr>
-                                        <td>{{ lista.fecha }}</td>
-                                        <td>{{ lista.glosa }}</td>
-                                        <td>{{ lista.cod_cuenta }}</td>
-                                        <td>{{ lista.nombre_cuenta }}</td>
-                                        <td>{{ lista.debe | round(2) }}</td>
-                                        <td>{{ lista.haber | round(2) }}</td>
+                                        <td class="text-center" style="padding: 10px; border: 1px solid #dee2e6;">{{
+                                            lista.fecha }}</td>
+                                        <td class="text-center" style="padding: 10px; border: 1px solid #dee2e6;">{{
+                                            lista.glosa }}</td>
+                                        <td class="text-center" style="padding: 10px; border: 1px solid #dee2e6;">{{
+                                            lista.cod_cuenta }}</td>
+                                        <td class="text-center" style="padding: 10px; border: 1px solid #dee2e6;">{{
+                                            lista.nombre_cuenta }}</td>
+                                        <td class="text-end" style="padding: 10px; border: 1px solid #dee2e6;">{{
+                                            lista.debe | round(2) }}</td>
+                                        <td class="text-end" style="padding: 10px; border: 1px solid #dee2e6;">{{
+                                            lista.haber | round(2) }}</td>
                                     </tr>
                                     {% endfor %}
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="6" class="text-center"
+                                            style="padding: 10px; border: 1px solid #dee2e6;">No se encontraron
+                                            registros para el criterio seleccionado.</td>
+                                    </tr>
                                     {% endif %}
                                 </tbody>
-                                <tfoot>
+                                <tfoot style="background-color: #f7f9fc;">
                                     {% if total_caja %}
                                     <tr>
-                                        <th colspan="4" class="text-end" style="font-weight: bold;">TOTALES</th>
-                                        <th style="font-weight: bold;">{{ total_caja.debe | round(2) }}</th>
-                                        <th style="font-weight: bold;">{{ total_caja.haber | round(2) }}</th>
+                                        <th colspan="4" class="text-end"
+                                            style="padding: 10px; font-weight: bold; font-size: 14px; color: #000; border: 1px solid #dee2e6;">
+                                            TOTALES</th>
+                                        <th class="text-end"
+                                            style="padding: 10px; font-weight: bold; font-size: 14px; color: #000; border: 1px solid #dee2e6;">
+                                            {{ total_caja.debe | round(2) }}</th>
+                                        <th class="text-end"
+                                            style="padding: 10px; font-weight: bold; font-size: 14px; color: #000; border: 1px solid #dee2e6;">
+                                            {{ total_caja.haber | round(2) }}</th>
                                     </tr>
                                     {% endif %}
                                 </tfoot>
@@ -946,50 +990,86 @@
                     </div>
 
                     <!-- Tab: Libro Caja - Cuenta Corriente -->
-                    <div class="tab-pane fade" id="cuenta-corriente">
-                        <div class="table-responsive mb-4">
-                            <table class="table table-bordered table-hover">
-                                <thead class="table-light">
+                    <div class="tab-pane fade {% if active_tab == 'cuenta-corriente' %}show active{% endif %}"
+                        id="cuenta-corriente">
+                        <div class="table-container mt-2"
+                            style="border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); overflow: hidden;">
+                            <table id="tabla_corriente"
+                                style="width: 100%; font-size: 13px; border-collapse: collapse;">
+                                <thead style="background-color: #f7f9fc; border-bottom: 2px solid #dee2e6;">
                                     <tr>
-                                        <th rowspan="2" class="text-center">FECHA</th>
-                                        <th colspan="4" class="text-center">OPERACIÓNES BANCARIAS</th>
-                                        <th colspan="2" class="text-center">CUENTA CONTABLE</th>
-                                        <th colspan="2" class="text-center">SALDOS Y MOVIMIENTOS</th>
+                                        <th rowspan="2" class="text-center"
+                                            style="padding: 10px; border: 1px solid #dee2e6;">FECHA</th>
+                                        <th colspan="4" class="text-center"
+                                            style="padding: 10px; border: 1px solid #dee2e6;">OPERACIONES BANCARIAS</th>
+                                        <th colspan="2" class="text-center"
+                                            style="padding: 10px; border: 1px solid #dee2e6;">CUENTA CONTABLE</th>
+                                        <th colspan="2" class="text-center"
+                                            style="padding: 10px; border: 1px solid #dee2e6;">SALDOS Y MOVIMIENTOS</th>
                                     </tr>
                                     <tr>
-                                        <th class="text-center">MEDIO DE PAGO</th>
-                                        <th class="text-center">DESCRIPCIÓN</th>
-                                        <th class="text-center">RAZÓN SOCIAL</th>
-                                        <th class="text-center">COMPROBANTE</th>
-                                        <th class="text-center">CÓDIGO</th>
-                                        <th class="text-center">DENOMINACIÓN</th>
-                                        <th class="text-center">DEUDOR</th>
-                                        <th class="text-center">ACREEDOR</th>
+                                        <th class="text-center" style="padding: 10px; border: 1px solid #dee2e6;">MEDIO
+                                            DE PAGO</th>
+                                        <th class="text-center" style="padding: 10px; border: 1px solid #dee2e6;">
+                                            DESCRIPCIÓN</th>
+                                        <th class="text-center" style="padding: 10px; border: 1px solid #dee2e6;">RAZÓN
+                                            SOCIAL</th>
+                                        <th class="text-center" style="padding: 10px; border: 1px solid #dee2e6;">
+                                            COMPROBANTE</th>
+                                        <th class="text-center" style="padding: 10px; border: 1px solid #dee2e6;">CÓDIGO
+                                        </th>
+                                        <th class="text-center" style="padding: 10px; border: 1px solid #dee2e6;">
+                                            DENOMINACIÓN</th>
+                                        <th class="text-center" style="padding: 10px; border: 1px solid #dee2e6;">DEUDOR
+                                        </th>
+                                        <th class="text-center" style="padding: 10px; border: 1px solid #dee2e6;">
+                                            ACREEDOR</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% if lista_libro_caja_cuenta_corriente %}
                                     {% for lista in lista_libro_caja_cuenta_corriente %}
                                     <tr>
-                                        <td>{{ lista.fecha }}</td>
-                                        <td>{{ lista.forma_pago }}</td>
-                                        <td>{{ lista.nombre_cuenta }}</td>
-                                        <td>{{ lista.nombre }}</td>
-                                        <td>{{ lista.comprobante }}</td>
-                                        <td>{{ lista.codigo }}</td>
-                                        <td>{{ lista.denominacion }}</td>
-                                        <td>{{ lista.debe | round(2) }}</td>
-                                        <td>{{ lista.haber | round(2) }}</td>
+                                        <td class="text-center" style="padding: 10px; border: 1px solid #dee2e6;">{{
+                                            lista.fecha }}</td>
+                                        <td class="text-center" style="padding: 10px; border: 1px solid #dee2e6;">{{
+                                            lista.forma_pago }}</td>
+                                        <td class="text-center" style="padding: 10px; border: 1px solid #dee2e6;">{{
+                                            lista.nombre_cuenta }}</td>
+                                        <td class="text-center" style="padding: 10px; border: 1px solid #dee2e6;">{{
+                                            lista.nombre }}</td>
+                                        <td class="text-center" style="padding: 10px; border: 1px solid #dee2e6;">{{
+                                            lista.comprobante }}</td>
+                                        <td class="text-center" style="padding: 10px; border: 1px solid #dee2e6;">{{
+                                            lista.codigo }}</td>
+                                        <td class="text-center" style="padding: 10px; border: 1px solid #dee2e6;">{{
+                                            lista.denominacion }}</td>
+                                        <td class="text-end" style="padding: 10px; border: 1px solid #dee2e6;">{{
+                                            lista.debe | round(2) }}</td>
+                                        <td class="text-end" style="padding: 10px; border: 1px solid #dee2e6;">{{
+                                            lista.haber | round(2) }}</td>
                                     </tr>
                                     {% endfor %}
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="9" class="text-center"
+                                            style="padding: 10px; border: 1px solid #dee2e6;">No se encontraron
+                                            registros para el criterio seleccionado.</td>
+                                    </tr>
                                     {% endif %}
                                 </tbody>
-                                <tfoot>
+                                <tfoot style="background-color: #f7f9fc;">
                                     {% if total_caja_corriente %}
                                     <tr>
-                                        <th colspan="6" class="text-end" style="font-weight: bold;">TOTALES</th>
-                                        <th style="font-weight: bold;">{{ total_caja_corriente.debe | round(2) }}</th>
-                                        <th style="font-weight: bold;">{{ total_caja_corriente.haber | round(2) }}</th>
+                                        <th colspan="7" class="text-end"
+                                            style="padding: 10px; font-weight: bold; font-size: 14px; color: #000; border: 1px solid #dee2e6;">
+                                            TOTALES</th>
+                                        <th class="text-end"
+                                            style="padding: 10px; font-weight: bold; font-size: 14px; color: #000; border: 1px solid #dee2e6;">
+                                            {{ total_caja_corriente.debe | round(2) }}</th>
+                                        <th class="text-end"
+                                            style="padding: 10px; font-weight: bold; font-size: 14px; color: #000; border: 1px solid #dee2e6;">
+                                            {{ total_caja_corriente.haber | round(2) }}</th>
                                     </tr>
                                     {% endif %}
                                 </tfoot>
@@ -997,331 +1077,371 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
 
-
-    <!---Compras-->
-    <div id="downloadExcelModalCompras" class="confirmation-modal-overlay" style="display: none">
-        <div class="confirmation-modal" style="text-align: center;">
-            <div class="modal-icon" style="margin-bottom: 10px;">
-                <!-- Icono de descarga -->
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
-                    stroke="green" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-            </div>
-            <h2 class="confirmation-modal-title" style="color: rgb(30, 30, 30);">DESCARGAR ARCHIVO EXCEL</h2>
-            <p class="confirmation-modal-message">¿Estás seguro que deseas descargar el registro de compras en formato
-                Excel?</p>
-            <div class="confirmation-modal-buttons"
-                style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
-                <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;"
-                    class="btn btn-secondary" onclick="closeModalDownloadCompras()">No, Cancelar</button>
-                <button
-                    style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600; background-color: #1F6E43; border: none;"
-                    class="btn btn-primary" onclick="downloadExcelCompras()">Sí, Descargar</button>
-            </div>
-        </div>
-    </div>
-
-
-    <div id="downloadPDFModalCompras" class="confirmation-modal-overlay" style="display: none;">
-        <div class="confirmation-modal" style="text-align: center;">
-            <div class="modal-icon" style="margin-bottom: 10px;">
-                <!-- Icono de descarga en rojo para PDF -->
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
-                    stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-            </div>
-            <h2 class="confirmation-modal-title" style="color: rgb(30, 30, 30);">DESCARGAR ARCHIVO PDF</h2>
-            <p class="confirmation-modal-message">¿Estás seguro que deseas descargar el registro de compras en formato
-                PDF?</p>
-            <div class="confirmation-modal-buttons"
-                style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
-                <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;"
-                    class="btn btn-secondary" onclick="closeModalDownloadPDFCompras()">No, Cancelar</button>
-                <button
-                    style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600; background-color: #0B5ED7; border: none; transition: background-color 0.3s;"
-                    class="btn btn-primary" onclick="downloadPDFCompras()"
-                    onmouseover="this.style.backgroundColor='#1D4ED8'"
-                    onmouseout="this.style.backgroundColor='#0B5ED7'">
-                    Sí, Descargar
-                </button>
 
             </div>
         </div>
     </div>
+</div>
+</div>
 
 
-    <!---Ventas-->
-    <div id="downloadExcelModalVentas" class="confirmation-modal-overlay" style="display: none">
-        <div class="confirmation-modal" style="text-align: center;">
-            <div class="modal-icon" style="margin-bottom: 10px;">
-                <!-- Icono de descarga -->
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
-                    stroke="green" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-            </div>
-            <h2 class="confirmation-modal-title" style="color: rgb(30, 30, 30);">DESCARGAR ARCHIVO EXCEL</h2>
-            <p class="confirmation-modal-message">¿Estás seguro que deseas descargar el registro de ventas en formato
-                Excel?</p>
-            <div class="confirmation-modal-buttons"
-                style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
-                <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;"
-                    class="btn btn-secondary" onclick="closeModalDownloadVentas()">No, Cancelar</button>
-                <button
-                    style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600; background-color: #1F6E43; border: none;"
-                    class="btn btn-primary" onclick="downloadExcelVentas()">Sí, Descargar</button>
-            </div>
+<!---Compras-->
+<div id="downloadExcelModalCompras" class="confirmation-modal-overlay" style="display: none">
+    <div class="confirmation-modal" style="text-align: center;">
+        <div class="modal-icon" style="margin-bottom: 10px;">
+            <!-- Icono de descarga -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                stroke="green" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+        </div>
+        <h2 class="confirmation-modal-title" style="color: rgb(30, 30, 30);">DESCARGAR ARCHIVO EXCEL</h2>
+        <p class="confirmation-modal-message">¿Estás seguro que deseas descargar el registro de compras en formato
+            Excel?</p>
+        <div class="confirmation-modal-buttons"
+            style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
+            <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" class="btn btn-secondary"
+                onclick="closeModalDownloadCompras()">No, Cancelar</button>
+            <button
+                style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600; background-color: #1F6E43; border: none;"
+                class="btn btn-primary" onclick="downloadExcelCompras()">Sí, Descargar</button>
         </div>
     </div>
+</div>
 
 
-    <div id="downloadPDFModalVentas" class="confirmation-modal-overlay" style="display: none;">
-        <div class="confirmation-modal" style="text-align: center;">
-            <div class="modal-icon" style="margin-bottom: 10px;">
-                <!-- Icono de descarga en rojo para PDF -->
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
-                    stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-            </div>
-            <h2 class="confirmation-modal-title" style="color: rgb(30, 30, 30);">DESCARGAR ARCHIVO PDF</h2>
-            <p class="confirmation-modal-message">¿Estás seguro que deseas descargar el registro de ventas en formato
-                PDF?</p>
-            <div class="confirmation-modal-buttons"
-                style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
-                <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;"
-                    class="btn btn-secondary" onclick="closeModalDownloadPDFVentas()">No, Cancelar</button>
-                <button
-                    style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600; background-color: #0B5ED7; border: none; transition: background-color 0.3s;"
-                    class="btn btn-primary" onclick="downloadPDFVentas()"
-                    onmouseover="this.style.backgroundColor='#1D4ED8'"
-                    onmouseout="this.style.backgroundColor='#0B5ED7'">
-                    Sí, Descargar
-                </button>
+<div id="downloadPDFModalCompras" class="confirmation-modal-overlay" style="display: none;">
+    <div class="confirmation-modal" style="text-align: center;">
+        <div class="modal-icon" style="margin-bottom: 10px;">
+            <!-- Icono de descarga en rojo para PDF -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="red"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+        </div>
+        <h2 class="confirmation-modal-title" style="color: rgb(30, 30, 30);">DESCARGAR ARCHIVO PDF</h2>
+        <p class="confirmation-modal-message">¿Estás seguro que deseas descargar el registro de compras en formato
+            PDF?</p>
+        <div class="confirmation-modal-buttons"
+            style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
+            <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" class="btn btn-secondary"
+                onclick="closeModalDownloadPDFCompras()">No, Cancelar</button>
+            <button
+                style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600; background-color: #0B5ED7; border: none; transition: background-color 0.3s;"
+                class="btn btn-primary" onclick="downloadPDFCompras()"
+                onmouseover="this.style.backgroundColor='#1D4ED8'" onmouseout="this.style.backgroundColor='#0B5ED7'">
+                Sí, Descargar
+            </button>
 
-            </div>
         </div>
     </div>
+</div>
 
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-            popoverTriggerList.forEach(function (popoverTriggerEl) {
-                var isAcreedor = popoverTriggerEl.getAttribute("data-bs-content").includes("Saldo Acreedor");
-                var colorClass = isAcreedor ? "saldo-acreedor" : "saldo-deudor";
+<!---Ventas-->
+<div id="downloadExcelModalVentas" class="confirmation-modal-overlay" style="display: none">
+    <div class="confirmation-modal" style="text-align: center;">
+        <div class="modal-icon" style="margin-bottom: 10px;">
+            <!-- Icono de descarga -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                stroke="green" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+        </div>
+        <h2 class="confirmation-modal-title" style="color: rgb(30, 30, 30);">DESCARGAR ARCHIVO EXCEL</h2>
+        <p class="confirmation-modal-message">¿Estás seguro que deseas descargar el registro de ventas en formato
+            Excel?</p>
+        <div class="confirmation-modal-buttons"
+            style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
+            <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" class="btn btn-secondary"
+                onclick="closeModalDownloadVentas()">No, Cancelar</button>
+            <button
+                style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600; background-color: #1F6E43; border: none;"
+                class="btn btn-primary" onclick="downloadExcelVentas()">Sí, Descargar</button>
+        </div>
+    </div>
+</div>
 
-                var popover = new bootstrap.Popover(popoverTriggerEl, {
-                    html: true,
-                    content: function () {
-                        return '<span class="' + colorClass + '">' + popoverTriggerEl.getAttribute("data-bs-content") + '</span>';
-                    }
-                });
-            });
-        });
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            flatpickr("#daterange", {
-                mode: "range",
-                dateFormat: "m/Y",
-                minDate: "01/1900",
-                maxDate: "04/2028",
-                plugins: [
-                    new monthSelectPlugin({
-                        dateFormat: "m/Y",
-                        altFormat: "F Y",
-                        altInput: true
-                    })
-                ],
-                onClose: function (selectedDates, dateStr, instance) {
-                    if (selectedDates.length === 2) {
-                        document.getElementById('filterForm').submit();
-                    }
+
+<div id="downloadPDFModalVentas" class="confirmation-modal-overlay" style="display: none;">
+    <div class="confirmation-modal" style="text-align: center;">
+        <div class="modal-icon" style="margin-bottom: 10px;">
+            <!-- Icono de descarga en rojo para PDF -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="red"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+        </div>
+        <h2 class="confirmation-modal-title" style="color: rgb(30, 30, 30);">DESCARGAR ARCHIVO PDF</h2>
+        <p class="confirmation-modal-message">¿Estás seguro que deseas descargar el registro de ventas en formato
+            PDF?</p>
+        <div class="confirmation-modal-buttons"
+            style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
+            <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" class="btn btn-secondary"
+                onclick="closeModalDownloadPDFVentas()">No, Cancelar</button>
+            <button
+                style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600; background-color: #0B5ED7; border: none; transition: background-color 0.3s;"
+                class="btn btn-primary" onclick="downloadPDFVentas()" onmouseover="this.style.backgroundColor='#1D4ED8'"
+                onmouseout="this.style.backgroundColor='#0B5ED7'">
+                Sí, Descargar
+            </button>
+
+        </div>
+    </div>
+</div>
+
+
+<div id="downloadExcelModalCaja" class="confirmation-modal-overlay" style="display: none">
+    <div class="confirmation-modal" style="text-align: center;">
+        <div class="modal-icon" style="margin-bottom: 10px;">
+            <!-- Icono de descarga -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                stroke="green" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+        </div>
+        <h2 class="confirmation-modal-title" style="color: rgb(30, 30, 30);">DESCARGAR ARCHIVO EXCEL</h2>
+        <p class="confirmation-modal-message">¿Estás seguro que deseas descargar el libro caja en formato
+            Excel?</p>
+        <div class="confirmation-modal-buttons"
+            style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
+            <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" class="btn btn-secondary"
+                onclick="closeModalDownloadCaja()">No, Cancelar</button>
+            <button
+                style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600; background-color: #1F6E43; border: none;"
+                class="btn btn-primary" onclick="downloadExcelCaja()">Sí, Descargar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+        popoverTriggerList.forEach(function (popoverTriggerEl) {
+            var isAcreedor = popoverTriggerEl.getAttribute("data-bs-content").includes("Saldo Acreedor");
+            var colorClass = isAcreedor ? "saldo-acreedor" : "saldo-deudor";
+
+            var popover = new bootstrap.Popover(popoverTriggerEl, {
+                html: true,
+                content: function () {
+                    return '<span class="' + colorClass + '">' + popoverTriggerEl.getAttribute("data-bs-content") + '</span>';
                 }
             });
         });
-
-        document.addEventListener("DOMContentLoaded", function () {
-            // Verificar si hay un tab activo especificado en la URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const activeTab = urlParams.get('active_tab');
-
-            // Solo activa el tab específico si está presente en la URL
-            if (activeTab) {
-                const activeTabLink = document.querySelector(`[href="#${activeTab}"]`);
-                const activeTabContent = document.getElementById(activeTab);
-
-                if (activeTabLink && activeTabContent) {
-                    // Remover la clase 'active' de todos los tabs y contenidos
-                    document.querySelectorAll('.nav-tabs .nav-link').forEach(tab => tab.classList.remove('active'));
-                    document.querySelectorAll('.tab-content .tab-pane').forEach(content => content.classList.remove('show', 'active'));
-
-                    // Agregar la clase 'active' solo al tab específico
-                    activeTabLink.classList.add('active');
-                    activeTabContent.classList.add('show', 'active');
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        flatpickr("#daterange", {
+            mode: "range",
+            dateFormat: "m/Y",
+            minDate: "01/1900",
+            maxDate: "04/2028",
+            plugins: [
+                new monthSelectPlugin({
+                    dateFormat: "m/Y",
+                    altFormat: "F Y",
+                    altInput: true
+                })
+            ],
+            onClose: function (selectedDates, dateStr, instance) {
+                if (selectedDates.length === 2) {
+                    document.getElementById('filterForm').submit();
                 }
             }
+        });
+    });
 
-            // Configurar flatpickr para el campo daterangemayor en el "Libro Mayor"
-            flatpickr("#daterangemayor", {
-                mode: "range",
-                dateFormat: "m/Y",
-                minDate: "01/1900",
-                maxDate: "04/2028",
-                plugins: [
-                    new monthSelectPlugin({
-                        dateFormat: "m/Y",
-                        altFormat: "F Y",
-                        altInput: true
-                    })
-                ],
-                onClose: function (selectedDates, dateStr, instance) {
-                    if (selectedDates.length === 2) {
-                        document.getElementById('filterFormMayor').submit();
-                    }
-                }
-            });
+    document.addEventListener("DOMContentLoaded", function () {
+        // Verificar si hay un tab activo especificado en la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const activeTab = urlParams.get('active_tab');
 
-            flatpickr("#daterangecaja", {
-                mode: "range",
-                dateFormat: "m/Y",
-                minDate: "01/1900",
-                maxDate: "04/2028",
-                plugins: [
-                    new monthSelectPlugin({
-                        dateFormat: "m/Y",
-                        altFormat: "F Y",
-                        altInput: true
-                    })
-                ],
-                onClose: function (selectedDates, dateStr, instance) {
-                    if (selectedDates.length === 2) {
-                        document.getElementById('filterFormCaja').submit();
-                    }
+        // Solo activa el tab específico si está presente en la URL
+        if (activeTab) {
+            const activeTabLink = document.querySelector(`[href="#${activeTab}"]`);
+            const activeTabContent = document.getElementById(activeTab);
+
+            if (activeTabLink && activeTabContent) {
+                // Remover la clase 'active' de todos los tabs y contenidos
+                document.querySelectorAll('.nav-tabs .nav-link').forEach(tab => tab.classList.remove('active'));
+                document.querySelectorAll('.tab-content .tab-pane').forEach(content => content.classList.remove('show', 'active'));
+
+                // Agregar la clase 'active' solo al tab específico
+                activeTabLink.classList.add('active');
+                activeTabContent.classList.add('show', 'active');
+            }
+        }
+
+        // Configurar flatpickr para el campo daterangemayor en el "Libro Mayor"
+        flatpickr("#daterangemayor", {
+            mode: "range",
+            dateFormat: "m/Y",
+            minDate: "01/1900",
+            maxDate: "04/2028",
+            plugins: [
+                new monthSelectPlugin({
+                    dateFormat: "m/Y",
+                    altFormat: "F Y",
+                    altInput: true
+                })
+            ],
+            onClose: function (selectedDates, dateStr, instance) {
+                if (selectedDates.length === 2) {
+                    document.getElementById('filterFormMayor').submit();
                 }
-            });
+            }
         });
 
-        function openModalDownloadVentas() {
-            document.getElementById("downloadExcelModalVentas").style.display = "flex";
-        }
+        flatpickr("#daterangecaja", {
+            mode: "range",
+            dateFormat: "m/Y",
+            minDate: "01/1900",
+            maxDate: "04/2028",
+            plugins: [
+                new monthSelectPlugin({
+                    dateFormat: "m/Y",
+                    altFormat: "F Y",
+                    altInput: true
+                })
+            ],
+            onClose: function (selectedDates, dateStr, instance) {
+                if (selectedDates.length === 2) {
+                    document.getElementById('filterFormCaja').submit();
+                }
+            }
+        });
+    });
 
-        function closeModalDownloadVentas() {
-            document.getElementById("downloadExcelModalVentas").style.display = "none";
-        }
+    function openModalDownloadExcelCaja() {
+        document.getElementById("downloadExcelModalCaja").style.display = "flex";
+    }
 
-        function downloadExcelVentas() {
-            window.location.href = "{{ url_for('contable.exportar_registro_ventas_excel') }}";
-            closeModalDownloadVentas();
-        }
+    function closeModalDownloadCaja() {
+        document.getElementById("downloadExcelModalCaja").style.display = "none";
+    }
 
-        function openModalDownloadPDFVentas() {
-            document.getElementById("downloadPDFModalVentas").style.display = "flex";
-        }
+    function downloadExcelCaja() {
+        window.location.href = "{{ url_for('contable.exportar_libro_caja_excel') }}";
+        closeModalDownloadCaja();
+    }
 
-        function closeModalDownloadPDFVentas() {
-            document.getElementById("downloadPDFModalVentas").style.display = "none";
-        }
+    function openModalDownloadVentas() {
+        document.getElementById("downloadExcelModalVentas").style.display = "flex";
+    }
 
-        function downloadPDFVentas() {
-            window.location.href = "{{ url_for('contable.exportar_registro_ventas_pdf') }}";
-            closeModalDownloadPDFVentas();
-        }
+    function closeModalDownloadVentas() {
+        document.getElementById("downloadExcelModalVentas").style.display = "none";
+    }
 
-        function openModalDownloadExcelCompras() {
-            document.getElementById("downloadExcelModalCompras").style.display = "flex";
-        }
+    function downloadExcelVentas() {
+        window.location.href = "{{ url_for('contable.exportar_registro_ventas_excel') }}";
+        closeModalDownloadVentas();
+    }
 
-        function closeModalDownloadCompras() {
-            document.getElementById("downloadExcelModalCompras").style.display = "none";
-        }
+    function openModalDownloadPDFVentas() {
+        document.getElementById("downloadPDFModalVentas").style.display = "flex";
+    }
 
-        function downloadExcelCompras() {
-            window.location.href = "{{ url_for('contable.exportar_registro_compras_excel') }}";
-            closeModalDownloadCompras();
-        }
+    function closeModalDownloadPDFVentas() {
+        document.getElementById("downloadPDFModalVentas").style.display = "none";
+    }
 
-        function openModalDownloadPDFCompras() {
-            document.getElementById("downloadPDFModalCompras").style.display = "flex";
-        }
+    function downloadPDFVentas() {
+        window.location.href = "{{ url_for('contable.exportar_registro_ventas_pdf') }}";
+        closeModalDownloadPDFVentas();
+    }
 
-        function closeModalDownloadPDFCompras() {
-            document.getElementById("downloadPDFModalCompras").style.display = "none";
-        }
+    function openModalDownloadExcelCompras() {
+        document.getElementById("downloadExcelModalCompras").style.display = "flex";
+    }
 
-        function downloadPDFCompras() {
-            window.location.href = "{{ url_for('contable.exportar_registro_compras_pdf') }}";
-            closeModalDownloadPDFCompras();
-        }
+    function closeModalDownloadCompras() {
+        document.getElementById("downloadExcelModalCompras").style.display = "none";
+    }
 
-        function openModalDownloadExcelMayor() {
-            document.getElementById("downloadExcelModalMayor").style.display = "flex";
-        }
+    function downloadExcelCompras() {
+        window.location.href = "{{ url_for('contable.exportar_registro_compras_excel') }}";
+        closeModalDownloadCompras();
+    }
 
-        function openModalDownloadPDFMayor() {
-            document.getElementById("downloadPDFModalMayor").style.display = "flex";
-        }
+    function openModalDownloadPDFCompras() {
+        document.getElementById("downloadPDFModalCompras").style.display = "flex";
+    }
 
-        function closeModalDownloadExcelMayor() {
-            document.getElementById("downloadExcelModalMayor").style.display = "none";
-        }
+    function closeModalDownloadPDFCompras() {
+        document.getElementById("downloadPDFModalCompras").style.display = "none";
+    }
 
-        function downloadExcelMayor() {
-            window.location.href = "{{ url_for('contable.exportar_libro_mayor_excel') }}";
-            closeModalDownloadExcelMayor();
-        }
+    function downloadPDFCompras() {
+        window.location.href = "{{ url_for('contable.exportar_registro_compras_pdf') }}";
+        closeModalDownloadPDFCompras();
+    }
 
-        function downloadPDFMayor() {
-            window.location.href = "{{ url_for('contable.exportar_libro_mayor_pdf') }}";
-            closeModalDownloadPDFMayor();
-        }
+    function openModalDownloadExcelMayor() {
+        document.getElementById("downloadExcelModalMayor").style.display = "flex";
+    }
 
-        function closeModalDownloadPDFMayor() {
-            document.getElementById("downloadPDFModalMayor").style.display = "none";
-        }
+    function openModalDownloadPDFMayor() {
+        document.getElementById("downloadPDFModalMayor").style.display = "flex";
+    }
 
-        function openModalDownloadExcel() {
-            document.getElementById("downloadExcelModal").style.display = "flex";
-        }
+    function closeModalDownloadExcelMayor() {
+        document.getElementById("downloadExcelModalMayor").style.display = "none";
+    }
+
+    function downloadExcelMayor() {
+        window.location.href = "{{ url_for('contable.exportar_libro_mayor_excel') }}";
+        closeModalDownloadExcelMayor();
+    }
+
+    function downloadPDFMayor() {
+        window.location.href = "{{ url_for('contable.exportar_libro_mayor_pdf') }}";
+        closeModalDownloadPDFMayor();
+    }
+
+    function closeModalDownloadPDFMayor() {
+        document.getElementById("downloadPDFModalMayor").style.display = "none";
+    }
+
+    function openModalDownloadExcel() {
+        document.getElementById("downloadExcelModal").style.display = "flex";
+    }
 
 
-        function closeModalDownloadExcel() {
-            document.getElementById("downloadExcelModal").style.display = "none";
-        }
+    function closeModalDownloadExcel() {
+        document.getElementById("downloadExcelModal").style.display = "none";
+    }
 
-        function downloadExcel() {
-            window.location.href = "{{ url_for('contable.exportar_libro_diario_excel') }}";
-            closeModalDownloadExcel();
-        }
+    function downloadExcel() {
+        window.location.href = "{{ url_for('contable.exportar_libro_diario_excel') }}";
+        closeModalDownloadExcel();
+    }
 
-        function closeModalDownloadPDF() {
-            document.getElementById("downloadPDFModal").style.display = "none";
-        }
+    function closeModalDownloadPDF() {
+        document.getElementById("downloadPDFModal").style.display = "none";
+    }
 
-        function openModalDownloadPDF() {
-            document.getElementById("downloadPDFModal").style.display = "flex";
-        }
+    function openModalDownloadPDF() {
+        document.getElementById("downloadPDFModal").style.display = "flex";
+    }
 
-        function downloadPDF() {
-            // Redirecciona a la URL de descarga de PDF después de la confirmación
-            window.location.href = "{{ url_for('contable.exportar_libro_diario_pdf') }}";
-            closeModalDownloadPDF();
-        }
-    </script>
+    function downloadPDF() {
+        // Redirecciona a la URL de descarga de PDF después de la confirmación
+        window.location.href = "{{ url_for('contable.exportar_libro_diario_pdf') }}";
+        closeModalDownloadPDF();
+    }
+</script>
 
-    {% endblock %}
+{% endblock %}

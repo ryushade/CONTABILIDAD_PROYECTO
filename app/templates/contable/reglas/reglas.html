@@ -115,8 +115,6 @@
         box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
         text-align: center;
     }
-
-   
 </style>
 
 <div class="row align-items-center mt-4 mb-4">
@@ -381,18 +379,98 @@
     <div class="content-modal p-4"
         style="background-color: white; max-width: 600px; max-height: 90vh; width: 100%; overflow-y: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
         <!-- Encabezado -->
-        <div class="modal-header d-flex justify-content-between align-items-center border-0 pb-3"
-            style="padding-right: 10px;">
-            <h3 class="modal-title m-0" style="font-weight: bold;">EDITAR REGLA</h3>
+        <div class="modal-header"
+            style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #dee2e6;">
+            <h3 class="modal-title" style="font-size: 36px; font-weight: bold;">EDITAR REGLA</h3>
             <button type="button" class="modal-close" onclick="closeModalEdit()"
                 style="border: none; color: black; background-color: #e74c3c; font-weight: bold; font-size: 24px; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">&times;</button>
         </div>
+
 
         <!-- Cuerpo del modal -->
         <div class="modal-body">
             <form id="editReglaForm" onsubmit="submitEditForm(event)">
                 <!-- Nombre de la regla -->
                 <div class="mb-4">
+                    <div id="editReglaModal" class="modal-overlay"
+                        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1050;">
+                        <div class="content-modal p-4"
+                            style="background-color: white; max-width: 600px; max-height: 90vh; width: 100%; overflow-y: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+                            <!-- Encabezado -->
+                            <div class="modal-header d-flex justify-content-between align-items-center border-0 pb-3"
+                                style="padding-right: 10px;">
+                                <h3 class="modal-title" style="font-weight: bold;">EDITAR REGLA</h3>
+                                <button type="button" class="modal-close" onclick="closeModalEdit()"
+                                    style="border: none; color: black; background-color: #e74c3c; font-weight: bold; font-size: 24px; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">&times;</button>
+                            </div>
+
+                            <!-- Cuerpo del modal -->
+                            <div class="modal-body">
+                                <form id="editReglaForm" onsubmit="submitEditForm(event)">
+                                    <!-- Nombre de la regla -->
+                                    <div class="mb-4">
+                                        <label for="nombre_regla_edit" class="form-label"
+                                            style="font-weight: bold;">Nombre:</label>
+                                        <input type="text" id="nombre_regla_edit" name="nombre_regla"
+                                            class="form-control" placeholder="Ej: Registro de venta al contado"
+                                            required />
+                                    </div>
+
+                                    <!-- Tipo de transacción -->
+                                    <div class="mb-4">
+                                        <label for="tipo_transaccion_edit" class="form-label"
+                                            style="font-weight: bold;">Tipo de
+                                            transacción:</label>
+                                        <select id="tipo_transaccion_edit" name="tipo_transaccion" class="form-select"
+                                            required>
+                                            <option value="venta_contado">Venta al contado</option>
+                                            <option value="compra_contado">Compra al contado</option>
+                                            <option value="compra_contado_2">Compra al contado 2</option>
+                                            <option value="compra_contado_3">Compra al contado 3</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Cuenta débito -->
+                                    <div class="mb-4">
+                                        <label for="cuenta_debito_edit" class="form-label"
+                                            style="font-weight: bold;">Cuenta débito:</label>
+                                        <input type="text" id="cuenta_debito_edit" name="cuenta_debito"
+                                            class="form-control" placeholder="Ej: 1212" />
+                                    </div>
+
+                                    <!-- Cuenta crédito -->
+                                    <div class="mb-4">
+                                        <label for="cuenta_credito_edit" class="form-label"
+                                            style="font-weight: bold;">Cuenta
+                                            crédito:</label>
+                                        <input type="text" id="cuenta_credito_edit" name="cuenta_credito"
+                                            class="form-control" placeholder="Ej: 4010" />
+                                    </div>
+
+                                    <!-- Estado de la cuenta -->
+                                    <div class="mb-4">
+                                        <label for="estado_cuenta_edit" class="form-label"
+                                            style="font-weight: bold;">Estado:</label>
+                                        <select id="estado_cuenta_edit" name="estado_cuenta" class="form-select"
+                                            required>
+                                            <option value="1">Activo</option>
+                                            <option value="0">Inactivo</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Botones de acción -->
+                                    <div class="d-flex justify-content-end mt-4" style="gap: 12px;">
+                                        <button type="button" onclick="closeModalEdit()" class="btn btn-secondary me-2">
+                                            <i class="fas fa-times"></i> Cancelar
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Guardar
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                     <label for="nombre_regla_edit" class="form-label" style="font-weight: bold;">Nombre:</label>
                     <input type="text" id="nombre_regla_edit" name="nombre_regla" class="form-control"
                         placeholder="Ej: Registro de venta al contado" required />
@@ -662,7 +740,79 @@
         window.fetchReglaDetails = fetchReglaDetails;
         window.closeModalVer = closeModalVer;
     });
-    
+
+
+</script>
+
+<script>
+    let currentReglaId = null;
+
+    function openEditModal(reglaId, nombre, tipoTransaccion, cuentaDebito, cuentaCredito, estado) {
+        console.log("Datos recibidos:", { reglaId, nombre, tipoTransaccion, cuentaDebito, cuentaCredito, estado });
+
+        currentReglaId = reglaId;
+        document.getElementById("nombre_regla_edit").value = nombre || "";
+        document.getElementById("tipo_transaccion_edit").value = tipoTransaccion || "";
+        document.getElementById("cuenta_debito_edit").value = cuentaDebito || "";
+        document.getElementById("cuenta_credito_edit").value = cuentaCredito || "";
+        document.getElementById("estado_cuenta_edit").value = estado || "";
+
+        document.getElementById("cuenta_debito_edit").disabled = !cuentaDebito;
+        document.getElementById("cuenta_credito_edit").disabled = !cuentaCredito;
+
+        document.getElementById("editReglaModal").style.display = "flex";
+    }
+
+    function closeModalEdit() {
+        document.getElementById("editReglaModal").style.display = "none";
+
+        document.getElementById("cuenta_debito_edit").disabled = false;
+        document.getElementById("cuenta_credito_edit").disabled = false;
+    }
+
+
+    // Envía el formulario de edición
+    function submitEditForm(event) {
+        event.preventDefault(); // Evita el envío del formulario
+
+        // Obtiene los valores del formulario
+        const nombreRegla = document.getElementById("nombre_regla_edit").value;
+        const tipoTransaccion = document.getElementById("tipo_transaccion_edit").value;
+        const cuentaDebito = document.getElementById("cuenta_debito_edit").value || null;
+        const cuentaCredito = document.getElementById("cuenta_credito_edit").value || null;
+        const estado = document.getElementById("estado_cuenta_edit").value;
+
+        // Realiza una petición al servidor para actualizar la regla
+        fetch(`/contable/reglas/actualizar_regla/${currentReglaId}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                nombre_regla: nombreRegla,
+                tipo_transaccion: tipoTransaccion,
+                cuenta_debito: cuentaDebito,
+                cuenta_credito: cuentaCredito,
+                estado: estado,
+            }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Regla actualizada correctamente.");
+                    closeModalEdit(); // Cierra el modal
+                    location.reload(); // Recarga la página para mostrar los cambios
+                } else {
+                    console.log("Error en la respuesta del servidor:", data.message);
+                    alert("Error al actualizar la regla: " + data.message);
+                }
+            })
+            .catch(error => {
+                console.error("Error en la solicitud:", error);
+                alert("Ocurrió un error al intentar actualizar la regla.");
+            });
+    }
+
 
 </script>
 

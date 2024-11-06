@@ -40,29 +40,7 @@ document.getElementById('editUsuarioModal').addEventListener('submit', function 
 });
 
 
-function openEditRegla(reglaId) {
-  fetch('/contable/reglas/detalles/' + reglaId)
-    .then(response => response.json())
-    .then(data => {
-      if (data.error) {
-        alert('Error: ' + data.error);
-      } else {
-        // Verifica los datos que están siendo asignados
-        console.log("Datos recibidos:", data);
-        document.getElementById('nombre_regla').value = data.nombre_regla;
-        document.getElementById('tipo_transaccion').value = data.tipo_transaccion;
-        document.getElementById('cuenta_debito').value = data.cuenta_debito;
-        document.getElementById('cuenta_credito').value = data.cuenta_credito;
-        document.getElementById('estado').value = data.estado_regla;
 
-        document.getElementById('editReglaModal').style.display = 'flex';
-      }
-    })
-    .catch(error => {
-      console.error('Error fetching rule data:', error);
-    }
-    );
-}
 
 
 
@@ -345,74 +323,6 @@ function closeModalVer() {
 }
 
 
-let currentReglaId = null;
-
-function openEditModal(reglaId, nombre, tipoTransaccion, cuentaDebito, cuentaCredito, estado) {
-  currentReglaId = reglaId; // Guarda el ID de la regla actual
-
-  // Llena los campos del formulario con los datos actuales de la regla
-  document.getElementById("nombre_regla_edit").value = nombre;
-  document.getElementById("tipo_transaccion_edit").value = tipoTransaccion;
-  document.getElementById("cuenta_debito_edit").value = cuentaDebito || ""; // Si es nulo, poner ""
-  document.getElementById("cuenta_credito_edit").value = cuentaCredito || ""; // Si es nulo, poner ""
-  document.getElementById("estado_cuenta_edit").value = estado;
-
-  // Muestra el modal
-  document.getElementById("editReglaModal").style.display = "flex";
-}
-
-function closeModalEdit() {
-  document.getElementById("editReglaModal").style.display = "none";
-}
-
-function submitEditForm(event) {
-  event.preventDefault(); // Evita el envío del formulario
-
-  // Obtiene los valores del formulario
-  const nombreRegla = document.getElementById("nombre_regla_edit").value;
-  const tipoTransaccion = document.getElementById("tipo_transaccion_edit").value;
-  const cuentaDebito = document.getElementById("cuenta_debito_edit").value || null;
-  const cuentaCredito = document.getElementById("cuenta_credito_edit").value || null;
-  const estado = document.getElementById("estado_cuenta_edit").value;
-
-  // Realiza una petición al servidor para actualizar la regla
-  fetch(`/contable/reglas/actualizar_regla/${currentReglaId}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      nombre_regla: nombreRegla,
-      tipo_transaccion: tipoTransaccion,
-      cuenta_debito: cuentaDebito,
-      cuenta_credito: cuentaCredito,
-      estado: estado,
-    }),
-  })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        alert("Regla actualizada correctamente.");
-        closeModalEdit(); // Cierra el modal
-        location.reload(); // Recarga la página para mostrar los cambios
-      } else {
-        // Imprime los datos enviados y el mensaje de error recibido
-        console.log("Datos enviados:", {
-          nombre_regla: nombreRegla,
-          tipo_transaccion: tipoTransaccion,
-          cuenta_debito: cuentaDebito,
-          cuenta_credito: cuentaCredito,
-          estado: estado,
-        });
-        console.log("Error en la respuesta del servidor:", data.message);
-        alert("Error al actualizar la regla: " + data.message);
-      }
-    })
-    .catch(error => {
-      console.error("Error en la solicitud:", error);
-      alert("Ocurrió un error al intentar actualizar la regla.");
-    });
-}
 
 
 
