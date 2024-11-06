@@ -64,16 +64,22 @@ def reportes():
     daterange = request.args.get('daterange', '')
     start_date, end_date = None, None
 
+    from datetime import datetime, timedelta
+
     if daterange:
         try:
             dates = daterange.split(' to ')
             if len(dates) == 2:
                 start_date = datetime.strptime(dates[0].strip(), '%m/%Y').date()
                 end_date = datetime.strptime(dates[1].strip(), '%m/%Y').date()
+                # Calcular el último día del mes para el segundo mes
+                end_date = end_date.replace(day=1) + timedelta(days=31)
+                end_date = end_date.replace(day=1) - timedelta(days=1)
             elif len(dates) == 1:
                 # Si solo hay un mes, se usa como inicio y fin del mes
                 start_date = datetime.strptime(dates[0].strip(), '%m/%Y').date()
-                end_date = start_date
+                end_date = start_date.replace(day=1) + timedelta(days=31)
+                end_date = end_date.replace(day=1) - timedelta(days=1)
         except (ValueError, IndexError) as e:
             print(f"Error processing date range: {e}")
 
@@ -459,11 +465,14 @@ def eliminar_regla(regla_id):
 def ldpf():
     return render_template('contable/reportes/pdf_ld.html')
 
+
+from openpyxl import load_workbook
+from openpyxl.styles import Border, Side, Font, Alignment
+from openpyxl.styles import numbers
+    
 @accounting_bp.route('/exportar_libro_diario_excel', methods=['GET'])
 @jwt_required()
 def exportar_libro_diario_excel():
-
-    # Ruta de la plantilla
     template_path = os.path.join(current_app.root_path, 'templates', 'contable', 'plantillas', 'L,D.xlsx')
     
     if not os.path.exists(template_path):
@@ -471,8 +480,7 @@ def exportar_libro_diario_excel():
     
     output = BytesIO()
     
-    # Cargar el archivo de plantilla
-    workbook = openpyxl.load_workbook(template_path)
+    workbook = load_workbook(template_path)
     worksheet = workbook.active
     
     # Obtener la fecha actual
@@ -480,14 +488,13 @@ def exportar_libro_diario_excel():
     mes_anio_actual = fecha_actual.strftime('%m/%Y')
     
     # Llenar las celdas específicas con los datos necesarios
-    worksheet['B3'] = mes_anio_actual  # Coloca el período en la celda derecha de 'PERÍODO:'
-    worksheet['B4'] = '20610588981'    # Coloca el RUC
-    worksheet['B5'] = 'Tormenta'       # Coloca la razón social
+    worksheet['B3'] = mes_anio_actual
+    worksheet['B4'] = '20610588981'
+    worksheet['B5'] = 'Tormenta'
     
     # Definir la fila inicial para insertar los datos en la tabla
-    start_row = 11  # Comenzar desde la fila 11 como especificaste
+    start_row = 11
 
-    # Suponiendo que obtienes los datos de una función llamada obtener_asientos_agrupados
     asientos, _ = obtener_asientos_agrupados_excel()
     numero_correlativo = 1
 
@@ -505,21 +512,24 @@ def exportar_libro_diario_excel():
     # Crear un estilo de fuente sin negrita
     normal_font = Font(bold=False)
 
-    # Crear un estilo de alineación centrada
+    # Estilos de alineación
+    left_alignment = Alignment(horizontal='left', vertical='center')
+    right_alignment = Alignment(horizontal='right', vertical='center')
     center_alignment = Alignment(horizontal='center', vertical='center')
 
     # Insertar los datos en la tabla, fila por fila
     current_row = start_row
     for id_asiento, asiento in asientos.items():
         for detalle in asiento['detalles']:
-            worksheet[f'A{current_row}'] = numero_correlativo
+            worksheet[f'A{current_row}'].number_format = numbers.FORMAT_TEXT
+            worksheet[f'A{current_row}'] = str(numero_correlativo)
             worksheet[f'B{current_row}'] = asiento['fecha_asiento'].strftime('%d/%m/%Y')
             worksheet[f'C{current_row}'] = asiento['glosa']
             
             # Determinar el valor para la columna D
-            if 'venta' in asiento['glosa'].lower():
+            if 'venta' in asiento['glosa'].lower() or 'ingreso' in asiento['glosa'].lower():
                 worksheet[f'D{current_row}'] = 14
-            elif 'compra' in asiento['glosa'].lower():
+            elif 'compra' in asiento['glosa'].lower() or 'pago' in asiento['glosa'].lower():
                 worksheet[f'D{current_row}'] = 8
             else:
                 worksheet[f'D{current_row}'] = ''
@@ -529,15 +539,28 @@ def exportar_libro_diario_excel():
             worksheet[f'H{current_row}'] = detalle['nombre_cuenta']
             worksheet[f'I{current_row}'] = detalle['debe'] if detalle['debe'] != 0 else None
             worksheet[f'J{current_row}'] = detalle['haber'] if detalle['haber'] != 0 else None
-            
+
+            # Aplicar formato de número con dos decimales a las columnas "Debe" y "Haber"
+            worksheet[f'I{current_row}'].number_format = '#,##0.00'
+            worksheet[f'J{current_row}'].number_format = '#,##0.00'
+
             # Aplicar estilo a todas las celdas
             for col in ['A', 'B', 'C', 'D', 'F', 'G', 'H', 'I', 'J']:
                 cell = worksheet[f'{col}{current_row}']
                 cell.border = thin_border
                 cell.font = normal_font
-                cell.alignment = center_alignment
+
+            # Alineación específica para columnas
+            worksheet[f'A{current_row}'].alignment = center_alignment
+            worksheet[f'B{current_row}'].alignment = left_alignment
+            worksheet[f'C{current_row}'].alignment = left_alignment
+            worksheet[f'D{current_row}'].alignment = center_alignment
+            worksheet[f'F{current_row}'].alignment = left_alignment
+            worksheet[f'G{current_row}'].alignment = center_alignment
+            worksheet[f'H{current_row}'].alignment = left_alignment
+            worksheet[f'I{current_row}'].alignment = right_alignment
+            worksheet[f'J{current_row}'].alignment = right_alignment
             
-            # Sumar los valores para el total
             total_debe += detalle['debe']
             total_haber += detalle['haber']
 
@@ -548,25 +571,30 @@ def exportar_libro_diario_excel():
     total_row = current_row
     worksheet.merge_cells(f'A{total_row}:H{total_row}')
     worksheet[f'A{total_row}'] = "Total"
-    worksheet[f'A{total_row}'].alignment = Alignment(horizontal='right')  # Alinear a la izquierda
-    worksheet[f'A{total_row}'].border = thin_border  # Aplicar borde negro
+    worksheet[f'A{total_row}'].alignment = Alignment(horizontal='right')
+    worksheet[f'A{total_row}'].border = thin_border
 
     worksheet[f'I{total_row}'] = total_debe
     worksheet[f'J{total_row}'] = total_haber
+
+    # Aplicar formato de número con dos decimales a los totales
+    worksheet[f'I{total_row}'].number_format = '#,##0.00'
+    worksheet[f'J{total_row}'].number_format = '#,##0.00'
+
+    # Alinear a la derecha los totales de Debe y Haber
+    worksheet[f'I{total_row}'].alignment = right_alignment
+    worksheet[f'J{total_row}'].alignment = right_alignment
     
-    # Aplicar borde y estilo a las celdas de total
     for col in ['A', 'I', 'J']:
         cell = worksheet[f'{col}{total_row}']
         cell.border = thin_border
         cell.font = normal_font
-        cell.alignment = center_alignment
 
     # Asegurar que todas las columnas tengan un ancho adecuado
-    column_widths = {'A': 40, 'B': 15, 'C': 65, 'D': 10, 'F': 20, 'G': 15, 'H': 30, 'I': 15, 'J': 15}
+    column_widths = {'A': 40, 'B': 15, 'C': 65, 'D': 10, 'F': 20, 'G': 15, 'H': 40, 'I': 15, 'J': 15}
     for column, width in column_widths.items():
         worksheet.column_dimensions[column].width = width
 
-    # Guardar el archivo modificado en un buffer de memoria
     workbook.save(output)
     output.seek(0)
 

@@ -509,7 +509,6 @@ def obtener_asientos_agrupados(tipo_registro='Todas', start_date=None, end_date=
         with conexion.cursor() as cursor:
             query = """
                 SELECT 
-                    ROW_NUMBER() OVER (ORDER BY a.id_asiento) AS numero_correlativo,
                     a.id_asiento, 
                     a.fecha_asiento, 
                     a.glosa, 
@@ -528,7 +527,7 @@ def obtener_asientos_agrupados(tipo_registro='Todas', start_date=None, end_date=
             """
 
             params = []
-            
+
             # Filtro por tipo de registro
             if tipo_registro == 'Ventas':
                 query += " AND LOWER(a.glosa) LIKE %s"
@@ -542,24 +541,20 @@ def obtener_asientos_agrupados(tipo_registro='Todas', start_date=None, end_date=
                     '%pago%',
                     '%proveedor%'
                 ])
-            
 
             # Filtro por rango de fechas o por mes completo
             if start_date and end_date:
-                if start_date == end_date:
-                    query += " AND a.fecha_asiento BETWEEN %s AND LAST_DAY(%s)"
-                    params.extend([start_date, start_date])
-                else:
-                    query += " AND a.fecha_asiento BETWEEN %s AND %s"
-                    params.extend([start_date, end_date])
+                query += " AND a.fecha_asiento BETWEEN %s AND %s"
+                params.extend([start_date, end_date])
 
             cursor.execute(query, params)
             resultados = cursor.fetchall()
-        
+
         # Procesamiento de resultados
         asientos_agrupados = defaultdict(lambda: {"detalles": []})
         global_total_debe = 0.0
         global_total_haber = 0.0
+        correlativo = 1
         
         for row in resultados:
             id_asiento = row["id_asiento"]
@@ -568,7 +563,7 @@ def obtener_asientos_agrupados(tipo_registro='Todas', start_date=None, end_date=
                 if isinstance(fecha_asiento, str):
                     fecha_asiento = datetime.strptime(fecha_asiento, '%Y-%m-%d')
                 asientos_agrupados[id_asiento].update({
-                    "numero_correlativo": row["numero_correlativo"],
+                    "numero_correlativo": correlativo,
                     "fecha_asiento": fecha_asiento,
                     "glosa": row["glosa"],
                     "num_comprobante": row["num_comprobante"],
@@ -576,9 +571,10 @@ def obtener_asientos_agrupados(tipo_registro='Todas', start_date=None, end_date=
                     "total_debe": float(row["total_debe"]),
                     "total_haber": float(row["total_haber"])
                 })
+                correlativo += 1
                 global_total_debe += float(row["total_debe"])
                 global_total_haber += float(row["total_haber"])
-            
+
             asientos_agrupados[id_asiento]["detalles"].append({
                 "codigo_cuenta": row["codigo_cuenta"],
                 "nombre_cuenta": row["nombre_cuenta"],
@@ -590,11 +586,10 @@ def obtener_asientos_agrupados(tipo_registro='Todas', start_date=None, end_date=
             "total_debe": global_total_debe,
             "total_haber": global_total_haber
         }
-        
+
         return asientos_agrupados, totales
     finally:
         conexion.close()
-
 
 
 def obtener_asientos_agrupados_excel():
@@ -603,7 +598,6 @@ def obtener_asientos_agrupados_excel():
         with conexion.cursor() as cursor:
             cursor.execute("""
                 SELECT 
-                    ROW_NUMBER() OVER (ORDER BY a.id_asiento) AS numero_correlativo,
                     a.id_asiento, 
                     a.fecha_asiento, 
                     a.glosa, 
@@ -621,11 +615,12 @@ def obtener_asientos_agrupados_excel():
                 ORDER BY a.id_asiento
             """)
             resultados = cursor.fetchall()
-        
+
         asientos_agrupados = defaultdict(lambda: {"detalles": []})
         global_total_debe = 0.0
         global_total_haber = 0.0
-        
+        correlativo = 1
+
         for row in resultados:
             id_asiento = row["id_asiento"]
             if id_asiento not in asientos_agrupados:
@@ -633,7 +628,7 @@ def obtener_asientos_agrupados_excel():
                 if isinstance(fecha_asiento, str):
                     fecha_asiento = datetime.strptime(fecha_asiento, '%Y-%m-%d')
                 asientos_agrupados[id_asiento].update({
-                    "numero_correlativo": row["numero_correlativo"],
+                    "numero_correlativo": correlativo,
                     "fecha_asiento": fecha_asiento,
                     "glosa": row["glosa"],
                     "num_comprobante": row["num_comprobante"],
@@ -641,21 +636,22 @@ def obtener_asientos_agrupados_excel():
                     "total_debe": float(row["total_debe"]),
                     "total_haber": float(row["total_haber"])
                 })
+                correlativo += 1
                 global_total_debe += float(row["total_debe"])
                 global_total_haber += float(row["total_haber"])
-            
+
             asientos_agrupados[id_asiento]["detalles"].append({
                 "codigo_cuenta": row["codigo_cuenta"],
                 "nombre_cuenta": row["nombre_cuenta"],
                 "debe": float(row["debe"]),
                 "haber": float(row["haber"]),
             })
-        
+
         totales = {
             "total_debe": global_total_debe,
             "total_haber": global_total_haber
         }
-        
+
         return asientos_agrupados, totales
     finally:
         conexion.close()

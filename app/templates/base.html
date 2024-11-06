@@ -487,31 +487,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            flatpickr("#daterange", {
-                mode: "range",
-                dateFormat: "m/Y",
-                minDate: "01/1900",
-                maxDate: "04/2028",
-                plugins: [
-                    new monthSelectPlugin({
-                        dateFormat: "m/Y",
-                        altFormat: "F Y",
-                        altInput: true
-                    })
-                ],
-                onClose: function(selectedDates, dateStr, instance) {
-                    if (selectedDates.length === 2) {
-                        document.getElementById('filterForm').submit();
-                    }
-                }
-            });
-        });
-    </script>
-    
-    
-    
+
     <script>
         flatpickr("#datenormal", {
             dateFormat: "d/m/Y",
