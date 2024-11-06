@@ -1,28 +1,44 @@
+function openEditUsu(id_usuario, id_rol, usua, contra, estado_usuario) {
+  document.getElementById('rol_usuario').value = id_rol;
+  document.getElementById('usuario').value = usua;
+  document.getElementById('contrasena_usuario').value = contra;
+  document.getElementById('estado_usuario').value = estado_usuario;
 
-function openEditUsu(usuarioId) {
-  fetch('/contable/usuarios/obtener/' + usuarioId)
+  // Guardar el ID del usuario en el dataset del formulario para su uso en la actualización
+  document.getElementById('editUsuarioModal').dataset.usuarioId = id_usuario;
+
+  // Mostrar el modal de edición
+  document.getElementById('editUsuarioModal').style.display = 'flex';
+}
+
+// Evento de envío del formulario para actualizar el usuario
+document.getElementById('editUsuarioModal').addEventListener('submit', function (event) {
+  event.preventDefault();
+
+  const usuarioId = this.dataset.usuarioId;  // Recuperar el ID del usuario desde el dataset
+  const formData = new FormData(this);
+
+  fetch('/contable/usuarios/actualizar/' + usuarioId, {
+    method: 'POST',
+    body: formData
+  })
     .then(response => response.json())
     .then(data => {
-      if (data.error) {
-        alert('Error: ' + data.error);
+      if (data.code === 1) {
+        alert('Usuario modificado exitosamente');  // Mensaje simple de éxito
+        closeModalUsuEdit();  // Cerrar el modal de edición
+
+        // Actualizar la interfaz si es necesario
+        setTimeout(() => window.location.reload(), 500);
       } else {
-        // Verifica los datos que están siendo asignados
-        console.log("Datos recibidos:", data);
-
-        // Asignar valores a los campos del formulario
-        document.getElementById('rol').value = data.rol;
-        document.getElementById('usua').value = data.usua;
-        document.getElementById('contrasena').value = data.contra;
-        document.getElementById('estado').value = data.estado_usuario;
-
-        // Mostrar el modal de edición
-        document.getElementById('editUsuarioModal').style.display = 'flex';
+        alert(data.message || 'Error al actualizar el usuario');  // Mostrar mensaje de error si falla
       }
     })
     .catch(error => {
-      console.error('Error fetching user data:', error);
+      console.error('Error al actualizar el usuario:', error);
     });
-}
+});
+
 
 function openEditRegla(reglaId) {
   fetch('/contable/reglas/detalles/' + reglaId)
@@ -210,11 +226,36 @@ function deleteUsuario() {
 function submitAddUsuario(event) {
   event.preventDefault();
 
+  // Obtener valores de los campos
   const rol = document.getElementById('rol').value;
-  const usuario = document.getElementById('usuario').value;
+  const usuario = document.getElementById('usuario').value.trim();
   const contrasena = document.getElementById('contrasena').value;
   const estado = document.getElementById('estado').value;
 
+  // Expresiones regulares y validaciones
+  const usuarioRegex = /^[a-zA-Z0-9_]{3,20}$/; // Solo letras, números y guiones bajos, entre 3 y 20 caracteres
+
+  // Validar que todos los campos estén llenos
+  if (!rol || !usuario || !contrasena || !estado) {
+    alert("Todos los campos son obligatorios.");
+    return;
+  }
+
+  // Validar rol
+  if (rol === "0") { // Asegúrate de que el valor "0" es el predeterminado cuando no se selecciona un rol válido
+    alert("Por favor, selecciona un rol válido.");
+    return;
+  }
+
+  // Validar usuario
+  if (!usuarioRegex.test(usuario)) {
+    alert("El nombre de usuario debe contener solo letras, números o guiones bajos y tener entre 3 y 20 caracteres.");
+    return;
+  }
+
+
+
+  // Crear el cuerpo de la solicitud
   const data = {
     id_rol: rol,
     usua: usuario,
@@ -222,6 +263,7 @@ function submitAddUsuario(event) {
     estado_usuario: estado
   };
 
+  // Enviar la solicitud
   fetch('/contable/usuarios/agregar', {
     method: 'POST',
     headers: {
@@ -391,14 +433,18 @@ document.addEventListener('DOMContentLoaded', () => {
 function submitAddForm(event) {
   event.preventDefault();
 
-  // Get form elements
   const nombreRegla = document.getElementById("codigo_cuenta").value;
   const tipoTransaccion = document.getElementById("tipo_transaccion_add").value;
   const cuentaDebito = document.getElementById("cuenta_debito_add").value || null;
   const cuentaCredito = document.getElementById("cuenta_credito_add").value || null;
   const estado = document.getElementById("estado_cuenta").value;
 
-  // Log form data
+  const invalidChars = /[.@!#$%^&*(),?":{}|<>]/g;
+  if (invalidChars.test(cuentaDebito) || invalidChars.test(cuentaCredito)) {
+    alert("Las cuentas no deben contener caracteres especiales como '.', '@', etc.");
+    return;
+  }
+
   console.log("Datos del formulario:", {
     nombreRegla,
     tipoTransaccion,
@@ -407,7 +453,6 @@ function submitAddForm(event) {
     estado
   });
 
-  // Create request body
   const requestBody = {
     nombre_regla: nombreRegla,
     tipo_transaccion: tipoTransaccion,
@@ -416,7 +461,7 @@ function submitAddForm(event) {
     estado: estado,
   };
 
-  // Send request
+  // Enviar la solicitud
   fetch(`/contable/reglas/agregar`, {
     method: "POST",
     headers: {
@@ -444,6 +489,7 @@ function submitAddForm(event) {
       alert("Error al agregar la regla. Revisa la consola para más detalles.");
     });
 }
+
 
 function previewPhoto(event) {
   const reader = new FileReader();

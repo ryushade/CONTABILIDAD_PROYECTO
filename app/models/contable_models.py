@@ -39,21 +39,7 @@ def obtener_usuario_por_nombre(username):
         conexion.close()
 
 
-def obtener_usuario_por_id_2(usuario_id):
-    connection = obtener_conexion()
-    try:
-        with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-            sql = """
-                SELECT usuario.*, rol.nom_rol AS rol
-                FROM usuario
-                LEFT JOIN rol ON usuario.id_rol = rol.id_rol
-                WHERE usuario.id_usuario = %s
-            """
-            cursor.execute(sql, (usuario_id,))
-            usuario = cursor.fetchone()
-            return usuario
-    finally:
-        connection.close()
+
 
 def obtener_regla_por_id(regla_id):
     connection = obtener_conexion()
@@ -227,39 +213,36 @@ def agregar_usuario(id_rol, usua, contra, estado_usuario):
 
 
 
-def actualizar_usuario(usuario_id):
+def actualizar_usuario(id_usuario, id_rol, usua, contra, estado_usuario):
     conexion = obtener_conexion()
     try:
-        datos = request.get_json()
-        id_rol = datos.get("id_rol")
-        usua = datos.get("usua")
-        contra = datos.get("contra")
-        estado_usuario = datos.get("estado_usuario")
-
-        if id_rol is None or usua is None or contra is None or estado_usuario is None:
-            return jsonify({"message": "Bad Request. Please fill all fields."}), 400
-
-        usuario = {
-            "id_rol": id_rol,
-            "usua": usua.strip(),
-            "contra": contra.strip(),
-            "estado_usuario": estado_usuario
-        }
+        # Verifica que todos los campos estén presentes
+        if not all([id_rol, usua, contra, estado_usuario]):
+            return {"error": "Bad Request. Please fill all fields."}
 
         with conexion.cursor() as cursor:
-            query = "UPDATE usuario SET id_rol=%s, usua=%s, contra=%s, estado_usuario=%s WHERE id_usuario=%s"
-            values = (usuario["id_rol"], usuario["usua"], usuario["contra"], usuario["estado_usuario"], usuario_id)
+            query = """
+                UPDATE usuario 
+                SET id_rol=%s, usua=%s, contra=%s, estado_usuario=%s 
+                WHERE id_usuario=%s
+            """
+            values = (id_rol, usua, contra, estado_usuario, id_usuario)
             cursor.execute(query, values)
             conexion.commit()
 
+            # Verificar si se encontró el usuario para actualizar
             if cursor.rowcount == 0:
-                return jsonify({"code": 0, "message": "Usuario no encontrado"}), 404
+                print("No se encontró el usuario con ID:", id_usuario)  # Debugging
+                return {"code": 0, "message": "Usuario no encontrado"}
 
-        return jsonify({"code": 1, "message": "Usuario modificado"})
+            print("Usuario actualizado correctamente.")  # Debugging
+            return {"code": 1, "message": "Usuario modificado"}
     except Exception as error:
-        return jsonify({"error": str(error)}), 500
+        print("Error en la actualización:", str(error))  # Debugging
+        return {"error": str(error)}
     finally:
         conexion.close()
+
 
 def eliminar_usuario(usuario_id):
     conexion = obtener_conexion()

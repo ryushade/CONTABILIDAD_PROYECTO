@@ -142,32 +142,32 @@
 
     function openEditModal2(cuentaId) {
         fetch('/contable/cuentas/obtener/' + cuentaId)
-          .then(response => response.json())
-          .then(data => {
-            if (data.error) {
-              alert('Error: ' + data.error);
-            } else {
-              document.getElementById('codigo_cuenta').value = data.codigo_cuenta;
-              document.getElementById('nombre_cuenta').value = data.nombre_cuenta;
-              document.getElementById('naturaleza').value = data.naturaleza;
-              document.getElementById('estado_cuenta').value = data.estado_cuenta;
-      
-              // Establece la acción del formulario para enviar a la ruta de edición
-              document.getElementById('editCuentaModal').action = '/contable/cuentas/editar/' + cuentaId;
-      
-              // Mostrar el modal
-              document.querySelector('.modal-overlay').style.display = 'flex'; // Usa 'flex' si usas flexbox
-            }
-          })
-          .catch(error => {
-            console.error('Error fetching account data:', error);
-          });
-      }
-      
-      function closeModal() {
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                } else {
+                    document.getElementById('codigo_cuenta').value = data.codigo_cuenta;
+                    document.getElementById('nombre_cuenta').value = data.nombre_cuenta;
+                    document.getElementById('naturaleza').value = data.naturaleza;
+                    document.getElementById('estado_cuenta').value = data.estado_cuenta;
+
+                    // Establece la acción del formulario para enviar a la ruta de edición
+                    document.getElementById('editCuentaModal').action = '/contable/cuentas/editar/' + cuentaId;
+
+                    // Mostrar el modal
+                    document.querySelector('.modal-overlay').style.display = 'flex'; // Usa 'flex' si usas flexbox
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching account data:', error);
+            });
+    }
+
+    function closeModal() {
         document.querySelector('.modal-overlay').style.display = 'none';
-      }
-      
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         const editButtons = document.querySelectorAll('.action-button.edit');
 
@@ -183,7 +183,7 @@
         var currentItem = document.getElementById(itemId);
         var isActive = currentItem.classList.contains('accordion-active');
         var chevronIcon = currentItem.querySelector('.chevron-icon');  // Asumimos que el ícono tiene esta clase.
-    
+
         // Toggle the active class and chevron icon
         if (isActive) {
             currentItem.classList.remove('accordion-active');
@@ -205,7 +205,7 @@
             }
         }
     }
-    
+
     // Función auxiliar para desactivar todos los hijos recursivamente y cambiar su ícono
     function removeActiveFromChildren(parentItem) {
         const children = parentItem.querySelectorAll('.accordion-item');
@@ -218,8 +218,8 @@
             removeActiveFromChildren(child); // Recursividad para todos los niveles de hijos
         });
     }
-    
-        
+
+
 </script>
 
 
@@ -260,14 +260,6 @@
         </div>
     </div>
 
-    <div class="row align-items-center mt-2 mb-4">
-        <div class="col-md-12 d-flex flex-wrap align-items-center">
-            
-            <a class="btn btn-primary mb-2" style="margin-right: auto;" onclick="openModalAdd()">
-                <i class="fa fa-plus" style="font-size: 14px;"></i> Agregar cuenta
-            </a>
-        </div>
-    </div>
 </div>
 
 {% from "macros.html" import render_cuenta %}
@@ -276,9 +268,9 @@
     <div class="row mt-4">
         <div class="col">
             {% for key, cuentas_nivel in cuentas.items() %}
-                {% for cuenta in cuentas_nivel %}
-                    {{ render_cuenta(cuenta) }}
-                {% endfor %}
+            {% for cuenta in cuentas_nivel %}
+            {{ render_cuenta(cuenta) }}
+            {% endfor %}
             {% endfor %}
         </div>
     </div>
@@ -407,27 +399,29 @@
             <div class="modal-body">
                 <div class="w-full text-start mb-5">
                     <!-- Campo de código de la cuenta -->
-                    <label for="codigo_cuenta" class="text-sm font-bold text-black mt-4 block" style="font-weight: bold;">
+                    <label for="codigo_cuenta" class="text-sm font-bold text-black mt-4 block"
+                        style="font-weight: bold;">
                         Código:
                     </label>
                     <input type="text" id="codigo_cuenta" name="codigo_cuenta_agregar" value=""
                         class="w-100 bg-gray-50 border-gray-300 text-gray-900 rounded-lg border p-2 text-sm"
                         placeholder="Código de la cuenta" required />
-    
+
                     <!-- Mostrar nivel de cuenta (Simulación) -->
                     <div class="grid grid-cols-4 items-center gap-4 mt-3">
                         <label class="text-right col-span-1">Nivel:</label>
                         <div class="col-span-3 font-medium" id="nivel_cuenta">Elemento</div>
                     </div>
-    
+
                     <!-- Campo de nombre de la cuenta -->
-                    <label for="nombre_cuenta" class="text-sm font-bold text-black mt-4 block" style="font-weight: bold;">
+                    <label for="nombre_cuenta" class="text-sm font-bold text-black mt-4 block"
+                        style="font-weight: bold;">
                         Nombre:
                     </label>
                     <input type="text" id="nombre_cuenta" name="nombre_cuenta_agregar" value=""
                         class="w-100 bg-gray-50 border-gray-300 text-gray-900 rounded-lg border p-2 text-sm"
                         placeholder="Nombre de la cuenta" required />
-    
+
                     <!-- Campo de naturaleza de la cuenta -->
                     <label for="naturaleza" class="text-sm font-bold text-black mt-4 block" style="font-weight: bold;">
                         Naturaleza:
@@ -437,9 +431,10 @@
                         <option value="Deudora">Deudora</option>
                         <option value="Acreedora">Acreedora</option>
                     </select>
-    
+
                     <!-- Campo de estado de la cuenta -->
-                    <label for="estado_cuenta" class="text-sm font-bold text-black mt-4 block" style="font-weight: bold;">
+                    <label for="estado_cuenta" class="text-sm font-bold text-black mt-4 block"
+                        style="font-weight: bold;">
                         Estado de la cuenta:
                     </label>
                     <select id="estado_cuenta" name="estado_cuenta_agregar"
@@ -447,10 +442,10 @@
                         <option value="1">Activo</option>
                         <option value="0">Inactivo</option>
                     </select>
-    
+
                     <!-- Cuenta Padre (Opcional, según nivel) -->
-                    <div class="grid grid-cols-4 items-center gap-4 mt-3" id="cuenta_padre_container" style="display:none;"
-                        style="font-weight: bold;">
+                    <div class="grid grid-cols-4 items-center gap-4 mt-3" id="cuenta_padre_container"
+                        style="display:none;" style="font-weight: bold;">
                         <label class="text-right col-span-1">Cuenta Padre:</label>
                         <select id="cuenta_padre" name="cuenta_padre"
                             class="col-span-3 w-100 text-sm bg-gray-50 border-gray-300 text-gray-900 rounded-lg border p-2">
@@ -461,7 +456,7 @@
                         </select>
                     </div>
                 </div>
-    
+
                 <!-- Botones de acción -->
                 <div class="modal-buttons d-flex justify-content-end">
                     <button type="button" onclick="closeModalAdd()" class="btn btn-secondary me-2">
@@ -478,7 +473,8 @@
 
 <!-- Error Modal -->
 
-<div id="ErrorModal" class="confirmation-modal-overlay" {% if error_message %} style="display: flex;" {% else %} style="display: none;" {% endif %}>
+<div id="ErrorModal" class="confirmation-modal-overlay" {% if error_message %} style="display: flex;" {% else %}
+    style="display: none;" {% endif %}>
     <div class="confirmation-modal" style="text-align: center;">
         <div class="modal-icon" style="margin-bottom: 10px;">
             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"

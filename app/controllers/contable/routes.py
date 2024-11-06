@@ -1,7 +1,7 @@
 from flask import json, abort, request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
-from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, obtener_id_cuenta, obtener_regla_por_id, obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas,obtener_asientos_agrupados_excel,obtener_registro_compras
-from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_id_2, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas, obtener_asientos_agrupados_excel, obtener_libro_caja, obtener_libro_caja_cuenta_corriente
+from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, obtener_id_cuenta, obtener_regla_por_id, obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas,obtener_asientos_agrupados_excel,obtener_registro_compras
+from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas, obtener_asientos_agrupados_excel, obtener_libro_caja, obtener_libro_caja_cuenta_corriente
 from functools import wraps
 
 from . import accounting_bp
@@ -469,19 +469,36 @@ def usuarios():
     )
 
 
-@accounting_bp.route('/usuarios/obtener/<int:usuario_id>', methods=['GET'])
-def obtener_usuario(usuario_id):
-    usuario = obtener_usuario_por_id_2(usuario_id)
-    if usuario:
-        # Devuelve todos los datos necesarios del usuario en formato JSON
-        return jsonify({
-            "rol": usuario.get("rol"),
-            "usua": usuario.get("usua"),
-            "contra": usuario.get("contra"),
-            "estado_usuario": usuario.get("estado_usuario")
-        })
-    else:
-        return jsonify({'error': 'Usuario no encontrado'}), 404
+@accounting_bp.route('/usuarios/obtener/<int:id_usuario>', methods=['GET'])
+def obtener_usuario(id_usuario):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            # Consulta para obtener datos del usuario y el nombre del rol
+            query = """
+                SELECT usuario.id_rol, usuario.usua, usuario.contra, usuario.estado_usuario, rol.nombre_rol 
+                FROM usuario 
+                JOIN rol ON usuario.id_rol = rol.id_rol
+                WHERE usuario.id_usuario = %s
+            """
+            cursor.execute(query, (id_usuario,))
+            usuario = cursor.fetchone()
+
+            if usuario:
+                return jsonify({
+                    "id_rol": usuario[0],
+                    "usua": usuario[1],
+                    "contra": usuario[2],
+                    "estado_usuario": usuario[3],
+                    "nombre_rol": usuario[4]  # Nombre del rol
+                })
+            else:
+                return jsonify({"error": "Usuario no encontrado"}), 404
+    except Exception as error:
+        return jsonify({"error": str(error)}), 500
+    finally:
+        conexion.close()
+
 
 @accounting_bp.route('/reglas/detalles/<int:regla_id>', methods=['GET'])
 def obtener_detalles_regla(regla_id):
@@ -504,19 +521,17 @@ def obtener_detalles_regla(regla_id):
 
 @accounting_bp.route('/usuarios/actualizar/<int:id_usuario>', methods=['POST'])
 def actualizar_usu(id_usuario):
-    id_rol = request.form['id_rol']
-    usua = request.form['usua']
-    contra = request.form['contra']
-    estado_usuario = request.form['estado_usuario']
+    id_rol = request.form.get('id_rol')
+    usua = request.form.get('usua')
+    contra = request.form.get('contrasena')
+    estado_usuario = request.form.get('estado')
 
     resultado = actualizar_usuario(id_usuario, id_rol, usua, contra, estado_usuario)
-
+    print("Resultado de la actualización:", resultado)  
     if "error" in resultado:
-        return redirect(url_for('contable.usuarios'))
-    elif resultado.get("code") == 0:
-        return redirect(url_for('contable.usuarios'))
+        return jsonify(resultado), 400
 
-    return redirect(url_for('contable.usuarios'))
+    return jsonify(resultado), 200
 
 
 @accounting_bp.route('/usuarios/agregar', methods=['POST'])
