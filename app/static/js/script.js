@@ -351,11 +351,13 @@ function submitAddForm(event) {
 
   // Expresión regular para validar que no contenga letras ni caracteres especiales
   const invalidChars = /[A-Za-zñÑ@!#$%^&*(),?":{}|<>]/g;
-  if (invalidChars.test(cuentaDebito) || invalidChars.test(cuentaCredito)) {
+
+  // Solo validar si los campos tienen valor
+  if ((cuentaDebito && invalidChars.test(cuentaDebito)) ||
+    (cuentaCredito && invalidChars.test(cuentaCredito))) {
     alert("Las cuentas no deben contener letras ni caracteres especiales.");
     return;
   }
-
   console.log("Datos del formulario:", {
     nombreRegla,
     tipoTransaccion,

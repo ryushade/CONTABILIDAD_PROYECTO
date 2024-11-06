@@ -681,24 +681,35 @@
 
     function closeModalEdit() {
         document.getElementById("editReglaModal").style.display = "none";
-
         document.getElementById("cuenta_debito_edit").disabled = false;
         document.getElementById("cuenta_credito_edit").disabled = false;
     }
 
+    // Validación para evitar caracteres no permitidos
+    function validateAccountField(input) {
+        const regex = /^[0-9]*$/;
+        if (!regex.test(input.value)) {
+            input.value = input.value.replace(/[^0-9]/g, '');
+            alert("Solo se permiten números en los campos de cuenta.");
+        }
+    }
 
     // Envía el formulario de edición
     function submitEditForm(event) {
-        event.preventDefault(); // Evita el envío del formulario
+        event.preventDefault();
 
-        // Obtiene los valores del formulario
         const nombreRegla = document.getElementById("nombre_regla_edit").value;
         const tipoTransaccion = document.getElementById("tipo_transaccion_edit").value;
         const cuentaDebito = document.getElementById("cuenta_debito_edit").value || null;
         const cuentaCredito = document.getElementById("cuenta_credito_edit").value || null;
         const estado = document.getElementById("estado_cuenta_edit").value;
 
-        // Realiza una petición al servidor para actualizar la regla
+        // Verificar que al menos una cuenta esté habilitada
+        if (!cuentaDebito && !cuentaCredito) {
+            alert("Debe ingresar al menos una cuenta de débito o crédito.");
+            return;
+        }
+
         fetch(`/contable/reglas/actualizar_regla/${currentReglaId}`, {
             method: "POST",
             headers: {
@@ -716,8 +727,8 @@
             .then(data => {
                 if (data.success) {
                     alert("Regla actualizada correctamente.");
-                    closeModalEdit(); // Cierra el modal
-                    location.reload(); // Recarga la página para mostrar los cambios
+                    closeModalEdit();
+                    location.reload();
                 } else {
                     console.log("Error en la respuesta del servidor:", data.message);
                     alert("Error al actualizar la regla: " + data.message);
@@ -729,7 +740,14 @@
             });
     }
 
-
+    // Asignar evento de validación en los campos de cuentas
+    document.getElementById("cuenta_debito_edit").addEventListener("input", function () {
+        validateAccountField(this);
+    });
+    document.getElementById("cuenta_credito_edit").addEventListener("input", function () {
+        validateAccountField(this);
+    });
 </script>
+
 
 {% endblock %}
