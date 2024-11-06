@@ -349,9 +349,10 @@ function submitAddForm(event) {
   const cuentaCredito = document.getElementById("cuenta_credito_add").value || null;
   const estado = document.getElementById("estado_cuenta").value;
 
-  const invalidChars = /[.@!#$%^&*(),?":{}|<>]/g;
+  // Expresión regular para validar que no contenga letras ni caracteres especiales
+  const invalidChars = /[A-Za-zñÑ@!#$%^&*(),?":{}|<>]/g;
   if (invalidChars.test(cuentaDebito) || invalidChars.test(cuentaCredito)) {
-    alert("Las cuentas no deben contener caracteres especiales como '.', '@', etc.");
+    alert("Las cuentas no deben contener letras ni caracteres especiales.");
     return;
   }
 
@@ -399,6 +400,7 @@ function submitAddForm(event) {
       alert("Error al agregar la regla. Revisa la consola para más detalles.");
     });
 }
+
 
 
 function previewPhoto(event) {
