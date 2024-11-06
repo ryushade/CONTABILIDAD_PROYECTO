@@ -137,6 +137,10 @@ function closeModalDeleteRegla() {
   document.getElementById('deleteReglaModal').style.display = 'none';
 }
 
+function closeModalError() {
+  document.getElementById('ErrorModal').style.display = 'none';
+}
+
 function closeModalDeleteUsuario() {
   document.getElementById('deleteUsuarioModal').style.display = 'none';
 }

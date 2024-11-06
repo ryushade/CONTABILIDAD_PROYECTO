@@ -174,7 +174,9 @@ def cuentas():
     # print(json.dumps(estructura_cuentas, indent=2))
     total_cuentas = obtener_total_cuentas(tipo_cuenta=tipo_cuenta, naturaleza=naturaleza)
     total_pages = (total_cuentas + per_page - 1) // per_page
-
+    # Obtener el mensaje de error
+    error_message = session.pop('error_message', None)
+    print(error_message)
     return render_template(
         'contable/cuentas/cuentas2.html',
         cuentas = cuentas,
@@ -184,6 +186,7 @@ def cuentas():
         total_results=total_cuentas,
         tipo_cuenta=tipo_cuenta,
         naturaleza=naturaleza,
+        error_message = error_message,
         max=max,
         min=min
     )
@@ -260,18 +263,21 @@ def editar_cuenta(cuenta_id):
 
 @accounting_bp.route('/cuentas/registrar', methods=['POST'])
 def registrar_cuenta():
-    codigo_cuenta = request.form['codigo_cuenta_agregar']
-    nombre_cuenta = request.form['nombre_cuenta_agregar']
-    naturaleza = request.form['naturaleza_agregar']
-    estado_cuenta = request.form['estado_cuenta_agregar']
-    print(codigo_cuenta)
-    print(nombre_cuenta)
-    print(naturaleza)
-    print(estado_cuenta)
-    conta.insertar_cuenta(codigo_cuenta, nombre_cuenta, naturaleza, estado_cuenta)
+    try:
+        codigo_cuenta = request.form['codigo_cuenta_agregar']
+        nombre_cuenta = request.form['nombre_cuenta_agregar']
+        naturaleza = request.form['naturaleza_agregar']
+        estado_cuenta = request.form['estado_cuenta_agregar']
+        print(codigo_cuenta)
+        print(nombre_cuenta)
+        print(naturaleza)
+        print(estado_cuenta)
+        conta.insertar_cuenta(codigo_cuenta, nombre_cuenta, naturaleza, estado_cuenta)
+        return redirect(url_for('contable.cuentas'))
+    except Exception as e:
+        session['error_message'] = str(e)
+        return redirect(url_for('contable.cuentas'))
 
-
-    return redirect(url_for('contable.cuentas'))
 
 @accounting_bp.route('/reglas/agregar', methods=['POST'])
 def agregar_regla():
