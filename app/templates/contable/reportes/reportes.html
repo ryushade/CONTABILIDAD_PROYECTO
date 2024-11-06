@@ -198,7 +198,7 @@
 <div class="tab-content mb-5">
 
     <!-- Tab: Libro Diario -->
-    <div class="tab-pane fade show active" id="libro-diario">
+    <div class="tab-pane fade {% if active_tab == 'libro-diario' %}show active{% endif %}" id="libro-diario">
         <div class="card bg-white rounded custom-shadow p-4">
             <header class="d-flex justify-content-between align-items-center mb-2">
                 <h1 class="h4 mb-0 d-flex align-items-center" style="font-weight: bold;">
@@ -278,7 +278,6 @@
                                 onmouseout="this.style.backgroundColor='rgb(226, 39, 39)';">
                                 <i class="fa-solid fa-filter"></i> Borrar filtros
                             </a>
-
                         </div>
                     </div>
                 </form>
@@ -358,7 +357,7 @@
     </div>
 
     <!-- Tab: Libro Mayor -->
-    <div class="tab-pane fade" id="libro-mayor">
+    <div class="tab-pane fade {% if active_tab == 'libro-mayor' %}show active{% endif %}" id="libro-mayor">
         <div class="card bg-white rounded custom-shadow p-4">
             <header class="d-flex justify-content-between align-items-center mb-2">
                 <h1 class="h4 mb-0 d-flex align-items-center" style="font-weight: bold;">
@@ -393,36 +392,66 @@
             <p class="text-muted small mb-3">Consulta el detalle de los movimientos registrados, clasificados por
                 cuentas, mostrando los debe, haber y saldos</p>
             <div class="container">
-                <form class="row g-3">
+                <form id="filterFormMayor" class="row g-3 mb-3" method="GET" action="{{ url_for('contable.reportes') }}">
+                    <input type="hidden" name="active_tab" value="libro-mayor" id="activeTabInput"> <!-- Campo oculto para el tab activo -->
                     <!-- First column -->
                     <div class="col-md-3">
-                        <label for="daterange" class="form-label">
-                            Fecha <span class="required-asterisk">*</span>
+                        <label for="daterangemayor" class="form-label" style="font-size: 14px;">
+                            Fecha<span class="required-asterisk">*</span>
                         </label>
                         <div class="input-group">
                             <span class="input-group-text" id="basic-addon1">
                                 <i class="fas fa-calendar-alt"></i>
                             </span>
-                            <input type="text" class="form-control" id="daterange" placeholder="Selecciona mes y año"
-                                aria-label="Fecha" aria-describedby="basic-addon1">
+                            <input type="text" class="form-control" id="daterangemayor" name="daterangemayor"
+                                placeholder="Selecciona mes y año" aria-label="Fecha" aria-describedby="basic-addon1"
+                                value="{{ request.args.get('daterangemayor', '') }}">
                         </div>
                     </div>
-
-                    <!-- Second column -->
-                    <div class="col-md-3">
-                        <label for="tipo-registro" class="form-label">
-                            Tipo de registro
-                        </label>
-                        <select class="form-select" id="tipo-registro">
-                            <option selected>Todas</option>
-                        </select>
+                    <div class="col-md-2">
+                        <div class="mt-4">
+                            <a href="{{ url_for('contable.reportes', active_tab='libro-mayor') }}" class="btn btn-secondary mt-2"
+                                style="background-color: rgb(226, 39, 39); border: none; color: white;"
+                                onmouseover="this.style.backgroundColor='rgb(180, 20, 20)';"
+                                onmouseout="this.style.backgroundColor='rgb(226, 39, 39)';">
+                                <i class="fa-solid fa-filter"></i> Borrar filtros
+                            </a>
+                        </div>
                     </div>
                 </form>
             </div>
 
-            <div class="table-responsive mt-4 mb-4">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-light">
+            <div class="table-container mt-4" style="border: 1px solid #ccc;">
+                <style>
+                    /* Estilo de hover para resaltar todo el grupo de filas de un asiento */
+                    .asiento-group:hover {
+                        background-color: #e4ebf7;
+                    }
+            
+                    /* Ajuste de padding para filas compactas */
+                    table {
+                        border: #000;
+                        width: 100%;
+                        font-size: 13px;
+                    }
+            
+                    th, td {
+                        padding: 17px 10px; /* Ajuste de padding para reducir el tamaño de las filas */
+                        font-size: 13px;
+                    }
+            
+                    th {
+                        font-weight: bold;
+                        background-color: #f8f9fa;
+                        text-align: center;
+                    }
+            
+                    td {
+                        text-align: center;
+                    }
+                </style>
+                <table style="border: #000; width: 100%; font-size: 13px;">
+                    <thead>
                         <tr>
                             <th class="text-center">CÓDIGO DE CUENTA</th>
                             <th class="text-center">NOMBRE DE LA CUENTA</th>
@@ -432,54 +461,47 @@
                             <th class="text-center">SALDO</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {% for codigo_cuenta, cuenta in libro_mayor.items() %}
+                    {% if libro_mayor %}
+                    {% for codigo_cuenta, cuenta in libro_mayor.items() %}
+                    <tbody class="asiento-group">
                         {% for detalle in cuenta.detalles %}
                         <tr>
                             {% if loop.first %}
-                            <td class="text-center align-middle" rowspan="{{ cuenta.detalles|length }}">{{
-                                codigo_cuenta
-                                }}</td>
-                            <td class="text-center align-middle" rowspan="{{ cuenta.detalles|length }}">{{
-                                cuenta.nombre_cuenta }}</td>
+                            <td rowspan="{{ cuenta.detalles|length }}">{{ codigo_cuenta }}</td>
+                            <td rowspan="{{ cuenta.detalles|length }}">{{ cuenta.nombre_cuenta }}</td>
                             {% endif %}
-                            <td class="text-center">{{ detalle.fecha_asiento }}</td>
-                            <td class="text-center text-end">{{ detalle.debe | round(2) if detalle.debe is not none
-                                else
-                                '' }}</td>
-                            <td class="text-center text-end">{{ detalle.haber | round(2) if detalle.haber is not
-                                none
-                                else '' }}</td>
-
+                            <td>{{ detalle.fecha_asiento }}</td>
+                            <td class="text-end">{{ detalle.debe | round(2) if detalle.debe is not none else '-' }}</td>
+                            <td class="text-end">{{ detalle.haber | round(2) if detalle.haber is not none else '-' }}</td>
                             {% if loop.first %}
                             <td class="text-center align-middle" rowspan="{{ cuenta.detalles|length }}">
                                 <span tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
-                                    data-bs-content="{% if cuenta.saldo >= 0 %}Saldo Acreedor: S/ {{ cuenta.saldo | round(2) }}{% else %}Saldo Deudor: S/ {{ cuenta.saldo | abs | round(2) }}{% endif %}">
+                                      data-bs-content="{% if cuenta.saldo >= 0 %}Saldo Acreedor: S/ {{ cuenta.saldo | round(2) }}{% else %}Saldo Deudor: S/ {{ cuenta.saldo | abs | round(2) }}{% endif %}">
                                     {{ cuenta.saldo | round(2) }}
                                 </span>
                             </td>
-
-
                             {% endif %}
                         </tr>
                         {% endfor %}
-                        {% endfor %}
                     </tbody>
+                    {% endfor %}
+                    {% else %}
+                    <tbody>
+                        <tr>
+                            <td colspan="6" class="text-center">No se encontraron registros para el criterio seleccionado.</td>
+                        </tr>
+                    </tbody>
+                    {% endif %}
                     <tfoot>
                         <tr>
-                            <th colspan="3" class="text-end" style="font-weight: bold;">TOTALES (S/.)</th>
-                            <th class="text-center text-end" style="font-weight: bold;">{{ total_debe | round(2) }}
-                            </th>
-                            <th class="text-center text-end" style="font-weight: bold;">{{ total_haber | round(2) }}
-                            </th>
+                            <th colspan="3" class="text-end" style="font-weight: bold; color: #000; font-size: 14px;">TOTALES (S/.)</th>
+                            <th style="font-weight: bold; font-size: 14px; color: #000;" class="text-end">{{ total_debe | round(2) }}</th>
+                            <th style="font-weight: bold; font-size: 14px; color: #000;" class="text-end">{{ total_haber | round(2) }}</th>
                             <th></th>
                         </tr>
                     </tfoot>
                 </table>
-
             </div>
-
-
         </div>
     </div>
 
@@ -697,7 +719,9 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            
+                            <th colspan="6" class="text-end" style="font-weight: bold;">TOTALES</th>
+                            <th class="text-end" style="font-weight: bold;">{{ totale.total_importe | round(2) }}
+                            </th>
                             <th colspan="5" class="text-end" style="font-weight: bold;">TOTALES</th>
                             <th class="text-end" style="font-weight: bold;">{{ totale.total_importe | round(2) }}
                             </th>
@@ -891,12 +915,6 @@
             </div>
         </div>
 
-
-
-
-
-
-
     </div>
 
 
@@ -938,6 +956,49 @@
             });
         });
 
+        document.addEventListener("DOMContentLoaded", function () {
+        // Verificar si hay un tab activo especificado en la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const activeTab = urlParams.get('active_tab');
+
+        // Solo activa el tab específico si está presente en la URL
+        if (activeTab) {
+            const activeTabLink = document.querySelector(`[href="#${activeTab}"]`);
+            const activeTabContent = document.getElementById(activeTab);
+
+            if (activeTabLink && activeTabContent) {
+                // Remover la clase 'active' de todos los tabs y contenidos
+                document.querySelectorAll('.nav-tabs .nav-link').forEach(tab => tab.classList.remove('active'));
+                document.querySelectorAll('.tab-content .tab-pane').forEach(content => content.classList.remove('show', 'active'));
+
+                // Agregar la clase 'active' solo al tab específico
+                activeTabLink.classList.add('active');
+                activeTabContent.classList.add('show', 'active');
+            }
+        }
+
+        // Configurar flatpickr para el campo daterangemayor en el "Libro Mayor"
+        flatpickr("#daterangemayor", {
+            mode: "range",
+            dateFormat: "m/Y",
+            minDate: "01/1900",
+            maxDate: "04/2028",
+            plugins: [
+                new monthSelectPlugin({
+                    dateFormat: "m/Y",
+                    altFormat: "F Y",
+                    altInput: true
+                })
+            ],
+            onClose: function (selectedDates, dateStr, instance) {
+                if (selectedDates.length === 2) {
+                    document.getElementById('filterFormMayor').submit();
+                }
+            }
+        });
+    });
+
+        
         function openModalDownloadExcel() {
             document.getElementById("downloadExcelModal").style.display = "flex";
         }

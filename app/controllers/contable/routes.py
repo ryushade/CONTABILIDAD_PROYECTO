@@ -87,12 +87,16 @@ def logout():
 @jwt_required()
 @role_required('ADMIN', 'CONTADOR')
 def reportes():
+    active_tab = request.args.get('active_tab', 'libro-diario')
     tipo_registro = request.args.get('tipo_registro', 'Todas')
     daterange = request.args.get('daterange', '')
+    daterange_mayor = request.args.get('daterangemayor', '')  # Segundo rango de fechas específico para el Libro Mayor
     start_date, end_date = None, None
+    start_date_mayor, end_date_mayor = None, None
 
     from datetime import datetime, timedelta
 
+    # Procesa el rango de fechas para el Libro Diario
     if daterange:
         try:
             dates = daterange.split(' to ')
@@ -108,16 +112,53 @@ def reportes():
                 end_date = start_date.replace(day=1) + timedelta(days=31)
                 end_date = end_date.replace(day=1) - timedelta(days=1)
         except (ValueError, IndexError) as e:
-            print(f"Error processing date range: {e}")
+            print(f"Error processing date range for Libro Diario: {e}")
 
+    # Procesa el rango de fechas para el Libro Mayor
+    if daterange_mayor:
+        try:
+            dates_mayor = daterange_mayor.split(' to ')
+            if len(dates_mayor) == 2:
+                start_date_mayor = datetime.strptime(dates_mayor[0].strip(), '%m/%Y').date()
+                end_date_mayor = datetime.strptime(dates_mayor[1].strip(), '%m/%Y').date()
+                # Calcular el último día del mes para el segundo mes
+                end_date_mayor = end_date_mayor.replace(day=1) + timedelta(days=31)
+                end_date_mayor = end_date_mayor.replace(day=1) - timedelta(days=1)
+            elif len(dates_mayor) == 1:
+                # Si solo hay un mes, se usa como inicio y fin del mes
+                start_date_mayor = datetime.strptime(dates_mayor[0].strip(), '%m/%Y').date()
+                end_date_mayor = start_date_mayor.replace(day=1) + timedelta(days=31)
+                end_date_mayor = end_date_mayor.replace(day=1) - timedelta(days=1)
+        except (ValueError, IndexError) as e:
+            print(f"Error processing date range for Libro Mayor: {e}")
+
+    # Obtiene los datos aplicando el filtro de fechas correspondiente
     asientos, totales = obtener_asientos_agrupados(tipo_registro, start_date, end_date)
-    libro_mayor_data, total_debe, total_haber = obtener_libro_mayor_agrupado_por_fecha()
+    libro_mayor_data, total_debe, total_haber = obtener_libro_mayor_agrupado_por_fecha(start_date_mayor, end_date_mayor)
     lista_libro_caja, total_caja = obtener_libro_caja()
     lista_libro_caja_cuenta_corriente, total_caja_corriente = obtener_libro_caja_cuenta_corriente()
 
     registro_venta_data, totale = obtener_registro_ventas()
     registro_compra_data, totales_compra = obtener_registro_compras()
-    return render_template('contable/reportes/reportes.html', asientos=asientos, totales=totales, libro_mayor=libro_mayor_data, total_debe=total_debe, total_haber=total_haber, registros_ventas=registro_venta_data, totale=totale, registros_compras = registro_compra_data,totalesCompras = totales_compra,lista_libro_caja=lista_libro_caja, total_caja=total_caja, lista_libro_caja_cuenta_corriente=lista_libro_caja_cuenta_corriente, total_caja_corriente=total_caja_corriente)
+    
+    return render_template(
+        'contable/reportes/reportes.html', 
+        asientos=asientos, 
+        totales=totales, 
+        libro_mayor=libro_mayor_data, 
+        total_debe=total_debe, 
+        total_haber=total_haber, 
+        registros_ventas=registro_venta_data, 
+        totale=totale, 
+        registros_compras=registro_compra_data,
+        totalesCompras=totales_compra,
+        lista_libro_caja=lista_libro_caja, 
+        total_caja=total_caja, 
+        lista_libro_caja_cuenta_corriente=lista_libro_caja_cuenta_corriente, 
+        total_caja_corriente=total_caja_corriente,
+        active_tab=active_tab
+    )
+
 
 
 import app.models.contable_models as conta
@@ -543,8 +584,10 @@ def exportar_libro_diario_excel():
             # Determinar el valor para la columna D
             if 'venta' in asiento['glosa'].lower() or 'ingreso' in asiento['glosa'].lower():
                 worksheet[f'D{current_row}'] = 14
-            elif 'compra' in asiento['glosa'].lower() or 'pago' in asiento['glosa'].lower():
+            elif 'compra' in asiento['glosa'].lower():
                 worksheet[f'D{current_row}'] = 8
+            elif 'pago' in asiento['glosa'].lower():
+                worksheet[f'D{current_row}'] = 1
             else:
                 worksheet[f'D{current_row}'] = ''
             
