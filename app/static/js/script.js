@@ -348,6 +348,7 @@ function submitAddForm(event) {
   const cuentaDebito = document.getElementById("cuenta_debito_add").value || null;
   const cuentaCredito = document.getElementById("cuenta_credito_add").value || null;
   const estado = document.getElementById("estado_cuenta").value;
+  const tipoMonto = document.getElementById("tipo_monto_add").value;
 
   // Expresión regular para validar que no contenga letras ni caracteres especiales
   const invalidChars = /[A-Za-zñÑ@!#$%^&*(),?":{}|<>]/g;
@@ -363,7 +364,8 @@ function submitAddForm(event) {
     tipoTransaccion,
     cuentaDebito,
     cuentaCredito,
-    estado
+    estado,
+    tipoMonto,
   });
 
   const requestBody = {
@@ -372,6 +374,7 @@ function submitAddForm(event) {
     cuenta_debito: cuentaDebito,
     cuenta_credito: cuentaCredito,
     estado: estado,
+    tipo_monto: tipoMonto,
   };
 
   // Enviar la solicitud

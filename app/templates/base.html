@@ -16,7 +16,7 @@
 
     <style>
         .sidebar {
-            background-color: #1d4ed8;
+            background-color: #0866FF;
             color: white;
             width: 13rem;
             overflow-y: auto;
@@ -349,10 +349,11 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse ms-1 me-1" id="navbarSupportedContent">
+
                     <h4 class="text-6xl font-bold tracking-wide text-gray-70 ms-3 mt-2 me-3"
-                        style="color: #1D4ED8; font-weight: 700;">TORMENTA</h4>
+                        style="color: #0866FF; font-weight: 700;">TØRMENTA</h4>
                     <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('transaccional.ventas') }}">Ventas</a>
                         </li>
                         <li class="nav-item">
@@ -363,8 +364,22 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('contable.cuentas') }}">Contabilidad</a>
-                        </li>
+                        </li> -->
+                        <style>
+                            .btn-navbar {
+                                background-color: #0866FF;
+                            }
+
+                            .btn-navbar:hover {
+                                background-color: #1D4ED8;
+                            }
+                        </style>
+
                     </ul>
+                    <button style="border-radius: 50px; height: 3rem; width: 3rem;" class="btn-navbar"
+                        onclick="openPersiana()">
+                        <i class="fa-calculator"></i>
+                    </button>
                     <!-- User Dropdown -->
                     {% if user %}
                     <div class="dropdown me-3">
@@ -424,8 +439,15 @@
                 </div>
             </nav>
 
+            <style>
+                .me-5 {
+                    margin-left: 1.5rem !important;
+                    margin-right: 1.5rem !important;
+                }
+
+            </style>
             <!-- Contenido de la página -->
-            <div
+            <div 
                 class="me-5 mt-2 {% if 'transaccional' in request.path or 'contable' in request.path %}ms-5{% endif %}">
                 {% block content %}{% endblock %}
             </div>
@@ -541,6 +563,11 @@
             minDate: "01/01/1900",
             maxDate: "08/04/2028"
         });
+    </script>
+    <script>
+        function openPersiana() {
+
+        }
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {

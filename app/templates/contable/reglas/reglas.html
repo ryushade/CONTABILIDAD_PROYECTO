@@ -117,7 +117,7 @@
     }
 </style>
 
-<div class="row align-items-center mt-4 mb-4">
+<div class="row align-items-center mt-2 mb-2">
     <div class="col-md-8">
         <h1 class="font-weight-bold display-8 text-left fs-3" style="font-weight: bold;">GESTIÓN DE REGLAS CONTABLES
         </h1>
@@ -149,9 +149,9 @@
             <tr>
                 <td class="text-align" style="font-size: 14px;">{{ regla.nombre_regla }}</td>
                 {% if regla.tipo_transaccion == 'venta_contado' %}
-                <td class="text-center" style="font-size: 14px;">Venta al contado</td>
+                <td class="text-align" style="font-size: 14px; text-align: left;">Venta al contado</td>
                 {% else %}
-                <td class="text-center" style="font-size: 14px;">Compra al contado</td>
+                <td class="text-align" style="font-size: 14px; text-align: left;">Compra al contado</td>
                 {% endif %}
 
                 {% if regla.cuenta_debe_codigo %}
@@ -527,6 +527,16 @@
                             placeholder="Ej: 4010" required />
                     </div>
 
+                    <div class="mb-4">
+                        <label for="tipo_monto_add" class="form-label" style="font-weight: bold;">Tipo de monto:</label>
+                        <select id="tipo_monto_add" name="tipo_monto" class="form-select" required>
+                            <option value="monto_total">Monto total</option>
+                            <option value="igv">IGV</option>
+                            <option value="base_imponible">Base imponible</option>
+                        </select>
+
+                    </div>
+
                     <!-- Estado de la cuenta -->
                     <div class="mb-4">
                         <label for="estado_cuenta" class="form-label" style="font-weight: bold;">Estado:</label>
@@ -572,9 +582,9 @@
         <div class="confirmation-modal-buttons"
             style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
             <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" class="btn btn-secondary"
-                onclick="closeModalDeleteRegla()">No, Cancelar</button>
+                onclick="closeModalDeleteRegla()">No, cancelar</button>
             <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" class="btn btn-danger"
-                onclick="deleteRegla()">Sí, Eliminar!</button>
+                onclick="deleteRegla()">Sí, eliminar!</button>
         </div>
     </div>
 </div>

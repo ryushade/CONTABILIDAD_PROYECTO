@@ -2,6 +2,7 @@
 
 * {
   font-family: 'Inter', sans-serif;
+  scrollbar-gutter: stable;
 }
 
 
@@ -29,8 +30,8 @@ p {
 /* Contenedor del formulario de login */
 .login-container {
   display: flex;
-  width: 70vw;
-  height: 70vh;
+  width: 68vw;
+  height: 68vh;
   border-radius: 10px;
   overflow: hidden;
   position: relative;
@@ -59,7 +60,6 @@ p {
 @media (min-width: 992px) {
   .login-image-container {
     display: flex;
-    /* Visible en pantallas grandes */
   }
 }
 
@@ -400,7 +400,7 @@ table {
 
 th,
 td {
-  padding: 5px;
+  padding: 2px;
   text-align: left;
 }
 
@@ -470,6 +470,17 @@ tr:hover {
   color: white;
 }
 
+/* .table-container table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-container th,
+.table-container td {
+  padding: 7px;
+  border: 1px solid #ccc;
+} */
+
 
 
 .action-button:hover {
@@ -489,10 +500,7 @@ tr:hover {
 
 @media (max-width: 768px) {
 
-  th,
-  td {
-    padding: 12px;
-  }
+
 
   .description {
     max-width: 200px;

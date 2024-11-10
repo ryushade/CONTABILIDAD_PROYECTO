@@ -1,3 +1,4 @@
+from app.models.conexion import obtener_conexion
 from flask import json, abort, request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app, send_from_directory
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
 from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, obtener_id_cuenta, obtener_regla_por_id, obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas,obtener_asientos_agrupados_excel,obtener_registro_compras
@@ -11,7 +12,6 @@ import os
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font, Alignment, PatternFill
 from datetime import datetime
-import openpyxl 
 from openpyxl.styles import Border, Side, Alignment, Font
 from fpdf import FPDF
 from io import BytesIO
@@ -315,6 +315,7 @@ def agregar_regla():
     cuenta_debito_codigo = data.get("cuenta_debito") or None
     cuenta_credito_codigo = data.get("cuenta_credito") or None
     estado = data.get("estado")
+    tipo_monto = data.get("tipo_monto")
 
     print("Datos recibidos en agregar_regla:")
     print("Nombre de la regla:", nombre_regla)
@@ -335,7 +336,7 @@ def agregar_regla():
     print("Cuenta Crédito ID:", cuenta_credito)
 
     try:
-        resultado = agregar_regla_en_db(nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado)
+        resultado = agregar_regla_en_db(nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado, tipo_monto)
         
         if resultado:
             return jsonify({"success": True})
@@ -395,6 +396,31 @@ def upload_photo():
         return redirect(url_for('inicio'))
     else:
         return redirect(url_for('inicio'))
+    
+@accounting_bp.route('/upload_photo/obtener/<int:user_id>', methods=['GET'])
+def obtener_foto_usuario(user_id):
+    foto = obtener_foto_usuario_db(user_id)
+    def obtener_foto_usuario_db(user_id):
+        conexion = obtener_conexion()
+        try:
+            with conexion.cursor() as cursor:
+                query = "SELECT foto FROM usuario WHERE id_usuario = %s"
+                cursor.execute(query, (user_id,))
+                result = cursor.fetchone()
+                if result:
+                    return result['foto']
+                else:
+                    return None
+        except Exception as e:
+            print(f"Error al obtener la foto del usuario: {e}")
+            return None
+        finally:
+            conexion.close()
+    if foto:
+        return jsonify({"foto_path": foto})
+    else:
+        return jsonify({"foto_path": None})
+    
 
 @accounting_bp.route('/reglas/actualizar_regla/<int:id_regla>', methods=['POST'])
 def actualizar_regla(id_regla):
