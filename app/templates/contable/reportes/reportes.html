@@ -9,7 +9,32 @@
     <h1 class="font-weight-bold display-8 text-left fs-3" style="font-weight: bold;">REPORTES DE CONTABILIDAD</h1>
 </header>
 
+
 <style>
+    .dropdown-menu {
+        transform-origin: top;
+        animation: dropdownAnimation 0.3s ease-in-out;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    @keyframes dropdownAnimation {
+        from {
+            opacity: 0;
+            transform: scaleY(0);
+        }
+
+        to {
+            opacity: 1;
+            transform: scaleY(1);
+        }
+    }
+
+    /* Add hover effect for dropdown items */
+    .dropdown-item:hover {
+        background-color: #f8f9fa;
+        transition: background-color 0.2s ease;
+    }
+
     .saldo-acreedor {
         color: green;
     }
@@ -95,7 +120,6 @@
     .table-container th,
     .table-container td {
         padding: 4px;
-        border: 0.2px solid #ccc;
     }
 
     * .table-scroll th {
@@ -141,7 +165,7 @@
 
     <!-- Tab: Libro Diario -->
     <div class="tab-pane fade {% if active_tab == 'libro-diario' %}show active{% endif %}" id="libro-diario">
-        <div class="card bg-white rounded custom-shadow p-4">
+        <div class="card bg-white rounded custom-shadow p-4" style="padding: 1rem !important;">
             <header class="d-flex justify-content-between align-items-center mb-2">
                 <h1 class="h4 mb-0 d-flex align-items-center" style="font-weight: bold;">
                     LIBRO DIARIO
@@ -249,7 +273,7 @@
                             <th class="text-center">CÓDIGO</th>
                             <th class="text-center">DENOMINACIÓN</th>
                             <th class="text-center">DEBE</th>
-                            <th class="text-left">HABER</th>
+                            <th class="text-center">HABER</th>
                         </tr>
                     </thead>
                     {% if asientos %}
@@ -306,10 +330,9 @@
 
     <!-- Tab: Libro Mayor -->
     <div class="tab-pane fade {% if active_tab == 'libro-mayor' %}show active{% endif %}" id="libro-mayor">
-        <div class="card bg-white rounded custom-shadow p-4">
+        <div class="card bg-white rounded custom-shadow p-4" style="padding: 1rem !important;">
             <header class="d-flex justify-content-between align-items-center mb-2">
                 <h1 class="h4 mb-0 d-flex align-items-center" style="font-weight: bold;">
-                    <span></span>
                     LIBRO MAYOR
                 </h1>
 
@@ -370,7 +393,7 @@
                 </form>
             </div>
 
-            <div class="table-container mt-4" style="border: 1px solid #ccc;">
+            <div class="table-container mt-4" style="border: 1px solid #ccc; margin-top: 0.2rem !important;">
                 <style>
                     /* Estilo de hover para resaltar todo el grupo de filas de un asiento */
                     .asiento-group:hover {
@@ -463,10 +486,9 @@
 
     <!-- Tab: Libro Compras -->
     <div class="tab-pane fade" id="libro-compras">
-        <div class="card bg-white rounded custom-shadow p-4">
+        <div class="card bg-white rounded custom-shadow p-4" style="padding: 1rem !important;">
             <header class="d-flex justify-content-between align-items-center mb-2">
                 <h1 class="h4 mb-0 d-flex align-items-center" style="font-weight: bold;">
-                    <span></span>
                     LIBRO REGISTRO DE COMPRAS
                 </h1>
 
@@ -609,7 +631,7 @@
 
     <!-- Tab: Libro Ventas -->
     <div class="tab-pane fade" id="libro-ventas">
-        <div class="card bg-white rounded custom-shadow p-4">
+        <div class="card bg-white rounded custom-shadow p-4" style="padding: 1rem !important;">
             <header class="d-flex justify-content-between align-items-center mb-1">
                 <h1 class="h4 mb-0 d-flex align-items-center" style="font-weight: bold;">
                     LIBRO REGISTRO DE VENTAS
@@ -722,10 +744,9 @@
 
     <!-- Tab: Libro Caja -->
     <div class="tab-pane fade" id="libro-caja">
-        <div class="card bg-white rounded custom-shadow p-4">
+        <div class="card bg-white rounded custom-shadow p-4" style="padding: 1rem !important;">
             <header class="d-flex justify-content-between align-items-center mb-2">
                 <h1 class="h4 mb-0 d-flex align-items-center" style="font-weight: bold;">
-                    <span></span>
                     LIBRO CAJA
                 </h1>
                 <div class="dropdown me-2">

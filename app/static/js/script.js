@@ -119,8 +119,6 @@ function openModalDeleteUsu(idUsuario, nombreRol, nombreUsuario) {
 }
 
 
-
-
 function openModalDeleteRegla(idRegla, nombreRegla) {
   document.getElementById('deleteReglaModal').style.display = 'flex';
   document.getElementById('deleteReglaId').value = idRegla;

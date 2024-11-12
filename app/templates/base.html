@@ -14,11 +14,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='img/icono.ico') }}">
 
+
     <style>
         .sidebar {
             background-color: #0866FF;
             color: white;
-            width: 13rem;
+            width: 13.2rem;
             overflow-y: auto;
             overflow-x: hidden;
             transition: width 0.3s;
@@ -29,6 +30,8 @@
             height: 100vh;
             z-index: 1000;
         }
+
+
 
         .sidebar.collapsed {
             width: 55px;
@@ -309,51 +312,56 @@
                 </div>
                 {% else %}
                 <!-- Opciones del sistema contable -->
-                <div class="nav-item">
-                    <i class="fas fa-calculator"></i>
-                    <a href="{{ url_for('contable.cuentas') }}" style="text-decoration: none; color: inherit;">
+                <a href="{{ url_for('contable.cuentas') }}" style="text-decoration: none; color: inherit;">
+                    <div class="nav-item">
+                        <i class="fas fa-calculator"></i>
                         <span class="nav-text">Plan contable</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <i class="fas fa-chart-line"></i>
-                    <a href="{{ url_for('contable.reportes') }}" style="text-decoration: none; color: inherit;">
-                        <span class="nav-text">Reportes</span>
-                    </a>
-                </div>
-                <div class="nav-item has-subnav">
-                    <i class="fas fa-cog"></i>
-                    <span class="nav-text">Configuración</span>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="subnav">
-                    <a href="{{url_for('contable.usuarios')}}" style="text-decoration: none; color: inherit;">
-                        <div class="subnav-item">Usuarios</div>
-                    </a>
-                    <a href="{{url_for('contable.reglas')}}" style="text-decoration: none; color: inherit;">
-                        <div class="subnav-item">Reglas contables</div>
-                    </a>
-                </div>
-                {% endif %}
+                    </div>
+                </a>
             </div>
-        </aside>
-        {% endif %}
+            <div class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <a href="{{ url_for('contable.reportes') }}" style="text-decoration: none; color: inherit;">
+                    <span class="nav-text">Reportes</span>
+                </a>
+            </div>
+            <div class="nav-item has-subnav">
+                <i class="fas fa-cog"></i>
+                <span class="nav-text">Configuración</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="subnav">
+                <a href="{{url_for('contable.usuarios')}}" style="text-decoration: none; color: inherit;">
+                    <div class="subnav-item">Usuarios</div>
+                </a>
+                <a href="{{url_for('contable.reglas')}}" style="text-decoration: none; color: inherit;">
+                    <div class="subnav-item">Reglas contables</div>
+                </a>
+            </div>
+            {% endif %}
+    </div>
+    </aside>
+    {% endif %}
 
 
-        <!-- Contenido principal -->
-        <div class="main-content flex-grow-1">
-            <!-- Navbar -->
-            <nav class="navbar navbar-expand-lg navbar-light">
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse ms-1 me-1" id="navbarSupportedContent">
-
-                    <h4 class="text-6xl font-bold tracking-wide text-gray-70 ms-3 mt-2 me-3"
-                        style="color: #0866FF; font-weight: 700;">TØRMENTA</h4>
-                    <ul class="navbar-nav me-auto">
-                        <!-- <li class="nav-item">
+    <!-- Contenido principal -->
+    <div class="main-content flex-grow-1">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse ms-1 me-1" id="navbarSupportedContent">
+                <style>
+                    .ms-3 {
+                        margin-left: 1rem !important;
+                    }
+                </style>
+                <h4 class="text-6xl font-bold tracking-wide text-gray-70 ms-3 mt-2 me-3"
+                    style="color: #0866FF; font-weight: 700;">TORMENTA</h4>
+                <ul class="navbar-nav me-auto">
+                    <!-- <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('transaccional.ventas') }}">Ventas</a>
                         </li>
                         <li class="nav-item">
@@ -365,93 +373,164 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('contable.cuentas') }}">Contabilidad</a>
                         </li> -->
-                        <style>
-                            .btn-navbar {
-                                background-color: #0866FF;
-                            }
+                    <style>
+                        .btn-navbar {
+                            background-color: #0866FF;
+                        }
 
-                            .btn-navbar:hover {
-                                background-color: #1D4ED8;
-                            }
-                        </style>
+                        .btn-navbar:hover {
+                            background-color: #1D4ED8;
+                        }
+                    </style>
 
-                    </ul>
-                    <button style="border-radius: 50px; height: 3rem; width: 3rem;" class="btn-navbar"
-                        onclick="openPersiana()">
-                        <i class="fa-calculator"></i>
-                    </button>
-                    <!-- User Dropdown -->
-                    {% if user %}
-                    <div class="dropdown me-3">
-                        <button class="btn btn-light d-flex align-items-center" type="button" id="userDropdown"
-                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                            style="border: none; background: none;">
+                </ul>
+                <button style="border-radius: 50px; height: 3rem; width: 3rem;border: none;" class="btn-navbar"
+                    onclick="openPersiana()" title="Accesos directos">
+                    <i class="fas fa-route" style="color: white;"></i>
+                </button>
 
-                            <!-- Foto de perfil o icono de usuario -->
-                            <div
-                                style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; background-color: #e0e0e0; border-radius: 50%; border: 2px solid #b3b3b3;">
-                                <div
-                                    style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background-color: #f0f0f0; border-radius: 50%;">
-                                    {% if session.get('username') %}
-                                    <img src="{{ url_for('static', filename='fotos_perfil/' ~ session['username'] ~ '.jpg') }}"
-                                        alt="{{ session['username'] }}'s image"
-                                        style="width: 100%; height: 100%; border-radius: 50%;" />
-                                    {% else %}
-                                    <i class="fas fa-user" style="font-size: 20px; color: #6e6e6e;"></i>
-                                    {% endif %}
-                                </div>
+                <style>
+                    .persiana {
+                        position: fixed;
+                        top: 0;
+                        right: -500px;
+                        /* Oculto fuera de la pantalla */
+                        width: 380px;
+                        height: 100%;
+                        background-color: rgb(255, 255, 255);
+                        color: white;
+                        z-index: 1000000;
+                        transition: right 0.3s ease;
+                        padding: 1.5rem !important;
+                    }
+
+                    .persiana.active {
+                        right: 0;
+                        /* Visible en la pantalla */
+                    }
+
+                    .grid-persiana {
+                        display: inline-grid;
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                        gap: 1rem;
+                    }
+
+                    .btn-secondary-persiana::after {
+                        background-color: #4c5058;
+                    }
+                </style>
+                <div class="persiana" id="persiana">
+                    <div class=" persiana-titulo">
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <h3 style="font-size: 24px;color: black;font-weight: 700;">ACCESOS DIRECTOS</h3>
+                            <button type="button" class="modal-close" onclick="closeModalEdit()"
+                                style="border: none; color: black; background-color: #e74c3c; font-weight: bold; font-size: 24px; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">&times;</button>
+                        </div>
+                        <div class="persiana-cont">
+                            <div class="grid-persiana" style="margin-top: 20px;">
+                                <button class="btn-secondary"
+                                    style="width: 160px; height: 120px;background-color: #0866FF;border: none; border-radius: 20px;">
+                                    <i class="fas fa-chart-line"
+                                        style="font-size: 20px; color: white; margin-bottom: 18px;"></i>
+                                    <p style="color: white; font-size: 14px; font-weight: bold;">Ventas</p>
+
+                                </button>
+                                <button class="btn-secondary-persiana"
+                                    style="width: 160px; height: 120px;background-color: #40B75C;border: none; border-radius: 20px;">
+                                    <i class="fas fa-shopping-cart"
+                                        style="font-size: 20px; color: white; margin-bottom: 18px;"></i>
+                                    <p style="color: white; font-size: 14px; font-weight: bold;">Compras</p>
+                                </button>
+
+                                <button class="btn-secondary-persiana"
+                                    style="width: 160px; height: 120px;background-color: #ffc30f;border: none; border-radius: 20px;">
+                                    <i class="fas fa-warehouse"
+                                        style="font-size: 20px; color: white; margin-bottom: 18px;"></i>
+                                    <p style="color: white; font-size: 14px; font-weight: bold;">Almacén</p>
+                                </button>
+
+                                <button class="btn-secondary-persiana"
+                                    style="width: 160px; height: 120px;background-color: #C55CEF;border: none; border-radius: 20px;">
+                                    <i class="fas fa-calculator"
+                                        style="font-size: 20px; color: white; margin-bottom: 18px;"></i>
+                                    <p style="color: white; font-size: 14px; font-weight: bold;">Contabilidad</p>
+                                </button>
                             </div>
-
-                            <!-- Nombre y Rol -->
-                            <div class="ms-2 text-start">
-                                <span style="font-weight: bold; font-size: 16px;">{{ user.usua }}</span><br>
-                                <span style="font-size: 14px; color: gray;">
-                                    {% if user.rol and user.rol.nom_rol == "ADMIN" %}
-                                    Administrador
-                                    {% elif user.rol and user.rol.nom_rol == "EMPLEADO" %}
-                                    Empleado
-                                    {% else %}
-                                    Rol desconocido
-                                    {% endif %}
-                                </span>
-                            </div>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown"
-                            style="min-width: 200px; max-width: 250px; white-space: nowrap;">
-                            <a class="dropdown-item d-flex align-items-center" href="#" onclick="openUserConfigModal()"
-                                style="padding: 8px 12px;">
-                                <i class="fas fa-cog" style="color: rgb(155, 149, 149); margin-right: 8px;"></i>
-                                <span>Configuración de usuario</span>
-                            </a>
-                            <a class="dropdown-item d-flex align-items-center text-danger"
-                                href="{{ url_for('contable.logout') }}" style="padding: 8px 12px;">
-                                <i class="fas fa-sign-out-alt" style="color: red; margin-right: 8px;"></i>
-                                <span>Cerrar sesión</span>
-                            </a>
                         </div>
                     </div>
-                    {% else %}
-                    <a href="{{ url_for('contable.login') }}" class="btn btn-outline-primary">Iniciar Sesión</a>
-                    {% endif %}
-
-
 
                 </div>
-            </nav>
 
-            <style>
-                .me-5 {
-                    margin-left: 1.5rem !important;
-                    margin-right: 1.5rem !important;
-                }
+                <!-- User Dropdown -->
+                {% if user %}
+                <div class="dropdown me-3">
+                    <button class="btn btn-light d-flex align-items-center" type="button" id="userDropdown"
+                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                        style="border: none; background: none;">
 
-            </style>
-            <!-- Contenido de la página -->
-            <div 
-                class="me-5 mt-2 {% if 'transaccional' in request.path or 'contable' in request.path %}ms-5{% endif %}">
-                {% block content %}{% endblock %}
+                        <!-- Foto de perfil o icono de usuario -->
+                        <div
+                            style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; background-color: #e0e0e0; border-radius: 50%; border: 2px solid #b3b3b3;">
+                            <div
+                                style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background-color: #f0f0f0; border-radius: 50%;">
+                                {% if session.get('username') %}
+                                <img src="{{ url_for('static', filename='fotos_perfil/' ~ session['username'] ~ '.jpg') }}"
+                                    alt="{{ session['username'] }}'s image"
+                                    style="width: 100%; height: 100%; border-radius: 50%;" />
+                                {% else %}
+                                <i class="fas fa-user" style="font-size: 20px; color: #6e6e6e;"></i>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Nombre y Rol -->
+                        <div class="ms-2 text-start">
+                            <span style="font-weight: bold; font-size: 16px;">{{ user.usua }}</span><br>
+                            <span style="font-size: 14px; color: gray;">
+                                {% if user.rol and user.rol.nom_rol == "ADMIN" %}
+                                Administrador
+                                {% elif user.rol and user.rol.nom_rol == "EMPLEADO" %}
+                                Empleado
+                                {% else %}
+                                Rol desconocido
+                                {% endif %}
+                            </span>
+                        </div>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown"
+                        style="min-width: 200px; max-width: 250px; white-space: nowrap;">
+                        <a class="dropdown-item d-flex align-items-center" href="#" onclick="openUserConfigModal()"
+                            style="padding: 8px 12px;">
+                            <i class="fas fa-cog" style="color: rgb(155, 149, 149); margin-right: 8px;"></i>
+                            <span>Configuración de usuario</span>
+                        </a>
+                        <a class="dropdown-item d-flex align-items-center text-danger"
+                            href="{{ url_for('contable.logout') }}" style="padding: 8px 12px;">
+                            <i class="fas fa-sign-out-alt" style="color: red; margin-right: 8px;"></i>
+                            <span>Cerrar sesión</span>
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <a href="{{ url_for('contable.login') }}" class="btn btn-outline-primary">Iniciar Sesión</a>
+                {% endif %}
+
+
+
             </div>
+        </nav>
+
+        <style>
+            .me-5 {
+                margin-left: 1.5rem !important;
+                margin-right: 1.5rem !important;
+            }
+        </style>
+        <!-- Contenido de la página -->
+        <div class="me-5 mt-2 {% if 'transaccional' in request.path or 'contable' in request.path %}ms-5{% endif %}">
+            {% block content %}{% endblock %}
         </div>
+    </div>
     </div>
 
     <div id="userConfigModal" class="modal-overlay"
@@ -526,6 +605,23 @@
 
     <button class="circular-button" onclick="scrollDown()"></button>
 
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            function openPersiana() {
+                document.getElementById('persiana').classList.add('active');
+            }
+
+            function closeModalEdit() {
+                document.getElementById('persiana').classList.remove('active');
+            }
+
+            // Hacer las funciones accesibles globalmente
+            window.openPersiana = openPersiana;
+            window.closeModalEdit = closeModalEdit;
+        });
+    </script>
+
     <script>
         function openUserConfigModal() {
             const modal = document.getElementById('userConfigModal');
@@ -543,6 +639,9 @@
                 closeUserConfigModal();
             }
         });
+
+
+
     </script>
 
 
