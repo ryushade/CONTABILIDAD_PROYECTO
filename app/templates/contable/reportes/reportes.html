@@ -9,7 +9,32 @@
     <h1 class="font-weight-bold display-8 text-left fs-3" style="font-weight: bold;">REPORTES DE CONTABILIDAD</h1>
 </header>
 
+
 <style>
+    .dropdown-menu {
+        transform-origin: top;
+        animation: dropdownAnimation 0.3s ease-in-out;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    @keyframes dropdownAnimation {
+        from {
+            opacity: 0;
+            transform: scaleY(0);
+        }
+
+        to {
+            opacity: 1;
+            transform: scaleY(1);
+        }
+    }
+
+    /* Add hover effect for dropdown items */
+    .dropdown-item:hover {
+        background-color: #f8f9fa;
+        transition: background-color 0.2s ease;
+    }
+
     .saldo-acreedor {
         color: green;
     }
@@ -92,15 +117,12 @@
         width: 100%;
     }
 
-    .table-scroll th,
-    .table-scroll td {
-        padding: 10px 15px;
-        /* Padding uniforme para todas las celdas */
-        border-bottom: 1px solid #ddd;
-        /* Línea divisoria entre filas */
+    .table-container th,
+    .table-container td {
+        padding: 4px;
     }
 
-    .table-scroll th {
+    * .table-scroll th {
         text-align: center;
         background-color: #f9f9f9;
         font-weight: bold;
@@ -139,126 +161,11 @@
     </div>
 </div>
 
-<div id="downloadExcelModal" class="confirmation-modal-overlay" style="display: none">
-    <div class="confirmation-modal" style="text-align: center;">
-        <div class="modal-icon" style="margin-bottom: 10px;">
-            <!-- Icono de descarga -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
-                stroke="green" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-        </div>
-        <h2 class="confirmation-modal-title" style="color: rgb(30, 30, 30);">DESCARGAR ARCHIVO EXCEL</h2>
-        <p class="confirmation-modal-message">¿Estás seguro que deseas descargar el libro diario en formato
-            Excel?</p>
-        <div class="confirmation-modal-buttons"
-            style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
-            <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" class="btn btn-secondary"
-                onclick="closeModalDownloadExcel()">No, Cancelar</button>
-            <button
-                style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600; background-color: #1F6E43; border: none;"
-                class="btn btn-primary" onclick="downloadExcel()">Sí, Descargar</button>
-        </div>
-    </div>
-</div>
-
-<!---Mayor-->
-<div id="downloadExcelModalMayor" class="confirmation-modal-overlay" style="display: none">
-    <div class="confirmation-modal" style="text-align: center;">
-        <div class="modal-icon" style="margin-bottom: 10px;">
-            <!-- Icono de descarga -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
-                stroke="green" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-        </div>
-        <h2 class="confirmation-modal-title" style="color: rgb(30, 30, 30);">DESCARGAR ARCHIVO EXCEL</h2>
-        <p class="confirmation-modal-message">¿Estás seguro que deseas descargar el libro mayor en formato
-            Excel?</p>
-        <div class="confirmation-modal-buttons"
-            style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
-            <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" class="btn btn-secondary"
-                onclick="closeModalDownloadExcelMayor()">No, Cancelar</button>
-            <button
-                style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600; background-color: #1F6E43; border: none;"
-                class="btn btn-primary" onclick="downloadExcelMayor()">Sí, Descargar</button>
-        </div>
-    </div>
-</div>
-
-
-<div id="downloadPDFModal" class="confirmation-modal-overlay" style="display: none;">
-    <div class="confirmation-modal" style="text-align: center;">
-        <div class="modal-icon" style="margin-bottom: 10px;">
-            <!-- Icono de descarga en rojo para PDF -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="red"
-                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-        </div>
-        <h2 class="confirmation-modal-title" style="color: rgb(30, 30, 30);">DESCARGAR ARCHIVO PDF</h2>
-        <p class="confirmation-modal-message">¿Estás seguro que deseas descargar el libro diario en formato PDF?</p>
-        <div class="confirmation-modal-buttons"
-            style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
-            <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" class="btn btn-secondary"
-                onclick="closeModalDownloadPDF()">No, Cancelar</button>
-            <button
-                style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600; background-color: #0B5ED7; border: none; transition: background-color 0.3s;"
-                class="btn btn-primary" onclick="downloadPDF()" onmouseover="this.style.backgroundColor='#1D4ED8'"
-                onmouseout="this.style.backgroundColor='#0B5ED7'">
-                Sí, Descargar
-            </button>
-
-        </div>
-    </div>
-</div>
-
-
-<!--Mayor-->
-
-<div id="downloadPDFModalMayor" class="confirmation-modal-overlay" style="display: none;">
-    <div class="confirmation-modal" style="text-align: center;">
-        <div class="modal-icon" style="margin-bottom: 10px;">
-            <!-- Icono de descarga en rojo para PDF -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="red"
-                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-        </div>
-        <h2 class="confirmation-modal-title" style="color: rgb(30, 30, 30);">DESCARGAR ARCHIVO PDF</h2>
-        <p class="confirmation-modal-message">¿Estás seguro que deseas descargar el libro mayor en formato PDF?</p>
-        <div class="confirmation-modal-buttons"
-            style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
-            <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" class="btn btn-secondary"
-                onclick="closeModalDownloadPDFMayor()">No, Cancelar</button>
-            <button
-                style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600; background-color: #0B5ED7; border: none; transition: background-color 0.3s;"
-                class="btn btn-primary" onclick="downloadPDFMayor()" onmouseover="this.style.backgroundColor='#1D4ED8'"
-                onmouseout="this.style.backgroundColor='#0B5ED7'">
-                Sí, Descargar
-            </button>
-
-        </div>
-    </div>
-</div>
-
-
-
-
-
 <div class="tab-content mb-5">
 
     <!-- Tab: Libro Diario -->
     <div class="tab-pane fade {% if active_tab == 'libro-diario' %}show active{% endif %}" id="libro-diario">
-        <div class="card bg-white rounded custom-shadow p-4">
+        <div class="card bg-white rounded custom-shadow p-4" style="padding: 1rem !important;">
             <header class="d-flex justify-content-between align-items-center mb-2">
                 <h1 class="h4 mb-0 d-flex align-items-center" style="font-weight: bold;">
                     LIBRO DIARIO
@@ -343,14 +250,20 @@
             </div>
 
 
-            <div class="table-container mt-2" style="border: 1px solid #ccc;">
+            <div class="table-container mt-1" style="border: 1px solid #ccc;">
+                <style>
+                    /* Hover style for row groups */
+                    .asiento-group:hover {
+                        background-color: #e4ebf7;
+                    }
+                </style>
                 <style>
                     /* Estilo de hover para resaltar todo el grupo de filas de un asiento */
                     .asiento-group:hover {
                         background-color: #e4ebf7;
                     }
                 </style>
-                <table style="border: #000; width: 100%; font-size: 13px;">
+                <table style="border: #000; width: 100%; font-size: 16px;">
                     <thead>
                         <tr>
                             <th class="text-center">NÚMERO CORRELATIVO</th>
@@ -360,7 +273,7 @@
                             <th class="text-center">CÓDIGO</th>
                             <th class="text-center">DENOMINACIÓN</th>
                             <th class="text-center">DEBE</th>
-                            <th class="text-left">HABER</th>
+                            <th class="text-center">HABER</th>
                         </tr>
                     </thead>
                     {% if asientos %}
@@ -369,22 +282,21 @@
                         {% for detalle in asiento.detalles %}
                         <tr>
                             {% if loop.first %}
-                            <td style="padding-top: 10px;" class="text-center" rowspan="{{ asiento.detalles|length }}">
+                            <td class="text-center" rowspan="{{ asiento.detalles|length }}">
                                 {{ asiento.numero_correlativo }}
                             </td>
-                            <td class="text-center" style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">
+                            <td class="text-center" rowspan="{{ asiento.detalles|length }}">
                                 {{ asiento.fecha_asiento.strftime('%d/%m/%Y') }}
                             </td>
-                            <td class="text-center" style="padding-top: 20px;" rowspan="{{ asiento.detalles|length }}">
+                            <td class="text-align" style="text-align: left;" rowspan="{{ asiento.detalles|length }}">
                                 {{ asiento.glosa }}
                             </td>
-                            <td class="text-center" style="padding: 20px 40px; white-space: nowrap;"
-                                rowspan="{{ asiento.detalles|length }}">
+                            <td class="text-center" rowspan="{{ asiento.detalles|length }}">
                                 {{ asiento.num_comprobante }}
                             </td>
                             {% endif %}
-                            <td>{{ detalle.codigo_cuenta }}</td>
-                            <td class="text-center" style="padding: 15px 15px;">{{ detalle.nombre_cuenta }}</td>
+                            <td class="text-align" style="text-align: right;">{{ detalle.codigo_cuenta }}</td>
+                            <td class="text-left" style="text-align: left;">{{ detalle.nombre_cuenta }}</td>
                             <td class="text-end">{{ detalle.debe if detalle.debe != 0 else '-' }}</td>
                             <td class="text-end">{{ detalle.haber if detalle.haber != 0 else '-' }}</td>
                         </tr>
@@ -418,10 +330,9 @@
 
     <!-- Tab: Libro Mayor -->
     <div class="tab-pane fade {% if active_tab == 'libro-mayor' %}show active{% endif %}" id="libro-mayor">
-        <div class="card bg-white rounded custom-shadow p-4">
+        <div class="card bg-white rounded custom-shadow p-4" style="padding: 1rem !important;">
             <header class="d-flex justify-content-between align-items-center mb-2">
                 <h1 class="h4 mb-0 d-flex align-items-center" style="font-weight: bold;">
-                    <span></span>
                     LIBRO MAYOR
                 </h1>
 
@@ -482,7 +393,7 @@
                 </form>
             </div>
 
-            <div class="table-container mt-4" style="border: 1px solid #ccc;">
+            <div class="table-container mt-4" style="border: 1px solid #ccc; margin-top: 0.2rem !important;">
                 <style>
                     /* Estilo de hover para resaltar todo el grupo de filas de un asiento */
                     .asiento-group:hover {
@@ -575,10 +486,9 @@
 
     <!-- Tab: Libro Compras -->
     <div class="tab-pane fade" id="libro-compras">
-        <div class="card bg-white rounded custom-shadow p-4">
+        <div class="card bg-white rounded custom-shadow p-4" style="padding: 1rem !important;">
             <header class="d-flex justify-content-between align-items-center mb-2">
                 <h1 class="h4 mb-0 d-flex align-items-center" style="font-weight: bold;">
-                    <span></span>
                     LIBRO REGISTRO DE COMPRAS
                 </h1>
 
@@ -635,7 +545,7 @@
                     </div>
                 </form>
             </div>
-            <div class="table-container mt-2 mb-2" style="border: 1px solid #ccc;">
+            <div class="table-container mt-2 mb-2" style="border: 1px solid #ccc; margin-top: -0.9rem !important;">
                 <style>
                     /* Estilo de hover para resaltar la fila */
                     #tabla_compras tr:hover {
@@ -721,8 +631,8 @@
 
     <!-- Tab: Libro Ventas -->
     <div class="tab-pane fade" id="libro-ventas">
-        <div class="card bg-white rounded custom-shadow p-4">
-            <header class="d-flex justify-content-between align-items-center mb-2">
+        <div class="card bg-white rounded custom-shadow p-4" style="padding: 1rem !important;">
+            <header class="d-flex justify-content-between align-items-center mb-1">
                 <h1 class="h4 mb-0 d-flex align-items-center" style="font-weight: bold;">
                     LIBRO REGISTRO DE VENTAS
                 </h1>
@@ -783,7 +693,7 @@
                     background-color: #e4ebf7;
                 }
             </style>
-            <div class="table-container mt-2" style="border: 1px solid #ccc;">
+            <div class="table-container mt-2" style="border: 1px solid #ccc; margin-top: -0.9rem !important;">
                 <table id="tabla_ventas" style="border: #000; width: 100%; font-size: 13px;">
                     <thead>
                         <tr>
@@ -834,10 +744,9 @@
 
     <!-- Tab: Libro Caja -->
     <div class="tab-pane fade" id="libro-caja">
-        <div class="card bg-white rounded custom-shadow p-4">
+        <div class="card bg-white rounded custom-shadow p-4" style="padding: 1rem !important;">
             <header class="d-flex justify-content-between align-items-center mb-2">
                 <h1 class="h4 mb-0 d-flex align-items-center" style="font-weight: bold;">
-                    <span></span>
                     LIBRO CAJA
                 </h1>
                 <div class="dropdown me-2">
@@ -846,8 +755,7 @@
                         Exportar datos
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item d-flex flex-column"
-                            href="#" onclick="openModalDownloadExcelCaja()">
+                        <a class="dropdown-item d-flex flex-column" href="#" onclick="openModalDownloadExcelCaja()">
                             <span class="d-flex align-items-center">
                                 <i class="fa fa-file-excel mr-2"></i>
                                 <strong>Exportar a Excel</strong>
@@ -1104,10 +1012,10 @@
         <div class="confirmation-modal-buttons"
             style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
             <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" class="btn btn-secondary"
-                onclick="closeModalDownloadCompras()">No, Cancelar</button>
+                onclick="closeModalDownloadCompras()">No, cancelar</button>
             <button
                 style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600; background-color: #1F6E43; border: none;"
-                class="btn btn-primary" onclick="downloadExcelCompras()">Sí, Descargar</button>
+                class="btn btn-primary" onclick="downloadExcelCompras()">Sí, descargar</button>
         </div>
     </div>
 </div>
@@ -1130,12 +1038,12 @@
         <div class="confirmation-modal-buttons"
             style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
             <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" class="btn btn-secondary"
-                onclick="closeModalDownloadPDFCompras()">No, Cancelar</button>
+                onclick="closeModalDownloadPDFCompras()">No, cancelar</button>
             <button
                 style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600; background-color: #0B5ED7; border: none; transition: background-color 0.3s;"
                 class="btn btn-primary" onclick="downloadPDFCompras()"
                 onmouseover="this.style.backgroundColor='#1D4ED8'" onmouseout="this.style.backgroundColor='#0B5ED7'">
-                Sí, Descargar
+                Sí, descargar
             </button>
 
         </div>
@@ -1161,10 +1069,10 @@
         <div class="confirmation-modal-buttons"
             style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
             <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" class="btn btn-secondary"
-                onclick="closeModalDownloadVentas()">No, Cancelar</button>
+                onclick="closeModalDownloadVentas()">No, cancelar</button>
             <button
                 style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600; background-color: #1F6E43; border: none;"
-                class="btn btn-primary" onclick="downloadExcelVentas()">Sí, Descargar</button>
+                class="btn btn-primary" onclick="downloadExcelVentas()">Sí, descargar</button>
         </div>
     </div>
 </div>
@@ -1187,18 +1095,128 @@
         <div class="confirmation-modal-buttons"
             style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
             <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" class="btn btn-secondary"
-                onclick="closeModalDownloadPDFVentas()">No, Cancelar</button>
+                onclick="closeModalDownloadPDFVentas()">No, cancelar</button>
             <button
                 style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600; background-color: #0B5ED7; border: none; transition: background-color 0.3s;"
                 class="btn btn-primary" onclick="downloadPDFVentas()" onmouseover="this.style.backgroundColor='#1D4ED8'"
                 onmouseout="this.style.backgroundColor='#0B5ED7'">
-                Sí, Descargar
+                Sí, descargar
             </button>
 
         </div>
     </div>
 </div>
 
+
+
+<div id="downloadExcelModal" class="confirmation-modal-overlay" style="display: none">
+    <div class="confirmation-modal" style="text-align: center;">
+        <div class="modal-icon" style="margin-bottom: 10px;">
+            <!-- Icono de descarga -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                stroke="green" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+        </div>
+        <h2 class="confirmation-modal-title" style="color: rgb(30, 30, 30);">DESCARGAR ARCHIVO EXCEL</h2>
+        <p class="confirmation-modal-message">¿Estás seguro que deseas descargar el libro diario en formato
+            Excel?</p>
+        <div class="confirmation-modal-buttons"
+            style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
+            <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" class="btn btn-secondary"
+                onclick="closeModalDownloadExcel()">No, cancelar</button>
+            <button
+                style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600; background-color: #1F6E43; border: none;"
+                class="btn btn-primary" onclick="downloadExcel()">Sí, descargar</button>
+        </div>
+    </div>
+</div>
+
+<!---Mayor-->
+<div id="downloadExcelModalMayor" class="confirmation-modal-overlay" style="display: none">
+    <div class="confirmation-modal" style="text-align: center;">
+        <div class="modal-icon" style="margin-bottom: 10px;">
+            <!-- Icono de descarga -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                stroke="green" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+        </div>
+        <h2 class="confirmation-modal-title" style="color: rgb(30, 30, 30);">DESCARGAR ARCHIVO EXCEL</h2>
+        <p class="confirmation-modal-message">¿Estás seguro que deseas descargar el libro mayor en formato
+            Excel?</p>
+        <div class="confirmation-modal-buttons"
+            style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
+            <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" class="btn btn-secondary"
+                onclick="closeModalDownloadExcelMayor()">No, cancelar</button>
+            <button
+                style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600; background-color: #1F6E43; border: none;"
+                class="btn btn-primary" onclick="downloadExcelMayor()">Sí, descargar</button>
+        </div>
+    </div>
+</div>
+
+
+<div id="downloadPDFModal" class="confirmation-modal-overlay" style="display: none;">
+    <div class="confirmation-modal" style="text-align: center;">
+        <div class="modal-icon" style="margin-bottom: 10px;">
+            <!-- Icono de descarga en rojo para PDF -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="red"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+        </div>
+        <h2 class="confirmation-modal-title" style="color: rgb(30, 30, 30);">DESCARGAR ARCHIVO PDF</h2>
+        <p class="confirmation-modal-message">¿Estás seguro que deseas descargar el libro diario en formato PDF?</p>
+        <div class="confirmation-modal-buttons"
+            style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
+            <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" class="btn btn-secondary"
+                onclick="closeModalDownloadPDF()">No, cancelar</button>
+            <button
+                style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600; background-color: #0B5ED7; border: none; transition: background-color 0.3s;"
+                class="btn btn-primary" onclick="downloadPDF()" onmouseover="this.style.backgroundColor='#1D4ED8'"
+                onmouseout="this.style.backgroundColor='#0B5ED7'">
+                Sí, descargar
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<!--Mayor-->
+
+<div id="downloadPDFModalMayor" class="confirmation-modal-overlay" style="display: none;">
+    <div class="confirmation-modal" style="text-align: center;">
+        <div class="modal-icon" style="margin-bottom: 10px;">
+            <!-- Icono de descarga en rojo para PDF -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="red"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+        </div>
+        <h2 class="confirmation-modal-title" style="color: rgb(30, 30, 30);">DESCARGAR ARCHIVO PDF</h2>
+        <p class="confirmation-modal-message">¿Estás seguro que deseas descargar el libro mayor en formato PDF?</p>
+        <div class="confirmation-modal-buttons"
+            style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
+            <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" class="btn btn-secondary"
+                onclick="closeModalDownloadPDFMayor()">No, cancelar</button>
+            <button
+                style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600; background-color: #0B5ED7; border: none; transition: background-color 0.3s;"
+                class="btn btn-primary" onclick="downloadPDFMayor()" onmouseover="this.style.backgroundColor='#1D4ED8'"
+                onmouseout="this.style.backgroundColor='#0B5ED7'">
+                Sí, descargar
+            </button>
+        </div>
+    </div>
+</div>
 
 <div id="downloadExcelModalCaja" class="confirmation-modal-overlay" style="display: none">
     <div class="confirmation-modal" style="text-align: center;">
@@ -1217,10 +1235,10 @@
         <div class="confirmation-modal-buttons"
             style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
             <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" class="btn btn-secondary"
-                onclick="closeModalDownloadCaja()">No, Cancelar</button>
+                onclick="closeModalDownloadCaja()">No, cancelar</button>
             <button
                 style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600; background-color: #1F6E43; border: none;"
-                class="btn btn-primary" onclick="downloadExcelCaja()">Sí, Descargar</button>
+                class="btn btn-primary" onclick="downloadExcelCaja()">Sí, descargar</button>
         </div>
     </div>
 </div>
