@@ -368,6 +368,9 @@
                             <li>Esta regla se aplica automáticamente en transacciones de tipo <span
                                     id="tipo_transaccion"></span></li>
                         </ul>
+                        <ul class="text-muted" style="font-size: 14px;list-style-type: disc;padding-left: 20px;">
+                            <li>Esta regla contiene el tipo de monto: <span id="tipo_monto"> </span></li>
+                        </ul>
                     </div>
                 </div>
 
@@ -385,7 +388,7 @@
         <div class="modal-header d-flex justify-content-between align-items-center border-0 pb-3"
             style="padding-right: 10px;">
             <h3 class="modal-title" style="font-weight: bold;">EDITAR REGLA</h3>
-            <button type="button" class="modal-close" onclick="closeModalEdit()"
+            <button type="button" class="modal-close" onclick="closeModalEditRegla()"
                 style="border: none; color: black; background-color: #e74c3c; font-weight: bold; font-size: 24px; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">&times;</button>
         </div>
 
@@ -437,7 +440,8 @@
 
                 <!-- Botones de acción -->
                 <div class="d-flex justify-content-end mt-4" style="gap: 12px;">
-                    <button type="button" onclick="closeModalEdit()" class="btn btn-secondary me-2">Cancelar</button>
+                    <button type="button" onclick="closeModalEditRegla()"
+                        class="btn btn-secondary me-2">Cancelar</button>
                     <button type="submit" class="btn btn-primary">Guardar</button>
                 </div>
             </form>
@@ -636,7 +640,8 @@
                             data.cuenta_debito_codigo,
                             data.cuenta_debito_nombre,
                             data.cuenta_credito_codigo,
-                            data.cuenta_credito_nombre
+                            data.cuenta_credito_nombre,
+                            data.tipo_monto
                         );
                     }
                 })
@@ -646,7 +651,7 @@
                 });
         }
 
-        function openModalVerRegla(nombre_regla, tipo_transaccion, estado, cuenta_debito_codigo, cuenta_debito_nombre, cuenta_credito_codigo, cuenta_credito_nombre) {
+        function openModalVerRegla(nombre_regla, tipo_transaccion, estado, cuenta_debito_codigo, cuenta_debito_nombre, cuenta_credito_codigo, cuenta_credito_nombre, tipo_monto) {
             document.getElementById('nombre_regla').textContent = nombre_regla || "No disponible";
             document.getElementById('tipo_transaccion_info').textContent = tipo_transaccion || "No disponible";
             document.getElementById('estado').textContent = estado || "No disponible";
@@ -658,6 +663,8 @@
             document.getElementById('cuenta_credito').textContent = cuentaCreditoText;
 
             document.getElementById('tipo_transaccion').textContent = tipo_transaccion || "No disponible";
+
+            document.getElementById('tipo_monto').textContent = tipo_monto || "No disponible";
 
             document.getElementById('openVerModal').style.display = 'flex';
         }
@@ -692,10 +699,8 @@
         document.getElementById("editReglaModal").style.display = "flex";
     }
 
-    function closeModalEdit() {
+    function closeModalEditRegla() {
         document.getElementById("editReglaModal").style.display = "none";
-        document.getElementById("cuenta_debito_edit").disabled = false;
-        document.getElementById("cuenta_credito_edit").disabled = false;
     }
 
     // Validación para evitar caracteres no permitidos
