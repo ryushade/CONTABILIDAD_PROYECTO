@@ -29,7 +29,6 @@ def role_required(*roles):
             if user and user['rol']['nom_rol'] in roles:
                 return f(*args, **kwargs)
             else:
-                flash("No tiene permiso para acceder a esta página.", "error")
                 return redirect(url_for('inicio'))
         return decorated_function
     return decorator
@@ -63,8 +62,6 @@ def login():
             session['username'] = username
             print(session.get('username'))
             return response
-        else:
-            flash("Usuario o contraseña incorrectos", "error")
 
     return render_template('contable/login.html')
 
@@ -82,12 +79,10 @@ def cambiar_rol():
     user = obtener_usuario_por_id(user_id)
     
     if not user or not user.get('admin'):
-        flash("No tiene permiso para cambiar roles.", "error")
         return redirect(url_for('inicio'))
 
     selected_role_id = request.form.get('selected_role')
     if not selected_role_id:
-        flash("No se ha seleccionado un rol.", "error")
         return redirect(url_for('inicio'))
 
     # Validar que el rol seleccionado es válido
@@ -95,20 +90,16 @@ def cambiar_rol():
     try:
         selected_role_id = int(selected_role_id)
     except ValueError:
-        flash("Rol seleccionado no es válido.", "error")
         return redirect(url_for('inicio'))
 
     if selected_role_id not in allowed_roles:
-        flash("Rol seleccionado no es válido.", "error")
         return redirect(url_for('inicio'))
 
     # Actualizar el id_rol del usuario
     try:
         actualizar_rol_usuario(user_id, selected_role_id)
-        flash("Rol actualizado correctamente.", "success")
     except Exception as e:
         app.logger.error(f"Error al actualizar el rol: {str(e)}")
-        flash("Error al actualizar el rol.", "error")
 
     print(f"Usuario ID: {user_id}")
     print(f"Rol seleccionado: {selected_role_id}")
