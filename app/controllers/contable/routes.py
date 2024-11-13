@@ -545,7 +545,8 @@ def obtener_detalles_regla(regla_id):
             "cuenta_debito_codigo": regla.get("cuenta_debe_codigo"),
             "cuenta_debito_nombre": regla.get("cuenta_debe_nombre"),
             "cuenta_credito_codigo": regla.get("cuenta_haber_codigo"),
-            "cuenta_credito_nombre": regla.get("cuenta_haber_nombre")
+            "cuenta_credito_nombre": regla.get("cuenta_haber_nombre"),
+            "tipo_monto" : regla.get("tipo_monto")
         })
     else:
         return jsonify({'error': 'Regla no encontrada'}), 404

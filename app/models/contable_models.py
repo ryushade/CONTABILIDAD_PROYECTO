@@ -51,6 +51,7 @@ def obtener_regla_por_id(regla_id):
                 r.nombre_regla,
                 r.tipo_transaccion,
                 r.estado,
+                r.tipo_monto,
                 c_debe.codigo_cuenta AS cuenta_debe_codigo,
                 c_debe.nombre_cuenta AS cuenta_debe_nombre,
                 c_haber.codigo_cuenta AS cuenta_haber_codigo,
@@ -394,23 +395,27 @@ def obtener_asientodiario():
         connection.close()
 
 def agregar_regla_en_db(nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado, tipo_monto):
-    connection = obtener_conexion()  # Asegúrate de que esta función esté bien configurada
+    connection = obtener_conexion()  
     try:
         with connection.cursor() as cursor:
             sql = """
-            INSERT INTO reglas_contabilizacion (nombre_regla, tipo_transaccion, cuenta_debe, cuenta_haber, estado, tipo_monto)
-            VALUES (%s, %s, %s, %s, %s)
+            INSERT INTO reglas_contabilizacion 
+            (nombre_regla, tipo_transaccion, cuenta_debe, cuenta_haber, estado, tipo_monto)
+            VALUES (%s, %s, %s, %s, %s, %s)  -- Placeholder corregido para 6 valores
             """
             print("Ejecutando SQL:", sql)
             print("Valores:", (nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado, tipo_monto))
+            
             cursor.execute(sql, (nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado, tipo_monto))
             connection.commit()
-            return cursor.rowcount > 0  # Retorna True si se agregó una fila
+            
+            return cursor.rowcount > 0  
     except Exception as e:
-        print("Error en agregar_regla_en_db:", e)  # Imprime el error específico en la consola
+        print("Error en agregar_regla_en_db:", e)  
         return False
     finally:
         connection.close()
+
 
 
 def actualizar_regla_en_db(id_regla, nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado):
@@ -448,6 +453,8 @@ def actualizar_regla_en_db(id_regla, nombre_regla, tipo_transaccion, cuenta_debi
         return False
     finally:
         connection.close()
+
+
 
 
 
