@@ -315,17 +315,18 @@
     function addToTable(nombre, precio) {
         const tableBody = document.querySelector("#newventa .table-container tbody");
         const existingRow = Array.from(tableBody.rows).find(row => row.cells[0].textContent === nombre);
-
+    
         if (existingRow) {
+            // Esta función incrementa la cantidad en el input
             updateQuantity(existingRow, 1, precio);
         } else {
             const newRow = document.createElement("tr");
             newRow.innerHTML = `
                 <td class="text-center">${nombre}</td>
                 <td class="text-center">
-                    <button type="button" onclick="updateQuantity(this.parentElement.parentElement, -1, ${precio})">-</button>
-                    <span class="quantity">1</span>
-                    <button type="button" onclick="updateQuantity(this.parentElement.parentElement, 1, ${precio})">+</button>
+                    <button type="button" class="btn btn-danger" onclick="updateQuantity(this.parentElement.parentElement, -1, ${precio})">-</button>
+                    <input type="number" name="cantidad" value="1" class="quantity" min="1" style="width: 75px; text-align: center;" oninput="updateQuantity(this.parentElement.parentElement, 0, ${precio})">
+                    <button type="button" class="btn btn-primary" onclick="updateQuantity(this.parentElement.parentElement, 1, ${precio})">+</button>
                 </td>
                 <td class="text-center">S/ ${precio.toFixed(2)}</td>
                 <td class="text-center">0</td>
@@ -336,24 +337,27 @@
             `;
             tableBody.appendChild(newRow);
         }
-        updateTotals(); // Asegura actualizar los totales después de añadir el producto
+        updateTotals(); // Actualiza los totales después de añadir el producto
         closeModal();
     }
+    
 
     // Función para actualizar la cantidad y subtotal de una fila
     function updateQuantity(row, change, price) {
-        const quantityCell = row.querySelector(".quantity");
+        const input = row.querySelector(".quantity");
+        let quantity = parseInt(input.value);
+        quantity = change === 0 ? quantity : quantity + change;
+    
+        if (quantity < 1) quantity = 1; // Previene cantidad negativa
+        input.value = quantity;
+    
         const subtotalCell = row.querySelector(".subtotal");
-
-        let quantity = parseInt(quantityCell.textContent) + change;
-        if (quantity < 1) quantity = 1;  // Prevent quantity from going below 1
-        quantityCell.textContent = quantity;
-
-        // Update subtotal
-        subtotalCell.textContent = "S/ " + (quantity * price).toFixed(2);
-
-        updateTotals(); // Asegura actualizar los totales después de cambiar la cantidad
+        const subtotal = quantity * price;
+        subtotalCell.textContent = `S/ ${subtotal.toFixed(2)}`;
+    
+        updateTotals(); // Actualiza los totales después de cambiar la cantidad
     }
+    
 
     // Función para eliminar una fila
     function removeRow(button) {
@@ -404,7 +408,7 @@
     
         rows.forEach(row => {
             let nombre = row.cells[0].textContent;
-            let cantidad = row.cells[1].querySelector(".quantity").textContent;
+            let cantidad = row.cells[1].querySelector(".quantity").value;  // Corregido para obtener el value en lugar de textContent
             let precio = row.cells[2].textContent.replace('S/ ', '');
             let descuento = row.cells[3].textContent;
             let subtotal = row.cells[4].textContent.replace('S/ ', '');
@@ -419,7 +423,7 @@
         });
     
         return JSON.stringify(data);
-    }
+    }    
 
     function saveToCookie(jsonData) {
         const d = new Date();
