@@ -2,9 +2,9 @@ from app.models.conexion import obtener_conexion
 from flask import json, abort, request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app, send_from_directory
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
 from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, obtener_id_cuenta, obtener_regla_por_id, obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas,obtener_asientos_agrupados_excel,obtener_registro_compras
-from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas, obtener_asientos_agrupados_excel, obtener_libro_caja, obtener_libro_caja_cuenta_corriente
+from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas, obtener_asientos_agrupados_excel, obtener_libro_caja, obtener_libro_caja_cuenta_corriente, actualizar_rol_usuario
 from functools import wraps
-
+from flask import current_app as app
 from . import accounting_bp
 import pandas as pd
 import io
@@ -22,23 +22,15 @@ def role_required(*roles):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
+            # Verificar el JWT
+            verify_jwt_in_request()
             user_id = get_jwt_identity()
             user = obtener_usuario_por_id(user_id)
-            
-            if not user:
-                print("Error: Usuario no encontrado")
-                session['show_permission_alert'] = True  # Activa el mensaje en la sesión
-                return abort(403)
-            
-            user_role = user['rol']['nom_rol'].strip().upper()
-            print(f"Usuario rol: {user_role}")
-
-            if user_role not in [role.upper() for role in roles]:
-                print("Error: Rol no permitido")
-                session['show_permission_alert'] = True  # Activa el mensaje en la sesión
-                return abort(403)
-
-            return f(*args, **kwargs)
+            if user and user['rol']['nom_rol'] in roles:
+                return f(*args, **kwargs)
+            else:
+                flash("No tiene permiso para acceder a esta página.", "error")
+                return redirect(url_for('inicio'))
         return decorated_function
     return decorator
 
@@ -82,6 +74,46 @@ def logout():
     response = redirect(url_for('contable.login'))
     unset_jwt_cookies(response)  # Elimina el token de la cookie
     return response
+
+@accounting_bp.route('/cambiar_rol', methods=['POST'])
+@jwt_required()
+def cambiar_rol():
+    user_id = get_jwt_identity()
+    user = obtener_usuario_por_id(user_id)
+    
+    if not user or not user.get('admin'):
+        flash("No tiene permiso para cambiar roles.", "error")
+        return redirect(url_for('inicio'))
+
+    selected_role_id = request.form.get('selected_role')
+    if not selected_role_id:
+        flash("No se ha seleccionado un rol.", "error")
+        return redirect(url_for('inicio'))
+
+    # Validar que el rol seleccionado es válido
+    allowed_roles = [1, 2, 3]  # ADMIN, CONTADOR, EMPLEADO
+    try:
+        selected_role_id = int(selected_role_id)
+    except ValueError:
+        flash("Rol seleccionado no es válido.", "error")
+        return redirect(url_for('inicio'))
+
+    if selected_role_id not in allowed_roles:
+        flash("Rol seleccionado no es válido.", "error")
+        return redirect(url_for('inicio'))
+
+    # Actualizar el id_rol del usuario
+    try:
+        actualizar_rol_usuario(user_id, selected_role_id)
+        flash("Rol actualizado correctamente.", "success")
+    except Exception as e:
+        app.logger.error(f"Error al actualizar el rol: {str(e)}")
+        flash("Error al actualizar el rol.", "error")
+
+    print(f"Usuario ID: {user_id}")
+    print(f"Rol seleccionado: {selected_role_id}")
+
+    return redirect(url_for('inicio'))
 
 @accounting_bp.route('/reportes', methods=['GET'])
 @jwt_required()
@@ -213,6 +245,7 @@ def cuentas():
 
 @accounting_bp.route('/exportar_excel', methods=['GET'])
 @jwt_required()
+@role_required('ADMIN', 'CONTADOR')
 def exportar_excel():
     cuentas = obtener_cuentas_excel()
 
@@ -256,6 +289,7 @@ def exportar_excel():
 # routes.py
 @accounting_bp.route('/exportar_pdf', methods=['GET'], endpoint='exportar_pdf')
 @jwt_required()
+@role_required('ADMIN', 'CONTADOR')
 def descargar_pdf():
     return send_from_directory(
         directory='static/files',  
@@ -273,8 +307,6 @@ def obtener_cuenta(cuenta_id):
     else:
         return jsonify({'error': 'Cuenta no encontrada'}), 404
     
-
-
 
 
 @accounting_bp.route('/cuentas/editar/<int:cuenta_id>', methods=['POST'])

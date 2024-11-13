@@ -490,9 +490,9 @@
                                 {% if user.rol and user.rol.nom_rol == "ADMIN" %}
                                 Administrador
                                 {% elif user.rol and user.rol.nom_rol == "EMPLEADO" %}
-                                Empleado
+                                Vendedor
                                 {% else %}
-                                Rol desconocido
+                                Contador
                                 {% endif %}
                             </span>
                         </div>
@@ -610,8 +610,6 @@
 
     </div>
 
-
-
     <style>
         .parent {
             display: grid;
@@ -638,83 +636,108 @@
 
         }
     </style>
+
     <div id="cambiarRolModal" class="modal-overlay"
         style="display: none; position: fixed; top: 0; left: 0; width: auto; height: 100%; background: rgba(0, 0, 0, 0.5); align-items: center; justify-content: center; z-index: 1050;">
-        <div class="content-modal"
-            style="width: 90%; max-height: 90vh; overflow-y: auto; background-color: white; border-radius: 8px; padding: 20px;">
+        <form id="cambiarRolForm" method="POST" action="{{ url_for('contable.cambiar_rol') }}">
+            <input type="hidden" name="csrf_token" id="csrf_token" value="">
+            <input type="hidden" name="selected_role" id="selected_role" value="">
 
-            <!-- Modal Header -->
-            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center;">
-                <h3 class="modal-title" style="font-size: 24px;">CAMBIAR ROL DE USUARIO</h3>
-                <button type="button" class="modal-close" onclick="closeModalRol()"
-                    style="border: none; color: black; background-color: #e74c3c; font-weight: bold; font-size: 24px; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-                    &times;
-                </button>
-            </div>
+            <div class="content-modal"
+                style="width: 90%; max-height: 90vh; overflow-y: auto; background-color: white; border-radius: 8px; padding: 20px;">
 
-            <!-- Modal Body -->
-            <div class="modal-body">
-                <div class="w-full text-start mb-5">
+                <!-- Modal Header -->
+                <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 class="modal-title" style="font-size: 24px;">CAMBIAR ROL DE USUARIO</h3>
+                    <button type="button" class="modal-close" onclick="closeModalRol()"
+                        style="border: none; color: black; background-color: #e74c3c; font-weight: bold; font-size: 24px; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        &times;
+                    </button>
+                </div>
 
-                    <!-- Nombre de la Regla -->
-                    <div class="parent" style="gap: 2px;">
-                        <div class="div1">
-                            <div class="card p-4" style="width: 145px">
-                                <div id="profileImagePreview"
-                                    style="width: 100px; height: 100px; background-color: #f0f0f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: auto;">
-                                    <i class="fas fa-user-circle" style="font-size: 60px; color: #0360f5;"></i>
+                <!-- Modal Body -->
+                <div class="modal-body">
+                    <div class="w-full text-start mb-5">
+                        <!-- Nombre de la Regla -->
+                        <div class="parent" style="gap: 2px;">
+                            <div class="div1">
+                                <div class="card p-4" style="width: 145px">
+                                    <div id="profileImagePreview"
+                                        style="width: 100px; height: 100px; background-color: #f0f0f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: auto;">
+                                        <i class="fas fa-user-circle" style="font-size: 60px; color: #0360f5;"></i>
+                                    </div>
+                                    <span
+                                        style="font-size: 12px;margin-top: 8px;font-weight: bold;text-align: center;">Administrador</span>
+                                    <button class="btn btn-outline-primary btn-sm mt-2" onclick="selectRole(1)"
+                                        style="font-size: 11px; padding: 2px 8px;">Seleccionar</button>
                                 </div>
-                                <span
-                                    style="font-size: 12px;margin-top: 8px;font-weight: bold;text-align: center;">Administrador</span>
-                                <button class="btn btn-outline-primary btn-sm mt-2"
-                                    style="font-size: 11px; padding: 2px 8px;">Seleccionar</button>
+
+
                             </div>
+                            <div class="div2">
+                                <div class="card p-4" style="width: 145px">
+                                    <div id=" profileImagePreview"
+                                        style="width: 100px; height: 100px; background-color: #f0f0f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: auto;">
+                                        <i class="fas fa-user-circle" style="font-size: 60px; color: #5d7bf5;"></i>
+                                    </div>
+                                    <span
+                                        style="font-size: 12px;margin-top: 8px;font-weight: bold;text-align: center;">Vendedor</span>
 
-
-                        </div>
-                        <div class="div2">
-                            <div class="card p-4" style="width: 145px">
-                                <div id=" profileImagePreview"
-                                    style="width: 100px; height: 100px; background-color: #f0f0f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: auto;">
-                                    <i class="fas fa-user-circle" style="font-size: 60px; color: #5d7bf5;"></i>
+                                    <button class="btn btn-outline-primary btn-sm mt-2" onclick="selectRole(3)"
+                                        style="font-size: 11px; padding: 2px 8px;">Seleccionar</button>
                                 </div>
-                                <span
-                                    style="font-size: 12px;margin-top: 8px;font-weight: bold;text-align: center;">Vendedor</span>
-
-                                <button class="btn btn-outline-primary btn-sm mt-2"
-                                    style="font-size: 11px; padding: 2px 8px;">Seleccionar</button>
                             </div>
-                        </div>
-                        <div class="div3">
-                            <div class="card p-4" style="width: 145px">
-                                <div id=" profileImagePreview"
-                                    style="width: 100px; height: 100px; background-color: #f0f0f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: auto;">
-                                    <i class="fas fa-user-circle" style="font-size: 60px; color: #0b2975;"></i>
-                                </div>
+                            <div class="div3">
+                                <div class="card p-4" style="width: 145px">
+                                    <div id=" profileImagePreview"
+                                        style="width: 100px; height: 100px; background-color: #f0f0f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: auto;">
+                                        <i class="fas fa-user-circle" style="font-size: 60px; color: #0b2975;"></i>
+                                    </div>
 
-                                <span
-                                    style="font-size: 12px;margin-top: 8px;font-weight: bold;text-align: center;">Contador</span>
-                                <button class="btn btn-outline-primary btn-sm mt-2"
-                                    style="font-size: 11px; padding: 2px 15px;">Seleccionar</button>
+                                    <span
+                                        style="font-size: 12px;margin-top: 8px;font-weight: bold;text-align: center;">Contador</span>
+                                    <button class="btn btn-outline-primary btn-sm mt-2" onclick="selectRole(2)"
+                                        style="font-size: 11px; padding: 2px 15px;">Seleccionar</button>
+                                </div>
                             </div>
                         </div>
                     </div>
-
-
-
-                </div>
-                <div style="display: flex;justify-content: center;align-items: center; margin-top: -40px;">
-                    <button type="submit" class="btn btn-primary" style="font-size: 14px;margin-top: 10px;margin-right: 20px;">
-                        <i class="fas fa-check"></i> Confirmar
-                    </button>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
 
 
     <button class="circular-button" onclick="scrollDown()"></button>
 
+    <script>
+        
+        function getCookie(name) {
+            let cookieArr = document.cookie.split(';');
+            for (let i = 0; i < cookieArr.length; i++) {
+                let cookiePair = cookieArr[i].trim().split('=');
+                if (cookiePair[0] == name) {
+                    return decodeURIComponent(cookiePair[1]);
+                }
+            }
+            return null;
+        }
+
+        window.onload = function () {
+            let csrfToken = getCookie('csrf_access_token');
+            document.getElementById('csrf_token').value = csrfToken;
+        };
+
+        function selectRole(roleId) {
+            document.getElementById('selected_role').value = roleId;
+            let csrfToken = getCookie('csrf_access_token');
+            document.getElementById('csrf_token').value = csrfToken;
+            console.log("Rol seleccionado:", roleId);
+            console.log("CSRF Token:", csrfToken);
+            document.getElementById('cambiarRolForm').submit();
+        }
+
+    </script>
 
     <script>
         function openUserCambioRol() {
@@ -865,9 +888,11 @@
     window.addEventListener('resize', toggleButtonVisibility);
     document.addEventListener('DOMContentLoaded', toggleButtonVisibility);
     document.querySelector('.circular-button').addEventListener('click', scrollToPosition);
-
-
-
+</script>
+<script>
+    function closeModalRol() {
+        document.getElementById('cambiarRolModal').style.display = 'none';
+    }
 </script>
 
 </html>

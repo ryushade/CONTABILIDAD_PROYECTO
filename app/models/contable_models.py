@@ -74,9 +74,8 @@ def obtener_usuario_por_id(user_id):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
-            # Consulta que une la tabla usuario con rol e incluye la columna de foto
             sql = """
-                SELECT u.*, r.nom_rol, r.estado_rol, u.foto 
+                SELECT u.*, r.nom_rol, r.estado_rol, u.foto, u.admin
                 FROM usuario u
                 JOIN rol r ON u.id_rol = r.id_rol
                 WHERE u.id_usuario = %s
@@ -84,14 +83,14 @@ def obtener_usuario_por_id(user_id):
             cursor.execute(sql, (user_id,))
             resultado = cursor.fetchone()
             if resultado:
-                # Estructurar el resultado para incluir el rol y la foto como un diccionario
                 user = {
                     'id_usuario': resultado['id_usuario'],
                     'usua': resultado['usua'],
                     'contra': resultado['contra'],
                     'estado_usuario': resultado['estado_usuario'],
                     'id_rol': resultado['id_rol'],
-                    'foto': resultado['foto'],  # Agregar la foto al diccionario del usuario
+                    'foto': resultado['foto'],
+                    'admin': resultado['admin'],  # Asegúrate de incluir este campo
                     'rol': {
                         'id_rol': resultado['id_rol'],
                         'nom_rol': resultado['nom_rol'],
@@ -101,6 +100,17 @@ def obtener_usuario_por_id(user_id):
                 return user
             else:
                 return None
+    finally:
+        conexion.close()
+
+
+def actualizar_rol_usuario(user_id, new_role_id):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            sql = "UPDATE usuario SET id_rol = %s WHERE id_usuario = %s"
+            cursor.execute(sql, (new_role_id, user_id))
+        conexion.commit()  # Mover el commit fuera del bloque with
     finally:
         conexion.close()
 
