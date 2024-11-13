@@ -184,6 +184,7 @@ def ventas():
 def add_venta():
     try:
         venta_data = request.cookies.get('ventaData')
+        print(venta_data)
         usuario = 1  # Usuario obtener de cookie
         id_sucursal = 1
         comprobante_pago = request.form.get('comprobante_pago')
