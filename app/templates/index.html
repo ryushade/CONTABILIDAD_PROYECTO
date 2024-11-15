@@ -60,12 +60,18 @@
     <!-- Tabs de Reporte -->
     <div class="mb-4">
         <div class="nav nav-tabs">
+            {% if user.rol and user.rol.nom_rol != "CONTADOR" %}
+
             <a class="nav-item nav-link active" href="#sistrans" data-bs-toggle="tab">
                 <i class="fas fa-credit-card"></i> Sistema transaccional
             </a>
+            {% endif %}
+            {% if user.rol and user.rol.nom_rol != "EMPLEADO" %}
+
             <a class="nav-item nav-link" href="#siscon" data-bs-toggle="tab">
                 <i class="fas fa-calculator"></i> Sistema contable
             </a>
+            {% endif %}
         </div>
     </div>
 
@@ -188,6 +194,7 @@
             </div>
         </div>
     </div>
+    {% if user.rol and user.rol.nom_rol != "CONTADOR" %}
 
     <div class="tab-content">
         <!-- Sistema Transaccional -->
@@ -291,8 +298,11 @@
                 </div>
             </div>
         </div>
+        {% endif %}
 
         <!-- Sistema Contable -->
+        {% if user.rol and user.rol.nom_rol != "EMPLEADO" %}
+
         <div class="tab-pane fade fade-lazy" id="siscon">
             <div class="mb-4">
                 <div class="line-with-text" style="margin-bottom: 15px;">
@@ -326,6 +336,7 @@
                 </a>
             </div>
         </div>
+        {% endif %}
     </div>
 </div>
 
