@@ -196,24 +196,18 @@ def eliminar_cuenta(cuenta_id):
 
 
 # Backend - usuarios
-def agregar_usuario(id_rol, usua, contra, estado_usuario):
+def agregar_usuario(id_rol, usua, contra, estado_usuario, admin):
     conexion = obtener_conexion()
     try:
-        if id_rol is None or usua is None or contra is None:
+        if not all([id_rol, usua, contra]):
             return {"error": "Bad Request. Please fill all fields."}
 
-        usuario = {
-            "id_rol": id_rol,
-            "usua": usua.strip(),
-            "contra": contra.strip(),
-            "estado_usuario": estado_usuario
-        }
-
         with conexion.cursor() as cursor:
-            cursor.execute(
-                "INSERT INTO usuario SET id_rol=%s, usua=%s, contra=%s, estado_usuario=%s",
-                (usuario["id_rol"], usuario["usua"], usuario["contra"], usuario["estado_usuario"])
-            )
+            query = """
+                INSERT INTO usuario (id_rol, usua, contra, estado_usuario, admin)
+                VALUES (%s, %s, %s, %s, %s)
+            """
+            cursor.execute(query, (id_rol, usua, contra, estado_usuario, admin))
             conexion.commit()
 
         return {"code": 1, "message": "Usuario añadido"}
@@ -221,6 +215,7 @@ def agregar_usuario(id_rol, usua, contra, estado_usuario):
         return {"error": str(error)}
     finally:
         conexion.close()
+
 
 
 
@@ -346,7 +341,7 @@ def obtener_usuarios(page, per_page):
         with connection.cursor(pymysql.cursors.DictCursor) as cursor:
             offset = (page - 1) * per_page
             sql = """
-                SELECT id_usuario, U.id_rol, nom_rol, usua, contra, estado_usuario
+                SELECT id_usuario, U.id_rol, nom_rol, usua, contra, estado_usuario, admin
                 FROM usuario U
                 INNER JOIN rol R ON U.id_rol = R.id_rol
                 ORDER BY id_usuario DESC

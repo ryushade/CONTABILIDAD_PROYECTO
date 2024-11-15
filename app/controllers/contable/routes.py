@@ -599,12 +599,13 @@ def agregar_usu():
     usua = datos.get('usua')
     contra = datos.get('contra')
     estado_usuario = datos.get('estado_usuario')
+    admin = datos.get('admin')
 
     # Verifica que los datos no sean nulos
     if not id_rol or not usua or not contra or not estado_usuario:
         return jsonify({"message": "Bad Request. Please fill all fields."}), 400
 
-    resultado = agregar_usuario(id_rol, usua, contra, estado_usuario)
+    resultado = agregar_usuario(id_rol, usua, contra, estado_usuario, admin)
 
     # Verifica si hubo un error y devuelve un mensaje apropiado
     if "error" in resultado:

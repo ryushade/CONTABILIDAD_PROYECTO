@@ -82,6 +82,7 @@
 
 
 
+
     .confirmation-modal-overlay {
         position: fixed;
         top: 0;
@@ -103,6 +104,18 @@
         max-width: 500px;
         box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
         text-align: center;
+    }
+
+    .admin {
+        background-color: #d1fae5;
+        color: #0e7cf9;
+        border-color: #047857;
+    }
+
+    .user {
+        background-color: #fee2e2;
+        color: #b91c1c;
+        border-color: #b91c1c;
     }
 </style>
 <div class="row align-items-center mt-2 mb-2">
@@ -126,6 +139,7 @@
                 <th class="text-center" style="font-weight: bolder;">rol</th>
                 <th class="text-center" style="font-weight: bolder;">usuario</th>
                 <th class="text-center" style="font-weight: bolder;">contraseña</th>
+                <th class="text-center" style="font-weight: bolder;">tipo usuario</th>
                 <th class="text-center" style="font-weight: bolder;">estado</th>
                 <th class="text-center" style="font-weight: bolder;">ACCIONES</th>
             </tr>
@@ -133,11 +147,22 @@
         <tbody>
             {% for usuario in usuarios %}
             <tr>
-                <td class="text-center" style="padding: 17px;">{{ usuario.nom_rol }}</td>
-                <td class="text-center">{{ usuario.usua }}</td>
-                <td class="text-center">{{ usuario.contra }}</td>
+                <td class="text-align col-2" style="padding: 13px;text-align: left;">{{ usuario.nom_rol }}</td>
+                <td class="text-align col-2">{{ usuario.usua }}</td>
+                <td class="text-center"><span class="password">{{ usuario.contra }}</span></td>
                 <td class="text-center">
-                    <span style="font-size: 14px;" class="
+                    <span style="font-size: 14px; font-weight: bold;"
+                        class="status {% if usuario.admin == 1 %}admin{% else %}user{% endif %}">
+                        {% if usuario.admin == 1 %}
+                        Super usuario
+                        {% else %}
+                        Usuario normal
+                        {% endif %}
+                    </span>
+
+                </td>
+                <td class=" text-center col-2">
+                    <span style="font-size: 14px;font-weight: bold;" class="
                 status 
                 {% if usuario.estado_usuario == 1 %}
                     active-c
@@ -155,6 +180,16 @@
                 </td>
                 <td class="text-center" style="font-size: 14px;">
 
+                    <span style="font-size: 14px; class=" action-button secondary view" onclick="openViewUsu(
+                        {{ usuario.id_usuario }}, 
+                        {{ usuario.id_rol }}, 
+                        '{{ usuario.usua }}', 
+                        '{{ usuario.contra }}', 
+                        {{ usuario.estado_usuario }}
+                         )">
+                        <i class="fas fa-eye
+                        "></i>
+                    </span>
                     <span style="font-size: 14px;" class="action-button secondary edit" onclick="openEditUsu(
                         {{ usuario.id_usuario }}, 
                         {{ usuario.id_rol }}, 
@@ -260,13 +295,16 @@
 
 
 
-<div id="addUsuarioModal" class="modal-overlay" style="display: none;">
-    <div class="content-modal p-4 rounded" style="background-color: white; max-width: 600px; margin: auto;">
+<div id="addUsuarioModal" class="modal-overlay"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1050;">
+
+    <div class="content-modal p-4"
+        style="background-color: white; max-width: 600px; max-height: 90vh; width: 35%; overflow-y: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
         <!-- Header -->
         <div class="modal-header">
             <h5 class="modal-title" style="font-size: 32px;">NUEVO USUARIO</h5>
             <button type="button" class="modal-close" onclick="closeModalUsu()"
-                style="border: none; color: black; background-color: #e74c3c; font-weight: bold; font-size: 24px; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                style="border: none; color: black; background-color: #e74c3c; font-weight: bold; font-size: 18px; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;margin-left: 8px;">
                 &times;
             </button>
         </div>
@@ -274,57 +312,64 @@
         <!-- Body -->
         <div class="modal-body">
             <form onsubmit="submitAddUsuario(event)">
-                <div class="row g-4">
+                <div class="mb-2">
                     <!-- Campo de Rol -->
-                    <div class="col-md-6">
-                        <label for="rol" class="form-label" style="font-weight: bold;">Rol:</label>
-                        <select id="rol" name="rol" class="form-select">
-                            <option selected>Seleccione...</option>
-                            {% for rol in roles %}
-                            <option value="{{ rol.id_rol }}">{{ rol.nom_rol }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
+                    <label for="rol" class="form-label" style="font-weight: bold;">Rol:</label>
+                    <select id="rol" name="rol" class="form-select">
+                        <option selected>Seleccione...</option>
+                        {% for rol in roles %}
+                        <option value="{{ rol.id_rol }}">{{ rol.nom_rol }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-                    <!-- Campo de Usuario -->
-                    <div class="col-md-6">
-                        <label for="usuario" class="form-label" style="font-weight: bold;">Usuario:</label>
-                        <input type="text" id="usuario" name="usuario" class="form-control"
-                            placeholder="Ingrese usuario">
-                    </div>
+                <!-- Campo de Usuario -->
+                <div class="mb-2">
+                    <label for="usuario" class="form-label" style="font-weight: bold;">Usuario:</label>
+                    <input type="text" id="usuario" name="usuario" class="form-control" placeholder="Ingrese usuario">
+                </div>
 
-                    <!-- Campo de Contraseña -->
-                    <div class="col-md-6">
-                        <label for="contrasena" class="form-label" style="font-weight: bold;">Contraseña:</label>
-                        <div class="input-group">
-                            <input type="password" id="contrasena" name="contrasena" class="form-control"
-                                placeholder="Ingrese contraseña">
-                        </div>
-                    </div>
-
-                    <!-- Campo de Estado -->
-                    <div class="col-md-6">
-                        <label for="estado" class="form-label" style="font-weight: bold;">Estado:</label>
-                        <select id="estado" name="estado" class="form-select">
-                            <option selected>Seleccione...</option>
-                            <option value="1">Activo</option>
-                            <option value="0">Inactivo</option>
-                        </select>
+                <!-- Campo de Contraseña -->
+                <div class="mb-2">
+                    <label for="contrasena" class="form-label" style="font-weight: bold;">Contraseña:</label>
+                    <div class="input-group">
+                        <input type="password" id="contrasena" name="contrasena" class="form-control"
+                            placeholder="Ingrese contraseña">
                     </div>
                 </div>
 
-                <!-- Botones de acción -->
-                <div class="d-flex justify-content-end mt-4" style="gap: 10px;">
-                    <button type="button" onclick="closeModalUsu()" class="btn btn-secondary me-2">
-                        <i class="fas fa-times"></i> Cerrar
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Guardar
-                    </button>
+                <div class="mb-2">
+                    <label for="admin" class="form-label" style="font-weight: bold;">Tipo usuario:</label>
+                    <select id="admin" name="admin" class="form-select">
+                        <option selected>Seleccione...</option>
+                        <option value="1">Super usuario</option>
+                        <option value="0">Usuario normal</option>
+                    </select>
                 </div>
-            </form>
+
+                <!-- Campo de Estado -->
+                <div class="mt-2">
+                    <label for="estado" class="form-label" style="font-weight: bold;">Estado:</label>
+                    <select id="estado" name="estado" class="form-select">
+                        <option selected>Seleccione...</option>
+                        <option value="1">Activo</option>
+                        <option value="0">Inactivo</option>
+                    </select>
+                </div>
         </div>
+
+        <!-- Botones de acción -->
+        <div class="d-flex justify-content-end mt-4" style="gap: 10px;">
+            <button type="button" onclick="closeModalUsu()" class="btn btn-secondary me-2">
+                <i class="fas fa-times"></i> Cerrar
+            </button>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Guardar
+            </button>
+        </div>
+        </form>
     </div>
+</div>
 </div>
 
 <form method="POST" id="editUsuarioModal" class="edit-form" style="display: none;">

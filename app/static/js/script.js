@@ -207,6 +207,7 @@ function submitAddUsuario(event) {
   const usuario = document.getElementById('usuario').value.trim();
   const contrasena = document.getElementById('contrasena').value;
   const estado = document.getElementById('estado').value;
+  const admin = document.getElementById('admin').value;
 
   // Expresiones regulares y validaciones
   const usuarioRegex = /^[a-zA-Z0-9_]{3,20}$/; // Solo letras, números y guiones bajos, entre 3 y 20 caracteres
@@ -236,7 +237,8 @@ function submitAddUsuario(event) {
     id_rol: rol,
     usua: usuario,
     contra: contrasena,
-    estado_usuario: estado
+    estado_usuario: estado,
+    admin: admin
   };
 
   // Enviar la solicitud
