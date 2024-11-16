@@ -587,11 +587,11 @@ def obtener_asientos_agrupados(tipo_registro='Todas', start_date=None, end_date=
         conexion.close()
 
 
-def obtener_asientos_agrupados_excel():
+def obtener_asientos_agrupados_excel(tipo_registro='Todas', start_date=None, end_date=None):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
-            cursor.execute("""
+            query = """
                 SELECT 
                     a.id_asiento, 
                     a.fecha_asiento, 
@@ -607,8 +607,32 @@ def obtener_asientos_agrupados_excel():
                 INNER JOIN detalle_asiento d ON a.id_asiento = d.id_asiento
                 INNER JOIN cuenta cu ON cu.id_cuenta = d.id_cuenta
                 INNER JOIN comprobante co ON co.id_comprobante = a.id_comprobante
-                ORDER BY a.id_asiento
-            """)
+                WHERE TRUE
+            """
+
+            params = []
+
+            # Filtro por tipo de registro
+            if tipo_registro == 'Ventas':
+                query += " AND LOWER(a.glosa) LIKE %s"
+                params.append('%venta%')
+            elif tipo_registro == 'Compras':
+                query += " AND (LOWER(a.glosa) LIKE %s OR LOWER(a.glosa) LIKE %s OR LOWER(a.glosa) LIKE %s OR LOWER(a.glosa) LIKE %s OR LOWER(a.glosa) LIKE %s)"
+                params.extend([
+                    '%compra%',
+                    '%ingreso%',
+                    '%almacen%', 
+                    '%pago%',
+                    '%proveedor%'
+                ])
+
+            # Filtro por rango de fechas
+            if start_date and end_date:
+                query += " AND a.fecha_asiento BETWEEN %s AND %s"
+                params.extend([start_date, end_date])
+
+            query += " ORDER BY a.id_asiento"
+            cursor.execute(query, params)
             resultados = cursor.fetchall()
 
         asientos_agrupados = defaultdict(lambda: {"detalles": []})

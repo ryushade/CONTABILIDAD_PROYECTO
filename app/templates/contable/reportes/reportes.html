@@ -178,7 +178,7 @@
                         Exportar datos
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item d-flex flex-column" href="#" onclick="openModalDownloadExcel()">
+                        <a class="dropdown-item d-flex flex-column" href="#" onclick="openModalDownloadExcel()" href="/exportar_libro_diario_excel?tipo_registro={{ request.args.get('tipo_registro', 'Todas') }}&daterange={{ request.args.get('daterange', '') }}">
                             <span class="d-flex align-items-center">
                                 <i class="fa fa-file-excel mr-2"></i>
                                 <strong>Exportar a Excel</strong>
@@ -1444,7 +1444,21 @@
     }
 
     function downloadExcel() {
-        window.location.href = "{{ url_for('contable.exportar_libro_diario_excel') }}";
+        const tipoRegistroElement = document.getElementById('tipo-registro');
+        const dateRangeElement = document.getElementById('daterange');
+
+        const tipoRegistro = tipoRegistroElement ? tipoRegistroElement.value : 'Todas';
+        const dateRange = dateRangeElement ? dateRangeElement.value : '';
+
+        console.log('tipoRegistro:', tipoRegistro);
+        console.log('dateRange:', dateRange);
+
+        const url = "{{ url_for('contable.exportar_libro_diario_excel') }}" + `?tipo_registro=${encodeURIComponent(tipoRegistro)}&daterange=${encodeURIComponent(dateRange)}`;
+
+        console.log('URL:', url);
+
+        window.location.href = url;
+
         closeModalDownloadExcel();
     }
 

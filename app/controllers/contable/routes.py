@@ -17,6 +17,7 @@ from fpdf import FPDF
 from io import BytesIO
 from werkzeug.utils import secure_filename
 from flask_jwt_extended import get_jwt_identity
+from datetime import datetime, timedelta
 
 def role_required(*roles):
     def decorator(f):
@@ -118,8 +119,6 @@ def reportes():
     start_date, end_date = None, None
     start_date_mayor, end_date_mayor = None, None
     start_date_caja, end_date_caja = None, None
-
-    from datetime import datetime, timedelta
 
     # Procesa el rango de fechas para el Libro Diario
     if daterange:
@@ -652,19 +651,47 @@ def exportar_libro_diario_excel():
     workbook = load_workbook(template_path)
     worksheet = workbook.active
     
-    # Obtener la fecha actual
-    fecha_actual = datetime.now()
-    mes_anio_actual = fecha_actual.strftime('%m/%Y')
+    # Capturar filtros desde la URL
+    tipo_registro = request.args.get('tipo_registro', 'Todas')
+    daterange = request.args.get('daterange', '')
+    start_date, end_date = None, None
+
+    # Procesar rango de fechas y determinar el mes para B3
+    mes_anio_excel = None  # Variable para guardar el valor de B3
+
+    # Procesar rango de fechas
+    if daterange:
+        try:
+            dates = daterange.split(' to ')
+            if len(dates) == 2:
+                start_date = datetime.strptime(dates[0].strip(), '%m/%Y').date()
+                end_date = datetime.strptime(dates[1].strip(), '%m/%Y').date()
+                end_date = end_date.replace(day=1) + timedelta(days=31)
+                end_date = end_date.replace(day=1) - timedelta(days=1)
+                mes_anio_excel = start_date.strftime('%m/%Y')
+            elif len(dates) == 1:
+                start_date = datetime.strptime(dates[0].strip(), '%m/%Y').date()
+                end_date = start_date.replace(day=1) + timedelta(days=31)
+                end_date = end_date.replace(day=1) - timedelta(days=1)
+                mes_anio_excel = start_date.strftime('%m/%Y')
+        except ValueError as e:
+            print(f"Error processing date range: {e}")
+
+    # Si no se proporcionó un rango de fechas, usar el mes actual
+    if not mes_anio_excel:
+        fecha_actual = datetime.now()
+        mes_anio_excel = fecha_actual.strftime('%m/%Y')
     
     # Llenar las celdas específicas con los datos necesarios
-    worksheet['B3'] = mes_anio_actual
+    worksheet['B3'] = mes_anio_excel  
     worksheet['B4'] = '20610588981'
     worksheet['B5'] = 'Tormenta'
     
     # Definir la fila inicial para insertar los datos en la tabla
     start_row = 11
 
-    asientos, _ = obtener_asientos_agrupados_excel()
+    asientos, _ = obtener_asientos_agrupados_excel(tipo_registro, start_date, end_date)
+
     numero_correlativo = 1
 
     total_debe = 0
