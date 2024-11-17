@@ -385,8 +385,30 @@
                         margin-right: -0.75rem !important;
                     }
                 </style>
+                <style>
+                    .lightning-o {
+                        position: relative;
+                        display: inline-block;
+                    }
+
+                    .lightning-o i {
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        font-size: 0.6rem;
+                        color: #F8B608;
+                        pointer-events: none;
+                    }
+                   
+                </style>
+
                 <h4 class="text-6xl font-bold tracking-wide text-gray-70 ms-3 mt-2 me-3"
-                    style="color: #0866FF; font-weight: 700;">TORMENTA</h4>
+                    style="color: #0866FF; font-weight: 700;">
+                    T<span class="lightning-o">O<i class="fas fa-bolt"></i></span>RMENTA
+                </h4>
+
+
                 <ul class="navbar-nav me-auto">
                     <!-- <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('transaccional.ventas') }}">Ventas</a>
@@ -678,7 +700,7 @@
         }
 
         .mt-2 {
-            margin-top: 1.5rem !important;
+            margin-top: 0.5rem !important;
 
         }
     </style>

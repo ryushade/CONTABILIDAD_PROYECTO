@@ -1,7 +1,7 @@
 function openEditUsu(id_usuario, id_rol, usua, contra, estado_usuario, admin) {
   document.getElementById('rol_usuario').value = id_rol;
-  document.getElementById('usuario').value = usua;
-  document.getElementById('contrasena_usuario').value = contra;
+  document.getElementById('usuario_edit').value = usua;
+  document.getElementById('contrasena_usuario_edit').value = contra;
   document.getElementById('estado_usuario').value = estado_usuario;
   document.getElementById('admin_edit').value = admin ? '1' : '0';
   // Guardar el ID del usuario en el dataset del formulario para su uso en la actualización
@@ -11,32 +11,34 @@ function openEditUsu(id_usuario, id_rol, usua, contra, estado_usuario, admin) {
   document.getElementById('editUsuarioModal').style.display = 'flex';
 }
 
-// Evento de envío del formulario para actualizar el usuario
 document.getElementById('editUsuarioModal').addEventListener('submit', function (event) {
   event.preventDefault();
 
-  const usuarioId = this.dataset.usuarioId;  // Recuperar el ID del usuario desde el dataset
+  const usuarioId = this.dataset.usuarioId;  
   const formData = new FormData(this);
 
-  fetch('/contable/usuarios/actualizar/' + usuarioId, {
-    method: 'POST',
-    body: formData
-  })
-    .then(response => response.json())
-    .then(data => {
-      if (data.code === 1) {
-        alert('Usuario modificado exitosamente');  // Mensaje simple de éxito
-        closeModalUsuEdit();  // Cerrar el modal de edición
+  for (let [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
+  }
 
-        // Actualizar la interfaz si es necesario
-        setTimeout(() => window.location.reload(), 500);
+  fetch('/contable/usuarios/actualizar/' + usuarioId, {
+      method: 'POST',
+      body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+      if (data.code === 1) {
+          alert('Usuario modificado exitosamente');  
+          closeModalUsuEdit();  
+          setTimeout(() => window.location.reload(), 500);
       } else {
-        alert(data.message || 'Error al actualizar el usuario');  // Mostrar mensaje de error si falla
+          alert(data.error || data.message || 'Error al actualizar el usuario');
       }
-    })
-    .catch(error => {
+  })
+  .catch(error => {
       console.error('Error al actualizar el usuario:', error);
-    });
+      alert('Error al actualizar el usuario. Por favor, inténtalo de nuevo más tarde.');
+  });
 });
 
 

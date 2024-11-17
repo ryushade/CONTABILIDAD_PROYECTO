@@ -584,12 +584,16 @@ def actualizar_usu(id_usuario):
     estado_usuario = request.form.get('estado')
     admin = request.form.get('admin')
 
+    print("Valores recibidos en el servidor:")
+    print(f"id_rol: {id_rol}, usua: {usua}, contra: {contra}, estado: {estado_usuario}, admin: {admin}")
+
     resultado = actualizar_usuario(id_usuario, id_rol, usua, contra, estado_usuario, admin)
-    print("Resultado de la actualización:", resultado)  
+    print("Resultado de la actualización:", resultado)
     if "error" in resultado:
         return jsonify(resultado), 400
 
     return jsonify(resultado), 200
+
 
 
 @accounting_bp.route('/usuarios/agregar', methods=['POST'])

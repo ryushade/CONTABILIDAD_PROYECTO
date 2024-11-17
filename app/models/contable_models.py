@@ -224,27 +224,35 @@ def actualizar_usuario(id_usuario, id_rol, usua, contra, estado_usuario, admin):
     try:
         # Verifica que todos los campos estén presentes
         if not all([id_rol, usua, contra, estado_usuario]):
-            return {"error": "Bad Request. Please fill all fields."}
+            return {"error": "Por favor, completa todos los campos."}
 
         with conexion.cursor() as cursor:
+            # Verifica si el nombre de usuario ya existe en otro registro
+            query_check = "SELECT id_usuario FROM usuario WHERE usua = %s AND id_usuario != %s"
+            cursor.execute(query_check, (usua, id_usuario))
+            existing_user = cursor.fetchone()
+            if existing_user:
+                return {"error": "El nombre de usuario ya está en uso. Por favor, elige otro."}
+
+            # Actualiza el usuario
             query = """
                 UPDATE usuario 
                 SET id_rol=%s, usua=%s, contra=%s, estado_usuario=%s, admin=%s
                 WHERE id_usuario=%s
             """
-            values = (id_rol, usua, contra, estado_usuario, id_usuario,admin)
+            values = (id_rol, usua, contra, estado_usuario, admin, id_usuario)
             cursor.execute(query, values)
             conexion.commit()
 
-            # Verificar si se encontró el usuario para actualizar
+            # Verificar si se actualizó algún registro
             if cursor.rowcount == 0:
-                print("No se encontró el usuario con ID:", id_usuario)  # Debugging
+                print("No se encontró el usuario con ID:", id_usuario)
                 return {"code": 0, "message": "Usuario no encontrado"}
 
-            print("Usuario actualizado correctamente.")  # Debugging
+            print("Usuario actualizado correctamente.")
             return {"code": 1, "message": "Usuario modificado"}
     except Exception as error:
-        print("Error en la actualización:", str(error))  # Debugging
+        print("Error en la actualización:", str(error))
         return {"error": str(error)}
     finally:
         conexion.close()
