@@ -4,6 +4,9 @@
   font-family: 'Inter', sans-serif;
 }
 
+html, body {
+  overflow-x: hidden; /* Oculta el scroll horizontal */
+}
 
 h1,
 h2,
