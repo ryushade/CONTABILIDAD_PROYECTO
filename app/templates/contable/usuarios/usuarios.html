@@ -195,7 +195,9 @@
                         {{ usuario.id_rol }}, 
                         '{{ usuario.usua }}', 
                         '{{ usuario.contra }}', 
-                        {{ usuario.estado_usuario }}
+                        {{ usuario.estado_usuario }},
+                        {{ usuario.admin }}
+
                          )">
                         <i class="fas fa-edit"></i>
                     </span>
@@ -374,49 +376,55 @@
 
 <form method="POST" id="editUsuarioModal" class="edit-form" style="display: none;">
     <div class="modal-overlay">
-        <div class="content-modal p-4 rounded" style="background-color: white; max-width: 600px; margin: auto;">
+        <div class="content-modal p-4 rounded" style="background-color: white; width: 40%; height: 80%;margin: auto;">
             <div class="modal-header">
                 <h5 class="modal-title" style="font-size: 32px;">EDITAR USUARIO</h5>
                 <button type="button" class="modal-close" onclick="closeModalUsuEdit()"
                     style="border: none; color: black; background-color: #e74c3c; font-weight: bold; font-size: 24px; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <label for="rol_usuario" class="form-label" style="font-weight: bold;">Rol:</label>
-                        <select id="rol_usuario" name="id_rol" class="form-select">
-                            <option value="1">Administrador</option>
-                            <option value="3">Empleado</option>
-                            <option value="2">Contador</option>
-                        </select>
+                <div class="col-mb-2">
+                    <label for="rol_usuario" class="form-label" style="font-weight: bold;">Rol:</label>
+                    <select id="rol_usuario" name="id_rol" class="form-select">
+                        <option value="1">Administrador</option>
+                        <option value="3">Empleado</option>
+                        <option value="2">Contador</option>
+                    </select>
 
-                    </div>
-                    <div class="col-md-6">
-                        <label for="usuario" class="form-label" style="font-weight: bold;">Usuario:</label>
-                        <input type="text" id="usuario" name="usua" class="form-control" placeholder="Ingrese usuario">
-                    </div>
-                    <div class="col-md-6">
-                        <label for="contrasena_usuario" class="form-label"
-                            style="font-weight: bold;">Contraseña:</label>
-                        <input type="password" id="contrasena_usuario" name="contrasena" class="form-control"
-                            placeholder="Ingrese contraseña">
-                    </div>
-                    <div class="col-md-6">
-                        <label for="estado_usuario" class="form-label" style="font-weight: bold;">Estado:</label>
-                        <select id="estado_usuario" name="estado" class="form-select">
-                            <option value="1">Activo</option>
-                            <option value="0">Inactivo</option>
-                        </select>
-                    </div>
                 </div>
-                <div class="d-flex justify-content-end mt-4" style="gap: 10px;">
-                    <button type="button" onclick="closeModalUsuEdit()" class="btn btn-secondary me-2">
-                        <i class="fas fa-times"></i> Cerrar
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Guardar
-                    </button>
+                <div class="col-mb-2">
+                    <label for="usuario" class="form-label" style="font-weight: bold;">Usuario:</label>
+                    <input type="text" id="usuario" name="usua" class="form-control" placeholder="Ingrese usuario">
                 </div>
+                <div class="col-mb-2">
+                    <label for="contrasena_usuario" class="form-label" style="font-weight: bold;">Contraseña:</label>
+                    <input type="password" id="contrasena_usuario" name="contrasena" class="form-control"
+                        placeholder="Ingrese contraseña">
+                </div>
+
+                <div class="col-mb-2">
+                    <label for="admin_edit" class="form-label" style="font-weight: bold;">Tipo usuario:</label>
+                    <select id="admin_edit" name="admin" class="form-select">
+                        <option selected>Seleccione...</option>
+                        <option value="1">Super usuario</option>
+                        <option value="0">Usuario normal</option>
+                    </select>
+                </div>
+                <div class="col-mb-2">
+                    <label for="estado_usuario" class="form-label" style="font-weight: bold;">Estado:</label>
+                    <select id="estado_usuario" name="estado" class="form-select">
+                        <option value="1">Activo</option>
+                        <option value="0">Inactivo</option>
+                    </select>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end mt-4" style="gap: 10px;">
+                <button type="button" onclick="closeModalUsuEdit()" class="btn btn-secondary me-2">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Guardar
+                </button>
             </div>
         </div>
     </div>

@@ -582,8 +582,9 @@ def actualizar_usu(id_usuario):
     usua = request.form.get('usua')
     contra = request.form.get('contrasena')
     estado_usuario = request.form.get('estado')
+    admin = request.form.get('admin')
 
-    resultado = actualizar_usuario(id_usuario, id_rol, usua, contra, estado_usuario)
+    resultado = actualizar_usuario(id_usuario, id_rol, usua, contra, estado_usuario, admin)
     print("Resultado de la actualización:", resultado)  
     if "error" in resultado:
         return jsonify(resultado), 400

@@ -46,6 +46,16 @@
         /* Color y grosor de la línea */
         margin: 0 10px;
     }
+
+    .div-class {
+        position: relative;
+        margin: 0 auto;
+        width: 6rem;
+        height: 0.25rem;
+        background: linear-gradient(to right, rgba(52, 152, 219, 0.5), #1D4ED8);
+        border-radius: 9999px;
+        margin-top: 0.2rem;
+    }
 </style>
 
 
@@ -55,6 +65,8 @@
         <h1 class="gradient-text" style="text-align: center;">
             MÓDULOS DEL SISTEMA
         </h1>
+        <div class="div-class"></div>
+
     </header>
 
     <!-- Tabs de Reporte -->
@@ -199,7 +211,7 @@
     <div class="tab-content">
         <!-- Sistema Transaccional -->
         <div class="tab-pane fade show active fade-lazy" id="sistrans">
-            <div class="mb-4">
+            <div class="mb-4" style="margin-bottom: 0rem !important;">
                 <div class="line-with-text" style="margin-bottom: 15px;">
                     <span>Detalles</span>
                 </div>
@@ -212,7 +224,7 @@
             <!-- Módulos -->
             <div class="row">
                 <!-- Módulo de Ventas -->
-                <div class="col-md-6 mb-4">
+                <div class="col-md-6 mb-4" style="margin-bottom: 0rem !important;">
                     <a href="{{ url_for('transaccional.ventas') }}" class="text-decoration-none text-dark">
                         <div class="card">
                             <div class="card-body d-flex align-items-center">
@@ -232,7 +244,7 @@
                     </a>
                 </div>
 
-                <div class="col-md-6 mb-4">
+                <div class="col-md-6 mb-4" style="margin-bottom: 0rem !important;">
                     <a href="{{ url_for('transaccional.almacen') }}" class="text-decoration-none text-dark">
                         <div class="card">
                             <div class="card-body d-flex align-items-center">
@@ -254,7 +266,7 @@
                 </div>
 
                 <!-- Módulo de Compras -->
-                <div class="col-md-6 mb-4">
+                <div class="col-md-6 mb-4" style="margin-bottom: 0rem !important;">
                     <a href="{{ url_for('transaccional.compras') }}" class="text-decoration-none text-dark">
                         <div class="card">
                             <div class="card-body d-flex align-items-center">
@@ -276,7 +288,7 @@
                 </div>
 
                 <!-- Módulo de Almacén -->
-                <div class="col-md-6 mb-4">
+                <div class="col-md-6 mb-4" style="margin-bottom: 0rem !important;">
                     <a href="{{ url_for('transaccional.almacen') }}" class="text-decoration-none text-dark">
                         <div class="card">
                             <div class="card-body d-flex align-items-center">
@@ -314,7 +326,7 @@
             </div>
 
             <!-- Módulo de Cuentas PCGE -->
-            <div class="col-md-6 mb-4 mx-auto">
+            <div class="col-md-6 mb-4 mx-auto" style="margin-bottom: 0rem !important;">
                 <a href="{{ url_for('contable.cuentas') }}" class="text-decoration-none text-dark">
                     <div class="card">
                         <div class="card-body d-flex align-items-center">

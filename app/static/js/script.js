@@ -1,9 +1,9 @@
-function openEditUsu(id_usuario, id_rol, usua, contra, estado_usuario) {
+function openEditUsu(id_usuario, id_rol, usua, contra, estado_usuario, admin) {
   document.getElementById('rol_usuario').value = id_rol;
   document.getElementById('usuario').value = usua;
   document.getElementById('contrasena_usuario').value = contra;
   document.getElementById('estado_usuario').value = estado_usuario;
-
+  document.getElementById('admin_edit').value = admin ? '1' : '0';
   // Guardar el ID del usuario en el dataset del formulario para su uso en la actualización
   document.getElementById('editUsuarioModal').dataset.usuarioId = id_usuario;
 

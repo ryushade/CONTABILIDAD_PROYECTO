@@ -219,7 +219,7 @@ def agregar_usuario(id_rol, usua, contra, estado_usuario, admin):
 
 
 
-def actualizar_usuario(id_usuario, id_rol, usua, contra, estado_usuario):
+def actualizar_usuario(id_usuario, id_rol, usua, contra, estado_usuario, admin):
     conexion = obtener_conexion()
     try:
         # Verifica que todos los campos estén presentes
@@ -229,10 +229,10 @@ def actualizar_usuario(id_usuario, id_rol, usua, contra, estado_usuario):
         with conexion.cursor() as cursor:
             query = """
                 UPDATE usuario 
-                SET id_rol=%s, usua=%s, contra=%s, estado_usuario=%s 
+                SET id_rol=%s, usua=%s, contra=%s, estado_usuario=%s, admin=%s
                 WHERE id_usuario=%s
             """
-            values = (id_rol, usua, contra, estado_usuario, id_usuario)
+            values = (id_rol, usua, contra, estado_usuario, id_usuario,admin)
             cursor.execute(query, values)
             conexion.commit()
 
