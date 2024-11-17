@@ -616,8 +616,26 @@ def agregar_usu():
 
 @accounting_bp.route('/usuarios/eliminar/<int:usuario_id>', methods=['POST'])
 def eliminar_usu(usuario_id):
+    usuario_a_eliminar = obtener_usuario_por_id(usuario_id)
+    
+    if not usuario_a_eliminar:
+        flash("El usuario no existe o ya ha sido eliminado.", "warning")
+        return redirect(url_for('contable.usuarios'))
+
     eliminar_usuario(usuario_id)
+
+    if 'username' in session and session.get('username') == usuario_a_eliminar['usua']:
+        session.clear()
+        flash("Tu cuenta ha sido eliminada. Por favor, inicia sesión nuevamente.", "warning")
+        
+        response = redirect(url_for('contable.login'))
+        unset_jwt_cookies(response)
+        return response
+    
+    flash("Usuario eliminado exitosamente.", "success")
     return redirect(url_for('contable.usuarios'))
+
+
 
 @accounting_bp.route('/cuentas/eliminar/<int:cuenta_id>', methods=['POST'])
 def eliminar_cuenta(cuenta_id):
