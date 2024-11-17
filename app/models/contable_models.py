@@ -736,18 +736,23 @@ def obtener_libro_mayor_agrupado_por_fecha(start_date=None, end_date=None):
     finally:
         conexion.close()
 
-
-
-def obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica():
+def obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica(start_date=None, end_date=None):
     conexion = obtener_conexion()
     try:
         with conexion.cursor(DictCursor) as cursor:
-            cursor.execute("""
+            query = """
                 SELECT 
                     cu.codigo_cuenta, 
                     cu.nombre_cuenta, 
                     a.fecha_asiento, 
-                    LEFT(MIN(a.glosa), LOCATE('SEGÚN', MIN(a.glosa)) - 1) AS glosa,
+                    CASE
+                        WHEN LOCATE('SEGÚN', REPLACE(REPLACE(MIN(a.glosa), 'AL ALMACÉN', ''), 'EL REGISTRO DE', '')) > 0 THEN 
+                            LEFT(REPLACE(REPLACE(MIN(a.glosa), 'AL ALMACÉN', ''), 'EL REGISTRO DE', ''), LOCATE('SEGÚN', REPLACE(REPLACE(MIN(a.glosa), 'AL ALMACÉN', ''), 'EL REGISTRO DE', '')) - 1)
+                        WHEN LOCATE('PROVEEDOR', REPLACE(REPLACE(MIN(a.glosa), 'AL ALMACÉN', ''), 'EL REGISTRO DE', '')) > 0 THEN 
+                            SUBSTRING(REPLACE(REPLACE(MIN(a.glosa), 'AL ALMACÉN', ''), 'EL REGISTRO DE', ''), 1, LOCATE('PROVEEDOR', REPLACE(REPLACE(MIN(a.glosa), 'AL ALMACÉN', ''), 'EL REGISTRO DE', '')) + LENGTH('PROVEEDOR') - 1)
+                        ELSE 
+                            REPLACE(REPLACE(MIN(a.glosa), 'AL ALMACÉN', ''), 'EL REGISTRO DE', '')
+                    END AS glosa,
                     SUM(d.debe) AS total_debe, 
                     SUM(d.haber) AS total_haber
                 FROM 
@@ -756,11 +761,24 @@ def obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica():
                     detalle_asiento d ON a.id_asiento = d.id_asiento
                 INNER JOIN 
                     cuenta cu ON cu.id_cuenta = d.id_cuenta
+                WHERE TRUE
+            """
+
+            params = []
+
+            # Aplicar filtro de fecha si se proporcionan las fechas
+            if start_date and end_date:
+                query += " AND a.fecha_asiento BETWEEN %s AND %s"
+                params.extend([start_date, end_date])
+
+            query += """
                 GROUP BY 
                     cu.codigo_cuenta, cu.nombre_cuenta, a.fecha_asiento
                 ORDER BY 
                     cu.codigo_cuenta, a.fecha_asiento;
-            """)
+            """
+
+            cursor.execute(query, params)
             resultados = cursor.fetchall()
 
         libro_mayor = defaultdict(list)
