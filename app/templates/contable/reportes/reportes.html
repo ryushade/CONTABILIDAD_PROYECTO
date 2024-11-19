@@ -285,7 +285,8 @@
                             <td class="text-center" rowspan="{{ asiento.detalles|length }}">
                                 {{ asiento.fecha_asiento.strftime('%d/%m/%Y') }}
                             </td>
-                            <td class="text-align" style="text-align: left;width: 270px;" rowspan="{{ asiento.detalles|length }}">
+                            <td class="text-align" style="text-align: left;width: 270px;"
+                                rowspan="{{ asiento.detalles|length }}">
                                 {{ asiento.glosa }}
                             </td>
                             <td class="text-center" rowspan="{{ asiento.detalles|length }}">
@@ -438,16 +439,20 @@
                         {% for detalle in cuenta.detalles %}
                         <tr>
                             {% if loop.first %}
-                            <td class="text-align" rowspan="{{ cuenta.detalles|length }}" style="width: 100px;text-align: right;">{{ codigo_cuenta }}</td>
+                            <td class="text-align" rowspan="{{ cuenta.detalles|length }}"
+                                style="width: 100px;text-align: right;">{{ codigo_cuenta }}</td>
                             <td class="text-align" style="text-align: left; width: 250px;"
                                 rowspan="{{ cuenta.detalles|length }}">{{ cuenta.nombre_cuenta }}</td>
                             {% endif %}
                             <td style="width: 100px;">{{ detalle.fecha_asiento }}</td>
-                            <td class="text-end" style="width: 100px;">{{ detalle.debe | round(2) if detalle.debe is not none else '-' }}</td>
-                            <td class="text-end" style="width: 100px;">{{ detalle.haber | round(2) if detalle.haber is not none else '-' }}
+                            <td class="text-end" style="width: 100px;">{{ detalle.debe | round(2) if detalle.debe is not
+                                none else '-' }}</td>
+                            <td class="text-end" style="width: 100px;">{{ detalle.haber | round(2) if detalle.haber is
+                                not none else '-' }}
                             </td>
                             {% if loop.first %}
-                            <td style="width: 100px;" class="text-center align-middle" rowspan="{{ cuenta.detalles|length }}">
+                            <td style="width: 100px;" class="text-center align-middle"
+                                rowspan="{{ cuenta.detalles|length }}">
                                 <span tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
                                     data-bs-content="{% if cuenta.saldo >= 0 %}Saldo Acreedor: S/ {{ cuenta.saldo | round(2) }}{% else %}Saldo Deudor: S/ {{ cuenta.saldo | abs | round(2) }}{% endif %}">
                                     {{ cuenta.saldo | round(2) }}
@@ -602,7 +607,8 @@
                             <td>{{ registro.fecha.strftime('%Y-%m-%d') }}</td>
                             <td class="text-align" style="text-align: center;">{{ registro.documento_cliente }}</td>
                             <td class="text-align" style="text-align: left;">{{ registro.nombre_cliente }}</td>
-                            <td class="text-align" style="text-align: left;width: 50px;">{{ registro.num_comprobante }}</td>
+                            <td class="text-align" style="text-align: left;width: 50px;">{{ registro.num_comprobante }}
+                            </td>
                             <td class="text-end">{{ registro.importe | round(2) }}</td>
                             <td class="text-end">{{ registro.igv | round(2) }}</td>
                             <td class="text-end">{{ registro.total | round(2) }}</td>
@@ -635,7 +641,7 @@
                     LIBRO REGISTRO DE VENTAS
                 </h1>
 
-                <div class="dropdown me-1">
+                <div class="dropdown me-2">
                     <button class="btn btn-light border dropdown-toggle" type="button" id="dropdownMenuButton"
                         data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Exportar datos
