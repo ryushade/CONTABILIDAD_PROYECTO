@@ -1,3 +1,5 @@
+
+
 function openEditUsu(id_usuario, id_rol, usua, contra, estado_usuario, admin) {
   document.getElementById('rol_usuario').value = id_rol;
   document.getElementById('usuario_edit').value = usua;
@@ -211,8 +213,8 @@ function submitAddUsuario(event) {
   const estado = document.getElementById('estado').value;
   const admin = document.getElementById('admin').value;
 
-  // Expresiones regulares y validaciones
-  const usuarioRegex = /^[a-zA-Z0-9_]{3,20}$/; // Solo letras, números y guiones bajos, entre 3 y 20 caracteres
+  // Expresión regular actualizada para permitir espacios entre palabras
+  const usuarioRegex = /^[a-zA-Z0-9_ ]{3,50}$/; // Permite letras, números, guiones bajos y espacios
 
   // Validar que todos los campos estén llenos
   if (!rol || !usuario || !contrasena || !estado) {
@@ -221,18 +223,18 @@ function submitAddUsuario(event) {
   }
 
   // Validar rol
-  if (rol === "0") { // Asegúrate de que el valor "0" es el predeterminado cuando no se selecciona un rol válido
+  if (rol === "0") {
     alert("Por favor, selecciona un rol válido.");
     return;
   }
 
-  // Validar usuario
+  // Validar usuario con el nuevo mensaje
   if (!usuarioRegex.test(usuario)) {
-    alert("El nombre de usuario debe contener solo letras, números o guiones bajos y tener entre 3 y 20 caracteres.");
+    alert("El nombre de usuario debe contener solo letras, números, espacios o guiones bajos y tener entre 3 y 50 caracteres.");
     return;
   }
 
-
+  // Resto del código sin cambios...
 
   // Crear el cuerpo de la solicitud
   const data = {
