@@ -116,8 +116,9 @@
         text-align: center;
     }
 
-    th, td{
-        padding:10px;
+    th,
+    td {
+        padding: 10px;
     }
 </style>
 
@@ -141,9 +142,9 @@
         <thead>
             <tr>
                 <th class="text-center" style="font-weight: bolder;">Nombre</th>
-                <th class="text-center" style="font-weight: bolder;">Tipo de transacción</th>
-                <th class="text-center" style="font-weight: bolder;">Cuenta débito</th>
-                <th class="text-center" style="font-weight: bolder;">Cuenta crédito</th>
+                <th class="text-align" style="font-weight: bolder;text-align: left;">Tipo de transacción</th>
+                <th class="text-align" style="font-weight: bolder;text-align: right;">Cuenta débito</th>
+                <th class="text-align" style="font-weight: bolder;text-align: right;">Cuenta crédito</th>
                 <th class="text-center" style="font-weight: bolder;">Estado</th>
                 <th class="text-center" style="font-weight: bolder;">Acciones</th>
             </tr>
@@ -159,15 +160,15 @@
                 {% endif %}
 
                 {% if regla.cuenta_debe_codigo %}
-                <td class="text-center" style="font-size: 14px;">{{ regla.cuenta_debe_codigo }}</td>
+                <td class="text-align" style="font-size: 14px;text-align: right;">{{ regla.cuenta_debe_codigo }}</td>
                 {% else %}
-                <td class="text-center" style="font-size: 14px;">Ninguna</td>
+                <td class="text-align" style="font-size: 14px;text-align: right;">Ninguna</td>
                 {% endif %}
 
                 {% if regla.cuenta_haber_codigo %}
-                <td class="text-center" style="font-size: 14px;">{{ regla.cuenta_haber_codigo }}</td>
+                <td class="text-align" style="font-size: 14px;text-align: right;">{{ regla.cuenta_haber_codigo }}</td>
                 {% else %}
-                <td class="text-center" style="font-size: 14px;">Ninguna</td>
+                <td class="text-align" style="font-size: 14px;text-align: right;">Ninguna</td>
                 {% endif %}
 
                 <td class="text-center">
@@ -453,7 +454,11 @@
     </div>
 </div>
 
-
+<style>
+    .action-button {
+        padding: 4px 6px;
+    }
+</style>
 
 
 

@@ -33,7 +33,8 @@ def role_required(*roles):
             if user and user['rol']['nom_rol'] in roles:
                 return f(*args, **kwargs)
             else:
-                return redirect(url_for('inicio'))
+                # Redirige al inicio con un parámetro para indicar acceso denegado
+                return redirect(url_for('inicio', acceso_denegado=1))
         return decorated_function
     return decorator
 
@@ -66,6 +67,9 @@ def login():
             session['username'] = username
             print(session.get('username'))
             return response
+        else:
+            # Si el inicio de sesión falla, redirige con el parámetro de error
+            return redirect(url_for('contable.login') + '?error=true')
 
     return render_template('contable/login.html')
 

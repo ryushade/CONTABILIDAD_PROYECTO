@@ -14,31 +14,31 @@ function openEditUsu(id_usuario, id_rol, usua, contra, estado_usuario, admin) {
 document.getElementById('editUsuarioModal').addEventListener('submit', function (event) {
   event.preventDefault();
 
-  const usuarioId = this.dataset.usuarioId;  
+  const usuarioId = this.dataset.usuarioId;
   const formData = new FormData(this);
 
   for (let [key, value] of formData.entries()) {
-      console.log(`${key}: ${value}`);
+    console.log(`${key}: ${value}`);
   }
 
   fetch('/contable/usuarios/actualizar/' + usuarioId, {
-      method: 'POST',
-      body: formData
+    method: 'POST',
+    body: formData
   })
-  .then(response => response.json())
-  .then(data => {
+    .then(response => response.json())
+    .then(data => {
       if (data.code === 1) {
-          alert('Usuario modificado exitosamente');  
-          closeModalUsuEdit();  
-          setTimeout(() => window.location.reload(), 500);
+        alert('Usuario modificado exitosamente');
+        closeModalUsuEdit();
+        setTimeout(() => window.location.reload(), 500);
       } else {
-          alert(data.error || data.message || 'Error al actualizar el usuario');
+        alert(data.error || data.message || 'Error al actualizar el usuario');
       }
-  })
-  .catch(error => {
+    })
+    .catch(error => {
       console.error('Error al actualizar el usuario:', error);
       alert('Error al actualizar el usuario. Por favor, inténtalo de nuevo más tarde.');
-  });
+    });
 });
 
 

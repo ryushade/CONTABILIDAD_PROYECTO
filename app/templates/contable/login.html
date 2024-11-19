@@ -7,6 +7,7 @@
     <title>Tormenta</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    
 </head>
 <style>
     .btn-login {
@@ -16,6 +17,34 @@
 
     .btn-login:hover {
         background-color: #1D4ED8;
+    }
+
+    .confirmation-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0, 0, 0, 0.5);
+        /* Fondo oscuro */
+        z-index: 9999;
+        /* Asegura que el modal esté sobre otros elementos */
+    }
+
+    .confirmation-modal {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        width: 400px;
+        /* Puedes ajustar el ancho según tus necesidades */
+        max-width: 90%;
+        /* Para que sea responsive */
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        /* Sombra suave */
+        text-align: center;
     }
 </style>
 
@@ -42,7 +71,8 @@
                             <input type="password" class="form-control" id="password" name="password"
                                 placeholder="Ingresa tu contraseña" required>
                         </div>
-                        <button style="margin-top: 10px;" type="submit" class="btn-login btn-primary w-100">Ingresar</button>
+                        <button style="margin-top: 10px;" type="submit"
+                            class="btn-login btn-primary w-100">Ingresar</button>
                     </form>
                 </div>
             </div>
@@ -53,6 +83,8 @@
             </div>
         </div>
     </div>
+
+    
 
     <!-- Modal de Inicio de Sesión Requerido -->
     <div id="loginModal" class="modal fade" tabindex="-1" role="dialog">
@@ -72,6 +104,33 @@
             </div>
         </div>
     </div>
+
+    <div id="errorUsu" class="confirmation-modal-overlay" style="display: none;">
+        <div class="confirmation-modal">
+            <div class="modal-icon" style="margin-bottom: 10px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+            </div>
+            <h2 class="confirmation-modal-title" style="color: rgba(0, 0, 0, 0.87);">ERROR</h2>
+            <p class="confirmation-modal-message">Usuario o contraseña incorrectos</p>
+            <div class="confirmation-modal-buttons"
+                style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
+                <button style="border-radius: 10px; width: 120px; height: 50px; font-weight: 600;"
+                    class="btn btn-danger" onclick="closeError()">
+                    <i class="fas fa-times"></i>
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+
+
 
     <!-- JS de Bootstrap -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -94,6 +153,20 @@
             }
         });
     </script>
+
+    <script>
+        $(document).ready(function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('error')) {
+                document.getElementById('errorUsu').style.display = 'flex';
+            }
+        });
+
+        function closeError() {
+            document.getElementById('errorUsu').style.display = 'none';
+        }
+    </script>
+
 </body>
 
 </html>
