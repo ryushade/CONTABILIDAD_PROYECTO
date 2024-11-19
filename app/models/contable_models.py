@@ -837,72 +837,74 @@ def insertar_regla(nombre_regla, tipo_transaccion, cuenta_debito_id, cuenta_cred
     finally:
         conexion.close()
 
-def obtener_registro_ventas():
+def obtener_registro_ventas(start_date=None, end_date=None):
     conexion = obtener_conexion()
     try:
-        with conexion.cursor() as cursor:
-            cursor.execute("""
+        with conexion.cursor(DictCursor) as cursor:
+            # Consulta SQL con filtro de fechas
+            query = """
                 SELECT 
-                ROW_NUMBER() OVER (ORDER BY v.id_venta) AS numero_correlativo,
-                v.f_venta as fecha,
-                v.f_venta AS fechaVencimiento,
-                COALESCE(cl.dni, cl.ruc) AS documento_cliente,
-                COALESCE(CONCAT(cl.nombres, ' ', cl.apellidos), cl.razon_social) AS nombre_cliente,
-                c.num_comprobante as num_comprobante,
-                SUM((dv.cantidad * dv.precio) - dv.descuento) AS importe,
-                SUM((dv.cantidad * dv.precio) - dv.descuento) * 0.18 AS igv,
-                SUM((dv.cantidad * dv.precio) - dv.descuento) * 1.18 AS total
-            FROM venta v
-            INNER JOIN detalle_venta dv ON v.id_venta = dv.id_venta
-            INNER JOIN comprobante c ON c.id_comprobante = v.id_comprobante
-            INNER JOIN cliente cl ON cl.id_cliente = v.id_cliente
-            GROUP BY 
-                v.id_venta
-            ORDER BY 
-                v.id_venta;
-            """)
+                    ROW_NUMBER() OVER (ORDER BY v.id_venta) AS numero_correlativo,
+                    v.f_venta AS fecha,
+                    v.f_venta AS fechaVencimiento,
+                    COALESCE(cl.dni, cl.ruc) AS documento_cliente,
+                    COALESCE(CONCAT(cl.nombres, ' ', cl.apellidos), cl.razon_social) AS nombre_cliente,
+                    c.num_comprobante AS num_comprobante,
+                    SUM((dv.cantidad * dv.precio) - dv.descuento) AS importe,
+                    SUM((dv.cantidad * dv.precio) - dv.descuento) * 0.18 AS igv,
+                    SUM((dv.cantidad * dv.precio) - dv.descuento) * 1.18 AS total
+                FROM venta v
+                INNER JOIN detalle_venta dv ON v.id_venta = dv.id_venta
+                INNER JOIN comprobante c ON c.id_comprobante = v.id_comprobante
+                INNER JOIN cliente cl ON cl.id_cliente = v.id_cliente
+                WHERE (%(start_date)s IS NULL OR v.f_venta >= %(start_date)s)
+                AND (%(end_date)s IS NULL OR v.f_venta <= %(end_date)s)
+                GROUP BY 
+                    v.id_venta
+                ORDER BY 
+                    v.id_venta;
+            """
+            params = {'start_date': start_date, 'end_date': end_date}
+            cursor.execute(query, params)
             resultados = cursor.fetchall()
 
-        # Inicializar variables para almacenar los totales
-        total_igv = 0.0
-        total_importe = 0.0
-        total_general = 0.0
-        registros_ventas = []
+        # Inicializar variables para almacenar totales y detalles
+        total_importe_global = Decimal("0.00")
+        total_igv_global = Decimal("0.00")
+        total_general_global = Decimal("0.00")
+        registro_ventas = []
 
         for row in resultados:
-            # Convertir la fecha a formato datetime si es necesario
-            fecha = row["fecha"]
-            if isinstance(fecha, str):
-                fecha = datetime.strptime(fecha, '%Y-%m-%d')
-            fechaV = row["fechaVencimiento"]
-            if isinstance(fechaV, str):
-                fechaV = datetime.strptime(fechaV, '%Y-%m-%d')
-            # Agregar cada registro a la lista de registros de compras
-            registros_ventas.append({
+            importe = Decimal(row["importe"]) or Decimal("0.00")
+            igv = Decimal(row["igv"]) or Decimal("0.00")
+            total = Decimal(row["total"]) or Decimal("0.00")
+
+            # Agregar detalles de cada registro
+            registro_ventas.append({
                 "numero_correlativo": row["numero_correlativo"],
-                "fecha": fecha,
-                "fechaV":fechaV,
+                "fecha": row["fecha"],
+                "fechaVencimiento": row["fechaVencimiento"],
                 "documento_cliente": row["documento_cliente"],
                 "nombre_cliente": row["nombre_cliente"],
                 "num_comprobante": row["num_comprobante"],
-                "importe": float(row["importe"]),
-                "igv": float(row["igv"]),
-                "total": float(row["total"])
+                "importe": float(importe),
+                "igv": float(igv),
+                "total": float(total),
             })
-            
-            # Acumular los totales
-            total_importe += float(row["importe"])
-            total_igv += float(row["igv"])
-            total_general += float(row["total"])
 
-        # Diccionario con los totales
+            # Acumular totales globales
+            total_importe_global += importe
+            total_igv_global += igv
+            total_general_global += total
+
+        # Totales finales en un diccionario
         totales = {
-            "total_importe": total_importe,
-            "total_igv": total_igv,
-            "total_general": total_general
+            "total_importe": float(total_importe_global),
+            "total_igv": float(total_igv_global),
+            "total_general": float(total_general_global),
         }
 
-        return registros_ventas, totales
+        return registro_ventas, totales
     finally:
         conexion.close()
 

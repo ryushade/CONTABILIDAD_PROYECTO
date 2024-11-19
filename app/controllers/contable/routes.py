@@ -133,10 +133,11 @@ def reportes():
     daterange = request.args.get('daterange', '')
     daterange_mayor = request.args.get('daterangemayor', '')  # Segundo rango de fechas específico para el Libro Mayor
     daterange_caja = request.args.get('daterangecaja', '')
+    daterange_venta = request.args.get('daterangeventa', '')
     start_date, end_date = None, None
     start_date_mayor, end_date_mayor = None, None
     start_date_caja, end_date_caja = None, None
-
+    start_date_venta, end_date_venta = None, None
     # Procesa el rango de fechas para el Libro Diario
     if daterange:
         try:
@@ -189,6 +190,23 @@ def reportes():
                 end_date_caja = end_date_caja.replace(day=1) - timedelta(days=1)
         except (ValueError, IndexError) as e:
             print(f"Error processing date range for Libro Caja: {e}")
+    
+    if daterange_venta:
+        try:
+            dates_venta = daterange_venta.split(' to ')
+            if len(dates_venta) == 2:
+                start_date_venta = datetime.strptime(dates_venta[0].strip(), '%m/%Y').date()
+                end_date_venta = datetime.strptime(dates_venta[1].strip(), '%m/%Y').date()
+                # Calcular el último día del mes para el segundo mes
+                end_date_venta = end_date_venta.replace(day=1) + timedelta(days=31)
+                end_date_venta = end_date_venta.replace(day=1) - timedelta(days=1)
+            elif len(dates_venta) == 1:
+                # Si solo hay un mes, se usa como inicio y fin del mes
+                start_date_venta = datetime.strptime(dates_venta[0].strip(), '%m/%Y').date()
+                end_date_venta = start_date_venta.replace(day=1) + timedelta(days=31)
+                end_date_venta = end_date_venta.replace(day=1) - timedelta(days=1)
+        except (ValueError, IndexError) as e:
+            print(f"Error processing date range for Libro de Ventas: {e}")
 
     # Obtiene los datos aplicando el filtro de fechas correspondiente
     asientos, totales = obtener_asientos_agrupados(tipo_registro, start_date, end_date)
@@ -196,7 +214,7 @@ def reportes():
     lista_libro_caja, total_caja = obtener_libro_caja(start_date_caja, end_date_caja)
     lista_libro_caja_cuenta_corriente, total_caja_corriente = obtener_libro_caja_cuenta_corriente()
 
-    registro_venta_data, totale = obtener_registro_ventas()
+    registro_venta_data, totale = obtener_registro_ventas(start_date_venta,end_date_venta)
     registro_compra_data, totales_compra = obtener_registro_compras()
     
     return render_template(
@@ -215,6 +233,7 @@ def reportes():
         lista_libro_caja_cuenta_corriente=lista_libro_caja_cuenta_corriente, 
         total_caja_corriente=total_caja_corriente,
         active_tab=active_tab
+        
     )
 
 
