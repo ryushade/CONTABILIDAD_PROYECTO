@@ -757,7 +757,15 @@ def exportar_libro_diario_excel():
     # Insertar los datos en la tabla, fila por fila
     current_row = start_row
     for id_asiento, asiento in asientos.items():
+        
+        # Guardar la fila inicial del grupo para combinar celdas
+        start_group_row = current_row
+
+        # Extraer los dígitos del número de comprobante para la columna E
+        num_correlativo_lm = asiento['num_comprobante'][1:4]  # Extraer los caracteres en posición 2, 3 y 4
+
         for detalle in asiento['detalles']:
+
             worksheet[f'A{current_row}'].number_format = numbers.FORMAT_TEXT
             worksheet[f'A{current_row}'] = str(numero_correlativo)
             worksheet[f'B{current_row}'] = asiento['fecha_asiento'].strftime('%d/%m/%Y')
@@ -784,7 +792,7 @@ def exportar_libro_diario_excel():
             worksheet[f'J{current_row}'].number_format = '#,##0.00'
 
             # Aplicar estilo a todas las celdas
-            for col in ['A', 'B', 'C', 'D', 'F', 'G', 'H', 'I', 'J']:
+            for col in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']:
                 cell = worksheet[f'{col}{current_row}']
                 cell.border = thin_border
                 cell.font = normal_font
@@ -804,6 +812,28 @@ def exportar_libro_diario_excel():
             total_haber += detalle['haber']
 
             current_row += 1
+
+        # Combinar celdas para las columnas indicadas
+        if current_row > start_group_row + 1:  # Combinar solo si hay más de una fila en el grupo
+            worksheet.merge_cells(f'A{start_group_row}:A{current_row - 1}')
+            worksheet.merge_cells(f'B{start_group_row}:B{current_row - 1}')
+            worksheet.merge_cells(f'C{start_group_row}:C{current_row - 1}')
+            worksheet.merge_cells(f'D{start_group_row}:D{current_row - 1}')
+            worksheet.merge_cells(f'E{start_group_row}:E{current_row - 1}')
+            worksheet.merge_cells(f'F{start_group_row}:F{current_row - 1}')
+            
+            # Alinear las celdas combinadas
+            worksheet[f'A{start_group_row}'].alignment = center_alignment
+            worksheet[f'B{start_group_row}'].alignment = left_alignment
+            worksheet[f'C{start_group_row}'].alignment = left_alignment
+            worksheet[f'D{start_group_row}'].alignment = center_alignment
+            worksheet[f'E{start_group_row}'].alignment = center_alignment
+            worksheet[f'F{start_group_row}'].alignment = left_alignment
+
+    
+        # Escribir el valor en la columna E (una vez por grupo de filas)
+        worksheet[f'E{start_group_row}'] = num_correlativo_lm
+
         numero_correlativo += 1
     
     # Combinar las celdas de la fila del total
@@ -860,7 +890,6 @@ def exportar_libro_mayor_excel():
     daterangemayor = request.args.get('daterangemayor', '')
     start_date, end_date = None, None
 
-    # Procesar rango de fechas y determinar el mes para B3
     mes_anio_excel = None  # Variable para guardar el valor de B3
 
     # Procesar rango de fechas
