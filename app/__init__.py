@@ -2,6 +2,9 @@ from flask import Flask, redirect, url_for, session, render_template, jsonify
 from config import Config
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity, create_access_token, set_access_cookies, unset_jwt_cookies
 from app.models.contable_models import obtener_usuario_por_id
+from functools import wraps
+from flask import make_response
+
 
 def create_app():
     app = Flask(__name__)
@@ -43,12 +46,24 @@ def create_app():
             return dict(user=None)
 
 
+    
+    def nocache(view):
+        @wraps(view)
+        def no_cache(*args, **kwargs):
+            response = make_response(view(*args, **kwargs))
+            response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            return response
+        return no_cache
+
     @app.route('/')
     def index():
         return redirect(url_for('contable.login'))
 
     @app.route('/inicio')
     @jwt_required()  # Protección con JWT en la ruta de inicio
+    @nocache
     def inicio():
         return render_template('index.html')    
 

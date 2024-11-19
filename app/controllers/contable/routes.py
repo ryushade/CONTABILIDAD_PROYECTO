@@ -22,6 +22,17 @@ from openpyxl import load_workbook
 from openpyxl.styles import Border, Side, Font, Alignment
 from openpyxl.styles import numbers 
 
+def nocache(view):
+    @wraps(view)
+    def no_cache(*args, **kwargs):
+        response = make_response(view(*args, **kwargs))
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        return response
+    return no_cache
+
+
 def role_required(*roles):
     def decorator(f):
         @wraps(f)
@@ -41,14 +52,14 @@ def role_required(*roles):
 from flask import Flask, request, redirect, url_for, render_template, flash, make_response
 
 @accounting_bp.route('/login', methods=['GET', 'POST'])
+@nocache
 def login():
-    try:
-        # Verifica si hay un JWT en la solicitud
-        verify_jwt_in_request(optional=True)
-        if get_jwt_identity():  # Si el usuario ya tiene un JWT válido
-            return redirect(url_for('inicio'))  # Redirigir a la página principal
-    except:
-        pass  # Si no hay un JWT válido, continúa con el proceso de inicio de sesión
+    if request.method == 'GET':
+        # Invalida el token JWT y limpia la sesión
+        response = make_response(render_template('contable/login.html'))
+        unset_jwt_cookies(response)
+        session.clear()
+        return response
 
     if request.method == 'POST':
         username = request.form['username']
@@ -59,25 +70,24 @@ def login():
 
         # Verifica si el usuario existe y la contraseña es correcta
         if user and verificar_contraseña(user, password):
-            # Generar el token de acceso JWT
+            # Genera el token de acceso JWT
             access_token = create_access_token(identity=user['id_usuario'])
             response = make_response(redirect(url_for('inicio')))
-            set_access_cookies(response, access_token)  # Guardar el token en una cookie segura
-            response.set_cookie('username', username, httponly=True)  # Guarda el username en una cookie
+            set_access_cookies(response, access_token)
             session['username'] = username
-            print(session.get('username'))
             return response
         else:
-            # Si el inicio de sesión falla, redirige con el parámetro de error
+            # Si el inicio de sesión falla, redirige con un mensaje de error
             return redirect(url_for('contable.login') + '?error=true')
 
-    return render_template('contable/login.html')
 
 
 @accounting_bp.route('/logout')
 def logout():
-    response = redirect(url_for('contable.login'))
-    unset_jwt_cookies(response)  # Elimina el token de la cookie
+    response = make_response(redirect(url_for('contable.login')))
+    unset_jwt_cookies(response)  # Elimina las cookies JWT
+    response.set_cookie('username', '', expires=0)  # Elimina la cookie del nombre de usuario
+    session.clear()  # Limpia la sesión
     return response
 
 @accounting_bp.route('/cambiar_rol', methods=['POST'])
