@@ -48,21 +48,25 @@ CREATE TABLE `asiento_contable` (
   CONSTRAINT `fk_id_comprobante` FOREIGN KEY (`id_comprobante`) REFERENCES `comprobante` (`id_comprobante`)
 ) ENGINE=InnoDB AUTO_INCREMENT=143 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO asiento_contable VALUES (127, 1, 2024-11-06, 'POR EL REGISTRO DE LA COMPRA DE MERCADERÍA', 'compra_contado', 1, 825.940000, 825.940000, None, 380);
-INSERT INTO asiento_contable VALUES (128, 1, 2024-11-06, 'POR EL INGRESO DE LA MERCADERÍA AL ALMACÉN', 'compra_contado_3', 1, 699.950000, 699.950000, None, 380);
+INSERT INTO asiento_contable VALUES (127, 1, 2024-11-06, 'POR EL REGISTRO DE LA COMPRA DE MERCADER�A', 'compra_contado', 1, 825.940000, 825.940000, None, 380);
+INSERT INTO asiento_contable VALUES (128, 1, 2024-11-06, 'POR EL INGRESO DE LA MERCADER�A AL ALMAC�N', 'compra_contado_3', 1, 699.950000, 699.950000, None, 380);
 INSERT INTO asiento_contable VALUES (129, 1, 2024-11-06, 'POR EL PAGO DE LA FACTURA DEL PROVEEDOR B001-3612', 'compra_contado_2', 1, 825.940000, 825.940000, None, 380);
-INSERT INTO asiento_contable VALUES (130, 1, 2024-11-06, 'POR EL REGISTRO DE LA COMPRA DE MERCADERÍA', 'compra_contado', 1, 6136.000000, 6136.000000, None, 368);
-INSERT INTO asiento_contable VALUES (131, 1, 2024-11-06, 'POR EL INGRESO DE LA MERCADERÍA AL ALMACÉN', 'compra_contado_3', 1, 5200.000000, 5200.000000, None, 368);
+INSERT INTO asiento_contable VALUES (130, 1, 2024-11-06, 'POR EL REGISTRO DE LA COMPRA DE MERCADER�A', 'compra_contado', 1, 6136.000000, 6136.000000, None, 368);
+INSERT INTO asiento_contable VALUES (131, 1, 2024-11-06, 'POR EL INGRESO DE LA MERCADER�A AL ALMAC�N', 'compra_contado_3', 1, 5200.000000, 5200.000000, None, 368);
 INSERT INTO asiento_contable VALUES (132, 1, 2024-11-06, 'POR EL PAGO DE LA FACTURA DEL PROVEEDOR B001-380', 'compra_contado_2', 1, 6136.000000, 6136.000000, None, 368);
-INSERT INTO asiento_contable VALUES (133, 1, 2024-11-06, 'POR EL REGISTRO DE LA COMPRA DE MERCADERÍA', 'compra_contado', 1, 12272.000000, 12272.000000, None, 380);
-INSERT INTO asiento_contable VALUES (134, 1, 2024-11-06, 'POR EL INGRESO DE LA MERCADERÍA AL ALMACÉN', 'compra_contado_3', 1, 10400.000000, 10400.000000, None, 380);
+INSERT INTO asiento_contable VALUES (133, 1, 2024-11-06, 'POR EL REGISTRO DE LA COMPRA DE MERCADER�A', 'compra_contado', 1, 12272.000000, 12272.000000, None, 380);
+INSERT INTO asiento_contable VALUES (134, 1, 2024-11-06, 'POR EL INGRESO DE LA MERCADER�A AL ALMAC�N', 'compra_contado_3', 1, 10400.000000, 10400.000000, None, 380);
 INSERT INTO asiento_contable VALUES (135, 1, 2024-11-06, 'POR EL PAGO DE LA FACTURA DEL PROVEEDOR B001-3612', 'compra_contado_2', 1, 12272.000000, 12272.000000, None, 380);
-INSERT INTO asiento_contable VALUES (137, 1, 2024-11-06, 'POR LA VENTA DE MERCADERÍA SEGÚN BOLETA B100-00000015', 'venta_contado', 1, 748.000000, 748.000000, None, 383);
-INSERT INTO asiento_contable VALUES (138, 1, 2024-11-10, 'POR EL REGISTRO DE LA COMPRA DE MERCADERÍA', 'compra_contado', 1, 814.200000, 814.200000, None, 380);
-INSERT INTO asiento_contable VALUES (139, 1, 2024-11-10, 'POR EL INGRESO DE LA MERCADERÍA AL ALMACÉN', 'compra_contado_3', 1, 690.000000, 690.000000, None, 380);
+INSERT INTO asiento_contable VALUES (137, 1, 2024-11-06, 'POR LA VENTA DE MERCADER�A SEG�N BOLETA B100-00000015', 'venta_contado', 1, 748.000000, 748.000000, None, 383);
+INSERT INTO asiento_contable VALUES (138, 1, 2024-11-10, 'POR EL REGISTRO DE LA COMPRA DE MERCADER�A', 'compra_contado', 1, 814.200000, 814.200000, None, 380);
+INSERT INTO asiento_contable VALUES (139, 1, 2024-11-10, 'POR EL INGRESO DE LA MERCADER�A AL ALMAC�N', 'compra_contado_3', 1, 690.000000, 690.000000, None, 380);
 INSERT INTO asiento_contable VALUES (140, 1, 2024-11-10, 'POR EL PAGO DE LA FACTURA DEL PROVEEDOR B001-3612', 'compra_contado_2', 1, 814.200000, 814.200000, None, 380);
-INSERT INTO asiento_contable VALUES (141, 1, 2024-11-19, 'POR LA VENTA DE MERCADERÍA SEGÚN BOLETA B100-00000016', 'venta_contado', 1, 501.840000, 501.840000, None, 384);
-INSERT INTO asiento_contable VALUES (142, 1, 2024-11-19, 'POR LA VENTA DE MERCADERÍA SEGÚN FACTURA F100-00000013', 'venta_contado', 1, 470.560000, 470.560000, None, 385);
+INSERT INTO asiento_contable VALUES (141, 1, 2024-11-19, 'POR EL REGISTRO DE LA COMPRA DE MERCADER�A', 'compra_contado', 1, 81.420000, 81.420000, None, 384);
+INSERT INTO asiento_contable VALUES (142, 1, 2024-11-19, 'POR EL INGRESO DE LA MERCADER�A AL ALMAC�N', 'compra_contado_3', 1, 69.000000, 69.000000, None, 384);
+INSERT INTO asiento_contable VALUES (143, 1, 2024-11-19, 'POR EL PAGO DE LA FACTURA DEL PROVEEDOR B11001100', 'compra_contado_2', 1, 81.420000, 81.420000, None, 384);
+INSERT INTO asiento_contable VALUES (144, 1, 2024-11-19, 'POR EL REGISTRO DE LA COMPRA DE MERCADER�A', 'compra_contado', 1, 148.680000, 148.680000, None, 385);
+INSERT INTO asiento_contable VALUES (145, 1, 2024-11-19, 'POR EL INGRESO DE LA MERCADER�A AL ALMAC�N', 'compra_contado_3', 1, 126.000000, 126.000000, None, 385);
+INSERT INTO asiento_contable VALUES (146, 1, 2024-11-19, 'POR EL PAGO DE LA FACTURA DEL PROVEEDOR B001-3617', 'compra_contado_2', 1, 148.680000, 148.680000, None, 385);
 
 CREATE TABLE `bitacora_nota` (
   `id_bitacora` int(11) NOT NULL AUTO_INCREMENT,
@@ -127,7 +131,7 @@ CREATE TABLE `compra` (
   PRIMARY KEY (`id_compra`),
   KEY `id_proveedor` (`id_proveedor`),
   CONSTRAINT `compra_ibfk_1` FOREIGN KEY (`id_proveedor`) REFERENCES `proveedor` (`id_proveedor`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO compra VALUES (23, 1, 'B001-380', 1, 2024-11-05, 9.00, 59.00, 368);
 INSERT INTO compra VALUES (24, 5, 'B001-382', 1, 2024-11-05, 25.20, 165.20, 369);
@@ -137,6 +141,7 @@ INSERT INTO compra VALUES (28, 1, 'B001-3612', 1, 2024-11-06, 125.99, 825.94, 38
 INSERT INTO compra VALUES (29, 1, 'B001-380', 1, 2024-11-06, 936.00, 6136.00, 368);
 INSERT INTO compra VALUES (30, 2, 'B001-3612', 1, 2024-11-06, 1872.00, 12272.00, 380);
 INSERT INTO compra VALUES (31, 1, 'B001-3612', 1, 2024-11-10, 124.20, 814.20, 380);
+INSERT INTO compra VALUES (33, 1, 'B001-3617', 1, 2024-11-19, 22.68, 148.68, 385);
 
 CREATE TABLE `comprobante` (
   `id_comprobante` int(11) NOT NULL AUTO_INCREMENT,
@@ -146,8 +151,9 @@ CREATE TABLE `comprobante` (
   UNIQUE KEY `num_comprobante` (`num_comprobante`,`id_comprobante`,`id_tipocomprobante`) USING BTREE,
   KEY `FKcomprobant701552` (`id_tipocomprobante`),
   CONSTRAINT `FKcomprobant701552` FOREIGN KEY (`id_tipocomprobante`) REFERENCES `tipo_comprobante` (`id_tipocomprobante`)
-) ENGINE=InnoDB AUTO_INCREMENT=386 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=388 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+INSERT INTO comprobante VALUES (386, 1, 'B000-212');
 INSERT INTO comprobante VALUES (359, 1, 'B001-000010');
 INSERT INTO comprobante VALUES (367, 1, 'B001-000020');
 INSERT INTO comprobante VALUES (363, 1, 'B001-312');
@@ -181,7 +187,7 @@ INSERT INTO comprobante VALUES (378, 1, 'B100-00000012');
 INSERT INTO comprobante VALUES (381, 1, 'B100-00000013');
 INSERT INTO comprobante VALUES (382, 1, 'B100-00000014');
 INSERT INTO comprobante VALUES (383, 1, 'B100-00000015');
-INSERT INTO comprobante VALUES (384, 1, 'B100-00000016');
+INSERT INTO comprobante VALUES (384, 1, 'B11001100');
 INSERT INTO comprobante VALUES (305, 2, 'F100-00000001');
 INSERT INTO comprobante VALUES (316, 2, 'F100-00000001');
 INSERT INTO comprobante VALUES (333, 2, 'F100-00000001');
@@ -2001,8 +2007,8 @@ CREATE TABLE `detalle_asiento` (
   KEY `id_asiento` (`id_asiento`),
   KEY `id_cuenta` (`id_cuenta`),
   CONSTRAINT `detalle_asiento_ibfk_1` FOREIGN KEY (`id_asiento`) REFERENCES `asiento_contable` (`id_asiento`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `detalle_asiento_ibfk_2` FOREIGN KEY (`id_cuenta`) REFERENCES `cuenta` (`id_cuenta`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=266 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  CONSTRAINT `detalle_asiento_ibfk_2` FOREIGN KEY (`id_cuenta`) REFERENCES `cuenta` (`id_cuenta`) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=274 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO detalle_asiento VALUES (227, 127, 1181, 699.950000, 0.000000);
 INSERT INTO detalle_asiento VALUES (228, 127, 941, 125.990000, 0.000000);
@@ -2035,12 +2041,20 @@ INSERT INTO detalle_asiento VALUES (256, 139, 167, 690.000000, 0.000000);
 INSERT INTO detalle_asiento VALUES (257, 139, 1216, 0.000000, 690.000000);
 INSERT INTO detalle_asiento VALUES (258, 140, 1005, 814.200000, 0.000000);
 INSERT INTO detalle_asiento VALUES (259, 140, 6, 0.000000, 814.200000);
-INSERT INTO detalle_asiento VALUES (260, 141, 49, 501.840000, 0.000000);
-INSERT INTO detalle_asiento VALUES (261, 141, 941, 0.000000, 66.420000);
-INSERT INTO detalle_asiento VALUES (262, 141, 1594, 0.000000, 435.420000);
-INSERT INTO detalle_asiento VALUES (263, 142, 49, 470.560000, 0.000000);
-INSERT INTO detalle_asiento VALUES (264, 142, 941, 0.000000, 62.280000);
-INSERT INTO detalle_asiento VALUES (265, 142, 1594, 0.000000, 408.280000);
+INSERT INTO detalle_asiento VALUES (260, 141, 1181, 69.000000, 0.000000);
+INSERT INTO detalle_asiento VALUES (261, 141, 941, 12.420000, 0.000000);
+INSERT INTO detalle_asiento VALUES (262, 141, 1007, 0.000000, 81.420000);
+INSERT INTO detalle_asiento VALUES (263, 142, 167, 69.000000, 0.000000);
+INSERT INTO detalle_asiento VALUES (264, 142, 1216, 0.000000, 69.000000);
+INSERT INTO detalle_asiento VALUES (265, 143, 1005, 81.420000, 0.000000);
+INSERT INTO detalle_asiento VALUES (266, 143, 6, 0.000000, 81.420000);
+INSERT INTO detalle_asiento VALUES (267, 144, 1181, 126.000000, 0.000000);
+INSERT INTO detalle_asiento VALUES (268, 144, 941, 22.680000, 0.000000);
+INSERT INTO detalle_asiento VALUES (269, 144, 1007, 0.000000, 148.680000);
+INSERT INTO detalle_asiento VALUES (270, 145, 167, 126.000000, 0.000000);
+INSERT INTO detalle_asiento VALUES (271, 145, 1216, 0.000000, 126.000000);
+INSERT INTO detalle_asiento VALUES (272, 146, 1005, 148.680000, 0.000000);
+INSERT INTO detalle_asiento VALUES (273, 146, 6, 0.000000, 148.680000);
 
 CREATE TABLE `detalle_compra` (
   `id_detalle_compra` int(11) NOT NULL AUTO_INCREMENT,
@@ -2054,7 +2068,7 @@ CREATE TABLE `detalle_compra` (
   KEY `id_producto` (`id_producto`),
   CONSTRAINT `detalle_compra_ibfk_1` FOREIGN KEY (`id_compra`) REFERENCES `compra` (`id_compra`),
   CONSTRAINT `detalle_compra_ibfk_2` FOREIGN KEY (`id_producto`) REFERENCES `producto` (`id_producto`)
-) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO detalle_compra VALUES (25, 23, 4, 1, 50.00, 50.00);
 INSERT INTO detalle_compra VALUES (26, 24, 10, 2, 70.00, 140.00);
@@ -2070,6 +2084,9 @@ INSERT INTO detalle_compra VALUES (35, 30, 15, 100, 57.00, 5700.00);
 INSERT INTO detalle_compra VALUES (36, 30, 14, 100, 47.00, 4700.00);
 INSERT INTO detalle_compra VALUES (37, 31, 10, 5, 70.00, 350.00);
 INSERT INTO detalle_compra VALUES (38, 31, 11, 5, 68.00, 340.00);
+INSERT INTO detalle_compra VALUES (39, 32, 16, 1, 69.00, 69.00);
+INSERT INTO detalle_compra VALUES (40, 33, 16, 1, 69.00, 69.00);
+INSERT INTO detalle_compra VALUES (41, 33, 15, 1, 57.00, 57.00);
 
 CREATE TABLE `detalle_envio` (
   `id_guiaremision` int(11) NOT NULL,
@@ -2124,7 +2141,7 @@ CREATE TABLE `detalle_venta` (
   KEY `FKdetalle_ve323232` (`id_producto`),
   CONSTRAINT `FKdetalle_ve758085` FOREIGN KEY (`id_venta`) REFERENCES `venta` (`id_venta`),
   CONSTRAINT `FKdetalle_ve907712` FOREIGN KEY (`id_producto`) REFERENCES `producto` (`id_producto`)
-) ENGINE=InnoDB AUTO_INCREMENT=271 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=266 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO detalle_venta VALUES (249, 7, 325, 2, 79.99, 0, 159.98);
 INSERT INTO detalle_venta VALUES (250, 6, 325, 2, 89.99, 0, 179.98);
@@ -2141,11 +2158,6 @@ INSERT INTO detalle_venta VALUES (262, 14, 334, 4, 47.00, 0, 188.00);
 INSERT INTO detalle_venta VALUES (263, 15, 334, 4, 57.00, 0, 228.00);
 INSERT INTO detalle_venta VALUES (264, 16, 334, 4, 69.00, 0, 276.00);
 INSERT INTO detalle_venta VALUES (265, 4, 336, 11, 50.00, 0, 550.00);
-INSERT INTO detalle_venta VALUES (266, 15, 337, 4, 57.00, 0, 228.00);
-INSERT INTO detalle_venta VALUES (267, 14, 337, 3, 47.00, 0, 141.00);
-INSERT INTO detalle_venta VALUES (268, 15, 338, 2, 57.00, 0, 114.00);
-INSERT INTO detalle_venta VALUES (269, 14, 338, 2, 47.00, 0, 94.00);
-INSERT INTO detalle_venta VALUES (270, 16, 338, 2, 69.00, 0, 138.00);
 
 CREATE TABLE `detalle_venta_boucher` (
   `id_detalle` int(11) NOT NULL AUTO_INCREMENT,
@@ -2280,9 +2292,9 @@ INSERT INTO inventario VALUES (10, 1, 65);
 INSERT INTO inventario VALUES (11, 1, 78);
 INSERT INTO inventario VALUES (12, 1, 74);
 INSERT INTO inventario VALUES (13, 1, 60);
-INSERT INTO inventario VALUES (14, 1, 210);
-INSERT INTO inventario VALUES (15, 1, 205);
-INSERT INTO inventario VALUES (16, 1, 67);
+INSERT INTO inventario VALUES (14, 1, 218);
+INSERT INTO inventario VALUES (15, 1, 212);
+INSERT INTO inventario VALUES (16, 1, 73);
 
 CREATE TABLE `marca` (
   `id_marca` int(11) NOT NULL AUTO_INCREMENT,
