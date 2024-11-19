@@ -3,7 +3,7 @@ import os
 from urllib import response
 from app.models.contable_models import obtener_usuario_por_id
 from flask import abort, current_app, make_response, render_template, send_file, session
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, verify_jwt_in_request
 
 from flask import render_template, send_file, request, jsonify, redirect, url_for, flash
 from app.models.transaccional_models import obtener_productos, obtener_ventas, obtener_marcas, obtener_categorias, obtener_ingresos, obtener_nota_salida, obtener_inventario, obtener_subcategorias_por_categoria, agregar_producto, obtener_inventario_vigente, listarClientes, obtener_id_sucursal, obtener_ultimo_comprobante, obtener_ventas_con_detalles, obtener_proveedor, obtener_almacen, obtener_compras_con_detalles
@@ -18,23 +18,18 @@ def role_required(*roles):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
+            # Verificar el JWT
+            verify_jwt_in_request()
             user_id = get_jwt_identity()
             user = obtener_usuario_por_id(user_id)
-            
-            if not user:
-                print("Error: Usuario no encontrado")
-                return abort(403)
-            
-            user_role = user['rol']['nom_rol'].strip().upper() 
-            print(f"Usuario rol: {user_role}")  
-
-            if user_role not in [role.upper() for role in roles]: 
-                print("Error: Rol no permitido")
-                return abort(403)  
-
-            return f(*args, **kwargs)
+            if user and user['rol']['nom_rol'] in roles:
+                return f(*args, **kwargs)
+            else:
+                # Redirige al inicio con un parámetro para indicar acceso denegado
+                return redirect(url_for('inicio', acceso_denegado=1))
         return decorated_function
     return decorator
+
 
 
 

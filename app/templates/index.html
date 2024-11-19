@@ -368,7 +368,7 @@
         <div class="confirmation-modal-buttons"
             style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
             <button style="border-radius: 10px; width: 120px; height: 50px; font-weight: 600;" class="btn btn-danger"
-                onclick="closeAccessDeniedModal()">
+                onclick="window.location.href='{{ url_for('inicio') }}'">
                 <i class="fas fa-times me-2"></i>
                 Cerrar
             </button>
