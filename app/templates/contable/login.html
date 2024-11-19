@@ -7,7 +7,8 @@
     <title>Tormenta</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 </head>
 <style>
     .btn-login {
@@ -71,8 +72,9 @@
                             <input type="password" class="form-control" id="password" name="password"
                                 placeholder="Ingresa tu contraseña" required>
                         </div>
-                        <button style="margin-top: 10px;" type="submit"
-                            class="btn-login btn-primary w-100">Ingresar</button>
+                        <button style="margin-top: 10px;" type="submit" class="btn-login btn-primary w-100">
+                            <i class="fa fa-sign-in-alt"></i> Ingresar
+                        </button>
                     </form>
                 </div>
             </div>
@@ -84,7 +86,7 @@
         </div>
     </div>
 
-    
+
 
     <!-- Modal de Inicio de Sesión Requerido -->
     <div id="loginModal" class="modal fade" tabindex="-1" role="dialog">

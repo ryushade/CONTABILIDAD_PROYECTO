@@ -71,20 +71,46 @@
 
     <!-- Tabs de Reporte -->
     <div class="mb-4">
-        <div class="nav nav-tabs">
-            {% if user.rol and user.rol.nom_rol != "CONTADOR" %}
+        {% if user.rol %}
+        {% if user.rol.nom_rol == "CONTADOR" %}
+        {# Solo muestra la pestaña Sistema contable y la marca como activa #}
+        {% set active_tab = "siscon" %}
+        {% set available_tabs = ["siscon"] %}
+        {% elif user.rol.nom_rol == "EMPLEADO" %}
+        {# Muestra la pestaña Sistema transaccional y la marca como activa #}
+        {% set active_tab = "sistrans" %}
+        {% set available_tabs = ["sistrans"] %}
+        {% else %}
+        {# Para ADMINISTRADOR y otros roles, muestra ambas pestañas #}
+        {% set active_tab = "sistrans" %}
+        {% set available_tabs = ["sistrans", "siscon"] %}
+        {% endif %}
+        {% else %}
+        {# Si no hay rol definido, no muestra pestañas #}
+        {% set active_tab = "none" %}
+        {% set available_tabs = [] %}
+        {% endif %}
 
-            <a class="nav-item nav-link active" href="#sistrans" data-bs-toggle="tab">
+        <div class="nav nav-tabs">
+            {# Pestaña Sistema transaccional #}
+            {% if "sistrans" in available_tabs %}
+            <a class="nav-item nav-link {% if active_tab == 'sistrans' %}active{% endif %}" href="#sistrans"
+                data-bs-toggle="tab">
                 <i class="fas fa-credit-card"></i> Sistema transaccional
             </a>
             {% endif %}
-            {% if user.rol and user.rol.nom_rol != "EMPLEADO" %}
 
-            <a class="nav-item nav-link" href="#siscon" data-bs-toggle="tab">
+            {# Pestaña Sistema contable #}
+            {% if "siscon" in available_tabs %}
+            <a class="nav-item nav-link {% if active_tab == 'siscon' %}active{% endif %}" href="#siscon"
+                data-bs-toggle="tab">
                 <i class="fas fa-calculator"></i> Sistema contable
             </a>
             {% endif %}
         </div>
+
+
+
     </div>
 
     <style>
