@@ -480,21 +480,14 @@
     </div>
 </form>
 
-<!-- Error Modal -->
+<!-- Eliminacion satisfactoria Modal -->
 
-<div id="ErrorModal" class="confirmation-modal-overlay" {% if error_message %} style="display: flex;" {% else %}
+<div id="eliminacion_correcta" class="confirmation-modal-overlay" {% if success_messages %} style="display: flex;" {% else %}
     style="display: none;" {% endif %}>
     <div class="confirmation-modal" style="text-align: center;">
-        <div class="modal-icon" style="margin-bottom: 10px;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
-                <line x1="12" y1="9" x2="12" y2="13"></line>
-                <line x1="12" y1="17" x2="12.01" y2="17"></line>
-            </svg>
-        </div>
-        <h2 class="confirmation-modal-title" style="color: rgb(30, 30, 30);">Error al Registrar Cuenta</h2>
-        <p class="confirmation-modal-message">{{ error_message }}</p>
+
+        <h2 class="confirmation-modal-title" style="color: rgb(30, 30, 30);">Cuenta contable dada de baja</h2>
+        <p class="confirmation-modal-message">{{ success_messages }}</p>
         <input type="hidden" id="deleteCuentaId" value="">
         <p id="deleteCuentaInfo" class="confirmation-modal-message"
             style="font-size: 18px; color: rgb(30, 30, 30); font-weight: bold;">
@@ -502,7 +495,7 @@
         <div class="confirmation-modal-buttons"
             style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
             <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" class="btn btn-secondary"
-                onclick="closeModalError()">Cerrar</button>
+                onclick="closeModalEliminacionCorrectaCuenta()">Cerrar</button>
         </div>
     </div>
 </div>
@@ -656,5 +649,30 @@
     </div>
 </div>
 
+<!-- MODAL ERROR DE ELIMINACION -->
+<div id="ErrorModalEliminar" class="confirmation-modal-overlay" {% if error_eliminar %} style="display: flex;" {% else %}
+    style="display: none;" {% endif %}>
+    <div class="confirmation-modal" style="text-align: center;">
+        <div class="modal-icon" style="margin-bottom: 10px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+        </div>
+        <h2 class="confirmation-modal-title" style="color: rgb(30, 30, 30);">Error al eliminar</h2>
+        <p class="confirmation-modal-message">{{ error_eliminar }}</p>
+        <input type="hidden" id="deleteCuentaId" value="">
+        <p id="deleteCuentaInfo" class="confirmation-modal-message"
+            style="font-size: 18px; color: rgb(30, 30, 30); font-weight: bold;">
+        </p>
+        <div class="confirmation-modal-buttons"
+            style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
+            <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" class="btn btn-secondary"
+                onclick="closeModalErrorEliminarCuenta()">Cerrar</button>
+        </div>
+    </div>
+</div>
 
 {% endblock %}

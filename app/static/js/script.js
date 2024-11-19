@@ -131,8 +131,12 @@ function closeModalDeleteRegla() {
   document.getElementById('deleteReglaModal').style.display = 'none';
 }
 
-function closeModalError() {
-  document.getElementById('ErrorModal').style.display = 'none';
+function closeModalErrorEliminarCuenta() {
+  document.getElementById('ErrorModalEliminar').style.display = 'none';
+}
+
+function closeModalEliminacionCorrectaCuenta() {
+  document.getElementById('eliminacion_correcta').style.display = 'none';
 }
 
 function closeModalDeleteUsuario() {
@@ -271,6 +275,10 @@ function submitAddUsuario(event) {
 
 function openModalAdd() {
   document.getElementById('addAccountModal').style.display = 'flex';
+}
+
+function openModalError() {
+  document.getElementById('errorElimarModal').style.display = 'flex';
 }
 
 function openModalAddUsu() {
