@@ -493,151 +493,150 @@
         </div>
     </div>
 
-    <!-- Tab: Libro Compras -->
-    <div class="tab-pane fade" id="libro-compras">
-        <div class="card bg-white rounded custom-shadow p-4" style="padding: 1rem !important;">
-            <header class="d-flex justify-content-between align-items-center mb-2">
-                <h1 class="h4 mb-0 d-flex align-items-center" style="font-weight: bold;">
-                    LIBRO REGISTRO DE COMPRAS
-                </h1>
+<!-- Tab: Libro Compras -->
+<div class="tab-pane fade {% if active_tab == 'libro-compras' %}show active{% endif %}" id="libro-compras">
+    <div class="card bg-white rounded custom-shadow p-4" style="padding: 1rem !important;">
+        <header class="d-flex justify-content-between align-items-center mb-2">
+            <h1 class="h4 mb-0 d-flex align-items-center" style="font-weight: bold;">
+                LIBRO REGISTRO DE COMPRAS
+            </h1>
 
-                <div class="dropdown me-2">
-                    <button class="btn btn-light border dropdown-toggle" type="button" id="dropdownMenuButton"
-                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Exportar datos
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item d-flex flex-column" href="#" onclick="openModalDownloadExcelCompras()">
-                            <span class="d-flex align-items-center">
-                                <i class="fa fa-file-excel mr-2"></i>
-                                <strong>Exportar a Excel</strong>
-                            </span>
-                        </a>
-                        <a class="dropdown-item d-flex flex-column" href="#" onclick="openModalDownloadPDFCompras()">
-                            <span class="d-flex align-items-center">
-                                <i class="fa fa-file-pdf mr-2" style="color: red;"></i>
-                                <strong>Exportar a PDF</strong>
-                            </span>
-                        </a>
+            <div class="dropdown me-2">
+                <button class="btn btn-light border dropdown-toggle" type="button" id="dropdownMenuButton"
+                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Exportar datos
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item d-flex flex-column" href="#" onclick="openModalDownloadExcelCompras()">
+                        <span class="d-flex align-items-center">
+                            <i class="fa fa-file-excel mr-2"></i>
+                            <strong>Exportar a Excel</strong>
+                        </span>
+                    </a>
+                    <a class="dropdown-item d-flex flex-column" href="#" onclick="openModalDownloadPDFCompras()">
+                        <span class="d-flex align-items-center">
+                            <i class="fa fa-file-pdf mr-2" style="color: red;"></i>
+                            <strong>Exportar a PDF</strong>
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <p class="text-muted small mb-2">Registro detallado de todas las adquisiciones realizadas por la
+            empresa,
+            utilizado para control de gastos y cálculo de créditos fiscales.</p>
+        <div class="container-fluid">
+
+            <!-- Formulario con el campo oculto para mantener el tab activo -->
+            <form class="row g-3 mb-3 align-items-end" method="GET" action="{{ url_for('contable.reportes') }}">
+                <input type="hidden" name="active_tab" value="libro-compras" id="activeTabInputCompras">
+                <div class="col-4 col-md-3">
+                    <style>
+                        .required-asterisk {
+                            color: red;
+                        }
+                    </style>
+
+                    <label for="daterange" class="form-label" style="font-size: 14px;">
+                        Fecha <span class="required-asterisk">*</span>
+                    </label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">
+                            <i class="fas fa-calendar-alt"></i>
+                        </span>
+                        <input type="text" class="form-control" id="daterange" name="daterange"
+                            placeholder="Selecciona mes y año" aria-label="Fecha" aria-describedby="basic-addon1"
+                            value="{{ request.args.get('daterange', '') }}">
                     </div>
                 </div>
-            </header>
+                <div class="col-lg-2 d-flex justify-content-end" style="margin-left: auto;">
+                </div>
+            </form>
+        </div>
+        <div class="table-container mt-2 mb-2" style="border: 1px solid #ccc; margin-top: -0.9rem !important;">
+            <style>
+                /* Estilo de hover para resaltar la fila */
+                #tabla_compras tr:hover {
+                    background-color: #e4ebf7;
+                }
 
+                #tabla_caja tr:hover {
+                    background-color: #e4ebf7;
+                }
 
-            <p class="text-muted small mb-2">Registro detallado de todas las adquisiciones realizadas por la
-                empresa,
-                utilizado para control de gastos y cálculo de créditos fiscales.</p>
-            <div class="container-fluid">
+                #tabla_corriente tr:hover {
+                    background-color: #e4ebf7;
+                }
 
-                <form class="row g-3 mb-3 align-items-end">
-                    <div class="col-4 col-md-3">
-                        <style>
-                            .required-asterisk {
-                                color: red;
-                            }
-                        </style>
+                /* Ajuste de padding para filas compactas */
+                table {
+                    width: 100%;
+                    font-size: 13px;
+                    border: #000;
+                }
 
-                        <label for="daterange" class="form-label" style="font-size: 14px;">
-                            Fecha <span class="required-asterisk">*</span>
-                        </label>
-                        <div class="input-group mb-3">
-                            <span class="input-group-text" id="basic-addon1">
-                                <i class="fas fa-calendar-alt"></i>
-                            </span>
-                            <input type="text" class="form-control" id="daterange" placeholder="Selecciona mes y año"
-                                aria-label="Fecha" aria-describedby="basic-addon1">
-                        </div>
-                    </div>
+                th,
+                td {
+                    padding: 20px 10px;
+                    /* Ajuste del padding para reducir el tamaño de las filas */
+                    font-size: 13px;
+                }
 
-                    <div class="col-lg-2 d-flex justify-content-end" style="margin-left: auto;">
+                th {
+                    font-weight: bold;
+                    background-color: #f8f9fa;
+                    text-align: center;
+                }
 
-                    </div>
-                </form>
-            </div>
-            <div class="table-container mt-2 mb-2" style="border: 1px solid #ccc; margin-top: -0.9rem !important;">
-                <style>
-                    /* Estilo de hover para resaltar la fila */
-                    #tabla_compras tr:hover {
-                        background-color: #e4ebf7;
-                    }
-
-                    #tabla_caja tr:hover {
-                        background-color: #e4ebf7;
-                    }
-
-                    #tabla_corriente tr:hover {
-                        background-color: #e4ebf7;
-                    }
-
-                    /* Ajuste de padding para filas compactas */
-                    table {
-                        width: 100%;
-                        font-size: 13px;
-                        border: #000;
-                    }
-
-                    th,
-                    td {
-                        padding: 20px 10px;
-                        /* Ajuste del padding para reducir el tamaño de las filas */
-                        font-size: 13px;
-                    }
-
-                    th {
-                        font-weight: bold;
-                        background-color: #f8f9fa;
-                        text-align: center;
-                    }
-
-                    td {
-                        text-align: center;
-                    }
-                </style>
-                <table id="tabla_compras">
-                    <thead>
-                        <tr>
-                            <th>N° CORRELATIVO</th>
-                            <th>FECHA</th>
-                            <th>RUC</th>
-                            <th>RAZON SOCIAL</th>
-                            <th>COMPROBANTE</th>
-                            <th>MONTO</th>
-                            <th>IGV</th>
-                            <th>TOTAL</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for registro in registros_compras %}
-                        <tr>
-                            <td>{{ registro.numero_correlativo }}</td>
-                            <td>{{ registro.fecha.strftime('%Y-%m-%d') }}</td>
-                            <td class="text-align" style="text-align: center;">{{ registro.documento_cliente }}</td>
-                            <td class="text-align" style="text-align: left;">{{ registro.nombre_cliente }}</td>
-                            <td class="text-align" style="text-align: left;width: 50px;">{{ registro.num_comprobante }}
-                            </td>
-                            <td class="text-end">{{ registro.importe | round(2) }}</td>
-                            <td class="text-end">{{ registro.igv | round(2) }}</td>
-                            <td class="text-end">{{ registro.total | round(2) }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th colspan="5" style="text-align: right; font-weight: bold; color: #000; font-size: 14px;">
-                                TOTAL (S/)</th>
-                            <th style="font-weight: bold; font-size: 14px; color: #000;" class="text-end">{{
-                                totalesCompras.total_importe | round(2) }}</th>
-                            <th style="font-weight: bold; font-size: 14px; color: #000;" class="text-end">{{
-                                totalesCompras.total_igv
-                                | round(2) }}</th>
-                            <th style="font-weight: bold; font-size: 14px; color: #000;" class="text-end">{{
-                                totalesCompras.total_general | round(2) }}</th>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
+                td {
+                    text-align: center;
+                }
+            </style>
+            <table id="tabla_compras">
+                <thead>
+                    <tr>
+                        <th>N° CORRELATIVO</th>
+                        <th>FECHA</th>
+                        <th>RUC</th>
+                        <th>RAZON SOCIAL</th>
+                        <th>COMPROBANTE</th>
+                        <th>MONTO</th>
+                        <th>IGV</th>
+                        <th>TOTAL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for registro in registros_compras %}
+                    <tr>
+                        <td>{{ registro.numero_correlativo }}</td>
+                        <td>{{ registro.fecha.strftime('%Y-%m-%d') }}</td>
+                        <td class="text-align" style="text-align: center;">{{ registro.documento_cliente }}</td>
+                        <td class="text-align" style="text-align: left;">{{ registro.nombre_cliente }}</td>
+                        <td class="text-align" style="text-align: left;width: 50px;">{{ registro.num_comprobante }}</td>
+                        <td class="text-end">{{ registro.importe | round(2) }}</td>
+                        <td class="text-end">{{ registro.igv | round(2) }}</td>
+                        <td class="text-end">{{ registro.total | round(2) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="5" style="text-align: right; font-weight: bold; color: #000; font-size: 14px;">
+                            TOTAL (S/)</th>
+                        <th style="font-weight: bold; font-size: 14px; color: #000;" class="text-end">
+                            {{ totalesCompras.total_importe | round(2) }}</th>
+                        <th style="font-weight: bold; font-size: 14px; color: #000;" class="text-end">
+                            {{ totalesCompras.total_igv | round(2) }}</th>
+                        <th style="font-weight: bold; font-size: 14px; color: #000;" class="text-end">
+                            {{ totalesCompras.total_general | round(2) }}</th>
+                    </tr>
+                </tfoot>
+            </table>
         </div>
     </div>
+</div>
+
 
     <!-- Tab: Libro Ventas -->
     <div class="tab-pane fade" id="libro-ventas">

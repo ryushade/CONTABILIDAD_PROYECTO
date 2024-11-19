@@ -1,8 +1,8 @@
 from app.models.conexion import obtener_conexion
 from flask import json, abort, request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app, send_from_directory
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
-from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, obtener_id_cuenta, obtener_regla_por_id, obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas,obtener_asientos_agrupados_excel,obtener_registro_compras
-from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas, obtener_asientos_agrupados_excel, obtener_libro_caja, obtener_libro_caja_cuenta_corriente, actualizar_rol_usuario
+from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, obtener_id_cuenta, obtener_regla_por_id, obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta_contable, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas,obtener_asientos_agrupados_excel,obtener_registro_compras
+from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta_contable, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas, obtener_asientos_agrupados_excel, obtener_libro_caja, obtener_libro_caja_cuenta_corriente, actualizar_rol_usuario
 from functools import wraps
 from flask import current_app as app
 from . import accounting_bp
@@ -218,7 +218,7 @@ def reportes():
     )
 
 
-
+from flask import get_flashed_messages
 import app.models.contable_models as conta
 @accounting_bp.route('/cuentas', methods=['GET'])
 @jwt_required()
@@ -234,6 +234,8 @@ def cuentas():
     total_pages = (total_cuentas + per_page - 1) // per_page
     # Obtener el mensaje de error
     error_message = session.pop('error_message', None)
+    error_eliminar = get_flashed_messages(category_filter=['error'])
+    success_messages = get_flashed_messages(category_filter=['success'])
     print(error_message)
     return render_template(
         'contable/cuentas/cuentas2.html',
@@ -246,7 +248,9 @@ def cuentas():
         naturaleza=naturaleza,
         error_message = error_message,
         max=max,
-        min=min
+        min=min,
+        error_eliminar = error_eliminar,
+        success_messages = success_messages
     )
 
 
@@ -660,8 +664,13 @@ def eliminar_usu(usuario_id):
 
 @accounting_bp.route('/cuentas/eliminar/<int:cuenta_id>', methods=['POST'])
 def eliminar_cuenta(cuenta_id):
-    eliminar_cuenta(cuenta_id)
-    return redirect(url_for('contable.cuentas'))
+    try:
+        eliminar_cuenta_contable(cuenta_id)
+        flash("Cuenta eliminada correctamente", category='success')
+        return redirect(url_for('contable.cuentas'))
+    except Exception as e:
+        flash(str(e), category='error')  # Asegúrate de especificar una categoría adecuada
+        return redirect(url_for('contable.cuentas'))
 
 @accounting_bp.route('/reglas/eliminar/<int:regla_id>', methods=['POST'])
 def eliminar_regla(regla_id):
@@ -1399,7 +1408,7 @@ def exportar_registro_compras_excel():
         worksheet[f'J{current_row}'] = registro["nombre_cliente"]     # Razón social
         worksheet[f'K{current_row}'] = registro["importe"]           # Importe
         worksheet[f'L{current_row}'] = registro["igv"]
-        worksheet[f'M{current_row}'] = ''
+        worksheet[f'Z{current_row}'] = ''
         worksheet[f'N{current_row}'] = ''  # Base imponible exonerada
         worksheet[f'O{current_row}'] = ''  # Base imponible inafecta
         worksheet[f'P{current_row}'] = ''  # Otros conceptos
@@ -1407,7 +1416,7 @@ def exportar_registro_compras_excel():
         worksheet[f'Q{current_row}'] = ''  # Impuesto ISC (si aplica)
         worksheet[f'R{current_row}'] = ''           # Total
         worksheet[f'S{current_row}'] = ''  # Valor de adquisición no gravada
-        worksheet[f'T{current_row}'] = registro["total"]
+        worksheet[f'M{current_row}'] = registro["total"]
         
         current_row += 1
 
@@ -1417,7 +1426,7 @@ def exportar_registro_compras_excel():
     worksheet[f'H{total_row}'] = 'Totales'
     worksheet[f'K{total_row}'] = totales["total_importe"]
     worksheet[f'L{total_row}'] = totales["total_igv"]
-    worksheet[f'T{total_row}'] = totales["total_general"]
+    worksheet[f'M{total_row}'] = totales["total_general"]
 
     # Guardar el libro actualizado en el buffer
     workbook.save(output)
