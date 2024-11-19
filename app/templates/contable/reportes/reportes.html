@@ -200,6 +200,9 @@
 
             <p class="text-muted small mb-2">Consulta los asientos contables de tu empresa en el periodo de tiempo
                 que elijas.</p>
+            <div id="error-message-diario" style="display: none; color: red; font-weight: bold; margin-bottom: 20px;">
+            </div>
+
             <div class="container-fluid">
                 <form id="filterForm" class="row g-3 mb-3" method="GET" action="{{ url_for('contable.reportes') }}">
                     <!-- Primera columna -->
@@ -358,6 +361,9 @@
 
             <p class="text-muted small mb-3">Consulta el detalle de los movimientos registrados, clasificados por
                 cuentas, mostrando los debe, haber y saldos</p>
+            <div id="error-message-mayor" style="display: none; color: red; font-weight: bold; margin-bottom: 20px;">
+            </div>
+
             <div class="container-fluid">
                 <form id="filterFormMayor" class="row g-3 mb-3" method="GET" action="{{ url_for('contable.reportes') }}">
                     <input type="hidden" name="active_tab" value="libro-mayor" id="activeTabInput">
@@ -438,24 +444,24 @@
                         {% for detalle in cuenta.detalles %}
                         <tr>
                             {% if loop.first %}
-                            <td class="text-align" rowspan="{{ cuenta.detalles|length }}"
-                                style="width: 100px;text-align: right;">{{ codigo_cuenta }}</td>
-                            <td class="text-align" style="text-align: left; width: 250px;"
-                                rowspan="{{ cuenta.detalles|length }}">{{ cuenta.nombre_cuenta }}</td>
+                            <td rowspan="{{ cuenta.detalles|length }}">{{ codigo_cuenta }}</td>
+                            <td class="text-align" style="text-align: left;" rowspan="{{ cuenta.detalles|length }}">{{
+                                cuenta.nombre_cuenta }}</td>
                             {% endif %}
-                            <td style="width: 100px;">{{ detalle.fecha_asiento }}</td>
-                            <td class="text-end" style="width: 100px;">{{ detalle.debe | round(2) if detalle.debe is not
-                                none else '-' }}</td>
-                            <td class="text-end" style="width: 100px;">{{ detalle.haber | round(2) if detalle.haber is
-                                not none else '-' }}
+                            <td>{{ detalle.fecha_asiento }}</td>
+                            <td class="text-end">{{ detalle.debe | round(2) if detalle.debe is not none else '-' }}</td>
+                            <td class="text-end">{{ detalle.haber | round(2) if detalle.haber is not none else '-' }}
                             </td>
                             {% if loop.first %}
-                            <td style="width: 100px;" class="text-center align-middle"
-                                rowspan="{{ cuenta.detalles|length }}">
+                            <td class="text-align" style="text-align: right;" rowspan="{{ cuenta.detalles|length }}">
                                 <span tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
-                                    data-bs-content="{% if cuenta.saldo >= 0 %}Saldo Acreedor: S/ {{ cuenta.saldo | round(2) }}{% else %}Saldo Deudor: S/ {{ cuenta.saldo | abs | round(2) }}{% endif %}">
-                                    {{ cuenta.saldo | round(2) }}
-                                </span>
+                                    data-bs-content="{% if cuenta.saldo >= 0 %}
+                                                    Saldo Acreedor: S/ {{ cuenta.saldo | round(2) }}
+                                                {% else %}
+                                                    Saldo Deudor: S/ {{ cuenta.saldo | abs | round(2) }}
+                                                {% endif %}">
+                                    {% if cuenta.saldo < 0 %} ({{ cuenta.saldo | abs | round(2) }}) {% else %} {{
+                                        cuenta.saldo | round(2) }} {% endif %} </span>
                             </td>
                             {% endif %}
                         </tr>
@@ -486,151 +492,150 @@
         </div>
     </div>
 
-    <!-- Tab: Libro Compras -->
-    <div class="tab-pane fade" id="libro-compras">
-        <div class="card bg-white rounded custom-shadow p-4" style="padding: 1rem !important;">
-            <header class="d-flex justify-content-between align-items-center mb-2">
-                <h1 class="h4 mb-0 d-flex align-items-center" style="font-weight: bold;">
-                    LIBRO REGISTRO DE COMPRAS
-                </h1>
+<!-- Tab: Libro Compras -->
+<div class="tab-pane fade {% if active_tab == 'libro-compras' %}show active{% endif %}" id="libro-compras">
+    <div class="card bg-white rounded custom-shadow p-4" style="padding: 1rem !important;">
+        <header class="d-flex justify-content-between align-items-center mb-2">
+            <h1 class="h4 mb-0 d-flex align-items-center" style="font-weight: bold;">
+                LIBRO REGISTRO DE COMPRAS
+            </h1>
 
-                <div class="dropdown me-2">
-                    <button class="btn btn-light border dropdown-toggle" type="button" id="dropdownMenuButton"
-                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Exportar datos
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item d-flex flex-column" href="#" onclick="openModalDownloadExcelCompras()">
-                            <span class="d-flex align-items-center">
-                                <i class="fa fa-file-excel mr-2"></i>
-                                <strong>Exportar a Excel</strong>
-                            </span>
-                        </a>
-                        <a class="dropdown-item d-flex flex-column" href="#" onclick="openModalDownloadPDFCompras()">
-                            <span class="d-flex align-items-center">
-                                <i class="fa fa-file-pdf mr-2" style="color: red;"></i>
-                                <strong>Exportar a PDF</strong>
-                            </span>
-                        </a>
+            <div class="dropdown me-2">
+                <button class="btn btn-light border dropdown-toggle" type="button" id="dropdownMenuButton"
+                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Exportar datos
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item d-flex flex-column" href="#" onclick="openModalDownloadExcelCompras()">
+                        <span class="d-flex align-items-center">
+                            <i class="fa fa-file-excel mr-2"></i>
+                            <strong>Exportar a Excel</strong>
+                        </span>
+                    </a>
+                    <a class="dropdown-item d-flex flex-column" href="#" onclick="openModalDownloadPDFCompras()">
+                        <span class="d-flex align-items-center">
+                            <i class="fa fa-file-pdf mr-2" style="color: red;"></i>
+                            <strong>Exportar a PDF</strong>
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <p class="text-muted small mb-2">Registro detallado de todas las adquisiciones realizadas por la
+            empresa,
+            utilizado para control de gastos y cálculo de créditos fiscales.</p>
+        <div class="container-fluid">
+
+            <!-- Formulario con el campo oculto para mantener el tab activo -->
+            <form class="row g-3 mb-3 align-items-end" method="GET" action="{{ url_for('contable.reportes') }}">
+                <input type="hidden" name="active_tab" value="libro-compras" id="activeTabInputCompras">
+                <div class="col-4 col-md-3">
+                    <style>
+                        .required-asterisk {
+                            color: red;
+                        }
+                    </style>
+
+                    <label for="daterange" class="form-label" style="font-size: 14px;">
+                        Fecha <span class="required-asterisk">*</span>
+                    </label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">
+                            <i class="fas fa-calendar-alt"></i>
+                        </span>
+                        <input type="text" class="form-control" id="daterange" name="daterange"
+                            placeholder="Selecciona mes y año" aria-label="Fecha" aria-describedby="basic-addon1"
+                            value="{{ request.args.get('daterange', '') }}">
                     </div>
                 </div>
-            </header>
+                <div class="col-lg-2 d-flex justify-content-end" style="margin-left: auto;">
+                </div>
+            </form>
+        </div>
+        <div class="table-container mt-2 mb-2" style="border: 1px solid #ccc; margin-top: -0.9rem !important;">
+            <style>
+                /* Estilo de hover para resaltar la fila */
+                #tabla_compras tr:hover {
+                    background-color: #e4ebf7;
+                }
 
+                #tabla_caja tr:hover {
+                    background-color: #e4ebf7;
+                }
 
-            <p class="text-muted small mb-2">Registro detallado de todas las adquisiciones realizadas por la
-                empresa,
-                utilizado para control de gastos y cálculo de créditos fiscales.</p>
-            <div class="container-fluid">
+                #tabla_corriente tr:hover {
+                    background-color: #e4ebf7;
+                }
 
-                <form class="row g-3 mb-3 align-items-end">
-                    <div class="col-4 col-md-3">
-                        <style>
-                            .required-asterisk {
-                                color: red;
-                            }
-                        </style>
+                /* Ajuste de padding para filas compactas */
+                table {
+                    width: 100%;
+                    font-size: 13px;
+                    border: #000;
+                }
 
-                        <label for="daterange" class="form-label" style="font-size: 14px;">
-                            Fecha <span class="required-asterisk">*</span>
-                        </label>
-                        <div class="input-group mb-3">
-                            <span class="input-group-text" id="basic-addon1">
-                                <i class="fas fa-calendar-alt"></i>
-                            </span>
-                            <input type="text" class="form-control" id="daterange" placeholder="Selecciona mes y año"
-                                aria-label="Fecha" aria-describedby="basic-addon1">
-                        </div>
-                    </div>
+                th,
+                td {
+                    padding: 20px 10px;
+                    /* Ajuste del padding para reducir el tamaño de las filas */
+                    font-size: 13px;
+                }
 
-                    <div class="col-lg-2 d-flex justify-content-end" style="margin-left: auto;">
+                th {
+                    font-weight: bold;
+                    background-color: #f8f9fa;
+                    text-align: center;
+                }
 
-                    </div>
-                </form>
-            </div>
-            <div class="table-container mt-2 mb-2" style="border: 1px solid #ccc; margin-top: -0.9rem !important;">
-                <style>
-                    /* Estilo de hover para resaltar la fila */
-                    #tabla_compras tr:hover {
-                        background-color: #e4ebf7;
-                    }
-
-                    #tabla_caja tr:hover {
-                        background-color: #e4ebf7;
-                    }
-
-                    #tabla_corriente tr:hover {
-                        background-color: #e4ebf7;
-                    }
-
-                    /* Ajuste de padding para filas compactas */
-                    table {
-                        width: 100%;
-                        font-size: 13px;
-                        border: #000;
-                    }
-
-                    th,
-                    td {
-                        padding: 20px 10px;
-                        /* Ajuste del padding para reducir el tamaño de las filas */
-                        font-size: 13px;
-                    }
-
-                    th {
-                        font-weight: bold;
-                        background-color: #f8f9fa;
-                        text-align: center;
-                    }
-
-                    td {
-                        text-align: center;
-                    }
-                </style>
-                <table id="tabla_compras">
-                    <thead>
-                        <tr>
-                            <th>N° CORRELATIVO</th>
-                            <th>FECHA</th>
-                            <th>RUC</th>
-                            <th>RAZON SOCIAL</th>
-                            <th>COMPROBANTE</th>
-                            <th>MONTO</th>
-                            <th>IGV</th>
-                            <th>TOTAL</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for registro in registros_compras %}
-                        <tr>
-                            <td>{{ registro.numero_correlativo }}</td>
-                            <td>{{ registro.fecha.strftime('%Y-%m-%d') }}</td>
-                            <td class="text-align" style="text-align: center;">{{ registro.documento_cliente }}</td>
-                            <td class="text-align" style="text-align: left;">{{ registro.nombre_cliente }}</td>
-                            <td class="text-align" style="text-align: left;width: 50px;">{{ registro.num_comprobante }}
-                            </td>
-                            <td class="text-end">{{ registro.importe | round(2) }}</td>
-                            <td class="text-end">{{ registro.igv | round(2) }}</td>
-                            <td class="text-end">{{ registro.total | round(2) }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th colspan="5" style="text-align: right; font-weight: bold; color: #000; font-size: 14px;">
-                                TOTAL (S/)</th>
-                            <th style="font-weight: bold; font-size: 14px; color: #000;" class="text-end">{{
-                                totalesCompras.total_importe | round(2) }}</th>
-                            <th style="font-weight: bold; font-size: 14px; color: #000;" class="text-end">{{
-                                totalesCompras.total_igv
-                                | round(2) }}</th>
-                            <th style="font-weight: bold; font-size: 14px; color: #000;" class="text-end">{{
-                                totalesCompras.total_general | round(2) }}</th>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
+                td {
+                    text-align: center;
+                }
+            </style>
+            <table id="tabla_compras">
+                <thead>
+                    <tr>
+                        <th>N° CORRELATIVO</th>
+                        <th>FECHA</th>
+                        <th>RUC</th>
+                        <th>RAZON SOCIAL</th>
+                        <th>COMPROBANTE</th>
+                        <th>MONTO</th>
+                        <th>IGV</th>
+                        <th>TOTAL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for registro in registros_compras %}
+                    <tr>
+                        <td>{{ registro.numero_correlativo }}</td>
+                        <td>{{ registro.fecha.strftime('%Y-%m-%d') }}</td>
+                        <td class="text-align" style="text-align: center;">{{ registro.documento_cliente }}</td>
+                        <td class="text-align" style="text-align: left;">{{ registro.nombre_cliente }}</td>
+                        <td class="text-align" style="text-align: left;width: 50px;">{{ registro.num_comprobante }}</td>
+                        <td class="text-end">{{ registro.importe | round(2) }}</td>
+                        <td class="text-end">{{ registro.igv | round(2) }}</td>
+                        <td class="text-end">{{ registro.total | round(2) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="5" style="text-align: right; font-weight: bold; color: #000; font-size: 14px;">
+                            TOTAL (S/)</th>
+                        <th style="font-weight: bold; font-size: 14px; color: #000;" class="text-end">
+                            {{ totalesCompras.total_importe | round(2) }}</th>
+                        <th style="font-weight: bold; font-size: 14px; color: #000;" class="text-end">
+                            {{ totalesCompras.total_igv | round(2) }}</th>
+                        <th style="font-weight: bold; font-size: 14px; color: #000;" class="text-end">
+                            {{ totalesCompras.total_general | round(2) }}</th>
+                    </tr>
+                </tfoot>
+            </table>
         </div>
     </div>
+</div>
+
 
     <!-- Tab: Libro Ventas -->
     <div class="tab-pane fade {% if active_tab == 'libro-ventas' %}show active{% endif %}" id="libro-ventas">
@@ -1256,6 +1261,7 @@
     </div>
 </div>
 
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
@@ -1279,6 +1285,7 @@
             dateFormat: "m/Y",
             minDate: "01/1900",
             maxDate: "04/2028",
+            locale: "es",
             plugins: [
                 new monthSelectPlugin({
                     dateFormat: "m/Y",
@@ -1293,6 +1300,8 @@
             }
         });
     });
+
+
 
     document.addEventListener("DOMContentLoaded", function () {
         // Verificar si hay un tab activo especificado en la URL
@@ -1321,6 +1330,7 @@
             dateFormat: "m/Y",
             minDate: "01/1900",
             maxDate: "04/2028",
+            locale: "es",
             plugins: [
                 new monthSelectPlugin({
                     dateFormat: "m/Y",
@@ -1358,6 +1368,7 @@
             dateFormat: "m/Y",
             minDate: "01/1900",
             maxDate: "04/2028",
+            locale: "es",
             plugins: [
                 new monthSelectPlugin({
                     dateFormat: "m/Y",
@@ -1451,10 +1462,66 @@
     }
 
     function downloadExcelMayor() {
-        window.location.href = "{{ url_for('contable.exportar_libro_mayor_excel') }}";
-        closeModalDownloadExcelMayor();
+
+        const errorContainer = document.getElementById('error-message-mayor');
+        if (errorContainer) {
+            errorContainer.style.display = 'none';
+            errorContainer.textContent = '';
+        }
+
+        const dateRangeElement = document.getElementById('daterangemayor');
+        const dateRange = dateRangeElement ? dateRangeElement.value : '';
+
+        const url = "{{ url_for('contable.exportar_libro_mayor_excel') }}" + `?daterangemayor=${encodeURIComponent(dateRange)}`;
+
+        // Mostrar el indicador de carga (opcional)
+        // showLoadingIndicator();
+
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+        })
+            .then(response => {
+                if (response.headers.get('Content-Type').includes('application/json')) {
+                    // La respuesta es JSON, significa que hay un error
+                    return response.json().then(data => {
+                        // Mostrar el mensaje de error
+                        showErrorMayor(data.error);
+                    });
+                } else if (response.ok) {
+                    // La respuesta es un archivo, descargarlo
+                    return response.blob().then(blob => {
+                        const link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = 'libro_mayor.xlsx';
+                        link.click();
+                    });
+                } else {
+                    // Otro tipo de error
+                    showErrorMayor('Ocurrió un error al exportar el archivo.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showErrorMayor('Ocurrió un error al exportar el archivo.');
+            })
+            .finally(() => {
+                // Ocultar el indicador de carga (opcional)
+                // hideLoadingIndicator();
+                closeModalDownloadExcelMayor();
+            });
     }
 
+    function showErrorMayor(message) {
+        // Obtener el contenedor del mensaje de error
+        const errorContainer = document.getElementById('error-message-mayor');
+        if (errorContainer) {
+            errorContainer.textContent = message;
+            errorContainer.style.display = 'block';
+        }
+    }
     function downloadPDFMayor() {
         window.location.href = "{{ url_for('contable.exportar_libro_mayor_pdf') }}";
         closeModalDownloadPDFMayor();
@@ -1474,10 +1541,75 @@
     }
 
     function downloadExcel() {
-        window.location.href = "{{ url_for('contable.exportar_libro_diario_excel') }}";
-        closeModalDownloadExcel();
+        // Ocultar mensaje de error anterior
+        const errorContainer = document.getElementById('error-message-diario');
+        if (errorContainer) {
+            errorContainer.style.display = 'none';
+            errorContainer.textContent = '';
+        }
+
+        const tipoRegistroElement = document.getElementById('tipo-registro');
+        const dateRangeElement = document.getElementById('daterange');
+
+        const tipoRegistro = tipoRegistroElement ? tipoRegistroElement.value : 'Todas';
+        const dateRange = dateRangeElement ? dateRangeElement.value : '';
+
+        console.log('tipoRegistro:', tipoRegistro);
+        console.log('dateRange:', dateRange);
+
+        const url = "{{ url_for('contable.exportar_libro_diario_excel') }}" + `?tipo_registro=${encodeURIComponent(tipoRegistro)}&daterange=${encodeURIComponent(dateRange)}`;
+
+        console.log('URL:', url);
+
+        // Mostrar el indicador de carga (opcional)
+        // showLoadingIndicator();
+
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+        })
+            .then(response => {
+                const contentType = response.headers.get('Content-Type');
+                if (contentType && contentType.includes('application/json')) {
+                    // La respuesta es JSON, significa que hay un error
+                    return response.json().then(data => {
+                        // Mostrar el mensaje de error
+                        showErrorDiario(data.error);
+                    });
+                } else if (response.ok) {
+                    // La respuesta es un archivo, descargarlo
+                    return response.blob().then(blob => {
+                        const link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = 'libro_diario.xlsx';
+                        link.click();
+                    });
+                } else {
+                    // Otro tipo de error
+                    showErrorDiario('Ocurrió un error al exportar el archivo.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showErrorDiario('Ocurrió un error al exportar el archivo.');
+            })
+            .finally(() => {
+                // Ocultar el indicador de carga (opcional)
+                // hideLoadingIndicator();
+                closeModalDownloadExcel();
+            });
     }
 
+    function showErrorDiario(message) {
+        // Obtener el contenedor del mensaje de error
+        const errorContainer = document.getElementById('error-message-diario');
+        if (errorContainer) {
+            errorContainer.textContent = message;
+            errorContainer.style.display = 'block';
+        }
+    }
     function closeModalDownloadPDF() {
         document.getElementById("downloadPDFModal").style.display = "none";
     }

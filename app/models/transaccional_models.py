@@ -683,46 +683,45 @@ def generarPDF(fecha, idComprobante, id_cliente, venta_data, igv, monto_total):
         sheet['A9'] = cliente['nombre_completo']  # Nombre del cliente
         sheet['A10'] = cliente['direccion']  # Dirección del cliente
 
-        # Asumimos que los detalles comienzan en la fila 13
-        fila_inicial = 13
-        print("data del pdf:", venta_data)
-
-        # Estilo de borde lateral
+        # Estilo de borde lateral y formato de número
         thin_border = Border(left=Side(style='thin'), right=Side(style='thin'))
-
-        # Calcular la fila base para los totales
-        fila_base_totales = 18  # Fila inicial para Subtotal si no hay productos adicionales
+        number_format = '0.00'  # Formato para dos decimales
 
         # Iterar sobre cada producto en venta_data
+        fila_inicial = 13
+        fila_base_totales = 18  # Fila inicial para Subtotal si no hay productos adicionales
         for i, producto in enumerate(venta_data):
             fila_actual = fila_inicial + i
-            sheet.insert_rows(fila_actual)  # Insertar una fila nueva para cada producto
+            sheet.insert_rows(fila_actual)
             
-            # Establecer datos del producto
-            sheet[f'A{fila_actual}'] = f"{producto['nombre']} - cantidad: {producto['cantidad']} - precio un.: S/. {producto['precio']}"  # Descripción
-            sheet[f'F{fila_actual}'] = producto['subtotal']  # Subtotal en la columna F
+            # Establecer datos del producto y formato
+            sheet[f'A{fila_actual}'] = f"{producto['nombre']} - cantidad: {producto['cantidad']} - precio un.: S/. {producto['precio']}"
+            sheet[f'F{fila_actual}'] = producto['subtotal']
+            sheet[f'F{fila_actual}'].number_format = number_format
             
-            # Aplicar bordes a las celdas de la fila insertada
+            # Aplicar bordes
             for col in ['A', 'F']:
                 cell = sheet[f'{col}{fila_actual}']
                 cell.border = thin_border
 
-            fila_base_totales += 1  # Ajustar la fila base para los totales según los productos
+            fila_base_totales += 1
 
-        # Ajustar las filas de subtotal, IGV y total
+        # Ajustar las filas de subtotal, IGV y total con formato numérico
         fila_subtotal = fila_base_totales
-        fila_impuesto = fila_subtotal + 2  # Dinámico: siempre dos filas después de los comentarios que comienzan en la fila 20
-        fila_total = fila_impuesto + 2  # Dinámico: siempre cuatro filas después de los comentarios
+        fila_impuesto = fila_subtotal + 2
+        fila_total = fila_impuesto + 2
+        
+        sheet[f'F{fila_subtotal}'] = float(monto_total) - float(igv)
+        sheet[f'F{fila_subtotal}'].number_format = number_format
+        
+        sheet[f'F{fila_impuesto}'] = float(igv)
+        sheet[f'F{fila_impuesto}'].number_format = number_format
+        
+        sheet[f'F{fila_total}'] = float(monto_total)
+        sheet[f'F{fila_total}'].number_format = number_format
 
-        # Escribir los totales en las posiciones adecuadas
-        sheet[f'F{fila_subtotal}'] = float(monto_total) - float(igv)  # Subtotal
-        sheet[f'F{fila_impuesto}'] = float(igv)  # IGV
-        sheet[f'F{fila_total}'] = float(monto_total)  # Total
-
-        # Guardar el archivo con los cambios
+        # Guardar y convertir a PDF
         workbook.save('./app/static/PDF/factura2_copia.xlsx')
-
-        ## PDFF
         workbook = Workbook()
         workbook.LoadFromFile("./app/static/PDF/factura2_copia.xlsx")
         sheet = workbook.Worksheets['Factura']

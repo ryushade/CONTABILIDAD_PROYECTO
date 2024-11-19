@@ -184,15 +184,43 @@ def obtener_total_cuentas(tipo_cuenta=None, naturaleza=None):
 
 
 
-def eliminar_cuenta(cuenta_id):
+def eliminar_cuenta_contable(cuenta_id):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
-            sql = "DELETE FROM cuenta WHERE id_cuenta = %s"
+            # Verificar si la cuenta está siendo usada en reglas de contabilización
+            sql_validacion_reglas = """
+                SELECT COUNT(*) AS conteo
+                FROM reglas_contabilizacion
+                WHERE cuenta_debe = %s OR cuenta_haber = %s;
+            """
+            cursor.execute(sql_validacion_reglas, (cuenta_id, cuenta_id))
+            if cursor.fetchone()['conteo'] > 0:
+                print("La cuenta está siendo utilizada en las")
+                raise ValueError("La cuenta está siendo utilizada en las reglas de contabilización y no puede ser eliminada.")
+
+            # Verificar si la cuenta es cuenta padre
+            sql_validacion_padre = """
+                SELECT COUNT(*) AS conteo
+                FROM cuenta
+                WHERE cuenta_padre = %s;
+            """
+            cursor.execute(sql_validacion_padre, (cuenta_id,))
+            if cursor.fetchone()['conteo'] > 0:
+                print("La cuenta es una cuenta padre y")
+                raise ValueError("La cuenta es una cuenta padre y no puede ser eliminada.")
+
+            # Si pasa las validaciones, proceder a desactivar la cuenta
+            sql = "UPDATE cuenta SET estado_cuenta = 0 WHERE id_cuenta = %s"
             cursor.execute(sql, (cuenta_id,))
             conexion.commit()
+
+    except Exception as e:
+        conexion.rollback()  # Asegura que cualquier cambio parcial sea revertido
+        print(f"Error al intentar eliminar la cuenta: {e}")
+        raise  # Re-lanza la excepción para manejo adicional si es necesario
     finally:
-        conexion.close()
+        conexion.close()  # Asegura que la conexión se cierre apropiadamente
 
 
 # Backend - usuarios

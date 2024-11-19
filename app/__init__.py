@@ -63,7 +63,6 @@ def create_app():
 
     @app.route('/inicio')
     @jwt_required()  # Protección con JWT en la ruta de inicio
-    @nocache
     def inicio():
         return render_template('index.html')    
 
