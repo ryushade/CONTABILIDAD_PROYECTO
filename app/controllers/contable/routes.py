@@ -890,7 +890,6 @@ def exportar_libro_mayor_excel():
     daterangemayor = request.args.get('daterangemayor', '')
     start_date, end_date = None, None
 
-    # Procesar rango de fechas y determinar el mes para B3
     mes_anio_excel = None  # Variable para guardar el valor de B3
 
     # Procesar rango de fechas
