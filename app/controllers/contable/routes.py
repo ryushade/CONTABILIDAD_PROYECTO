@@ -1399,7 +1399,7 @@ def exportar_registro_compras_excel():
         worksheet[f'J{current_row}'] = registro["nombre_cliente"]     # Razón social
         worksheet[f'K{current_row}'] = registro["importe"]           # Importe
         worksheet[f'L{current_row}'] = registro["igv"]
-        worksheet[f'M{current_row}'] = ''
+        worksheet[f'Z{current_row}'] = ''
         worksheet[f'N{current_row}'] = ''  # Base imponible exonerada
         worksheet[f'O{current_row}'] = ''  # Base imponible inafecta
         worksheet[f'P{current_row}'] = ''  # Otros conceptos
@@ -1407,7 +1407,7 @@ def exportar_registro_compras_excel():
         worksheet[f'Q{current_row}'] = ''  # Impuesto ISC (si aplica)
         worksheet[f'R{current_row}'] = ''           # Total
         worksheet[f'S{current_row}'] = ''  # Valor de adquisición no gravada
-        worksheet[f'T{current_row}'] = registro["total"]
+        worksheet[f'M{current_row}'] = registro["total"]
         
         current_row += 1
 
@@ -1417,7 +1417,7 @@ def exportar_registro_compras_excel():
     worksheet[f'H{total_row}'] = 'Totales'
     worksheet[f'K{total_row}'] = totales["total_importe"]
     worksheet[f'L{total_row}'] = totales["total_igv"]
-    worksheet[f'T{total_row}'] = totales["total_general"]
+    worksheet[f'M{total_row}'] = totales["total_general"]
 
     # Guardar el libro actualizado en el buffer
     workbook.save(output)
