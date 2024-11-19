@@ -75,6 +75,9 @@ def login():
             response = make_response(redirect(url_for('inicio')))
             set_access_cookies(response, access_token)
             session['username'] = username
+            response.set_cookie('username', username, httponly=True)  # Guarda el username en una cookie
+            session['username'] = username
+            print(session.get('username'))
             return response
         else:
             # Si el inicio de sesión falla, redirige con un mensaje de error
@@ -406,6 +409,7 @@ def upload_photo():
         return redirect(url_for('inicio'))
 
     username = request.cookies.get('username', None)
+    print(username)
     if not username:
         return redirect(url_for('inicio'))  # Si no hay cookie, redireccionar al inicio
 
