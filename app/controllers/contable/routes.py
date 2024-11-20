@@ -9,6 +9,7 @@ from . import accounting_bp
 import pandas as pd
 import io
 import os
+import re
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font, Alignment, PatternFill
 from datetime import datetime
@@ -134,92 +135,61 @@ def reportes():
     active_tab = request.args.get('active_tab', 'libro-diario')
     tipo_registro = request.args.get('tipo_registro', 'Todas')
     daterange = request.args.get('daterange', '')
-    daterange_mayor = request.args.get('daterangemayor', '')  # Segundo rango de fechas específico para el Libro Mayor
+    daterange_mayor = request.args.get('daterangemayor', '')
     daterange_caja = request.args.get('daterangecaja', '')
     daterange_venta = request.args.get('daterangeventa', '')
     start_date, end_date = None, None
     start_date_mayor, end_date_mayor = None, None
     start_date_caja, end_date_caja = None, None
     start_date_venta, end_date_venta = None, None
-    # Procesa el rango de fechas para el Libro Diario
-    if daterange:
+
+    def last_day_of_month(any_day):
+        next_month = any_day.replace(day=28) + timedelta(days=4)
+        return next_month - timedelta(days=next_month.day)
+
+    def parse_daterange(daterange):
         try:
-            dates = daterange.split(' to ')
+            # Limpia espacios adicionales y remueve espacios al inicio y fin
+            daterange_clean = re.sub(r'\s+', ' ', daterange.strip())
+            # Divide por ' to ' o ' a '
+            dates = re.split(r'\s*(to|a)\s*', daterange_clean)
+            # Remueve los separadores del resultado
+            dates = [d for d in dates if d not in ('to', 'a')]
             if len(dates) == 2:
                 start_date = datetime.strptime(dates[0].strip(), '%m/%Y').date()
                 end_date = datetime.strptime(dates[1].strip(), '%m/%Y').date()
-                # Calcular el último día del mes para el segundo mes
-                end_date = end_date.replace(day=1) + timedelta(days=31)
-                end_date = end_date.replace(day=1) - timedelta(days=1)
+                end_date = last_day_of_month(end_date)
             elif len(dates) == 1:
-                # Si solo hay un mes, se usa como inicio y fin del mes
                 start_date = datetime.strptime(dates[0].strip(), '%m/%Y').date()
-                end_date = start_date.replace(day=1) + timedelta(days=31)
-                end_date = end_date.replace(day=1) - timedelta(days=1)
+                end_date = last_day_of_month(start_date)
+            else:
+                start_date = end_date = None
+            return start_date, end_date
         except (ValueError, IndexError) as e:
-            print(f"Error processing date range for Libro Diario: {e}")
+            print(f"Error processing date range: {daterange} - {e}")
+            return None, None
 
-    # Procesa el rango de fechas para el Libro Mayor
+    # Procesar los rangos de fechas utilizando la función parse_daterange
+    if daterange:
+        start_date, end_date = parse_daterange(daterange)
+
     if daterange_mayor:
-        try:
-            dates_mayor = daterange_mayor.split(' to ')
-            if len(dates_mayor) == 2:
-                start_date_mayor = datetime.strptime(dates_mayor[0].strip(), '%m/%Y').date()
-                end_date_mayor = datetime.strptime(dates_mayor[1].strip(), '%m/%Y').date()
-                # Calcular el último día del mes para el segundo mes
-                end_date_mayor = end_date_mayor.replace(day=1) + timedelta(days=31)
-                end_date_mayor = end_date_mayor.replace(day=1) - timedelta(days=1)
-            elif len(dates_mayor) == 1:
-                # Si solo hay un mes, se usa como inicio y fin del mes
-                start_date_mayor = datetime.strptime(dates_mayor[0].strip(), '%m/%Y').date()
-                end_date_mayor = start_date_mayor.replace(day=1) + timedelta(days=31)
-                end_date_mayor = end_date_mayor.replace(day=1) - timedelta(days=1)
-        except (ValueError, IndexError) as e:
-            print(f"Error processing date range for Libro Mayor: {e}")
+        start_date_mayor, end_date_mayor = parse_daterange(daterange_mayor)
 
     if daterange_caja:
-        try:
-            dates_caja = daterange_caja.split(' to ')
-            if len(dates_caja) == 2:
-                start_date_caja = datetime.strptime(dates_caja[0].strip(), '%m/%Y').date()
-                end_date_caja = datetime.strptime(dates_caja[1].strip(), '%m/%Y').date()
-                # Calcular el último día del mes para el segundo mes
-                end_date_caja = end_date_caja.replace(day=1) + timedelta(days=31)
-                end_date_caja = end_date_caja.replace(day=1) - timedelta(days=1)
-            elif len(dates_caja) == 1:
-                # Si solo hay un mes, se usa como inicio y fin del mes
-                start_date_caja = datetime.strptime(dates_caja[0].strip(), '%m/%Y').date()
-                end_date_caja = start_date_caja.replace(day=1) + timedelta(days=31)
-                end_date_caja = end_date_caja.replace(day=1) - timedelta(days=1)
-        except (ValueError, IndexError) as e:
-            print(f"Error processing date range for Libro Caja: {e}")
-    
-    if daterange_venta:
-        try:
-            dates_venta = daterange_venta.split(' to ')
-            if len(dates_venta) == 2:
-                start_date_venta = datetime.strptime(dates_venta[0].strip(), '%m/%Y').date()
-                end_date_venta = datetime.strptime(dates_venta[1].strip(), '%m/%Y').date()
-                # Calcular el último día del mes para el segundo mes
-                end_date_venta = end_date_venta.replace(day=1) + timedelta(days=31)
-                end_date_venta = end_date_venta.replace(day=1) - timedelta(days=1)
-            elif len(dates_venta) == 1:
-                # Si solo hay un mes, se usa como inicio y fin del mes
-                start_date_venta = datetime.strptime(dates_venta[0].strip(), '%m/%Y').date()
-                end_date_venta = start_date_venta.replace(day=1) + timedelta(days=31)
-                end_date_venta = end_date_venta.replace(day=1) - timedelta(days=1)
-        except (ValueError, IndexError) as e:
-            print(f"Error processing date range for Libro de Ventas: {e}")
+        start_date_caja, end_date_caja = parse_daterange(daterange_caja)
 
-    # Obtiene los datos aplicando el filtro de fechas correspondiente
+    if daterange_venta:
+        start_date_venta, end_date_venta = parse_daterange(daterange_venta)
+
+    # Llamar a las funciones para obtener los datos, pasando las fechas procesadas
     asientos, totales = obtener_asientos_agrupados(tipo_registro, start_date, end_date)
     libro_mayor_data, total_debe, total_haber = obtener_libro_mayor_agrupado_por_fecha(start_date_mayor, end_date_mayor)
     lista_libro_caja, total_caja = obtener_libro_caja(start_date_caja, end_date_caja)
     lista_libro_caja_cuenta_corriente, total_caja_corriente = obtener_libro_caja_cuenta_corriente()
-
-    registro_venta_data, totale = obtener_registro_ventas(start_date_venta,end_date_venta)
+    registro_venta_data, totale = obtener_registro_ventas(start_date_venta, end_date_venta)
     registro_compra_data, totales_compra = obtener_registro_compras()
-    
+
     return render_template(
         'contable/reportes/reportes.html', 
         asientos=asientos, 
@@ -236,7 +206,6 @@ def reportes():
         lista_libro_caja_cuenta_corriente=lista_libro_caja_cuenta_corriente, 
         total_caja_corriente=total_caja_corriente,
         active_tab=active_tab
-        
     )
 
 
