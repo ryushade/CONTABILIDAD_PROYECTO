@@ -678,6 +678,12 @@ def ldpf():
 @jwt_required()
 def exportar_libro_diario_excel():
     import re  # Asegúrate de importar 're' para expresiones regulares
+    import openpyxl
+    import os
+    from flask import current_app, send_file, request
+    from io import BytesIO
+    from datetime import datetime, timedelta
+    from openpyxl.styles import Alignment
     template_path = os.path.join(current_app.root_path, 'templates', 'contable', 'plantillas', 'L,D.xlsx')
     
     if not os.path.exists(template_path):
@@ -885,6 +891,14 @@ def exportar_libro_diario_excel():
 
     return send_file(output, download_name="libro_diario.xlsx", as_attachment=True)
 
+from flask import current_app, send_file, request, jsonify, make_response
+from io import BytesIO
+from datetime import datetime, timedelta
+import openpyxl
+from openpyxl.styles import Alignment
+import os
+import re
+
 @accounting_bp.route('/exportar_libro_mayor_excel', methods=['GET'])
 @jwt_required()
 def exportar_libro_mayor_excel():
@@ -903,8 +917,11 @@ def exportar_libro_mayor_excel():
     # Función para procesar el rango de fechas
     def parse_daterange(daterange):
         try:
+            # Limpiar espacios adicionales
             daterange_clean = re.sub(r'\s+', ' ', daterange.strip())
+            # Dividir por ' to ' o ' a '
             dates = re.split(r'\s*(to|a)\s*', daterange_clean)
+            # Remover los separadores del resultado
             dates = [d for d in dates if d not in ('to', 'a')]
             if len(dates) == 2:
                 start_date = datetime.strptime(dates[0].strip(), '%m/%Y').date()
@@ -915,6 +932,7 @@ def exportar_libro_mayor_excel():
                 mes_anio_excel = start_date.strftime('%m/%Y') + " - " + end_date.strftime('%m/%Y')
             elif len(dates) == 1:
                 start_date = datetime.strptime(dates[0].strip(), '%m/%Y').date()
+                # Ajustar end_date para que sea el último día del mes
                 end_date = start_date.replace(day=1) + timedelta(days=31)
                 end_date = end_date.replace(day=1) - timedelta(days=1)
                 mes_anio_excel = start_date.strftime('%m/%Y')
