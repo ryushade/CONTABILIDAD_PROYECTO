@@ -1274,7 +1274,7 @@ def exportar_registro_ventas_excel():
     worksheet['B5'] = 'Tormenta'     # Razón social
 
     # Iniciar desde la fila 11
-    start_row = 11
+    start_row = 12
     current_row = start_row
 
     for registro in registros_ventas:
@@ -1459,7 +1459,7 @@ def exportar_registro_compras_excel():
     worksheet['B5'] = 'Tormenta'     # Razón social
 
     # Iniciar desde la fila 11
-    start_row = 11
+    start_row = 14
     current_row = start_row
 
     for registro in registros_compras:
