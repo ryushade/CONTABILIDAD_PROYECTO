@@ -874,7 +874,7 @@ def obtener_registro_ventas(start_date=None, end_date=None):
                 SELECT 
                     ROW_NUMBER() OVER (ORDER BY v.id_venta) AS numero_correlativo,
                     v.f_venta AS fecha,
-                    v.f_venta AS fechaVencimiento,
+                    v.f_venta AS fechaV,
                     COALESCE(cl.dni, cl.ruc) AS documento_cliente,
                     COALESCE(CONCAT(cl.nombres, ' ', cl.apellidos), cl.razon_social) AS nombre_cliente,
                     c.num_comprobante AS num_comprobante,
@@ -911,7 +911,7 @@ def obtener_registro_ventas(start_date=None, end_date=None):
             registro_ventas.append({
                 "numero_correlativo": row["numero_correlativo"],
                 "fecha": row["fecha"],
-                "fechaVencimiento": row["fechaVencimiento"],
+                "fechaV": row["fechaV"],
                 "documento_cliente": row["documento_cliente"],
                 "nombre_cliente": row["nombre_cliente"],
                 "num_comprobante": row["num_comprobante"],
@@ -936,76 +936,75 @@ def obtener_registro_ventas(start_date=None, end_date=None):
     finally:
         conexion.close()
 
-def obtener_registro_compras():
+def obtener_registro_compras(start_date=None, end_date=None):
     conexion = obtener_conexion()
     try:
-        with conexion.cursor() as cursor:
-            cursor.execute("""
+        with conexion.cursor(DictCursor) as cursor:
+            # Consulta SQL con filtro de fechas
+            query = """
                 SELECT 
                     ROW_NUMBER() OVER (ORDER BY co.id_compra) AS numero_correlativo,
-                    co.f_compra as fecha,
-                    co.f_compra AS fechaVencimiento,
+                    co.f_compra AS fecha,
+                    co.f_compra AS fechaV,
                     pr.ruc AS documento_cliente,
                     pr.razon_social AS nombre_cliente,
-                    co.nro_comprobante as num_comprobante,
+                    co.nro_comprobante AS num_comprobante,
                     SUM(dc.cantidad * dc.precio) AS importe,
                     SUM(dc.cantidad * dc.precio) * 0.18 AS igv,
                     SUM(dc.cantidad * dc.precio) * 1.18 AS total
                 FROM compra co
                 INNER JOIN detalle_compra dc ON co.id_compra = dc.id_compra
                 INNER JOIN proveedor pr ON pr.id_proveedor = co.id_proveedor
+                WHERE (%(start_date)s IS NULL OR co.f_compra >= %(start_date)s)
+                AND (%(end_date)s IS NULL OR co.f_compra <= %(end_date)s)
                 GROUP BY 
                     co.id_compra
                 ORDER BY 
                     co.id_compra;
-            """)
+            """
+            params = {'start_date': start_date, 'end_date': end_date}
+            cursor.execute(query, params)
             resultados = cursor.fetchall()
 
-        # Inicializar variables para almacenar los totales
-        total_igv = 0.0
-        total_importe = 0.0
-        total_general = 0.0
+        # Inicializar variables para almacenar totales y detalles
+        total_importe_global = Decimal("0.00")
+        total_igv_global = Decimal("0.00")
+        total_general_global = Decimal("0.00")
         registros_compras = []
 
         for row in resultados:
-            # Convertir la fecha a formato datetime si es necesario
-            fecha = row["fecha"]
-            if isinstance(fecha, str):
-                fecha = datetime.strptime(fecha, '%Y-%m-%d')
-            fechaV = row["fechaVencimiento"]
-            if isinstance(fechaV, str):
-                fechaV = datetime.strptime(fechaV, '%Y-%m-%d')
-            
-            # Agregar cada registro a la lista de registros de compras
+            importe = Decimal(row["importe"]) or Decimal("0.00")
+            igv = Decimal(row["igv"]) or Decimal("0.00")
+            total = Decimal(row["total"]) or Decimal("0.00")
+
+            # Agregar detalles de cada registro
             registros_compras.append({
                 "numero_correlativo": row["numero_correlativo"],
-                "fecha": fecha,
-                "fechaV": fechaV,
+                "fecha": row["fecha"],
+                "fechaV": row["fechaV"],
                 "documento_cliente": row["documento_cliente"],
                 "nombre_cliente": row["nombre_cliente"],
                 "num_comprobante": row["num_comprobante"],
-                "importe": float(row["importe"]),
-                "igv": float(row["igv"]),
-                "total": float(row["total"])
+                "importe": float(importe),
+                "igv": float(igv),
+                "total": float(total),
             })
-            
-            # Acumular los totales
-            total_importe += float(row["importe"])
-            total_igv += float(row["igv"])
-            total_general += float(row["total"])
 
-        # Diccionario con los totales
+            # Acumular totales globales
+            total_importe_global += importe
+            total_igv_global += igv
+            total_general_global += total
+
+        # Totales finales en un diccionario
         totales = {
-            "total_importe": total_importe,
-            "total_igv": total_igv,
-            "total_general": total_general
+            "total_importe": float(total_importe_global),
+            "total_igv": float(total_igv_global),
+            "total_general": float(total_general_global),
         }
 
         return registros_compras, totales
     finally:
         conexion.close()
-
-
 
 # xd
 def obtener_libro_caja(start_date=None, end_date=None):

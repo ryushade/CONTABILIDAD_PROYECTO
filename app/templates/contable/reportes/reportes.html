@@ -526,35 +526,41 @@
             <p class="text-muted small mb-2">Registro detallado de todas las adquisiciones realizadas por la
                 empresa,
                 utilizado para control de gastos y cálculo de créditos fiscales.</p>
+            <div id="error-message-compras" style="display: none; color: red; font-weight: bold; margin-bottom: 20px;">
+            </div>
             <div class="container-fluid">
 
                 <!-- Formulario con el campo oculto para mantener el tab activo -->
-                <form class="row g-3 mb-3 align-items-end" method="GET" action="{{ url_for('contable.reportes') }}">
-                    <input type="hidden" name="active_tab" value="libro-compras" id="activeTabInputCompras">
+                <form id="filterFormCompra" class="row g-3 mb-3 align-items-end" method="GET" action="{{ url_for('contable.reportes') }}">
+                    <input type="hidden" name="active_tab" value="libro-compras" id="activeTabInput">
+                    <!-- Campo oculto para el tab activo -->
                     <div class="col-4 col-md-3">
-                        <style>
-                            .required-asterisk {
-                                color: red;
-                            }
-                        </style>
-
-                        <label for="daterange" class="form-label" style="font-size: 14px;">
-                            Fecha <span class="required-asterisk">*</span>
+                        <label for="daterangecompra" class="form-label" style="font-size: 14px;">
+                            Fecha<span class="required-asterisk">*</span>
                         </label>
-                        <div class="input-group mb-3">
+                        <div class="input-group">
                             <span class="input-group-text" id="basic-addon1">
                                 <i class="fas fa-calendar-alt"></i>
                             </span>
-                            <input type="text" class="form-control" id="daterange" name="daterange"
+                            <input type="text" class="form-control" id="daterangecompra" name="daterangecompra"
                                 placeholder="Selecciona mes y año" aria-label="Fecha" aria-describedby="basic-addon1"
-                                value="{{ request.args.get('daterange', '') }}">
+                                value="{{ request.args.get('daterangecompra', '') }}">
                         </div>
                     </div>
-                    <div class="col-lg-2 d-flex justify-content-end" style="margin-left: auto;">
+                    <div class="col-4 col-md-2">
+                        <div class="mt-4">
+                            <a href="{{ url_for('contable.reportes', active_tab='libro-compras') }}"
+                                class="btn btn-secondary mt-2"
+                                style="background-color: rgb(226, 39, 39); border: none; color: white;"
+                                onmouseover="this.style.backgroundColor='rgb(180, 20, 20)';"
+                                onmouseout="this.style.backgroundColor='rgb(226, 39, 39)';">
+                                <i class="fa-solid fa-filter"></i> Borrar filtros
+                            </a>
+                        </div>
                     </div>
                 </form>
             </div>
-            <div class="table-container mt-2 mb-2" style="border: 1px solid #ccc; margin-top: -0.9rem !important;">
+            <div class="table-container mt-2 mb-2" style="border: 1px solid #ccc; margin-top: 0.2rem !important;">
                 <style>
                     /* Estilo de hover para resaltar la fila */
                     #tabla_compras tr:hover {
@@ -639,7 +645,7 @@
     </div>
 
 
-    <!-- Tab: Libro Ventas -->
+    <!-- Tab: Libro Venta -->
     <div class="tab-pane fade {% if active_tab == 'libro-ventas' %}show active{% endif %}" id="libro-ventas">
         <div class="card bg-white rounded custom-shadow p-4" style="padding: 1rem !important;">
             <header class="d-flex justify-content-between align-items-center mb-1">
@@ -670,10 +676,11 @@
 
             </header>
 
-
             <p class="text-muted small mb-2">Registro detallado de todas las adquisiciones realizadas por la
                 empresa,
                 utilizado para control de gastos y cálculo de créditos fiscales.</p>
+            <div id="error-message-ventas" style="display: none; color: red; font-weight: bold; margin-bottom: 20px;">
+                </div>
             <div class="container-fluid">
 
                 <form id="filterFormVenta" class="row g-3 mb-3" method="GET"
@@ -985,7 +992,7 @@
                 onclick="closeModalDownloadVentas()">No, cancelar</button>
             <button
                 style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600; background-color: #1F6E43; border: none;"
-                class="btn btn-primary" onclick="downloadExcelVentas()">Sí, descargar</button>
+                class="btn btn-primary" onclick="downloadExcelVenta()">Sí, descargar</button>
         </div>
     </div>
 </div>
@@ -1289,6 +1296,25 @@
             }
         });
 
+        flatpickr("#daterangecompra", {
+            mode: "range",
+            dateFormat: "m/Y",
+            minDate: "01/1900",
+            maxDate: "04/2028",
+            plugins: [
+                new monthSelectPlugin({
+                    dateFormat: "m/Y",
+                    altFormat: "F Y",
+                    altInput: true
+                })
+            ],
+            onClose: function (selectedDates, dateStr, instance) {
+                if (selectedDates.length === 2) {
+                    document.getElementById('filterFormCompra').submit();
+                }
+            }
+        });
+
         flatpickr("#daterangecaja", {
             mode: "single",  // Cambia a selección de un solo mes
             dateFormat: "m/Y",
@@ -1345,10 +1371,7 @@
         document.getElementById("downloadExcelModalVentas").style.display = "none";
     }
 
-    function downloadExcelVentas() {
-        window.location.href = "{{ url_for('contable.exportar_registro_ventas_excel') }}";
-        closeModalDownloadVentas();
-    }
+    
 
     function openModalDownloadPDFVentas() {
         document.getElementById("downloadPDFModalVentas").style.display = "flex";
@@ -1371,10 +1394,6 @@
         document.getElementById("downloadExcelModalCompras").style.display = "none";
     }
 
-    function downloadExcelCompras() {
-        window.location.href = "{{ url_for('contable.exportar_registro_compras_excel') }}";
-        closeModalDownloadCompras();
-    }
 
     function openModalDownloadPDFCompras() {
         document.getElementById("downloadPDFModalCompras").style.display = "flex";
@@ -1477,7 +1496,7 @@
 
 
     function closeModalDownloadExcel() {
-        document.getElementById("downloadExcelModal").style.display = "none";
+        document.getElementById("downloadExcelModalVentas").style.display = "none";
     }
 
     function downloadExcel() {
@@ -1563,6 +1582,140 @@
         window.location.href = "{{ url_for('contable.exportar_libro_diario_pdf') }}";
         closeModalDownloadPDF();
     }
+    function downloadExcelVenta() {
+    // Ocultar mensaje de error anterior
+        const errorContainer = document.getElementById('error-message-ventas');
+        if (errorContainer) {
+            errorContainer.style.display = 'none';
+            errorContainer.textContent = '';
+        }
+
+        const dateRangeElement = document.getElementById('daterangeventa');
+        const dateRange = dateRangeElement ? dateRangeElement.value : '';
+
+
+        const url = "{{ url_for('contable.exportar_registro_ventas_excel') }}" + 
+                    `?daterange=${encodeURIComponent(dateRange)}`;
+
+        console.log('URL:', url);
+
+        // Mostrar el indicador de carga (opcional)
+        // showLoadingIndicator();
+
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+        })
+            .then(response => {
+                const contentType = response.headers.get('Content-Type');
+                if (contentType && contentType.includes('application/json')) {
+                    // La respuesta es JSON, significa que hay un error
+                    return response.json().then(data => {
+                        // Mostrar el mensaje de error
+                        showErrorVentas(data.error);
+                    });
+                } else if (response.ok) {
+                    // La respuesta es un archivo, descargarlo
+                    return response.blob().then(blob => {
+                        const link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = 'Registro_Ventas.xlsx';
+                        link.click();
+                    });
+                } else {
+                    // Otro tipo de error
+                    showErrorVentas('Ocurrió un error al exportar el archivo.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showErrorVentas('Ocurrió un error al exportar el archivo.');
+            })
+            .finally(() => {
+                // Ocultar el indicador de carga (opcional)
+                // hideLoadingIndicator();
+                closeModalDownloadExcel();
+            });
+    }
+
+    function showErrorVentas(message) {
+    // Obtener el contenedor del mensaje de error
+    const errorContainer = document.getElementById('error-message-ventas');
+    if (errorContainer) {
+        errorContainer.textContent = message;
+        errorContainer.style.display = 'block';
+    }
+    
+}
+function downloadExcelCompras() {
+    // Ocultar mensaje de error anterior
+    const errorContainer = document.getElementById('error-message-compras');
+    if (errorContainer) {
+        errorContainer.style.display = 'none';
+        errorContainer.textContent = '';
+    }
+
+    const dateRangeElement = document.getElementById('daterangecompra');
+    const dateRange = dateRangeElement ? dateRangeElement.value : '';
+
+    const url = "{{ url_for('contable.exportar_registro_compras_excel') }}" + 
+                `?daterange=${encodeURIComponent(dateRange)}`;
+
+    console.log('URL:', url);
+
+    // Mostrar el indicador de carga (opcional)
+    // showLoadingIndicator();
+
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+    })
+        .then(response => {
+            const contentType = response.headers.get('Content-Type');
+            if (contentType && contentType.includes('application/json')) {
+                // La respuesta es JSON, significa que hay un error
+                return response.json().then(data => {
+                    // Mostrar el mensaje de error
+                    showErrorCompras(data.error);
+                });
+            } else if (response.ok) {
+                // La respuesta es un archivo, descargarlo
+                return response.blob().then(blob => {
+                    const link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = 'Registro_Compras.xlsx';
+                    link.click();
+                });
+            } else {
+                // Otro tipo de error
+                showErrorCompras('Ocurrió un error al exportar el archivo.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showErrorCompras('Ocurrió un error al exportar el archivo.');
+        })
+        .finally(() => {
+            // Ocultar el indicador de carga (opcional)
+            // hideLoadingIndicator();
+            closeModalDownloadCompras();
+        });
+}
+
+function showErrorCompras(message) {
+    // Obtener el contenedor del mensaje de error
+    const errorContainer = document.getElementById('error-message-compras');
+    if (errorContainer) {
+        errorContainer.textContent = message;
+        errorContainer.style.display = 'block';
+    }
+}
+
+
 </script>
 
 {% endblock %}

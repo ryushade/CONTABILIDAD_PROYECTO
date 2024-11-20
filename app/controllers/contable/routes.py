@@ -138,10 +138,12 @@ def reportes():
     daterange_mayor = request.args.get('daterangemayor', '')
     daterange_caja = request.args.get('daterangecaja', '')
     daterange_venta = request.args.get('daterangeventa', '')
+    daterange_compra = request.args.get('daterangecompra', '')
     start_date, end_date = None, None
     start_date_mayor, end_date_mayor = None, None
     start_date_caja, end_date_caja = None, None
     start_date_venta, end_date_venta = None, None
+    start_date_compra, end_date_compra = None, None
 
     def last_day_of_month(any_day):
         next_month = any_day.replace(day=28) + timedelta(days=4)
@@ -182,13 +184,16 @@ def reportes():
     if daterange_venta:
         start_date_venta, end_date_venta = parse_daterange(daterange_venta)
 
+    if daterange_compra:
+        start_date_compra, end_date_compra = parse_daterange(daterange_compra)
+
     # Llamar a las funciones para obtener los datos, pasando las fechas procesadas
     asientos, totales = obtener_asientos_agrupados(tipo_registro, start_date, end_date)
     libro_mayor_data, total_debe, total_haber = obtener_libro_mayor_agrupado_por_fecha(start_date_mayor, end_date_mayor)
     lista_libro_caja, total_caja = obtener_libro_caja(start_date_caja, end_date_caja)
     lista_libro_caja_cuenta_corriente, total_caja_corriente = obtener_libro_caja_cuenta_corriente()
     registro_venta_data, totale = obtener_registro_ventas(start_date_venta, end_date_venta)
-    registro_compra_data, totales_compra = obtener_registro_compras()
+    registro_compra_data, totales_compra = obtener_registro_compras(start_date_compra, end_date_compra)
 
     return render_template(
         'contable/reportes/reportes.html', 
@@ -1203,90 +1208,104 @@ def exportar_libro_mayor_pdf():
 @accounting_bp.route('/exportar_registro_ventas_excel', methods=['GET'])
 @jwt_required()
 def exportar_registro_ventas_excel():
-    from io import BytesIO
-    import openpyxl
-    from flask import send_file, current_app
-    from datetime import datetime
-    import os
-
-    # Path to the Excel template
+    # Ruta de la plantilla
     template_path = os.path.join(current_app.root_path, 'templates', 'contable', 'plantillas', 'Registro_Ventas.xlsx')
     
     if not os.path.exists(template_path):
-        return "The Excel template was not found.", 404
+        return jsonify({'error': 'La plantilla de Excel no se encontró.'}), 404
     
-    output = BytesIO()
+    # Capturar filtros desde la URL
+    daterange = request.args.get('daterange', '')
     
-    # Load the template workbook
+    start_date, end_date = None, None
+    mes_anio_excel = None  # Variable para guardar el valor del período en B3
+
+    # Procesar el rango de fechas
+    def parse_daterange(daterange):
+        try:
+            daterange_clean = re.sub(r'\s+', ' ', daterange.strip())
+            dates = re.split(r'\s*(to|a)\s*', daterange_clean)
+            dates = [d for d in dates if d not in ('to', 'a')]
+            if len(dates) == 2:
+                start_date = datetime.strptime(dates[0].strip(), '%m/%Y').date()
+                end_date = datetime.strptime(dates[1].strip(), '%m/%Y').date()
+                end_date = end_date.replace(day=1) + timedelta(days=31)
+                end_date = end_date.replace(day=1) - timedelta(days=1)
+                mes_anio_excel = start_date.strftime('%m/%Y') + " - " + end_date.strftime('%m/%Y')
+            elif len(dates) == 1:
+                start_date = datetime.strptime(dates[0].strip(), '%m/%Y').date()
+                end_date = start_date.replace(day=1) + timedelta(days=31)
+                end_date = end_date.replace(day=1) - timedelta(days=1)
+                mes_anio_excel = start_date.strftime('%m/%Y')
+            else:
+                start_date = end_date = None
+            return start_date, end_date, mes_anio_excel
+        except (ValueError, IndexError):
+            return None, None, None
+
+    if daterange:
+        start_date, end_date, mes_anio_excel = parse_daterange(daterange)
+
+    # Si no se proporcionó rango de fechas, usar el mes actual
+    if not mes_anio_excel:
+        fecha_actual = datetime.now()
+        mes_anio_excel = fecha_actual.strftime('%m/%Y')
+        start_date = fecha_actual.replace(day=1).date()
+        end_date = (fecha_actual.replace(day=1) + timedelta(days=31)).replace(day=1) - timedelta(days=1)
+    
+    print(start_date)
+    print(end_date)
+    # Obtener datos del registro de ventas
+    registros_ventas, totales = obtener_registro_ventas(start_date, end_date)
+
+    # Verificar si hay datos
+    if not registros_ventas:
+        response = make_response(jsonify({'error': 'No hay datos para exportar en el rango de fechas seleccionado.'}), 200)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    # Cargar el archivo de plantilla
     workbook = openpyxl.load_workbook(template_path)
     worksheet = workbook.active
-    
-    # Set the current period and company info
-    fecha_actual = datetime.now()
-    mes_anio_actual = fecha_actual.strftime('%m/%Y')
-    worksheet['B3'] = mes_anio_actual  # Period
-    worksheet['B4'] = '20610588981'    # RUC
-    worksheet['B5'] = 'Tormenta'       # Company name
 
-    # Fetch the purchase records
-    registros_compras, totales = obtener_registro_ventas()
-    print(registros_compras)
-    # Define the starting row for data
+    # Rellenar encabezados
+    worksheet['B3'] = mes_anio_excel
+    worksheet['B4'] = '20610588981'  # RUC
+    worksheet['B5'] = 'Tormenta'     # Razón social
+
+    # Iniciar desde la fila 11
     start_row = 11
     current_row = start_row
 
-    for registro in registros_compras:
-        worksheet[f'A{current_row}'] = registro["numero_correlativo"] #numero correlativo
-        worksheet[f'B{current_row}'] = registro["fecha"].strftime('%d/%m/%Y')  #fecha de emision
-        worksheet[f'C{current_row}'] = registro["fechaV"].strftime('%d/%m/%Y') #fecha de vencimiento
-        if str(registro["num_comprobante"])[0] == "F":
-            worksheet[f'D{current_row}'] = '01'  # tipo
-        elif str(registro["num_comprobante"])[0] =="B":
-            worksheet[f'D{current_row}'] = '03' # tipo
-        else:
-            worksheet[f'D{current_row}'] = '07' # tipo
-
-        comprobante = registro["num_comprobante"]
-
-        serie = comprobante.split("-")[0][1:]
-        numero = comprobante.split("-")[1]
-
-        worksheet[f'E{current_row}'] = serie  # la serie
-        worksheet[f'F{current_row}'] = numero # el número
-
-        if len(str(registro["documento_cliente"])) == 8:
-            worksheet[f'G{current_row}'] = '1' 
-        else:
-            worksheet[f'G{current_row}'] = '6' #tipo
-        worksheet[f'H{current_row}'] = registro["documento_cliente"] #numero de dni o ruc
-        worksheet[f'I{current_row}'] = registro["nombre_cliente"] #nombres o razon social
-        worksheet[f'J{current_row}'] = ''# valor facturado de la exportacion
-        worksheet[f'K{current_row}'] = registro["importe"] #importe
-        worksheet[f'L{current_row}'] = ''
-        worksheet[f'M{current_row}'] = ''
-        worksheet[f'N{current_row}'] = ''
-        worksheet[f'O{current_row}'] = registro["igv"]  # IGV
-        worksheet[f'P{current_row}'] = ''
-        worksheet[f'Q{current_row}'] = registro["total"]  
-        worksheet[f'R{current_row}'] = ''
-        worksheet[f'S{current_row}'] = ''
-        worksheet[f'T{current_row}'] = ''
-        worksheet[f'U{current_row}'] = ''
-        worksheet[f'V{current_row}'] = ''
+    for registro in registros_ventas:
+        worksheet[f'A{current_row}'] = registro["numero_correlativo"]
+        worksheet[f'B{current_row}'] = registro["fecha"].strftime('%d/%m/%Y')  # Fecha de emisión
+        worksheet[f'C{current_row}'] = registro["fechaV"].strftime('%d/%m/%Y')  # Fecha de vencimiento
+        worksheet[f'D{current_row}'] = '01' if str(registro["num_comprobante"])[0] == 'F' else '03'  # Tipo
+        worksheet[f'E{current_row}'] = registro["num_comprobante"].split('-')[0][1:]  # Serie
+        worksheet[f'F{current_row}'] = registro["num_comprobante"].split('-')[1]      # Número
+        worksheet[f'G{current_row}'] = '1' if len(str(registro["documento_cliente"])) == 8 else '6'  # Tipo documento
+        worksheet[f'H{current_row}'] = registro["documento_cliente"]  # Documento cliente
+        worksheet[f'I{current_row}'] = registro["nombre_cliente"]     # Cliente
+        worksheet[f'K{current_row}'] = registro["importe"]            # Importe
+        worksheet[f'O{current_row}'] = registro["igv"]                # IGV
+        worksheet[f'Q{current_row}'] = registro["total"]              # Total
         current_row += 1
 
-    # Adding totals row at the end
+    # Añadir totales al final
     total_row = current_row
-    worksheet.merge_cells(f'H{total_row}:J{total_row}') 
+    worksheet.merge_cells(f'H{total_row}:J{total_row}')
     worksheet[f'H{total_row}'] = 'Totales'
     worksheet[f'K{total_row}'] = totales["total_importe"]
     worksheet[f'O{total_row}'] = totales["total_igv"]
     worksheet[f'Q{total_row}'] = totales["total_general"]
 
-    # Save the updated workbook to a buffer
+    # Guardar el archivo modificado en un buffer
+    output = BytesIO()
     workbook.save(output)
     output.seek(0)
 
+    # Enviar el archivo generado
     return send_file(output, download_name="registro_ventas.xlsx", as_attachment=True)
 
 @accounting_bp.route('/exportar_registro_ventas_pdf', methods=['GET'])
@@ -1374,36 +1393,73 @@ def exportar_registro_ventas_pdf():
 @accounting_bp.route('/exportar_registro_compras_excel', methods=['GET'])
 @jwt_required()
 def exportar_registro_compras_excel():
-    from io import BytesIO
-    import openpyxl
-    from flask import send_file, current_app
-    from datetime import datetime
-    import os
-
-    # Ruta de la plantilla de Excel
+    # Ruta de la plantilla
     template_path = os.path.join(current_app.root_path, 'templates', 'contable', 'plantillas', 'Registro_Compras.xlsx')
     
     if not os.path.exists(template_path):
-        return "La plantilla de Excel no fue encontrada.", 404
+        return jsonify({'error': 'La plantilla de Excel no se encontró.'}), 404
     
-    output = BytesIO()
+    # Capturar filtros desde la URL
+    daterange = request.args.get('daterange', '')
     
-    # Cargar el libro de trabajo de la plantilla
+    start_date, end_date = None, None
+    mes_anio_excel = None  # Variable para guardar el valor del período en B3
+
+    # Procesar el rango de fechas
+    def parse_daterange(daterange):
+        try:
+            daterange_clean = re.sub(r'\s+', ' ', daterange.strip())
+            dates = re.split(r'\s*(to|a)\s*', daterange_clean)
+            dates = [d for d in dates if d not in ('to', 'a')]
+            if len(dates) == 2:
+                start_date = datetime.strptime(dates[0].strip(), '%m/%Y').date()
+                end_date = datetime.strptime(dates[1].strip(), '%m/%Y').date()
+                end_date = end_date.replace(day=1) + timedelta(days=31)
+                end_date = end_date.replace(day=1) - timedelta(days=1)
+                mes_anio_excel = start_date.strftime('%m/%Y') + " - " + end_date.strftime('%m/%Y')
+            elif len(dates) == 1:
+                start_date = datetime.strptime(dates[0].strip(), '%m/%Y').date()
+                end_date = start_date.replace(day=1) + timedelta(days=31)
+                end_date = end_date.replace(day=1) - timedelta(days=1)
+                mes_anio_excel = start_date.strftime('%m/%Y')
+            else:
+                start_date = end_date = None
+            return start_date, end_date, mes_anio_excel
+        except (ValueError, IndexError):
+            return None, None, None
+
+    if daterange:
+        start_date, end_date, mes_anio_excel = parse_daterange(daterange)
+
+    # Si no se proporcionó rango de fechas, usar el mes actual
+    if not mes_anio_excel:
+        fecha_actual = datetime.now()
+        mes_anio_excel = fecha_actual.strftime('%m/%Y')
+        start_date = fecha_actual.replace(day=1).date()
+        end_date = (fecha_actual.replace(day=1) + timedelta(days=31)).replace(day=1) - timedelta(days=1)
+    
+    print(start_date)
+    print(end_date)
+    # Obtener datos del registro de compras
+    registros_compras, totales = obtener_registro_compras(start_date, end_date)
+
+    # Verificar si hay datos
+    if not registros_compras:
+        response = make_response(jsonify({'error': 'No hay datos para exportar en el rango de fechas seleccionado.'}), 200)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    # Cargar el archivo de plantilla
     workbook = openpyxl.load_workbook(template_path)
     worksheet = workbook.active
-    
-    # Configurar el periodo actual y la información de la empresa
-    fecha_actual = datetime.now()
-    mes_anio_actual = fecha_actual.strftime('%m/%Y')
-    worksheet['B3'] = mes_anio_actual  # Periodo
-    worksheet['B4'] = '20610588981'    # RUC
-    worksheet['B5'] = 'Tormenta'       # Nombre de la empresa
 
-    # Obtener los registros de compras
-    registros_compras, totales = obtener_registro_compras()
-    
-    # Definir la fila inicial para los datos
-    start_row = 14
+    # Rellenar encabezados
+    worksheet['B3'] = mes_anio_excel
+    worksheet['B4'] = '20610588981'  # RUC
+    worksheet['B5'] = 'Tormenta'     # Razón social
+
+    # Iniciar desde la fila 11
+    start_row = 11
     current_row = start_row
 
     for registro in registros_compras:
@@ -1449,18 +1505,20 @@ def exportar_registro_compras_excel():
         
         current_row += 1
 
-    # Agregar la fila de totales al final
+    # Añadir totales al final
     total_row = current_row
-    worksheet.merge_cells(f'H{total_row}:J{total_row}') 
+    worksheet.merge_cells(f'H{total_row}:J{total_row}')
     worksheet[f'H{total_row}'] = 'Totales'
     worksheet[f'K{total_row}'] = totales["total_importe"]
     worksheet[f'L{total_row}'] = totales["total_igv"]
     worksheet[f'M{total_row}'] = totales["total_general"]
 
-    # Guardar el libro actualizado en el buffer
+    # Guardar el archivo modificado en un buffer
+    output = BytesIO()
     workbook.save(output)
     output.seek(0)
 
+    # Enviar el archivo generado
     return send_file(output, download_name="registro_compras.xlsx", as_attachment=True)
 
 @accounting_bp.route('/exportar_registro_compras_pdf', methods=['GET'])
