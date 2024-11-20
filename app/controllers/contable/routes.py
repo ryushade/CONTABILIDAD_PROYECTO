@@ -1605,3 +1605,71 @@ def exportar_libro_caja_excel():
     output.seek(0)
     
     return send_file(output, download_name="libro_caja.xlsx", as_attachment=True)
+
+
+@accounting_bp.route('/exportar_libro_caja_pdf', methods=['GET'])
+@jwt_required()
+@role_required('ADMIN', 'CONTADOR')
+def exportar_libro_caja_pdf():
+    from fpdf import FPDF
+    from io import BytesIO
+    from flask import send_file
+
+    # Crear un objeto FPDF
+    pdf = FPDF(orientation='L', unit='mm', format='A4')
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+
+    # Encabezado
+    pdf.set_font("Arial", style='B', size=14)
+    pdf.cell(0, 10, 'Libro Caja', ln=True, align='C')
+    pdf.set_font("Arial", size=12)
+    pdf.cell(0, 10, 'RUC: 20610588981', ln=True, align='C')
+    pdf.cell(0, 10, 'Razón Social: Tormenta', ln=True, align='C')
+
+    pdf.ln(10)  # Espacio vertical
+
+    # Encabezados de la tabla
+    pdf.set_font("Arial", style='B', size=10)
+    headers = [
+        ('N°', 10), ('Fecha', 30), ('Glosa', 105),
+        ('Código', 20), ('Cuenta', 50), ('Debe', 30), ('Haber', 30)
+    ]
+    for header, width in headers:
+        pdf.cell(width, 10, header, border=1, align='C')
+    pdf.ln(10)
+
+    # Obtener datos del libro caja
+    lista_libro_caja, total_caja = obtener_libro_caja()
+
+    # Agregar los datos
+    pdf.set_font("Arial", size=9)
+    numero_correlativo = 1
+    for registro in lista_libro_caja:
+        pdf.cell(10, 10, str(numero_correlativo), border=1, align='C')
+        pdf.cell(30, 10, registro['fecha'].strftime('%d/%m/%Y'), border=1, align='C')
+        pdf.cell(105, 10, registro['glosa'], border=1)
+        pdf.cell(20, 10, registro['cod_cuenta'], border=1, align='C')
+        pdf.cell(50, 10, registro['nombre_cuenta'], border=1)
+        pdf.cell(30, 10, f"{registro['debe']:.2f}", border=1, align='R')
+        pdf.cell(30, 10, f"{registro['haber']:.2f}", border=1, align='R')
+        pdf.ln(10)
+        numero_correlativo += 1
+
+    # Totales
+    pdf.set_font("Arial", style='B', size=10)
+
+    # Ajustar los anchos de las columnas totales para coincidir con la tabla
+    total_row_width = 10 + 30 + 105 + 20 + 50
+    pdf.cell(total_row_width, 10, 'Totales', border=1, align='R')  # Ancho combinado de las columnas iniciales
+    pdf.cell(30, 10, f"{total_caja['debe']:.2f}", border=1, align='R')
+    pdf.cell(30, 10, f"{total_caja['haber']:.2f}", border=1, align='R')
+
+    # Guardar el archivo en memoria
+    output = BytesIO()
+    pdf_output = pdf.output(dest='S').encode('latin1')  # Generar el contenido del PDF en bytes
+    output.write(pdf_output)  # Escribir los bytes en el buffer
+    output.seek(0)  # Posicionar el cursor al inicio del buffer
+
+    # Enviar el archivo como respuesta
+    return send_file(output, download_name="libro_caja.pdf", as_attachment=True)
