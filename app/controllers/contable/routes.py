@@ -677,6 +677,7 @@ def ldpf():
 @accounting_bp.route('/exportar_libro_diario_excel', methods=['GET'])
 @jwt_required()
 def exportar_libro_diario_excel():
+    import re  # Asegúrate de importar 're' para expresiones regulares
     template_path = os.path.join(current_app.root_path, 'templates', 'contable', 'plantillas', 'L,D.xlsx')
     
     if not os.path.exists(template_path):
@@ -695,28 +696,42 @@ def exportar_libro_diario_excel():
     # Procesar rango de fechas y determinar el mes para B3
     mes_anio_excel = None  # Variable para guardar el valor de B3
 
-    # Procesar rango de fechas
-    if daterange:
+    # Función para procesar el rango de fechas (puedes extraerla a un módulo común si lo prefieres)
+    def parse_daterange(daterange):
         try:
-            dates = daterange.split(' to ')
+            daterange_clean = re.sub(r'\s+', ' ', daterange.strip())
+            dates = re.split(r'\s*(to|a)\s*', daterange_clean)
+            dates = [d for d in dates if d not in ('to', 'a')]
             if len(dates) == 2:
                 start_date = datetime.strptime(dates[0].strip(), '%m/%Y').date()
                 end_date = datetime.strptime(dates[1].strip(), '%m/%Y').date()
+                # Calcular el último día del mes para el segundo mes
                 end_date = end_date.replace(day=1) + timedelta(days=31)
                 end_date = end_date.replace(day=1) - timedelta(days=1)
-                mes_anio_excel = start_date.strftime('%m/%Y')
+                mes_anio_excel = start_date.strftime('%m/%Y') + " - " + end_date.strftime('%m/%Y')
             elif len(dates) == 1:
                 start_date = datetime.strptime(dates[0].strip(), '%m/%Y').date()
+                # Calcular el último día del mes para el mes seleccionado
                 end_date = start_date.replace(day=1) + timedelta(days=31)
                 end_date = end_date.replace(day=1) - timedelta(days=1)
                 mes_anio_excel = start_date.strftime('%m/%Y')
-        except ValueError as e:
-            print(f"Error processing date range: {e}")
+            else:
+                start_date = end_date = None
+            return start_date, end_date, mes_anio_excel
+        except (ValueError, IndexError) as e:
+            print(f"Error processing date range: {daterange} - {e}")
+            return None, None, None
+
+    # Procesar el rango de fechas
+    if daterange:
+        start_date, end_date, mes_anio_excel = parse_daterange(daterange)
 
     # Si no se proporcionó un rango de fechas, usar el mes actual
     if not mes_anio_excel:
         fecha_actual = datetime.now()
         mes_anio_excel = fecha_actual.strftime('%m/%Y')
+        start_date = fecha_actual.replace(day=1).date()
+        end_date = (fecha_actual.replace(day=1) + timedelta(days=31)).replace(day=1) - timedelta(days=1)
     
     # Llenar las celdas específicas con los datos necesarios
     worksheet['B3'] = mes_anio_excel  
@@ -726,7 +741,8 @@ def exportar_libro_diario_excel():
     # Definir la fila inicial para insertar los datos en la tabla
     start_row = 11
 
-    asientos, _ = obtener_asientos_agrupados_excel(tipo_registro, start_date, end_date)
+    # Obtener los asientos aplicando los filtros
+    asientos, _ = obtener_asientos_agrupados(tipo_registro, start_date, end_date)
 
     # Verificar si hay datos para exportar
     if not asientos:
@@ -831,7 +847,6 @@ def exportar_libro_diario_excel():
             worksheet[f'E{start_group_row}'].alignment = center_alignment
             worksheet[f'F{start_group_row}'].alignment = left_alignment
 
-    
         # Escribir el valor en la columna E (una vez por grupo de filas)
         worksheet[f'E{start_group_row}'] = num_correlativo_lm
 
@@ -870,17 +885,9 @@ def exportar_libro_diario_excel():
 
     return send_file(output, download_name="libro_diario.xlsx", as_attachment=True)
 
-
 @accounting_bp.route('/exportar_libro_mayor_excel', methods=['GET'])
 @jwt_required()
 def exportar_libro_mayor_excel():
-    import openpyxl
-    import os
-    from flask import current_app, send_file, request
-    from io import BytesIO
-    from datetime import datetime, timedelta
-    from openpyxl.styles import Alignment
-
     # Ruta de la plantilla
     template_path = os.path.join(current_app.root_path, 'templates', 'contable', 'plantillas', '234_formato51.xlsx')
     
@@ -893,29 +900,41 @@ def exportar_libro_mayor_excel():
 
     mes_anio_excel = None  # Variable para guardar el valor de B3
 
-    # Procesar rango de fechas
-    if daterangemayor:
+    # Función para procesar el rango de fechas
+    def parse_daterange(daterange):
         try:
-            dates = daterangemayor.split(' to ')
+            daterange_clean = re.sub(r'\s+', ' ', daterange.strip())
+            dates = re.split(r'\s*(to|a)\s*', daterange_clean)
+            dates = [d for d in dates if d not in ('to', 'a')]
             if len(dates) == 2:
                 start_date = datetime.strptime(dates[0].strip(), '%m/%Y').date()
                 end_date = datetime.strptime(dates[1].strip(), '%m/%Y').date()
                 # Ajustar end_date para que sea el último día del mes
                 end_date = end_date.replace(day=1) + timedelta(days=31)
                 end_date = end_date.replace(day=1) - timedelta(days=1)
-                mes_anio_excel = start_date.strftime('%m/%Y')
+                mes_anio_excel = start_date.strftime('%m/%Y') + " - " + end_date.strftime('%m/%Y')
             elif len(dates) == 1:
                 start_date = datetime.strptime(dates[0].strip(), '%m/%Y').date()
                 end_date = start_date.replace(day=1) + timedelta(days=31)
                 end_date = end_date.replace(day=1) - timedelta(days=1)
                 mes_anio_excel = start_date.strftime('%m/%Y')
-        except ValueError as e:
-            print(f"Error processing date range: {e}")
+            else:
+                start_date = end_date = None
+            return start_date, end_date, mes_anio_excel
+        except (ValueError, IndexError) as e:
+            print(f"Error processing date range: {daterange} - {e}")
+            return None, None, None
+
+    # Procesar el rango de fechas
+    if daterangemayor:
+        start_date, end_date, mes_anio_excel = parse_daterange(daterangemayor)
 
     # Si no se proporcionó un rango de fechas, usar el mes actual
     if not mes_anio_excel:
         fecha_actual = datetime.now()
         mes_anio_excel = fecha_actual.strftime('%m/%Y')
+        start_date = fecha_actual.replace(day=1).date()
+        end_date = (fecha_actual.replace(day=1) + timedelta(days=31)).replace(day=1) - timedelta(days=1)
     
     # Obtener datos del libro mayor con glosa agrupados por fecha y filtro de fecha
     libro_mayor = obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica(start_date, end_date)
