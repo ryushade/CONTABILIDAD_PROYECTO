@@ -57,3 +57,5 @@ config.py
 static/img/
 
 app/static/PDF/
+
+files/backupBD.sql
