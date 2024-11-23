@@ -1015,18 +1015,29 @@ def exportar_libro_mayor_excel():
         # Definir el estilo de fuente y alineación
         font = openpyxl.styles.Font(size=10, bold=False)
         alignment_left = Alignment(horizontal='left')
+        alignment_center = Alignment(horizontal='center')  # Alineación centrada
 
         # Insertar los detalles en la tabla, fila por fila
         start_row = 11
         current_row = start_row
-        
+        thin_border = Border(
+            left=Side(style='thin', color='000000'),
+            right=Side(style='thin', color='000000'),
+            top=Side(style='thin', color='000000'),
+            bottom=Side(style='thin', color='000000')
+        )
+
         for detalle in detalles:
             worksheet[f'A{current_row}'] = detalle['fecha_asiento'].strftime('%d/%m/%Y')
             worksheet[f'A{current_row}'].font = font
+            worksheet[f'A{current_row}'].border = thin_border
+
 
             worksheet[f'C{current_row}'] = detalle['glosa']
             worksheet[f'C{current_row}'].font = font
             worksheet[f'C{current_row}'].alignment = alignment_left  # Alinear a la izquierda
+            worksheet[f'C{current_row}'].border = thin_border
+            worksheet[f'A{current_row}'].alignment = alignment_center  # Alinear al centro
 
             saldo_debe = detalle['total_debe']
             saldo_haber = detalle['total_haber']
@@ -1034,10 +1045,12 @@ def exportar_libro_mayor_excel():
             worksheet[f'D{current_row}'] = saldo_debe if saldo_debe > 0 else None
             worksheet[f'D{current_row}'].number_format = '0.00#################'
             worksheet[f'D{current_row}'].font = font
+            worksheet[f'D{current_row}'].border = thin_border
 
             worksheet[f'E{current_row}'] = saldo_haber if saldo_haber > 0 else None
             worksheet[f'E{current_row}'].number_format = '0.00#################'
             worksheet[f'E{current_row}'].font = font
+            worksheet[f'E{current_row}'].border = thin_border
 
             current_row += 1
 
@@ -1045,6 +1058,7 @@ def exportar_libro_mayor_excel():
         worksheet[f'C{current_row}'] = "Total"
         worksheet[f'C{current_row}'].font = openpyxl.styles.Font(size=10, bold=True)
         worksheet[f'C{current_row}'].alignment = alignment_left  # Alinear a la izquierda
+        worksheet[f'C{current_row}'].border = thin_border
 
         # Sumar las columnas D (Deudor) y E (Acreedor)
         total_debe_formula = f'=SUM(D{start_row}:D{current_row - 1})'
@@ -1053,11 +1067,13 @@ def exportar_libro_mayor_excel():
         worksheet[f'D{current_row}'] = total_debe_formula
         worksheet[f'D{current_row}'].number_format = '0.00'
         worksheet[f'D{current_row}'].font = openpyxl.styles.Font(size=10, bold=True)
+        worksheet[f'D{current_row}'].border = thin_border
 
         worksheet[f'E{current_row}'] = total_haber_formula
         worksheet[f'E{current_row}'].number_format = '0.00'
         worksheet[f'E{current_row}'].font = openpyxl.styles.Font(size=10, bold=True)
-        
+        worksheet[f'E{current_row}'].border = thin_border
+
     # Eliminar la hoja de plantilla original si no la necesitas
     workbook.remove(template_sheet)
 
@@ -1246,6 +1262,13 @@ def exportar_registro_ventas_excel():
     start_date, end_date = None, None
     mes_anio_excel = None  # Variable para guardar el valor del período en B3
 
+    thin_border = Border(
+        left=Side(border_style='thin', color='000000'),
+        right=Side(border_style='thin', color='000000'),
+        top=Side(border_style='thin', color='000000'),
+        bottom=Side(border_style='thin', color='000000')
+    )
+
     # Procesar el rango de fechas
     def parse_daterange(daterange):
         try:
@@ -1303,28 +1326,106 @@ def exportar_registro_ventas_excel():
     start_row = 12
     current_row = start_row
 
+    # Estilo de fuente
+    font_style = Font(name='Calibri', size=11)
+
+    # Alineación
+    alignment_center = Alignment(horizontal='center')
+    alignment_left = Alignment(horizontal='left')
+    alignment_right = Alignment(horizontal='right')
+
     for registro in registros_ventas:
         worksheet[f'A{current_row}'] = registro["numero_correlativo"]
-        worksheet[f'B{current_row}'] = registro["fecha"].strftime('%d/%m/%Y')  # Fecha de emisión
-        worksheet[f'C{current_row}'] = registro["fechaV"].strftime('%d/%m/%Y')  # Fecha de vencimiento
-        worksheet[f'D{current_row}'] = '01' if str(registro["num_comprobante"])[0] == 'F' else '03'  # Tipo
-        worksheet[f'E{current_row}'] = registro["num_comprobante"].split('-')[0][1:]  # Serie
-        worksheet[f'F{current_row}'] = registro["num_comprobante"].split('-')[1]      # Número
-        worksheet[f'G{current_row}'] = '1' if len(str(registro["documento_cliente"])) == 8 else '6'  # Tipo documento
-        worksheet[f'H{current_row}'] = registro["documento_cliente"]  # Documento cliente
-        worksheet[f'I{current_row}'] = registro["nombre_cliente"]     # Cliente
-        worksheet[f'K{current_row}'] = registro["importe"]            # Importe
-        worksheet[f'O{current_row}'] = registro["igv"]                # IGV
-        worksheet[f'Q{current_row}'] = registro["total"]              # Total
+        worksheet[f'A{current_row}'].border = thin_border
+        worksheet[f'A{current_row}'].font = font_style
+        worksheet[f'A{current_row}'].alignment = alignment_center
+
+        worksheet[f'B{current_row}'] = registro["fecha"].strftime('%d/%m/%Y')
+        worksheet[f'B{current_row}'].border = thin_border
+        worksheet[f'B{current_row}'].font = font_style
+        worksheet[f'B{current_row}'].alignment = alignment_center
+
+        worksheet[f'C{current_row}'] = registro["fechaV"].strftime('%d/%m/%Y')
+        worksheet[f'C{current_row}'].border = thin_border
+        worksheet[f'C{current_row}'].font = font_style
+        worksheet[f'C{current_row}'].alignment = alignment_center
+
+        worksheet[f'D{current_row}'] = '01' if str(registro["num_comprobante"])[0] == 'F' else '03'
+        worksheet[f'D{current_row}'].border = thin_border
+        worksheet[f'D{current_row}'].font = font_style
+        worksheet[f'D{current_row}'].alignment = alignment_center
+
+        worksheet[f'E{current_row}'] = registro["num_comprobante"].split('-')[0][1:]
+        worksheet[f'E{current_row}'].border = thin_border
+        worksheet[f'E{current_row}'].font = font_style
+        worksheet[f'E{current_row}'].alignment = alignment_center
+
+        worksheet[f'F{current_row}'] = registro["num_comprobante"].split('-')[1]
+        worksheet[f'F{current_row}'].border = thin_border
+        worksheet[f'F{current_row}'].font = font_style
+        worksheet[f'F{current_row}'].alignment = alignment_center
+
+        worksheet[f'G{current_row}'] = '1' if len(str(registro["documento_cliente"])) == 8 else '6'
+        worksheet[f'G{current_row}'].border = thin_border
+        worksheet[f'G{current_row}'].font = font_style
+        worksheet[f'G{current_row}'].alignment = alignment_center
+
+        worksheet[f'H{current_row}'] = registro["documento_cliente"]
+        worksheet[f'H{current_row}'].border = thin_border
+        worksheet[f'H{current_row}'].font = font_style
+        worksheet[f'H{current_row}'].alignment = alignment_center
+
+        worksheet[f'I{current_row}'] = registro["nombre_cliente"]
+        worksheet[f'I{current_row}'].border = thin_border
+        worksheet[f'I{current_row}'].font = font_style
+        worksheet[f'I{current_row}'].alignment = alignment_left
+
+        worksheet[f'K{current_row}'] = registro["importe"]
+        worksheet[f'K{current_row}'].border = thin_border
+        worksheet[f'K{current_row}'].font = font_style
+        worksheet[f'K{current_row}'].alignment = alignment_right
+        worksheet[f'K{current_row}'].number_format = '#,##0.00'
+
+        worksheet[f'O{current_row}'] = registro["igv"]
+        worksheet[f'O{current_row}'].border = thin_border
+        worksheet[f'O{current_row}'].font = font_style
+        worksheet[f'O{current_row}'].alignment = alignment_right
+        worksheet[f'O{current_row}'].number_format = '#,##0.00'
+
+        worksheet[f'Q{current_row}'] = registro["total"]
+        worksheet[f'Q{current_row}'].border = thin_border
+        worksheet[f'Q{current_row}'].font = font_style
+        worksheet[f'Q{current_row}'].alignment = alignment_right
+        worksheet[f'Q{current_row}'].number_format = '#,##0.00'
+
         current_row += 1
+
 
     # Añadir totales al final
     total_row = current_row
     worksheet.merge_cells(f'H{total_row}:J{total_row}')
     worksheet[f'H{total_row}'] = 'Totales'
+    worksheet[f'H{total_row}'].border = thin_border
+    worksheet[f'H{total_row}'].font = Font(name='Calibri', size=11, bold=True)
+    worksheet[f'H{total_row}'].alignment = alignment_right
+
     worksheet[f'K{total_row}'] = totales["total_importe"]
+    worksheet[f'K{total_row}'].border = thin_border
+    worksheet[f'K{total_row}'].font = Font(name='Calibri', size=11, bold=True)
+    worksheet[f'K{total_row}'].alignment = alignment_right
+    worksheet[f'K{total_row}'].number_format = '#,##0.00'
+
     worksheet[f'O{total_row}'] = totales["total_igv"]
+    worksheet[f'O{total_row}'].border = thin_border
+    worksheet[f'O{total_row}'].font = Font(name='Calibri', size=11, bold=True)
+    worksheet[f'O{total_row}'].alignment = alignment_right
+    worksheet[f'O{total_row}'].number_format = '#,##0.00'
+
     worksheet[f'Q{total_row}'] = totales["total_general"]
+    worksheet[f'Q{total_row}'].border = thin_border
+    worksheet[f'Q{total_row}'].font = Font(name='Calibri', size=11, bold=True)
+    worksheet[f'Q{total_row}'].alignment = alignment_right
+    worksheet[f'Q{total_row}'].number_format = '#,##0.00'
 
     # Guardar el archivo modificado en un buffer
     output = BytesIO()
@@ -1464,8 +1565,6 @@ def exportar_registro_compras_excel():
         start_date = fecha_actual.replace(day=1).date()
         end_date = (fecha_actual.replace(day=1) + timedelta(days=31)).replace(day=1) - timedelta(days=1)
     
-    print(start_date)
-    print(end_date)
     # Obtener datos del registro de compras
     registros_compras, totales = obtener_registro_compras(start_date, end_date)
 
@@ -1484,14 +1583,66 @@ def exportar_registro_compras_excel():
     worksheet['B4'] = '20610588981'  # RUC
     worksheet['B5'] = 'Tormenta'     # Razón social
 
-    # Iniciar desde la fila 11
+    # Definir estilos
+    thin_border = Border(
+        left=Side(border_style='thin', color='000000'),
+        right=Side(border_style='thin', color='000000'),
+        top=Side(border_style='thin', color='000000'),
+        bottom=Side(border_style='thin', color='000000')
+    )
+    font_style = Font(name='Calibri', size=11)
+    alignment_center = Alignment(horizontal='center')
+    alignment_left = Alignment(horizontal='left')
+    alignment_right = Alignment(horizontal='right')
+
+    # Aplicar bordes y estilos a los encabezados
+    header_row = 13
+    for col in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M']:
+        cell = worksheet[f'{col}{header_row}']
+        cell.border = thin_border
+        cell.font = Font(name='Calibri', size=11, bold=True)
+        cell.alignment = alignment_center
+
+    # Ajustar ancho de columnas
+    column_widths = {
+        'A': 10,
+        'B': 12,
+        'C': 12,
+        'D': 5,
+        'E': 8,
+        'F': 8,
+        'G': 10,
+        'H': 5,
+        'I': 15,
+        'J': 30,
+        'K': 15,
+        'L': 15,
+        'M': 15,
+        # Agrega más columnas si es necesario
+    }
+
+    for col, width in column_widths.items():
+        worksheet.column_dimensions[col].width = width
+
+    # Iniciar desde la fila 14
     start_row = 14
     current_row = start_row
 
     for registro in registros_compras:
-        worksheet[f'A{current_row}'] = registro["numero_correlativo"] # Número correlativo
+        worksheet[f'A{current_row}'] = registro["numero_correlativo"]  # Número correlativo
+        worksheet[f'A{current_row}'].border = thin_border
+        worksheet[f'A{current_row}'].font = font_style
+        worksheet[f'A{current_row}'].alignment = alignment_center
+
         worksheet[f'B{current_row}'] = registro["fecha"].strftime('%d/%m/%Y')  # Fecha de emisión
-        worksheet[f'C{current_row}'] = registro["fechaV"].strftime('%d/%m/%Y') # Fecha de vencimiento
+        worksheet[f'B{current_row}'].border = thin_border
+        worksheet[f'B{current_row}'].font = font_style
+        worksheet[f'B{current_row}'].alignment = alignment_center
+
+        worksheet[f'C{current_row}'] = registro["fechaV"].strftime('%d/%m/%Y')  # Fecha de vencimiento
+        worksheet[f'C{current_row}'].border = thin_border
+        worksheet[f'C{current_row}'].font = font_style
+        worksheet[f'C{current_row}'].alignment = alignment_center
 
         # Lógica para tipo de comprobante basado en el número
         if str(registro["num_comprobante"])[0] == "F":
@@ -1500,6 +1651,9 @@ def exportar_registro_compras_excel():
             worksheet[f'D{current_row}'] = '03'  # Tipo
         else:
             worksheet[f'D{current_row}'] = '07'  # Tipo
+        worksheet[f'D{current_row}'].border = thin_border
+        worksheet[f'D{current_row}'].font = font_style
+        worksheet[f'D{current_row}'].alignment = alignment_center
 
         # Dividir el número de comprobante en serie y número
         comprobante = registro["num_comprobante"]
@@ -1507,37 +1661,86 @@ def exportar_registro_compras_excel():
         numero = comprobante.split("-")[1]
 
         worksheet[f'E{current_row}'] = serie  # Serie
-        worksheet[f'F{current_row}'] = ''
-        worksheet[f'G{current_row}'] = numero # Número
+        worksheet[f'E{current_row}'].border = thin_border
+        worksheet[f'E{current_row}'].font = font_style
+        worksheet[f'E{current_row}'].alignment = alignment_center
+
+        worksheet[f'F{current_row}'] = ''  # Se deja vacío según tu código original
+        worksheet[f'F{current_row}'].border = thin_border
+        worksheet[f'F{current_row}'].font = font_style
+        worksheet[f'F{current_row}'].alignment = alignment_center
+
+        worksheet[f'G{current_row}'] = numero  # Número
+        worksheet[f'G{current_row}'].border = thin_border
+        worksheet[f'G{current_row}'].font = font_style
+        worksheet[f'G{current_row}'].alignment = alignment_center
 
         # Tipo de documento del proveedor basado en el número de documento
         if len(str(registro["documento_cliente"])) == 8:
             worksheet[f'H{current_row}'] = '1' 
         else:
             worksheet[f'H{current_row}'] = '6'  # Tipo
+        worksheet[f'H{current_row}'].border = thin_border
+        worksheet[f'H{current_row}'].font = font_style
+        worksheet[f'H{current_row}'].alignment = alignment_center
+
         worksheet[f'I{current_row}'] = registro["documento_cliente"]  # Número de documento
-        worksheet[f'J{current_row}'] = registro["nombre_cliente"]     # Razón social
-        worksheet[f'K{current_row}'] = registro["importe"]           # Importe
-        worksheet[f'L{current_row}'] = registro["igv"]
-        worksheet[f'Z{current_row}'] = ''
-        worksheet[f'N{current_row}'] = ''  # Base imponible exonerada
-        worksheet[f'O{current_row}'] = ''  # Base imponible inafecta
-        worksheet[f'P{current_row}'] = ''  # Otros conceptos
-                     # IGV
-        worksheet[f'Q{current_row}'] = ''  # Impuesto ISC (si aplica)
-        worksheet[f'R{current_row}'] = ''           # Total
-        worksheet[f'S{current_row}'] = ''  # Valor de adquisición no gravada
-        worksheet[f'M{current_row}'] = registro["total"]
-        
+        worksheet[f'I{current_row}'].border = thin_border
+        worksheet[f'I{current_row}'].font = font_style
+        worksheet[f'I{current_row}'].alignment = alignment_center
+
+        worksheet[f'J{current_row}'] = registro["nombre_cliente"]  # Razón social
+        worksheet[f'J{current_row}'].border = thin_border
+        worksheet[f'J{current_row}'].font = font_style
+        worksheet[f'J{current_row}'].alignment = alignment_left
+
+        worksheet[f'K{current_row}'] = registro["importe"]  # Importe
+        worksheet[f'K{current_row}'].border = thin_border
+        worksheet[f'K{current_row}'].font = font_style
+        worksheet[f'K{current_row}'].alignment = alignment_right
+        worksheet[f'K{current_row}'].number_format = '#,##0.00'
+
+        worksheet[f'L{current_row}'] = registro["igv"]  # IGV
+        worksheet[f'L{current_row}'].border = thin_border
+        worksheet[f'L{current_row}'].font = font_style
+        worksheet[f'L{current_row}'].alignment = alignment_right
+        worksheet[f'L{current_row}'].number_format = '#,##0.00'
+
+        worksheet[f'M{current_row}'] = registro["total"]  # Total
+        worksheet[f'M{current_row}'].border = thin_border
+        worksheet[f'M{current_row}'].font = font_style
+        worksheet[f'M{current_row}'].alignment = alignment_right
+        worksheet[f'M{current_row}'].number_format = '#,##0.00'
+
+        # Si tienes otras columnas (N, O, P, etc.), aplica el mismo procedimiento
+
         current_row += 1
 
     # Añadir totales al final
     total_row = current_row
-    worksheet.merge_cells(f'H{total_row}:J{total_row}')
+    worksheet.merge_cells(f'H{total_row}:I{total_row}')
     worksheet[f'H{total_row}'] = 'Totales'
+    worksheet[f'H{total_row}'].border = thin_border
+    worksheet[f'H{total_row}'].font = Font(name='Calibri', size=11, bold=True)
+    worksheet[f'H{total_row}'].alignment = alignment_right
+
     worksheet[f'K{total_row}'] = totales["total_importe"]
+    worksheet[f'K{total_row}'].border = thin_border
+    worksheet[f'K{total_row}'].font = Font(name='Calibri', size=11, bold=True)
+    worksheet[f'K{total_row}'].alignment = alignment_right
+    worksheet[f'K{total_row}'].number_format = '#,##0.00'
+
     worksheet[f'L{total_row}'] = totales["total_igv"]
+    worksheet[f'L{total_row}'].border = thin_border
+    worksheet[f'L{total_row}'].font = Font(name='Calibri', size=11, bold=True)
+    worksheet[f'L{total_row}'].alignment = alignment_right
+    worksheet[f'L{total_row}'].number_format = '#,##0.00'
+
     worksheet[f'M{total_row}'] = totales["total_general"]
+    worksheet[f'M{total_row}'].border = thin_border
+    worksheet[f'M{total_row}'].font = Font(name='Calibri', size=11, bold=True)
+    worksheet[f'M{total_row}'].alignment = alignment_right
+    worksheet[f'M{total_row}'].number_format = '#,##0.00'
 
     # Guardar el archivo modificado en un buffer
     output = BytesIO()
