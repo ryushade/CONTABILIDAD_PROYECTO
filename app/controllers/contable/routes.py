@@ -213,6 +213,32 @@ def reportes():
         active_tab=active_tab
     )
 
+def last_day_of_month(any_day):
+    next_month = any_day.replace(day=28) + timedelta(days=4)
+    return next_month - timedelta(days=next_month.day)
+
+def parse_daterange(daterange):
+    try:
+        # Limpia espacios adicionales y remueve espacios al inicio y fin
+        daterange_clean = re.sub(r'\s+', ' ', daterange.strip())
+        # Divide por ' to ' o ' a '
+        dates = re.split(r'\s*(to|a)\s*', daterange_clean)
+        # Remueve los separadores del resultado
+        dates = [d for d in dates if d not in ('to', 'a')]
+        if len(dates) == 2:
+            start_date = datetime.strptime(dates[0].strip(), '%m/%Y').date()
+            end_date = datetime.strptime(dates[1].strip(), '%m/%Y').date()
+            end_date = last_day_of_month(end_date)
+        elif len(dates) == 1:
+            start_date = datetime.strptime(dates[0].strip(), '%m/%Y').date()
+            end_date = last_day_of_month(start_date)
+        else:
+            start_date = end_date = None
+        return start_date, end_date
+    except (ValueError, IndexError) as e:
+        print(f"Error processing date range: {daterange} - {e}")
+        return None, None
+    
 
 from flask import get_flashed_messages
 import app.models.contable_models as conta
@@ -881,7 +907,7 @@ def exportar_libro_diario_excel():
     worksheet[f'I{total_row}'].alignment = right_alignment
     worksheet[f'J{total_row}'].alignment = right_alignment
     
-    for col in ['A', 'I', 'J']:
+    for col in ['I', 'J']:
         cell = worksheet[f'{col}{total_row}']
         cell.border = thin_border
         cell.font = normal_font
@@ -1603,6 +1629,7 @@ def exportar_registro_compras_pdf():
 
     return send_file(output, download_name="registro_compras.pdf", as_attachment=True)
 
+from calendar import monthrange
 
 @accounting_bp.route('/exportar_libro_caja_excel', methods=['GET'])
 def exportar_libro_caja_excel():
@@ -1616,19 +1643,51 @@ def exportar_libro_caja_excel():
     output = BytesIO()
     workbook = load_workbook(template_path)
     worksheet = workbook.active
-    
-    # Obtener la fecha actual y formatearla
-    fecha_actual = datetime.now()
-    mes_anio_actual = fecha_actual.strftime('%m/%Y')
-    
+
+    # Obtener el rango de fechas desde los parámetros de la solicitud
+    daterange_caja = request.args.get('daterangecaja', '').strip()
+
+    if daterange_caja:
+        try:
+            # Parsear el mes y año seleccionados
+            selected_date = datetime.strptime(daterange_caja, '%m/%Y')
+            selected_month = selected_date.month
+            selected_year = selected_date.year
+
+            # Calcular las fechas de inicio y fin del mes seleccionado
+            start_date_caja = datetime(selected_year, selected_month, 1).date()
+            last_day = monthrange(selected_year, selected_month)[1]
+            end_date_caja = datetime(selected_year, selected_month, last_day).date()
+        except ValueError:
+            return "Fecha inválida", 400
+    else:
+        # Si no se proporciona una fecha, usar el mes actual
+        fecha_actual = datetime.now()
+        selected_month = fecha_actual.month
+        selected_year = fecha_actual.year
+        start_date_caja = fecha_actual.replace(day=1).date()
+        end_date_caja = last_day_of_month(fecha_actual).date()
+
+    # Llamar a obtener_libro_caja con las fechas
+    lista_libro_caja, total_caja = obtener_libro_caja(start_date_caja, end_date_caja)
+
+    # Verificar si hay datos
+    if not lista_libro_caja:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'error': 'No se encontraron registros para el criterio seleccionado.'}), 400
+        else:
+            return "No se encontraron registros para el criterio seleccionado.", 404
+
+    # Formatear mes y año para el encabezado
+    mes_anio_actual = f"{selected_month:02d}/{selected_year}"
+
     # Llenar las celdas con los datos de encabezado
     worksheet['B3'] = mes_anio_actual
     worksheet['B4'] = '20610588981'  # Ejemplo de RUC
     worksheet['B5'] = 'Tormenta'  # Nombre de la empresa
-    
-    # Define la fila inicial para los datos (ajustado para evitar filas extra)
-    start_row = 9  # Cambiado a la fila 9 para evitar la fila adicional
-    lista_libro_caja, total_caja = obtener_libro_caja()
+
+    # Define la fila inicial para los datos
+    start_row = 9
 
     # Borde delgado para las celdas
     thin_border = Border(
@@ -1651,7 +1710,7 @@ def exportar_libro_caja_excel():
     current_row = start_row
     for row in lista_libro_caja:
         worksheet[f'A{current_row}'] = numero_correlativo
-        worksheet[f'B{current_row}'] = row['fecha']
+        worksheet[f'B{current_row}'] = row['fecha'].strftime('%d/%m/%Y')
         worksheet[f'C{current_row}'] = row['glosa']
         worksheet[f'D{current_row}'] = row['cod_cuenta']
         worksheet[f'E{current_row}'] = row['nombre_cuenta']
@@ -1701,14 +1760,48 @@ def exportar_libro_caja_excel():
     
     return send_file(output, download_name="libro_caja.xlsx", as_attachment=True)
 
-
 @accounting_bp.route('/exportar_libro_caja_pdf', methods=['GET'])
 @jwt_required()
 @role_required('ADMIN', 'CONTADOR')
 def exportar_libro_caja_pdf():
     from fpdf import FPDF
     from io import BytesIO
-    from flask import send_file
+    from flask import send_file, jsonify
+    from calendar import monthrange
+
+    # Obtener el rango de fechas desde los parámetros de la solicitud
+    daterange_caja = request.args.get('daterangecaja', '').strip()
+
+    if daterange_caja:
+        try:
+            # Parsear el mes y año seleccionados
+            selected_date = datetime.strptime(daterange_caja, '%m/%Y')
+            selected_month = selected_date.month
+            selected_year = selected_date.year
+
+            # Calcular las fechas de inicio y fin del mes seleccionado
+            start_date_caja = datetime(selected_year, selected_month, 1).date()
+            last_day = monthrange(selected_year, selected_month)[1]
+            end_date_caja = datetime(selected_year, selected_month, last_day).date()
+        except ValueError:
+            return "Fecha inválida", 400
+    else:
+        # Si no se proporciona una fecha, usar el mes actual
+        fecha_actual = datetime.now()
+        selected_month = fecha_actual.month
+        selected_year = fecha_actual.year
+        start_date_caja = fecha_actual.replace(day=1).date()
+        end_date_caja = last_day_of_month(fecha_actual).date()
+
+    # Obtener datos del libro caja con el rango de fechas
+    lista_libro_caja, total_caja = obtener_libro_caja(start_date_caja, end_date_caja)
+
+    # Verificar si hay datos
+    if not lista_libro_caja:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'error': 'No se encontraron registros para el criterio seleccionado.'}), 400
+        else:
+            return "No se encontraron registros para el criterio seleccionado.", 404
 
     # Crear un objeto FPDF
     pdf = FPDF(orientation='L', unit='mm', format='A4')
@@ -1719,8 +1812,9 @@ def exportar_libro_caja_pdf():
     pdf.set_font("Arial", style='B', size=14)
     pdf.cell(0, 10, 'Libro Caja', ln=True, align='C')
     pdf.set_font("Arial", size=12)
-    pdf.cell(0, 10, 'RUC: 20610588981', ln=True, align='C')
+    pdf.cell(0, 10, f'RUC: 20610588981', ln=True, align='C')
     pdf.cell(0, 10, 'Razón Social: Tormenta', ln=True, align='C')
+    pdf.cell(0, 10, f'Periodo: {selected_month:02d}/{selected_year}', ln=True, align='C')  # Mostrar el mes y año seleccionados
 
     pdf.ln(10)  # Espacio vertical
 
@@ -1733,9 +1827,6 @@ def exportar_libro_caja_pdf():
     for header, width in headers:
         pdf.cell(width, 10, header, border=1, align='C')
     pdf.ln(10)
-
-    # Obtener datos del libro caja
-    lista_libro_caja, total_caja = obtener_libro_caja()
 
     # Agregar los datos
     pdf.set_font("Arial", size=9)
@@ -1756,7 +1847,7 @@ def exportar_libro_caja_pdf():
 
     # Ajustar los anchos de las columnas totales para coincidir con la tabla
     total_row_width = 10 + 30 + 105 + 20 + 50
-    pdf.cell(total_row_width, 10, 'Totales', border=1, align='R')  # Ancho combinado de las columnas iniciales
+    pdf.cell(total_row_width, 10, 'Totales', border=1, align='R')
     pdf.cell(30, 10, f"{total_caja['debe']:.2f}", border=1, align='R')
     pdf.cell(30, 10, f"{total_caja['haber']:.2f}", border=1, align='R')
 

@@ -850,8 +850,8 @@ def construir_jerarquia(cuentas):
             nodos[cuenta['cuenta_padre']]['hijos'].append(nodo)  # Si tiene padre, agrega el nodo actual a la lista de hijos del padre.
         else:
             estructura[cuenta['nivel']].append(nodo)  # Si no tiene padre, agrega el nodo al nivel superior en la estructura jerárquica.
-
     return estructura  # Devuelve la estructura jerárquica construida.
+    
 def insertar_regla(nombre_regla, tipo_transaccion, cuenta_debito_id, cuenta_credito_id, estado):
     conexion = obtener_conexion()
     try:
@@ -1049,9 +1049,10 @@ def obtener_libro_caja(start_date=None, end_date=None):
             "haber": total_haber_caja
         }
 
-        return  resultados, total_caja 
+        return resultados, total_caja 
     finally:
         conexion.close()
+
 
 
 def obtener_libro_caja_cuenta_corriente():
