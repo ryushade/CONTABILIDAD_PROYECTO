@@ -531,7 +531,8 @@
             <div class="container-fluid">
 
                 <!-- Formulario con el campo oculto para mantener el tab activo -->
-                <form id="filterFormCompra" class="row g-3 mb-3 align-items-end" method="GET" action="{{ url_for('contable.reportes') }}">
+                <form id="filterFormCompra" class="row g-3 mb-3 align-items-end" method="GET"
+                    action="{{ url_for('contable.reportes') }}">
                     <input type="hidden" name="active_tab" value="libro-compras" id="activeTabInput">
                     <!-- Campo oculto para el tab activo -->
                     <div class="col-4 col-md-3">
@@ -680,7 +681,7 @@
                 empresa,
                 utilizado para control de gastos y cálculo de créditos fiscales.</p>
             <div id="error-message-ventas" style="display: none; color: red; font-weight: bold; margin-bottom: 20px;">
-                </div>
+            </div>
             <div class="container-fluid">
 
                 <form id="filterFormVenta" class="row g-3 mb-3" method="GET"
@@ -1029,7 +1030,7 @@
 
 
 
-<div id="downloadExcelModal" class="confirmation-modal-overlay" style="display: none">
+<div id="downloadExcelLibrodiario" class="confirmation-modal-overlay" style="display: none">
     <div class="confirmation-modal" style="text-align: center;">
         <div class="modal-icon" style="margin-bottom: 10px;">
             <!-- Icono de descarga -->
@@ -1371,7 +1372,7 @@
         document.getElementById("downloadExcelModalVentas").style.display = "none";
     }
 
-    
+
 
     function openModalDownloadPDFVentas() {
         document.getElementById("downloadPDFModalVentas").style.display = "flex";
@@ -1489,15 +1490,20 @@
     function closeModalDownloadPDFMayor() {
         document.getElementById("downloadPDFModalMayor").style.display = "none";
     }
-
+    
     function openModalDownloadExcel() {
-        document.getElementById("downloadExcelModal").style.display = "flex";
+        document.getElementById("downloadExcelLibrodiario").style.display = "flex";
     }
 
 
-    function closeModalDownloadExcel() {
-        document.getElementById("downloadExcelModalVentas").style.display = "none";
-    }
+    document.addEventListener("DOMContentLoaded", function () {
+        // Define the function inside the event listener scope
+        function closeModalDownloadExcel() {
+            document.getElementById("downloadExcelLibrodiario").style.display = "none";
+        }
+
+        window.closeModalDownloadExcel = closeModalDownloadExcel;
+    }); // Added missing closing parenthesis
 
     function downloadExcel() {
         // Ocultar mensaje de error anterior
@@ -1583,7 +1589,7 @@
         closeModalDownloadPDF();
     }
     function downloadExcelVenta() {
-    // Ocultar mensaje de error anterior
+        // Ocultar mensaje de error anterior
         const errorContainer = document.getElementById('error-message-ventas');
         if (errorContainer) {
             errorContainer.style.display = 'none';
@@ -1594,8 +1600,8 @@
         const dateRange = dateRangeElement ? dateRangeElement.value : '';
 
 
-        const url = "{{ url_for('contable.exportar_registro_ventas_excel') }}" + 
-                    `?daterange=${encodeURIComponent(dateRange)}`;
+        const url = "{{ url_for('contable.exportar_registro_ventas_excel') }}" +
+            `?daterange=${encodeURIComponent(dateRange)}`;
 
         console.log('URL:', url);
 
@@ -1641,79 +1647,79 @@
     }
 
     function showErrorVentas(message) {
-    // Obtener el contenedor del mensaje de error
-    const errorContainer = document.getElementById('error-message-ventas');
-    if (errorContainer) {
-        errorContainer.textContent = message;
-        errorContainer.style.display = 'block';
+        // Obtener el contenedor del mensaje de error
+        const errorContainer = document.getElementById('error-message-ventas');
+        if (errorContainer) {
+            errorContainer.textContent = message;
+            errorContainer.style.display = 'block';
+        }
+
     }
-    
-}
-function downloadExcelCompras() {
-    // Ocultar mensaje de error anterior
-    const errorContainer = document.getElementById('error-message-compras');
-    if (errorContainer) {
-        errorContainer.style.display = 'none';
-        errorContainer.textContent = '';
-    }
+    function downloadExcelCompras() {
+        // Ocultar mensaje de error anterior
+        const errorContainer = document.getElementById('error-message-compras');
+        if (errorContainer) {
+            errorContainer.style.display = 'none';
+            errorContainer.textContent = '';
+        }
 
-    const dateRangeElement = document.getElementById('daterangecompra');
-    const dateRange = dateRangeElement ? dateRangeElement.value : '';
+        const dateRangeElement = document.getElementById('daterangecompra');
+        const dateRange = dateRangeElement ? dateRangeElement.value : '';
 
-    const url = "{{ url_for('contable.exportar_registro_compras_excel') }}" + 
-                `?daterange=${encodeURIComponent(dateRange)}`;
+        const url = "{{ url_for('contable.exportar_registro_compras_excel') }}" +
+            `?daterange=${encodeURIComponent(dateRange)}`;
 
-    console.log('URL:', url);
+        console.log('URL:', url);
 
-    // Mostrar el indicador de carga (opcional)
-    // showLoadingIndicator();
+        // Mostrar el indicador de carga (opcional)
+        // showLoadingIndicator();
 
-    fetch(url, {
-        method: 'GET',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-    })
-        .then(response => {
-            const contentType = response.headers.get('Content-Type');
-            if (contentType && contentType.includes('application/json')) {
-                // La respuesta es JSON, significa que hay un error
-                return response.json().then(data => {
-                    // Mostrar el mensaje de error
-                    showErrorCompras(data.error);
-                });
-            } else if (response.ok) {
-                // La respuesta es un archivo, descargarlo
-                return response.blob().then(blob => {
-                    const link = document.createElement('a');
-                    link.href = window.URL.createObjectURL(blob);
-                    link.download = 'Registro_Compras.xlsx';
-                    link.click();
-                });
-            } else {
-                // Otro tipo de error
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+        })
+            .then(response => {
+                const contentType = response.headers.get('Content-Type');
+                if (contentType && contentType.includes('application/json')) {
+                    // La respuesta es JSON, significa que hay un error
+                    return response.json().then(data => {
+                        // Mostrar el mensaje de error
+                        showErrorCompras(data.error);
+                    });
+                } else if (response.ok) {
+                    // La respuesta es un archivo, descargarlo
+                    return response.blob().then(blob => {
+                        const link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = 'Registro_Compras.xlsx';
+                        link.click();
+                    });
+                } else {
+                    // Otro tipo de error
+                    showErrorCompras('Ocurrió un error al exportar el archivo.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
                 showErrorCompras('Ocurrió un error al exportar el archivo.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showErrorCompras('Ocurrió un error al exportar el archivo.');
-        })
-        .finally(() => {
-            // Ocultar el indicador de carga (opcional)
-            // hideLoadingIndicator();
-            closeModalDownloadCompras();
-        });
-}
-
-function showErrorCompras(message) {
-    // Obtener el contenedor del mensaje de error
-    const errorContainer = document.getElementById('error-message-compras');
-    if (errorContainer) {
-        errorContainer.textContent = message;
-        errorContainer.style.display = 'block';
+            })
+            .finally(() => {
+                // Ocultar el indicador de carga (opcional)
+                // hideLoadingIndicator();
+                closeModalDownloadCompras();
+            });
     }
-}
+
+    function showErrorCompras(message) {
+        // Obtener el contenedor del mensaje de error
+        const errorContainer = document.getElementById('error-message-compras');
+        if (errorContainer) {
+            errorContainer.textContent = message;
+            errorContainer.style.display = 'block';
+        }
+    }
 
 
 </script>

@@ -36,7 +36,6 @@
     </div>
     
     <div class="text-center actions col-1" style="font-size: 14px">
-      <span class="action-button secondary eye" onclick="openModalVer('{{ cuenta['codigo_cuenta'] }}', '{{ cuenta['Nombre'] }}', '{{ cuenta['naturaleza'] }}', '{{ cuenta['nivel'] }}', '{{ cuenta['estado_cuenta'] }}')"><i class="fas fa-eye"></i></span>
       <span class="action-button secondary edit" data-cuenta-id="{{ cuenta['id_cuenta'] }}" onclick="openEditModal2('{{ cuenta.id_cuenta }}')"><i class="fas fa-edit"></i></span>
       <span class="action-button secondary trash" onclick='openModalDelete({{ cuenta['id_cuenta'] }}, "{{ cuenta['codigo_cuenta'] }}", "{{ cuenta['Nombre'] }}")'><i class="fas fa-trash"></i></span>
     </div>
