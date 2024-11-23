@@ -58,4 +58,4 @@ static/img/
 
 app/static/PDF/
 
-files/backupBD.sql
+app/static/files/backupBD.sql
