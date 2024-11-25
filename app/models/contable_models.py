@@ -442,7 +442,7 @@ def agregar_regla_en_db(nombre_regla, tipo_transaccion, cuenta_debito, cuenta_cr
             sql = """
             INSERT INTO reglas_contabilizacion 
             (nombre_regla, tipo_transaccion, cuenta_debe, cuenta_haber, estado, tipo_monto)
-            VALUES (%s, %s, %s, %s, %s, %s)  -- Placeholder corregido para 6 valores
+            VALUES (%s, %s, %s, %s, %s, %s)  
             """
             print("Ejecutando SQL:", sql)
             print("Valores:", (nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado, tipo_monto))
@@ -1196,5 +1196,21 @@ def cuentas_por_columnas():
             for index, cuenta in enumerate(cuentas_nivel_1):
                 columnas[index % 4].append(cuenta)
             return columnas
+    finally:
+        conexion.close()
+
+
+def obtener_numero_reglas_por_tipo_transaccion(tipo_transaccion):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            sql = "SELECT COUNT(*) AS total FROM reglas_contabilizacion WHERE tipo_transaccion = %s"
+            cursor.execute(sql, (tipo_transaccion,))
+            result = cursor.fetchone()
+            print("Número de reglas existentes para el tipo de transacción '{}': {}".format(tipo_transaccion, result['total']))
+            return result['total']
+    except Exception as e:
+        print("Error al obtener el número de reglas:", e)
+        return 0
     finally:
         conexion.close()

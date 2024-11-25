@@ -409,13 +409,15 @@ function submitAddForm(event) {
         closeModalAdd();
         location.reload();
       } else {
-        alert("Hubo un problema al agregar la regla: " + (data.message || ''));
+        // Mostrar directamente el mensaje enviado por el servidor
+        alert(data.message || "Hubo un problema al agregar la regla.");
       }
     })
     .catch(error => {
       console.error("Error al agregar la regla:", error);
-      alert("Error al agregar la regla. Revisa la consola para más detalles.");
+      alert("No se pueden agregar más de 3 reglas para este tipo de transacción.");
     });
+
 }
 
 
