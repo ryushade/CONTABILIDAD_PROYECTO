@@ -135,6 +135,7 @@
                                 </div>
 
                                 <div class="row justify-content-end mt-4">
+                                    <div id="errorMessages" class="text-danger mb-3" style="text-align: right"></div>
                                     <div class="col-1">
                                         <button type="button" class="btn btn-cotizar flex items-center">Cotizar</button>
                                     </div>
@@ -174,7 +175,7 @@
                                             <td>{{ producto.nombre }}</td>
                                             <td>S/ {{ producto.precio }}</td>
                                             <td>{{ producto.stock }}</td>
-                                            <td><button type="button" class="btn btn-primary btn-seleccionar" onclick="addToTable('{{ producto.nombre }}', {{ producto.precio }})">Seleccionar</button></td>
+                                            <td><button type="button" class="btn btn-primary btn-seleccionar" onclick="addToTable('{{ producto.nombre }}', {{ producto.precio }}, {{ producto.stock }})">Seleccionar</button></td>
                                         </tr>
                                         {% endfor %}
                                     </tbody>
@@ -312,12 +313,12 @@
     });
 
     // Función para añadir el producto seleccionado a la tabla o incrementar si ya existe
-    function addToTable(nombre, precio) {
+    function addToTable(nombre, precio, stock) {
         const tableBody = document.querySelector("#newventa .table-container tbody");
         const existingRow = Array.from(tableBody.rows).find(row => row.cells[0].textContent === nombre);
-    
+
         if (existingRow) {
-            // Esta función incrementa la cantidad en el input
+            // Actualiza la cantidad si el producto ya existe, con validación de stock
             updateQuantity(existingRow, 1, precio);
         } else {
             const newRow = document.createElement("tr");
@@ -325,7 +326,7 @@
                 <td class="text-center">${nombre}</td>
                 <td class="text-center">
                     <button type="button" class="btn btn-danger" onclick="updateQuantity(this.parentElement.parentElement, -1, ${precio})">-</button>
-                    <input type="number" name="cantidad" value="1" class="quantity" min="1" style="width: 75px; text-align: center;" oninput="updateQuantity(this.parentElement.parentElement, 0, ${precio})">
+                    <input type="number" name="cantidad" value="1" class="quantity" min="1" max="${stock}" data-stock="${stock}" style="width: 75px; text-align: center;" oninput="updateQuantity(this.parentElement.parentElement, 0, ${precio})">
                     <button type="button" class="btn btn-primary" onclick="updateQuantity(this.parentElement.parentElement, 1, ${precio})">+</button>
                 </td>
                 <td class="text-center">S/ ${precio.toFixed(2)}</td>
@@ -345,18 +346,31 @@
     // Función para actualizar la cantidad y subtotal de una fila
     function updateQuantity(row, change, price) {
         const input = row.querySelector(".quantity");
+        const stock = parseInt(input.getAttribute('data-stock'));
         let quantity = parseInt(input.value);
+        const errorMessages = document.getElementById('errorMessages');
+
+        // Ajustar la cantidad basada en el cambio
         quantity = change === 0 ? quantity : quantity + change;
-    
-        if (quantity < 1) quantity = 1; // Previene cantidad negativa
+
+        if (quantity < 1) quantity = 1; // Evita cantidades negativas
+
+        if (quantity > stock) {
+            quantity = stock; // No permitir que exceda el stock
+            errorMessages.textContent = `No hay suficiente stock para ${row.cells[0].textContent}. Stock disponible: ${stock}.`;
+        } else {
+            errorMessages.textContent = '';
+        }
+
         input.value = quantity;
-    
+
         const subtotalCell = row.querySelector(".subtotal");
         const subtotal = quantity * price;
         subtotalCell.textContent = `S/ ${subtotal.toFixed(2)}`;
-    
+
         updateTotals(); // Actualiza los totales después de cambiar la cantidad
     }
+
     
 
     // Función para eliminar una fila
@@ -369,12 +383,13 @@
     function updateTotals() {
         const subtotals = document.querySelectorAll(".subtotal");
         let importe = 0;
+        let stockExceeds = false;
 
         subtotals.forEach(subtotal => {
             importe += parseFloat(subtotal.textContent.replace("S/ ", "").replace(",", "."));
         });
 
-        const igv = importe * 0.18;  // Assuming 18% IGV
+        const igv = importe * 0.18;  // Asumiendo 18% de IGV
         const total = importe + igv;
 
         document.getElementById("importe").textContent = "S/. " + importe.toFixed(2);
@@ -382,6 +397,28 @@
         document.getElementById("igv").value = igv.toFixed(2);
         document.getElementById("monto_totalDisplay").textContent = total.toFixed(2);
         document.getElementById("monto_total").value = total.toFixed(2);
+
+        // Verificar si alguna cantidad excede el stock
+        const tableBody = document.querySelector("#newventa .table-container tbody");
+        Array.from(tableBody.rows).forEach(row => {
+            const input = row.querySelector(".quantity");
+            const quantity = parseInt(input.value);
+            const stock = parseInt(input.getAttribute('data-stock'));
+            if (quantity > stock) {
+                stockExceeds = true;
+                input.classList.add("is-invalid");
+            } else {
+                input.classList.remove("is-invalid");
+            }
+        });
+
+        // Deshabilitar o habilitar el botón "Cobrar"
+        const cobrarButton = document.querySelector('.btn-cobrar');
+        if (stockExceeds) {
+            cobrarButton.disabled = true;
+        } else {
+            cobrarButton.disabled = false;
+        }
     }
 
     // Actualizar el valor de "Total a pagar" al abrir el modal
