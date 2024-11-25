@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>🥇 Plan Contable General Empresarial 2022 Modificado | PCGE</title>
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .container-pcge {
+            margin: 0 auto;
+            padding: 20px;
+            max-width: 1200px;
+        }
+
+        .title-pcge {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .entry-title {
+            font-size: 32px;
+            font-weight: 900;
+            color: #3A3A3A;
+            line-height: 1.2;
+            letter-spacing: -1.5px;
+            margin: 0;
+        }
+
+        .cuentas {
+            column-count: 4;
+            /* Número de columnas */
+            column-gap: 40px;
+            /* Espacio entre columnas */
+            list-style: none;
+            padding: 0;
+        }
+
+        .cuentas li {
+            break-inside: avoid;
+            /* Evita que los elementos se rompan entre columnas */
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .cuentas li strong {
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-pcge">
+        <div class="title-pcge">
+            <h1 class="entry-title">
+                PLAN CONTABLE<br>
+                GENERAL EMPRESARIAL<br>
+                2022
+            </h1>
+        </div>
+
+        <ul class="cuentas">
+            {% for cuenta in cuentas %}
+            <li>
+                {% if cuenta.nivel == 1 %}
+                <strong style="font-size: 18px">ELEMENTO {{ cuenta.codigo_cuenta }}: {{ cuenta.nombre_cuenta }}</strong>
+                {% else %}
+                <strong>{{ cuenta.codigo_cuenta }}</strong> {{ cuenta.nombre_cuenta }}
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+
+</html>

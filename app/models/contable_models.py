@@ -1119,3 +1119,82 @@ def insertar_cuenta(codigo_cuenta, nombre, naturaleza, estado_cuenta):
             
     finally:
         conexion.close()
+
+
+def cuentas_jerarquicas():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor(pymysql.cursors.DictCursor) as cursor:
+            sql = """
+                WITH RECURSIVE CuentasJerarquicas AS (
+                    SELECT
+                        id_cuenta,
+                        codigo_cuenta,
+                        nombre_cuenta,
+                        tipo_cuenta,
+                        naturaleza,
+                        estado_cuenta,
+                        cuenta_padre,
+                        nivel,
+                        CAST(nombre_cuenta AS CHAR(1000)) AS jerarquia
+                    FROM cuenta
+                    WHERE cuenta_padre IS NULL OR cuenta_padre = 0  -- Aseguramos que se seleccionen las cuentas raíz
+
+                    UNION ALL
+
+                    SELECT
+                        c.id_cuenta,
+                        c.codigo_cuenta,
+                        c.nombre_cuenta,
+                        c.tipo_cuenta,
+                        c.naturaleza,
+                        c.estado_cuenta,
+                        c.cuenta_padre,
+                        c.nivel,
+                        CONCAT(cj.jerarquia, ' > ', c.nombre_cuenta) AS jerarquia
+                    FROM cuenta c
+                    INNER JOIN CuentasJerarquicas cj
+                    ON c.cuenta_padre = cj.id_cuenta
+                )
+                SELECT
+                    id_cuenta,
+                    codigo_cuenta,
+                    nombre_cuenta,
+                    cuenta_padre,
+                    nivel,
+                    jerarquia
+                FROM CuentasJerarquicas
+                ORDER BY codigo_cuenta;
+            """
+            cursor.execute(sql)
+            cuentas = cursor.fetchall()
+            return cuentas  # Devolvemos la lista completa de cuentas
+    finally:
+        conexion.close()
+
+
+def cuentas_por_columnas():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor(pymysql.cursors.DictCursor) as cursor:
+            sql = """
+                SELECT
+                    id_cuenta,
+                    codigo_cuenta,
+                    nombre_cuenta,
+                    cuenta_padre,
+                    nivel
+                FROM cuenta
+                WHERE cuenta_padre IS NULL -- Solo cuentas de nivel 1 (sin padre)
+                ORDER BY codigo_cuenta;
+            """
+            cursor.execute(sql)
+            cuentas_nivel_1 = cursor.fetchall()
+            
+            # Dividir las cuentas en 4 columnas
+            columnas = [[], [], [], []]
+            for index, cuenta in enumerate(cuentas_nivel_1):
+                columnas[index % 4].append(cuenta)
+            return columnas
+    finally:
+        conexion.close()

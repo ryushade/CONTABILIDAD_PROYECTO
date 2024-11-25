@@ -2,7 +2,7 @@ from app.models.conexion import obtener_conexion
 from flask import json, abort, request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app, send_from_directory
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
 
-from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, obtener_id_cuenta ,guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta_contable, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas, obtener_asientos_agrupados_excel, obtener_libro_caja, obtener_libro_caja_cuenta_corriente, actualizar_rol_usuario, obtener_registro_compras
+from app.models.contable_models import actualizar_regla_en_db, agregar_regla_en_db, obtener_id_cuenta , cuentas_jerarquicas, guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta_contable, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas, obtener_asientos_agrupados_excel, obtener_libro_caja, obtener_libro_caja_cuenta_corriente, actualizar_rol_usuario, obtener_registro_compras
 from functools import wraps
 from flask import current_app as app
 from . import accounting_bp
@@ -638,6 +638,12 @@ def actualizar_usu(id_usuario):
 
     return jsonify(resultado), 200
 
+
+@accounting_bp.route('/cuentas/pcge', methods=['GET'])
+@jwt_required()
+def prueba_pcge():
+    cuentas = cuentas_jerarquicas()  # Obtener las cuentas distribuidas
+    return render_template('contable/cuentas/pcge.html', cuentas=cuentas)  # Pasa las columnas al template
 
 
 @accounting_bp.route('/usuarios/agregar', methods=['POST'])
