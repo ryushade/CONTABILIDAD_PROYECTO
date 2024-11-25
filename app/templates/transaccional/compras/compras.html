@@ -352,9 +352,9 @@
             newRow.innerHTML = `
                 <td class="text-center">${nombre}</td>
                 <td class="text-center">
-                    <button type="button" onclick="updateQuantity(this.parentElement.parentElement, -1, ${precio})">-</button>
+                    <button type="button" class="btn btn-danger" onclick="updateQuantity(this.parentElement.parentElement, -1, ${precio})">-</button>
                     <input type="number" class="quantity" value="1" min="1" style="width:50px; text-align:center;">
-                    <button type="button" onclick="updateQuantity(this.parentElement.parentElement, 1, ${precio})">+</button>
+                    <button type="button" class="btn btn-primary" onclick="updateQuantity(this.parentElement.parentElement, 1, ${precio})">+</button>
                 </td>
                 <td class="text-center">S/ ${precio.toFixed(2)}</td>
                 <td class="text-center subtotal">S/ ${precio.toFixed(2)}</td>
