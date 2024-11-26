@@ -610,11 +610,10 @@
                             <td>{{ registro.fecha.strftime('%Y-%m-%d') }}</td>
                             <td class="text-align" style="text-align: center;">{{ registro.documento_cliente }}</td>
                             <td class="text-align" style="text-align: left;">{{ registro.nombre_cliente }}</td>
-                            <td class="text-align" style="text-align: left;width: 50px;">{{ registro.num_comprobante }}
-                            </td>
-                            <td class="text-end">{{ registro.importe | round(2) }}</td>
-                            <td class="text-end">{{ registro.igv | round(2) }}</td>
-                            <td class="text-end">{{ registro.total | round(2) }}</td>
+                            <td class="text-align" style="text-align: left;width: 50px;">{{ registro.num_comprobante }}</td>
+                            <td class="text-end">{{ "%.2f"|format(registro.importe) }}</td>
+                            <td class="text-end">{{ "%.2f"|format(registro.igv) }}</td>
+                            <td class="text-end">{{ "%.2f"|format(registro.total) }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -623,11 +622,11 @@
                             <th colspan="5" style="text-align: right; font-weight: bold; color: #000; font-size: 14px;">
                                 TOTAL (S/)</th>
                             <th style="font-weight: bold; font-size: 14px; color: #000;" class="text-end">
-                                {{ totalesCompras.total_importe | round(2) }}</th>
+                                {{ "%.2f"|format(totalesCompras.total_importe) }}</th>
                             <th style="font-weight: bold; font-size: 14px; color: #000;" class="text-end">
-                                {{ totalesCompras.total_igv | round(2) }}</th>
+                                {{ "%.2f"|format(totalesCompras.total_igv) }}</th>
                             <th style="font-weight: bold; font-size: 14px; color: #000;" class="text-end">
-                                {{ totalesCompras.total_general | round(2) }}</th>
+                                {{ "%.2f"|format(totalesCompras.total_general) }}</th>
                         </tr>
                     </tfoot>
                 </table>
@@ -731,9 +730,9 @@
                             <td class="text-center">{{ registro.documento_cliente }}</td>
                             <td class="text-align" style="text-align: left;">{{ registro.nombre_cliente }}</td>
                             <td class="text-center">{{ registro.num_comprobante }}</td>
-                            <td class="text-end">{{ registro.importe | round(2) }}</td>
-                            <td class="text-end">{{ registro.igv | round(2) }}</td>
-                            <td class="text-end">{{ registro.total | round(2) }}</td>
+                            <td class="text-end">{{ "%.2f"|format(registro.importe) }}</td>
+                            <td class="text-end">{{ "%.2f"|format(registro.igv) }}</td>
+                            <td class="text-end">{{ "%.2f"|format(registro.total) }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
