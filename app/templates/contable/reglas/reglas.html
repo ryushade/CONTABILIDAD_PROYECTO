@@ -201,6 +201,8 @@
             </tr>
         </thead>
         <tbody>
+            {% if reglas %}
+
             {% for regla in reglas %}
             <tr>
                 <td class="text-align" style="font-size: 14px;">{{ regla.nombre_regla }}</td>
@@ -262,7 +264,14 @@
                 </td>
             </tr>
             {% endfor %}
-            
+            {% else %}
+            <tr>
+                <td colspan="6" class="text-center" style="padding: 20px; font-size: 14px;">
+                    No se encontraron registros que coincidan con los criterios de búsqueda
+                </td>
+            </tr>
+            {% endif %}
+
         </tbody>
     </table>
 </div>
