@@ -1130,18 +1130,26 @@ def exportar_libro_mayor_excel():
             top=Side(style='thin', color='000000'),
             bottom=Side(style='thin', color='000000')
         )
+        sequential_number = 1  # Iniciar el número correlativo en 1
 
         for detalle in detalles:
             worksheet[f'A{current_row}'] = detalle['fecha_asiento'].strftime('%d/%m/%Y')
             worksheet[f'A{current_row}'].font = font
             worksheet[f'A{current_row}'].border = thin_border
+            worksheet[f'A{current_row}'].alignment = alignment_center  # Alinear al centro
 
+            # Agregar el número correlativo en la columna B
+            worksheet[f'B{current_row}'] = sequential_number
+            worksheet[f'B{current_row}'].font = font
+            worksheet[f'B{current_row}'].border = thin_border
+            worksheet[f'B{current_row}'].alignment = alignment_center  # Alinear al centro
+
+            sequential_number += 1  # Incrementar el número correlativo
 
             worksheet[f'C{current_row}'] = detalle['glosa']
             worksheet[f'C{current_row}'].font = font
             worksheet[f'C{current_row}'].alignment = alignment_left  # Alinear a la izquierda
             worksheet[f'C{current_row}'].border = thin_border
-            worksheet[f'A{current_row}'].alignment = alignment_center  # Alinear al centro
 
             saldo_debe = detalle['total_debe']
             saldo_haber = detalle['total_haber']
@@ -1164,7 +1172,7 @@ def exportar_libro_mayor_excel():
         worksheet[f'C{current_row}'].alignment = alignment_left  # Alinear a la izquierda
         worksheet[f'C{current_row}'].border = thin_border
 
-        # Sumar las columnas D (Deudor) y E (Acreedor)
+        # Sumar las columnas D (Debe) y E (Haber)
         total_debe_formula = f'=SUM(D{start_row}:D{current_row - 1})'
         total_haber_formula = f'=SUM(E{start_row}:E{current_row - 1})'
 
