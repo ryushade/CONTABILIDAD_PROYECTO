@@ -830,7 +830,7 @@ def obtenerCuentas():
             sql = """
                 SELECT id_cuenta, codigo_cuenta, nombre_cuenta AS Nombre, nivel, cuenta_padre, estado_cuenta, naturaleza
                 FROM cuenta
-                ORDER BY nivel, cuenta_padre, id_cuenta;
+                ORDER BY nivel, codigo_cuenta, cuenta_padre, id_cuenta;
                 """  # Consulta SQL que selecciona y ordena las cuentas para facilitar la jerarquización.
             cursor.execute(sql)  # Ejecuta la consulta SQL en la base de datos.
             cuentas = cursor.fetchall()  # Obtiene todos los registros de la consulta y los almacena en la variable cuentas.
