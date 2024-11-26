@@ -1428,6 +1428,8 @@ def exportar_registro_ventas_excel():
     worksheet['B4'] = '20610588981'  # RUC
     worksheet['B5'] = 'Tormenta'     # Razón social
 
+   
+
     # Iniciar desde la fila 11
     start_row = 12
     current_row = start_row
@@ -1505,8 +1507,7 @@ def exportar_registro_ventas_excel():
         worksheet[f'Q{current_row}'].number_format = '#,##0.00'
 
         current_row += 1
-
-
+        
     # Añadir totales al final
     total_row = current_row
     worksheet.merge_cells(f'H{total_row}:J{total_row}')
@@ -1532,6 +1533,8 @@ def exportar_registro_ventas_excel():
     worksheet[f'Q{total_row}'].font = Font(name='Calibri', size=11, bold=True)
     worksheet[f'Q{total_row}'].alignment = alignment_right
     worksheet[f'Q{total_row}'].number_format = '#,##0.00'
+
+    current_row += 1
 
     # Guardar el archivo modificado en un buffer
     output = BytesIO()
@@ -1711,15 +1714,15 @@ def exportar_registro_compras_excel():
 
     # Ajustar ancho de columnas
     column_widths = {
-        'A': 10,
-        'B': 12,
-        'C': 12,
-        'D': 5,
+        'A': 20,
+        'B': 18,
+        'C': 18,
+        'D': 8,
         'E': 8,
         'F': 8,
-        'G': 10,
-        'H': 5,
-        'I': 15,
+        'G': 30,
+        'H': 15,
+        'I': 20,
         'J': 30,
         'K': 15,
         'L': 15,
@@ -1821,14 +1824,40 @@ def exportar_registro_compras_excel():
         # Si tienes otras columnas (N, O, P, etc.), aplica el mismo procedimiento
 
         current_row += 1
+        ###
+        # Fila inicial donde se comenzarán a escribir los textos
+        start_row = 42
+
+        # Textos explicativos
+        explanatory_texts = [
+            '(1) Señalar la fecha correspondiente, de acuerdo a lo establecido en el literal b) del inciso II del numeral 1 del Artículo 10 del Reglamento de la Ley del IGV.',
+            '(2) Sólo para los casos de utilización de servicios o adquisiciones de intangibles provenientes del exterior.',
+            '(3) Sólo para los casos de detracciones. Es optativo el llenado cuando exista un sistema de enlace que mantenga dicha información y se pueda identificar los comprobantes de pago respecto de los cuales se efectuó el depósito.'
+        ]
+
+        # Escribir los textos consecutivamente desde A hasta M en cada fila
+        for i, text in enumerate(explanatory_texts, start=start_row):
+            # Fusionar celdas desde A hasta M en la fila correspondiente
+            worksheet.merge_cells(start_row=i, start_column=1, end_row=i, end_column=13)  # A=1, M=13
+            cell = worksheet.cell(row=i, column=1)  # La celda A{i}
+            
+            # Asignar texto y aplicar formato
+            cell.value = text
+            cell.font = Font(name='Calibri', size=10, bold=False)
+            cell.alignment = Alignment(horizontal='left', vertical='top', wrap_text=True)
+        ###
 
     # Añadir totales al final
     total_row = current_row
-    worksheet.merge_cells(f'H{total_row}:I{total_row}')
+    worksheet.merge_cells(f'H{total_row}:J{total_row}')
+    # Aplicar contenido y formato a la celda fusionada
     worksheet[f'H{total_row}'] = 'Totales'
-    worksheet[f'H{total_row}'].border = thin_border
     worksheet[f'H{total_row}'].font = Font(name='Calibri', size=11, bold=True)
-    worksheet[f'H{total_row}'].alignment = alignment_right
+    worksheet[f'H{total_row}'].alignment = Alignment(horizontal='right', vertical='center')
+
+    # Aplicar bordes a todas las celdas del rango fusionado
+    for col in range(8, 11):  # Columnas H (8) a J (10)
+        worksheet.cell(row=total_row, column=col).border = thin_border
 
     worksheet[f'K{total_row}'] = totales["total_importe"]
     worksheet[f'K{total_row}'].border = thin_border
