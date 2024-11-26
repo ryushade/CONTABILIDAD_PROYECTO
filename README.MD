@@ -26,3 +26,7 @@ venv\Scripts\activate
 
 # Ejecutar aplicacion (dentro del venv)
 flask run --debug
+
+
+# Descargar
+https://wkhtmltopdf.org/downloads.html

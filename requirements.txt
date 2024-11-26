@@ -14,3 +14,4 @@ aspose-cells
 Flask-JWT-Extended
 Spire.XLS
 fpdf
+wkhtmltopdf
