@@ -1,5 +1,5 @@
 from app.models.conexion import obtener_conexion
-from flask import json, abort, request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app, send_from_directory
+from flask import json, Response, abort, request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app, send_from_directory
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
 
 from app.models.contable_models import actualizar_regla_en_db, obtener_numero_reglas_por_tipo_transaccion, agregar_regla_en_db, obtener_id_cuenta , cuentas_jerarquicas, guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta_contable, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas, obtener_asientos_agrupados_excel, obtener_libro_caja, obtener_libro_caja_cuenta_corriente, actualizar_rol_usuario, obtener_registro_compras
@@ -22,6 +22,8 @@ from datetime import datetime, timedelta
 from openpyxl import load_workbook
 from openpyxl.styles import Border, Side, Font, Alignment
 from openpyxl.styles import numbers 
+import pdfkit
+
 
 def nocache(view):
     @wraps(view)
@@ -319,17 +321,37 @@ def exportar_excel():
     return send_file(output, download_name="plan_de_cuentas.xlsx", as_attachment=True)
 
 
-# routes.py
 @accounting_bp.route('/exportar_pdf', methods=['GET'], endpoint='exportar_pdf')
 @jwt_required()
 @role_required('ADMIN', 'CONTADOR')
 def descargar_pdf():
-    return send_from_directory(
-        directory='static/files',  
-        path='PCGE.pdf',
-        as_attachment=True,
-        download_name="PCGE.pdf"
+    cuentas = cuentas_jerarquicas()  # Reemplaza con tu método real de obtención de cuentas
+
+    rendered_html = render_template('contable/cuentas/pcge.html', cuentas=cuentas)
+    
+    config = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
+    
+    options = {
+        'page-size': 'A4',
+        'margin-top': '10mm',
+        'margin-right': '10mm',
+        'margin-bottom': '10mm',
+        'margin-left': '10mm',
+        'encoding': "UTF-8",
+        'enable-local-file-access': '',
+        'no-outline': None,
+    }
+    
+    pdf = pdfkit.from_string(rendered_html, False, configuration=config, options=options)
+    
+    return Response(
+        pdf,
+        mimetype='application/pdf',
+        headers={
+            'Content-Disposition': 'attachment; filename="Plan_Contable_General_Empresarial_2022.pdf"'
+        }
     )
+
 
 
 @accounting_bp.route('/cuentas/obtener/<int:cuenta_id>', methods=['GET'])
