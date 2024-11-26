@@ -1267,6 +1267,11 @@ def exportar_libro_diario_pdf():
 @accounting_bp.route('/exportar_libro_mayor_pdf', methods=['GET'])
 @jwt_required()
 def exportar_libro_mayor_pdf():
+    from fpdf import FPDF
+    from flask import send_file
+    from datetime import datetime
+    from io import BytesIO
+
     # Obtener datos del libro mayor con glosa agrupados por fecha
     libro_mayor = obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica()
 
@@ -1274,10 +1279,10 @@ def exportar_libro_mayor_pdf():
     fecha_actual = datetime.now()
     mes_anio_actual = fecha_actual.strftime('%m/%Y')
 
-    pdf_files = []
+    # Crear un objeto FPDF para todo el documento
+    pdf = FPDF(orientation='L', unit='mm', format='A4')
 
     for codigo_cuenta, detalles in libro_mayor.items():
-        pdf = FPDF(orientation='L')
         pdf.add_page()
 
         # Configurar la fuente
@@ -1285,7 +1290,7 @@ def exportar_libro_mayor_pdf():
 
         # Título
         pdf.set_font("Arial", style='B', size=14)
-        pdf.cell(0, 10, "FORMATO 6.1: \"LIBRO MAYOR\"", ln=True, align='C')
+        pdf.cell(0, 10, 'FORMATO 6.1: "LIBRO MAYOR"', ln=True, align='C')
 
         # Información del período, RUC, razón social y cuenta
         pdf.set_font("Arial", size=10)
@@ -1293,6 +1298,8 @@ def exportar_libro_mayor_pdf():
         pdf.cell(40, 10, "RUC: 20610588981", ln=True)
         pdf.cell(40, 10, "APELLIDOS Y NOMBRE: Tormenta", ln=True)
         pdf.cell(40, 10, f"CODIGO Y/O DENOMINACIÓN: {codigo_cuenta}", ln=True)
+
+        pdf.ln(10)  # Espacio vertical
 
         # Encabezado de tabla
         pdf.set_font("Arial", style='B', size=10)
@@ -1329,27 +1336,14 @@ def exportar_libro_mayor_pdf():
         pdf.cell(50, 10, f"{total_haber:.2f}", border=1, align='R')
         pdf.ln()
 
-        # Guardar el PDF en memoria
-        output = BytesIO()
-        output.write(pdf.output(dest='S').encode('latin1'))
-        output.seek(0)
+    # Guardar el PDF en memoria
+    output = BytesIO()
+    pdf_output = pdf.output(dest='S').encode('latin-1')
+    output.write(pdf_output)
+    output.seek(0)
 
-        pdf_files.append({
-            'filename': f"libro_mayor_{codigo_cuenta}.pdf",
-            'content': output.getvalue()
-        })
+    return send_file(output, download_name="libro_mayor.pdf", as_attachment=True)
 
-    # Enviar todos los archivos generados
-    if len(pdf_files) == 1:
-        return send_file(BytesIO(pdf_files[0]['content']), download_name=pdf_files[0]['filename'], as_attachment=True)
-    else:
-        import zipfile
-        zip_output = BytesIO()
-        with zipfile.ZipFile(zip_output, 'w') as zf:
-            for archivo in pdf_files:
-                zf.writestr(archivo['filename'], archivo['content'])
-        zip_output.seek(0)
-        return send_file(zip_output, download_name="libro_mayor.zip", as_attachment=True)
     
 @accounting_bp.route('/exportar_registro_ventas_excel', methods=['GET'])
 @jwt_required()
