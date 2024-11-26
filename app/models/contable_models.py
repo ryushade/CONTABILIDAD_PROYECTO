@@ -499,12 +499,13 @@ def actualizar_regla_en_db(id_regla, nombre_regla, tipo_transaccion, cuenta_debi
 
 
 
-
-def obtener_reglas(page, per_page):
+def obtener_reglas(page, per_page, tipo_transaccion=None, tipo_monto=None):
     connection = obtener_conexion()
     try:
         with connection.cursor() as cursor:
             offset = (page - 1) * per_page
+
+            # Base SQL query
             sql = """
             SELECT 
                 r.id_regla, 
@@ -521,18 +522,44 @@ def obtener_reglas(page, per_page):
                 cuenta c_debe ON r.cuenta_debe = c_debe.id_cuenta
             LEFT JOIN 
                 cuenta c_haber ON r.cuenta_haber = c_haber.id_cuenta
-            LIMIT %s OFFSET %s
             """
-            cursor.execute(sql, (per_page, offset))
+            
+            params = []
+            conditions = []
+
+            # Agregar condiciones según los filtros seleccionados
+            if tipo_transaccion and tipo_transaccion != 'Todas':
+                conditions.append("r.tipo_transaccion = %s")
+                params.append(tipo_transaccion)
+
+            if tipo_monto and tipo_monto != 'Todas':
+                conditions.append("r.tipo_monto = %s")
+                params.append(tipo_monto)
+
+            # Agregar condiciones si existen
+            if conditions:
+                sql += " WHERE " + " AND ".join(conditions)
+
+            # Paginación
+            sql += " LIMIT %s OFFSET %s"
+            params.extend([per_page, offset])
+
+            cursor.execute(sql, tuple(params))
             reglas = cursor.fetchall()
-            
-            # Obtener el total de resultados
-            cursor.execute("SELECT COUNT(*) as total FROM reglas_contabilizacion")
+
+            # Consulta para contar los resultados
+            count_sql = "SELECT COUNT(*) as total FROM reglas_contabilizacion r"
+            if conditions:
+                count_sql += " WHERE " + " AND ".join(conditions)
+
+            cursor.execute(count_sql, tuple(params[:-2] if conditions else []))
             total_results = cursor.fetchone()['total']
-            
+
             return reglas, total_results
     finally:
         connection.close()
+
+
 
 def obtener_asientos_agrupados(tipo_registro='Todas', start_date=None, end_date=None):
     conexion = obtener_conexion()

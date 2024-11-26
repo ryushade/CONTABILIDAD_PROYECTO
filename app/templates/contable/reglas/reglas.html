@@ -142,6 +142,50 @@
         </a>
     </div>
 </div>
+<div class="container-fluid">
+    <form method="GET" action="{{ url_for('contable.reglas') }}">
+        <div class="row g-3 mb-3">
+            <div class="col-4 col-md-3">
+                <label for="tipo-transaccion" class="form-label" style="font-size: 14px;">Tipo de transacción</label>
+                <select class="form-select" id="tipo-transaccion" name="tipo_transaccion" onchange="this.form.submit()">
+                    <option value="Todas" {% if tipo_transaccion=='Todas' %}selected{% endif %}>Todas</option>
+                    <option value="venta_contado" {% if tipo_transaccion=='venta_contado' %}selected{% endif %}>Venta al
+                        contado</option>
+                    <option value="compra_contado" {% if tipo_transaccion=='compra_contado' %}selected{% endif %}>Compra
+                        al contado</option>
+                    <option value="compra_contado_2" {% if tipo_transaccion=='compra_contado_2' %}selected{% endif %}>
+                        Factura de compra</option>
+                    <option value="compra_contado_3" {% if tipo_transaccion=='compra_contado_3' %}selected{% endif %}>
+                        Ingreso al almacén</option>
+                </select>
+            </div>
+
+            <div class="col-4 col-md-3">
+                <label for="tipo-monto" class="form-label" style="font-size: 14px;">Tipo de monto</label>
+                <select class="form-select" id="tipo-monto" name="tipo_monto" onchange="this.form.submit()">
+                    <option value="Todas" {% if tipo_monto=='Todas' %}selected{% endif %}>Todos</option>
+                    <option value="monto_total" {% if tipo_monto=='monto_total' %}selected{% endif %}>Monto total
+                    </option>
+                    <option value="base_imponible" {% if tipo_monto=='base_imponible' %}selected{% endif %}>Base
+                        imponible</option>
+                    <option value="igv" {% if tipo_monto=='igv' %}selected{% endif %}>IGV</option>
+                </select>
+            </div>
+
+            <div class="col-4 col-md-3">
+                <div class="mt-4">
+                    <a href="{{ url_for('contable.reglas') }}" class="btn btn-secondary mt-2"
+                        style="background-color: rgb(226, 39, 39); border: none; color: white;"
+                        onmouseover="this.style.backgroundColor='rgb(180, 20, 20)';"
+                        onmouseout="this.style.backgroundColor='rgb(226, 39, 39)';">
+                        <i class="fa-solid fa-filter-circle-xmark"></i> Borrar filtros
+                    </a>
+                </div>
+            </div>
+        </div>
+    </form>
+
+</div>
 
 
 <div class="table-container mt-2" style="border: 1px solid #ccc;">
@@ -218,6 +262,7 @@
                 </td>
             </tr>
             {% endfor %}
+            
         </tbody>
     </table>
 </div>
@@ -226,57 +271,48 @@
     <!-- Paginación -->
     <nav aria-label="Pagination" class="col-md-8">
         <ul class="pagination">
-            <!-- Botón Primero -->
             {% if page > 1 %}
             <li class="page-item">
-                <a href="{{ url_for('contable.reglas', page=1, per_page=per_page) }}" class="page-link"
-                    aria-label="Primera Página">
+                <a href="{{ url_for('contable.reglas', page=1, per_page=per_page, tipo_transaccion=tipo_transaccion, tipo_monto=tipo_monto) }}"
+                    class="page-link" aria-label="Primera Página">
                     &laquo;&laquo;
                 </a>
             </li>
-            {% endif %}
-
-            <!-- Botón Anterior -->
-            {% if page > 1 %}
             <li class="page-item">
-                <a href="{{ url_for('contable.reglas', page=page - 1, per_page=per_page) }}" class="page-link"
-                    aria-label="Página Anterior">
+                <a href="{{ url_for('contable.reglas', page=page - 1, per_page=per_page, tipo_transaccion=tipo_transaccion, tipo_monto=tipo_monto) }}"
+                    class="page-link" aria-label="Página Anterior">
                     &laquo;
                 </a>
             </li>
             {% endif %}
 
-            <!-- Números de Página -->
             {% set start_page = max(1, page - 2) %}
             {% set end_page = min(total_pages, page + 2) %}
             {% for p in range(start_page, end_page + 1) %}
             <li class="page-item {% if p == page %}active{% endif %}">
-                <a href="{{ url_for('contable.reglas', page=p, per_page=per_page) }}" class="page-link"
-                    aria-label="Página {{ p }}">
+                <a href="{{ url_for('contable.reglas', page=p, per_page=per_page, tipo_transaccion=tipo_transaccion, tipo_monto=tipo_monto) }}"
+                    class="page-link">
                     {{ p }}
                 </a>
             </li>
             {% endfor %}
 
-            <!-- Botón Siguiente -->
             {% if page < total_pages %} <li class="page-item">
-                <a href="{{ url_for('contable.reglas', page=page + 1, per_page=per_page) }}" class="page-link"
-                    aria-label="Página Siguiente">
+                <a href="{{ url_for('contable.reglas', page=page + 1, per_page=per_page, tipo_transaccion=tipo_transaccion, tipo_monto=tipo_monto) }}"
+                    class="page-link" aria-label="Página Siguiente">
                     &raquo;
                 </a>
                 </li>
-                {% endif %}
-
-                <!-- Botón Final -->
-                {% if page < total_pages %} <li class="page-item">
-                    <a href="{{ url_for('contable.reglas', page=total_pages, per_page=per_page) }}" class="page-link"
-                        aria-label="Última Página">
+                <li class="page-item">
+                    <a href="{{ url_for('contable.reglas', page=total_pages, per_page=per_page, tipo_transaccion=tipo_transaccion, tipo_monto=tipo_monto) }}"
+                        class="page-link" aria-label="Última Página">
                         &raquo;&raquo;
                     </a>
-                    </li>
-                    {% endif %}
+                </li>
+                {% endif %}
         </ul>
     </nav>
+
 
     <!-- Selector de Cantidad -->
     <div class="col-md-4 text-end mt-3 mt-md-0">

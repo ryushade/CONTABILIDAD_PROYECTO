@@ -147,16 +147,28 @@
                 if (data.error) {
                     alert('Error: ' + data.error);
                 } else {
-                    document.getElementById('codigo_cuenta').value = data.codigo_cuenta;
+                    // Get the textbox element
+                    const codigoCuentaInput = document.getElementById('codigo_cuenta');
+
+                    // Set values
+                    codigoCuentaInput.value = data.codigo_cuenta;
                     document.getElementById('nombre_cuenta').value = data.nombre_cuenta;
                     document.getElementById('naturaleza').value = data.naturaleza;
                     document.getElementById('estado_cuenta').value = data.estado_cuenta;
 
-                    // Establece la acción del formulario para enviar a la ruta de edición
+                    // Disable textbox if nivel is 1
+                    if (data.nivel === 1) {
+                        codigoCuentaInput.disabled = true;
+                        
+                    } else {
+                        codigoCuentaInput.disabled = false;
+                    }
+
+                    // Set form action
                     document.getElementById('editCuentaModal').action = '/contable/cuentas/editar/' + cuentaId;
 
-                    // Mostrar el modal
-                    document.querySelector('.modal-overlay').style.display = 'flex'; // Usa 'flex' si usas flexbox
+                    // Show modal
+                    document.querySelector('.modal-overlay').style.display = 'flex';
                 }
             })
             .catch(error => {

@@ -284,13 +284,13 @@ def cuentas():
 @jwt_required()
 @role_required('ADMIN', 'CONTADOR')
 def exportar_excel():
-    # Obtener los datos jerárquicos de cuentas
+
     cuentas = cuentas_jerarquicas()
 
-    # Crear un DataFrame de pandas
+
     df = pd.DataFrame(cuentas)
 
-    # Renombrar los encabezados según sea necesario
+
     df.rename(columns={
         'codigo_cuenta': 'Código de Cuenta',
         'nombre_cuenta': 'Nombre de Cuenta',
@@ -299,36 +299,36 @@ def exportar_excel():
         'jerarquia': 'Jerarquía'
     }, inplace=True)
 
-    # Asignar números secuenciales a las cuentas de nivel 1
+   
     df['Elemento'] = (df['Nivel'] == 1).cumsum()
 
-    # Función para formatear el nombre de la cuenta
+ 
     def formatear_nombre(row):
         if row['Nivel'] == 1:
             nombre_formateado = f'ELEMENTO {row["Elemento"]}: {row["Nombre de Cuenta"]}'
         else:
             nombre_formateado = row['Nombre de Cuenta']
-        # Agregar indentación basada en el nivel
+        
         indentacion = '    ' * (row['Nivel'] - 1)
         return f'{indentacion}{nombre_formateado}'
 
-    # Aplicar la función para formatear el nombre de la cuenta
+
     df['Nombre de Cuenta Formateado'] = df.apply(formatear_nombre, axis=1)
 
-    # Opcional: Puedes eliminar o mantener columnas según prefieras
+    
     df = df[['Código de Cuenta', 'Nombre de Cuenta Formateado', 'Nivel']]
 
-    # Renombrar la columna formateada
+    
     df.rename(columns={'Nombre de Cuenta Formateado': 'Nombre de Cuenta'}, inplace=True)
 
-    # Crear un objeto BytesIO para almacenar el archivo Excel en memoria
+    
     output = io.BytesIO()
 
-    # Escribir el DataFrame en el objeto Excel con formateo
+    
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         df.to_excel(writer, sheet_name='Plan de Cuentas', index=False)
 
-        # Obtener el libro y la hoja de trabajo
+        
         workbook = writer.book
         worksheet = writer.sheets['Plan de Cuentas']
 
@@ -361,8 +361,8 @@ def exportar_excel():
 
         # Aplicar estilos condicionales a las filas
         for row in range(2, worksheet.max_row + 1):
-            nivel = df.at[row - 2, 'Nivel']  # DataFrame index starts at 0
-            nombre_cuenta_cell = worksheet[f'B{row}']  # 'Nombre de Cuenta' está en la columna B
+            nivel = df.at[row - 2, 'Nivel'] 
+            nombre_cuenta_cell = worksheet[f'B{row}'] 
 
             if nivel == 1 or nivel == 2:
                 nombre_cuenta_cell.font = Font(bold=True)
@@ -374,10 +374,9 @@ def exportar_excel():
                 cell = worksheet.cell(row=row, column=col_num)
                 cell.border = thin_border
 
-    # Posicionar el puntero al inicio del objeto BytesIO
+    
     output.seek(0)
 
-    # Enviar el archivo Excel como respuesta para descargar
     return send_file(
         output,
         download_name="plan_de_cuentas.xlsx",
@@ -617,11 +616,16 @@ def actualizar_regla(id_regla):
 def reglas():
     page = request.args.get('page', default=1, type=int)
     per_page = request.args.get('per_page', default=5, type=int)
+    tipo_transaccion = request.args.get('tipo_transaccion', default='Todas')
+    tipo_monto = request.args.get('tipo_monto', default='Todas')
 
-    reglas, total_results = obtener_reglas(page, per_page)
+    # Llamar a la función para obtener las reglas y el total de resultados
+    reglas, total_results = obtener_reglas(page, per_page, tipo_transaccion, tipo_monto)
 
+    # Calcular el total de páginas
     total_pages = (total_results + per_page - 1) // per_page
 
+    # Renderizar la plantilla
     return render_template(
         'contable/reglas/reglas.html',
         reglas=reglas,
@@ -629,9 +633,13 @@ def reglas():
         per_page=per_page,
         total_results=total_results,
         total_pages=total_pages,
-        max = max,
-        min = min,
+        tipo_transaccion=tipo_transaccion,
+        tipo_monto=tipo_monto,
+        max=max,
+        min=min,
     )
+
+
 
 
 @accounting_bp.route('/usuarios', methods=['GET'])
