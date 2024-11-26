@@ -24,7 +24,8 @@ from openpyxl.styles import Border, Side, Font, Alignment
 from openpyxl.styles import numbers 
 import pdfkit
 from weasyprint import HTML, CSS
-
+from openpyxl.styles import Font, PatternFill, Alignment
+from openpyxl.utils import get_column_letter
 
 def nocache(view):
     @wraps(view)
@@ -283,43 +284,106 @@ def cuentas():
 @jwt_required()
 @role_required('ADMIN', 'CONTADOR')
 def exportar_excel():
-    cuentas = obtener_cuentas_excel()
+    # Obtener los datos jerárquicos de cuentas
+    cuentas = cuentas_jerarquicas()
 
+    # Crear un DataFrame de pandas
     df = pd.DataFrame(cuentas)
 
-    # Renombrar los encabezados
+    # Renombrar los encabezados según sea necesario
     df.rename(columns={
         'codigo_cuenta': 'Código de Cuenta',
         'nombre_cuenta': 'Nombre de Cuenta',
-        'tipo_cuenta': 'Tipo de Cuenta',
-        'naturaleza': 'Naturaleza'
+        'cuenta_padre': 'Cuenta Padre',
+        'nivel': 'Nivel',
+        'jerarquia': 'Jerarquía'
     }, inplace=True)
 
+    # Asignar números secuenciales a las cuentas de nivel 1
+    df['Elemento'] = (df['Nivel'] == 1).cumsum()
+
+    # Función para formatear el nombre de la cuenta
+    def formatear_nombre(row):
+        if row['Nivel'] == 1:
+            nombre_formateado = f'ELEMENTO {row["Elemento"]}: {row["Nombre de Cuenta"]}'
+        else:
+            nombre_formateado = row['Nombre de Cuenta']
+        # Agregar indentación basada en el nivel
+        indentacion = '    ' * (row['Nivel'] - 1)
+        return f'{indentacion}{nombre_formateado}'
+
+    # Aplicar la función para formatear el nombre de la cuenta
+    df['Nombre de Cuenta Formateado'] = df.apply(formatear_nombre, axis=1)
+
+    # Opcional: Puedes eliminar o mantener columnas según prefieras
+    df = df[['Código de Cuenta', 'Nombre de Cuenta Formateado', 'Nivel']]
+
+    # Renombrar la columna formateada
+    df.rename(columns={'Nombre de Cuenta Formateado': 'Nombre de Cuenta'}, inplace=True)
+
+    # Crear un objeto BytesIO para almacenar el archivo Excel en memoria
     output = io.BytesIO()
 
+    # Escribir el DataFrame en el objeto Excel con formateo
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        df.to_excel(writer, sheet_name='Plan de cuentas', index=False)
+        df.to_excel(writer, sheet_name='Plan de Cuentas', index=False)
 
+        # Obtener el libro y la hoja de trabajo
         workbook = writer.book
-        worksheet = writer.sheets['Plan de cuentas']
+        worksheet = writer.sheets['Plan de Cuentas']
 
+        # Definir estilos para el encabezado
         header_font = Font(bold=True, color="FFFFFF")
         header_fill = PatternFill(start_color="4F81BD", end_color="4F81BD", fill_type="solid")
-        alignment = Alignment(horizontal="center", vertical="center")
+        header_alignment = Alignment(horizontal="center", vertical="center")
+        thin_border = Border(
+            left=Side(style='thin'),
+            right=Side(style='thin'),
+            top=Side(style='thin'),
+            bottom=Side(style='thin')
+        )
 
+        # Aplicar estilos al encabezado
         for col_num, column_title in enumerate(df.columns, 1):
             cell = worksheet[f'{get_column_letter(col_num)}1']
             cell.font = header_font
             cell.fill = header_fill
-            cell.alignment = alignment
+            cell.alignment = header_alignment
+            cell.border = thin_border
 
+        # Ajustar el ancho de las columnas según el contenido
         for col_num, column in enumerate(df.columns, 1):
-            max_length = max([len(str(value)) for value in df[column]]) + 2
+            max_length = max(
+                df[column].astype(str).map(len).max(),
+                len(column)
+            ) + 2  # Añadir un poco de espacio adicional
             worksheet.column_dimensions[get_column_letter(col_num)].width = max_length
 
+        # Aplicar estilos condicionales a las filas
+        for row in range(2, worksheet.max_row + 1):
+            nivel = df.at[row - 2, 'Nivel']  # DataFrame index starts at 0
+            nombre_cuenta_cell = worksheet[f'B{row}']  # 'Nombre de Cuenta' está en la columna B
+
+            if nivel == 1 or nivel == 2:
+                nombre_cuenta_cell.font = Font(bold=True)
+            else:
+                nombre_cuenta_cell.font = Font(bold=False)
+
+            # Aplicar borde a todas las celdas de la fila
+            for col_num in range(1, worksheet.max_column + 1):
+                cell = worksheet.cell(row=row, column=col_num)
+                cell.border = thin_border
+
+    # Posicionar el puntero al inicio del objeto BytesIO
     output.seek(0)
 
-    return send_file(output, download_name="plan_de_cuentas.xlsx", as_attachment=True)
+    # Enviar el archivo Excel como respuesta para descargar
+    return send_file(
+        output,
+        download_name="plan_de_cuentas.xlsx",
+        as_attachment=True,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
 
 
 @accounting_bp.route('/exportar_pdf', methods=['GET'], endpoint='exportar_pdf')
