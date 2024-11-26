@@ -1131,14 +1131,11 @@ def cuentas_jerarquicas():
                         id_cuenta,
                         codigo_cuenta,
                         nombre_cuenta,
-                        tipo_cuenta,
-                        naturaleza,
-                        estado_cuenta,
                         cuenta_padre,
                         nivel,
                         CAST(nombre_cuenta AS CHAR(1000)) AS jerarquia
                     FROM cuenta
-                    WHERE cuenta_padre IS NULL OR cuenta_padre = 0  -- Aseguramos que se seleccionen las cuentas raíz
+                    WHERE cuenta_padre IS NULL OR cuenta_padre = 0
 
                     UNION ALL
 
@@ -1146,15 +1143,12 @@ def cuentas_jerarquicas():
                         c.id_cuenta,
                         c.codigo_cuenta,
                         c.nombre_cuenta,
-                        c.tipo_cuenta,
-                        c.naturaleza,
-                        c.estado_cuenta,
                         c.cuenta_padre,
                         c.nivel,
                         CONCAT(cj.jerarquia, ' > ', c.nombre_cuenta) AS jerarquia
                     FROM cuenta c
                     INNER JOIN CuentasJerarquicas cj
-                    ON c.cuenta_padre = cj.id_cuenta
+                        ON c.cuenta_padre = cj.id_cuenta
                 )
                 SELECT
                     id_cuenta,
@@ -1168,7 +1162,7 @@ def cuentas_jerarquicas():
             """
             cursor.execute(sql)
             cuentas = cursor.fetchall()
-            return cuentas  # Devolvemos la lista completa de cuentas
+            return cuentas
     finally:
         conexion.close()
 
@@ -1214,3 +1208,4 @@ def obtener_numero_reglas_por_tipo_transaccion(tipo_transaccion):
         return 0
     finally:
         conexion.close()
+

@@ -23,6 +23,7 @@ from openpyxl import load_workbook
 from openpyxl.styles import Border, Side, Font, Alignment
 from openpyxl.styles import numbers 
 import pdfkit
+from weasyprint import HTML, CSS
 
 
 def nocache(view):
@@ -325,34 +326,26 @@ def exportar_excel():
 @jwt_required()
 @role_required('ADMIN', 'CONTADOR')
 def descargar_pdf():
-    cuentas = cuentas_jerarquicas()  # Reemplaza con tu método real de obtención de cuentas
+    try:
+        # Obtener las cuentas jerárquicas
+        cuentas = cuentas_jerarquicas()
 
-    rendered_html = render_template('contable/cuentas/pcge.html', cuentas=cuentas)
-    
-    config = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
-    
-    options = {
-        'page-size': 'A4',
-        'margin-top': '10mm',
-        'margin-right': '10mm',
-        'margin-bottom': '10mm',
-        'margin-left': '10mm',
-        'encoding': "UTF-8",
-        'enable-local-file-access': '',
-        'no-outline': None,
-    }
-    
-    pdf = pdfkit.from_string(rendered_html, False, configuration=config, options=options)
-    
-    return Response(
-        pdf,
-        mimetype='application/pdf',
-        headers={
-            'Content-Disposition': 'attachment; filename="Plan_Contable_General_Empresarial_2022.pdf"'
-        }
-    )
+        # Renderizar el HTML con la plantilla
+        rendered_html = render_template('contable/cuentas/pcge.html', cuentas=cuentas)
 
+        # Generar el PDF con WeasyPrint
+        pdf = HTML(string=rendered_html).write_pdf(
+            stylesheets=[CSS("app/static/css/cuenta.css")],
+            presentational_hints=True
+        )
 
+        return Response(
+            pdf,
+            mimetype='application/pdf',
+            headers={'Content-Disposition': 'attachment; filename="Plan_Contable.pdf"'}
+        )
+    except Exception as e:
+        return f"Error al generar el PDF: {e}", 500
 
 @accounting_bp.route('/cuentas/obtener/<int:cuenta_id>', methods=['GET'])
 def obtener_cuenta(cuenta_id):
