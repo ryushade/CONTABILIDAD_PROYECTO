@@ -1443,6 +1443,20 @@ def exportar_registro_ventas_excel():
     alignment_left = Alignment(horizontal='left')
     alignment_right = Alignment(horizontal='right')
 
+# Ajustar tamaños de columna
+    worksheet.column_dimensions['A'].width = 20  # Número correlativo
+    worksheet.column_dimensions['B'].width = 20  # Fecha
+    worksheet.column_dimensions['C'].width = 20  # FechaV
+    worksheet.column_dimensions['D'].width = 15  # Tipo
+    worksheet.column_dimensions['E'].width = 30  # Serie
+    worksheet.column_dimensions['F'].width = 20  # Número
+    worksheet.column_dimensions['G'].width = 10   # Tipo Doc Cliente
+    worksheet.column_dimensions['H'].width = 20  # Documento Cliente
+    worksheet.column_dimensions['I'].width = 55  # Nombre Cliente
+    worksheet.column_dimensions['K'].width = 15  # Importe
+    worksheet.column_dimensions['O'].width = 15  # IGV
+    worksheet.column_dimensions['Q'].width = 15  # Total
+
     for registro in registros_ventas:
         worksheet[f'A{current_row}'] = registro["numero_correlativo"]
         worksheet[f'A{current_row}'].border = thin_border
@@ -1489,53 +1503,79 @@ def exportar_registro_ventas_excel():
         worksheet[f'I{current_row}'].font = font_style
         worksheet[f'I{current_row}'].alignment = alignment_left
 
-        worksheet[f'K{current_row}'] = registro["importe"]
+        worksheet[f'J{current_row}'] = registro["importe"]
+        worksheet[f'J{current_row}'].border = thin_border
+        worksheet[f'J{current_row}'].font = font_style
+        worksheet[f'J{current_row}'].alignment = alignment_right
+        worksheet[f'J{current_row}'].number_format = '#,##0.00'
+
+        worksheet[f'K{current_row}'] = registro["igv"]
         worksheet[f'K{current_row}'].border = thin_border
         worksheet[f'K{current_row}'].font = font_style
         worksheet[f'K{current_row}'].alignment = alignment_right
         worksheet[f'K{current_row}'].number_format = '#,##0.00'
 
-        worksheet[f'O{current_row}'] = registro["igv"]
-        worksheet[f'O{current_row}'].border = thin_border
-        worksheet[f'O{current_row}'].font = font_style
-        worksheet[f'O{current_row}'].alignment = alignment_right
-        worksheet[f'O{current_row}'].number_format = '#,##0.00'
-
-        worksheet[f'Q{current_row}'] = registro["total"]
-        worksheet[f'Q{current_row}'].border = thin_border
-        worksheet[f'Q{current_row}'].font = font_style
-        worksheet[f'Q{current_row}'].alignment = alignment_right
-        worksheet[f'Q{current_row}'].number_format = '#,##0.00'
+        worksheet[f'L{current_row}'] = registro["total"]
+        worksheet[f'L{current_row}'].border = thin_border
+        worksheet[f'L{current_row}'].font = font_style
+        worksheet[f'L{current_row}'].alignment = alignment_right
+        worksheet[f'L{current_row}'].number_format = '#,##0.00'
 
         current_row += 1
         
     # Añadir totales al final
     total_row = current_row
-    worksheet.merge_cells(f'H{total_row}:J{total_row}')
-    worksheet[f'H{total_row}'] = 'Totales'
-    worksheet[f'H{total_row}'].border = thin_border
-    worksheet[f'H{total_row}'].font = Font(name='Calibri', size=11, bold=True)
-    worksheet[f'H{total_row}'].alignment = alignment_right
+    worksheet.merge_cells(f'G{total_row}:I{total_row}')
+    worksheet[f'G{total_row}'] = 'Totales'
+    worksheet[f'G{total_row}'].border = thin_border
+    worksheet[f'G{total_row}'].font = Font(name='Calibri', size=11, bold=True)
+    worksheet[f'G{total_row}'].alignment = alignment_right
 
-    worksheet[f'K{total_row}'] = totales["total_importe"]
+    # Aplicar bordes a todas las celdas del rango fusionado
+    for col in range(7, 10):  # Columnas H (8) a J (10)
+        worksheet.cell(row=total_row, column=col).border = thin_border 
+
+    worksheet[f'J{total_row}'] = totales["total_importe"]
+    worksheet[f'J{total_row}'].border = thin_border
+    worksheet[f'J{total_row}'].font = Font(name='Calibri', size=11, bold=True)
+    worksheet[f'J{total_row}'].alignment = alignment_right
+    worksheet[f'J{total_row}'].number_format = '#,##0.00'
+
+    worksheet[f'K{total_row}'] = totales["total_igv"]
     worksheet[f'K{total_row}'].border = thin_border
     worksheet[f'K{total_row}'].font = Font(name='Calibri', size=11, bold=True)
     worksheet[f'K{total_row}'].alignment = alignment_right
     worksheet[f'K{total_row}'].number_format = '#,##0.00'
 
-    worksheet[f'O{total_row}'] = totales["total_igv"]
-    worksheet[f'O{total_row}'].border = thin_border
-    worksheet[f'O{total_row}'].font = Font(name='Calibri', size=11, bold=True)
-    worksheet[f'O{total_row}'].alignment = alignment_right
-    worksheet[f'O{total_row}'].number_format = '#,##0.00'
+    worksheet[f'L{total_row}'] = totales["total_general"]
+    worksheet[f'L{total_row}'].border = thin_border
+    worksheet[f'L{total_row}'].font = Font(name='Calibri', size=11, bold=True)
+    worksheet[f'L{total_row}'].alignment = alignment_right
+    worksheet[f'L{total_row}'].number_format = '#,##0.00'
 
-    worksheet[f'Q{total_row}'] = totales["total_general"]
-    worksheet[f'Q{total_row}'].border = thin_border
-    worksheet[f'Q{total_row}'].font = Font(name='Calibri', size=11, bold=True)
-    worksheet[f'Q{total_row}'].alignment = alignment_right
-    worksheet[f'Q{total_row}'].number_format = '#,##0.00'
+    ### En caso falle, eliminar
 
-    current_row += 1
+    start_row = total_row + 5
+
+    # Textos explicativos
+    explanatory_texts = [
+        '(1) Señalar la fecha correspondiente, de acuerdo a lo establecido en el literal b) del inciso II del numeral 1 del Artículo 10 del Reglamento de la Ley del IGV.',
+        '(2) Sólo para los casos de utilización de servicios o adquisiciones de intangibles provenientes del exterior.',
+        '(3) Sólo para los casos de detracciones. Es optativo el llenado cuando exista un sistema de enlace que mantenga dicha información y se pueda identificar los comprobantes de pago respecto de los cuales se efectuó el depósito.'
+    ]
+    
+    # Escribir los textos consecutivamente desde A hasta M en cada fila
+    for i, text in enumerate(explanatory_texts, start=start_row):
+        # Fusionar celdas desde A hasta M en la fila correspondiente
+        worksheet.merge_cells(start_row=i, start_column=1, end_row=i, end_column=13)  # A=1, M=13
+        cell = worksheet.cell(row=i, column=1)  # La celda A{i}
+        
+        # Asignar texto y aplicar formato
+        cell.value = text
+        cell.font = Font(name='Calibri', size=10, bold=False)
+        cell.alignment = Alignment(horizontal='left', vertical='top', wrap_text=True)
+
+    ###
 
     # Guardar el archivo modificado en un buffer
     output = BytesIO()
