@@ -1427,7 +1427,7 @@ def exportar_registro_ventas_excel():
     # Rellenar encabezados
     worksheet['B3'] = mes_anio_excel
     worksheet['B4'] = '20610588981'  # RUC
-    worksheet['B5'] = 'Tormenta'     # Razón social
+    worksheet['E5'] = 'Tormenta'     # Razón social
 
    
 
@@ -1444,10 +1444,10 @@ def exportar_registro_ventas_excel():
     alignment_right = Alignment(horizontal='right')
 
 # Ajustar tamaños de columna
-    worksheet.column_dimensions['A'].width = 20  # Número correlativo
-    worksheet.column_dimensions['B'].width = 20  # Fecha
-    worksheet.column_dimensions['C'].width = 20  # FechaV
-    worksheet.column_dimensions['D'].width = 15  # Tipo
+    worksheet.column_dimensions['A'].width = 16  # Número correlativo
+    worksheet.column_dimensions['B'].width = 18  # Fecha
+    worksheet.column_dimensions['C'].width = 16  # FechaV
+    worksheet.column_dimensions['D'].width = 18  # Tipo
     worksheet.column_dimensions['E'].width = 30  # Serie
     worksheet.column_dimensions['F'].width = 20  # Número
     worksheet.column_dimensions['G'].width = 10   # Tipo Doc Cliente
@@ -1731,7 +1731,7 @@ def exportar_registro_compras_excel():
     # Rellenar encabezados
     worksheet['B3'] = mes_anio_excel
     worksheet['B4'] = '20610588981'  # RUC
-    worksheet['B5'] = 'Tormenta'     # Razón social
+    worksheet['D5'] = 'Tormenta'     # Razón social
 
     # Definir estilos
     thin_border = Border(
@@ -1755,9 +1755,9 @@ def exportar_registro_compras_excel():
 
     # Ajustar ancho de columnas
     column_widths = {
-        'A': 20,
-        'B': 18,
-        'C': 18,
+        'A': 22,
+        'B': 22,
+        'C': 22,
         'D': 8,
         'E': 8,
         'F': 8,
