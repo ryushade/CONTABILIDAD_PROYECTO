@@ -141,6 +141,7 @@
     }
 
     function openEditModal2(cuentaId) {
+        console.log(cuentaId);
         fetch('/contable/cuentas/obtener/' + cuentaId)
             .then(response => response.json())
             .then(data => {
@@ -156,12 +157,11 @@
                     document.getElementById('naturaleza').value = data.naturaleza;
                     document.getElementById('estado_cuenta').value = data.estado_cuenta;
 
-                    // Disable textbox if nivel is 1
+                    // Use readOnly instead of disabled
                     if (data.nivel === 1) {
-                        codigoCuentaInput.disabled = true;
-                        
+                        codigoCuentaInput.readOnly = true;
                     } else {
-                        codigoCuentaInput.disabled = false;
+                        codigoCuentaInput.readOnly = false;
                     }
 
                     // Set form action
@@ -186,7 +186,7 @@
         editButtons.forEach(button => {
             button.addEventListener('click', function () {
                 const cuentaId = this.dataset.cuentaId;
-                openEditModal(cuentaId);
+                openEditModal2(cuentaId);
             });
         });
     });
@@ -286,7 +286,7 @@
 
 {% from "macros.html" import render_cuenta %}
 
-<div class="accordion accordion-flush" id="accordionFlushExample">
+<div class="accordion accordion-flush mb-5 mt-5 ms-4 me-4" id="accordionFlushExample">
     <div class="row mt-2">
         <div class="col">
             {% for key, cuentas_nivel in cuentas.items() %}
@@ -401,30 +401,6 @@
                     </div>
                 </div>
             </div>
-            <!-- <label id="" class="text-sm font-bold text-black mt-4 block" style="font-weight: bold;">
-                Código:
-            </label>
-            <p id="codigo_cuenta2" class="w-100 bg-gray-50 border-gray-300 text-gray-900 rounded-lg p-2 text-sm"></p>
-
-            <label class="text-sm font-bold text-black mt-4 block" style="font-weight: bold;">
-                Nombre:
-            </label>
-            <p id="nombre_cuenta2" class="w-100 bg-gray-50 border-gray-300 text-gray-900 rounded-lg p-2 text-sm"></p>
-
-            <label class="text-sm font-bold text-black mt-4 block" style="font-weight: bold;">
-                Naturaleza:
-            </label>
-            <p id="naturaleza2" class="w-100 bg-gray-50 border-gray-300 text-gray-900 rounded-lg p-2 text-sm"></p>
-
-            <label class="text-sm font-bold text-black mt-4 block" style="font-weight: bold;">
-                Nivel:
-            </label>
-            <p id="nivel_cuenta2" class="w-100 bg-gray-50 border-gray-300 text-gray-900 rounded-lg p-2 text-sm"></p>
-
-            <label class="text-sm font-bold text-black mt-4 block" style="font-weight: bold;">
-                Estado de la cuenta:
-            </label>
-            <p id="estado_cuenta2" class="w-100 bg-gray-50 border-gray-300 text-gray-900 rounded-lg p-2 text-sm"></p> -->
         </div>
     </div>
 </div>
@@ -523,11 +499,11 @@
     <div class="confirmation-modal" style="text-align: center;">
 
         <h2 class="confirmation-modal-title" style="color: rgb(30, 30, 30);">Cuenta contable dada de baja</h2>
-        <p class="confirmation-modal-message">{{ success_messages }}</p>
+        <p class="confirmation-modal-message">Se ha cambiado el estado de la cuenta satisfactoriamente</p>
         <input type="hidden" id="deleteCuentaId" value="">
-        <p id="deleteCuentaInfo" class="confirmation-modal-message"
+        <!-- <p id="deleteCuentaInfo" class="confirmation-modal-message"
             style="font-size: 18px; color: rgb(30, 30, 30); font-weight: bold;">
-        </p>
+        </p> -->
         <div class="confirmation-modal-buttons"
             style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
             <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" class="btn btn-secondary"
@@ -564,75 +540,6 @@
         </div>
     </div>
 </div>
-
-<!-- Edit Modal -->
-<form method="POST" id="editCuentaModal" class="edit-form">
-    <div class="modal-overlay" style="display: none;">
-        <div class="content-modal">
-            <div class="modal-header">
-                <h3 class="modal-title">Editar Cuenta</h3>
-                <button type="button" class="modal-close" onclick="closeModal()"
-                    style="border: none; color: black; background-color: white; width: 15px; font-weight: bold;">
-                    &times;
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="w-full text-start mb-5">
-                    <!-- Campo de código de la cuenta -->
-                    <label for="codigo_cuenta" class="text-sm font-bold text-black mt-4 block"
-                        style="font-weight: bold;">
-                        Código:
-                    </label>
-                    <input type="text" id="codigo_cuenta" name="codigo_cuenta" value=""
-                        class="w-100 bg-gray-50 border-gray-300 text-gray-900 rounded-lg border p-2 text-sm"
-                        placeholder="Código de la cuenta" required />
-
-                    <!-- Campo de nombre de la cuenta -->
-                    <label for="nombre_cuenta" class="text-sm font-bold text-black mt-4 block"
-                        style="font-weight: bold;">
-                        Nombre:
-                    </label>
-                    <input type="text" id="nombre_cuenta" name="nombre_cuenta" value=""
-                        class="w-100 bg-gray-50 border-gray-300 text-gray-900 rounded-lg border p-2 text-sm"
-                        placeholder="Nombre de la cuenta" required />
-
-                    <!-- Campo para naturaleza de la cuenta -->
-                    <label for="naturaleza" class="text-sm font-bold text-black mt-4 block" style="font-weight: bold;">
-                        Naturaleza:
-                    </label>
-                    <select id="naturaleza" name="naturaleza"
-                        class="w-100 text-sm bg-gray-50 border-gray-300 text-gray-900 rounded-lg border p-2" required>
-                        <option value="Deudora">Deudora</option>
-                        <option value="Acreedora">Acreedora</option>
-                    </select>
-
-                    <!-- Campo para estado de la cuenta -->
-                    <label for="estado_cuenta" class="text-sm font-bold text-black mt-4 block"
-                        style="font-weight: bold;">
-                        Estado de la cuenta:
-                    </label>
-                    <select id="estado_cuenta" name="estado_cuenta"
-                        class="w-100 text-sm bg-gray-50 border-gray-300 text-gray-900 rounded-lg border p-2" required>
-                        <option value="1">Activo</option>
-                        <option value="0">Inactivo</option>
-                    </select>
-                </div>
-
-                <!-- Botones de acción -->
-                <div class="modal-buttons d-flex justify-content-end">
-                    <button type="button" onclick="closeModal()" class="btn btn-secondary me-2">
-                        <i class="fas fa-times"></i> Cancelar
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Guardar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    </div>
-</form>
-<!--Excel descargar modal-->
 
 <!-- Excel Descargar Modal -->
 <div id="downloadExcelModal" class="confirmation-modal-overlay" style="display: none;">

@@ -423,6 +423,7 @@ def obtener_cuenta(cuenta_id):
 @accounting_bp.route('/cuentas/editar/<int:cuenta_id>', methods=['POST'])
 def editar_cuenta(cuenta_id):
     codigo_cuenta = request.form['codigo_cuenta']
+    print(codigo_cuenta)
     nombre_cuenta = request.form['nombre_cuenta']
     naturaleza = request.form['naturaleza']
     estado_cuenta = request.form['estado_cuenta']
