@@ -878,7 +878,7 @@ def exportar_libro_diario_excel():
     # Llenar las celdas específicas con los datos necesarios
     worksheet['B3'] = mes_anio_excel  
     worksheet['B4'] = '20610588981'
-    worksheet['B5'] = 'Tormenta'
+    worksheet['C5'] = 'Tormenta'
     
     # Definir la fila inicial para insertar los datos en la tabla
     start_row = 11
@@ -1018,7 +1018,7 @@ def exportar_libro_diario_excel():
         cell.font = normal_font
 
     # Asegurar que todas las columnas tengan un ancho adecuado
-    column_widths = {'A': 40, 'B': 15, 'C': 65, 'D': 10, 'F': 20, 'G': 15, 'H': 40, 'I': 15, 'J': 15}
+    column_widths = {'A': 35, 'B': 32, 'C': 65, 'D': 10, 'F': 20, 'G': 15, 'H': 40, 'I': 15, 'J': 15}
     for column, width in column_widths.items():
         worksheet.column_dimensions[column].width = width
 
