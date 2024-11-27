@@ -2065,7 +2065,7 @@ def exportar_libro_caja_excel():
     # Llenar las celdas con los datos de encabezado
     worksheet['B3'] = mes_anio_actual
     worksheet['B4'] = '20610588981'  # Ejemplo de RUC
-    worksheet['B5'] = 'Tormenta'  # Nombre de la empresa
+    worksheet['D5'] = 'Tormenta'  # Nombre de la empresa
 
     # Define la fila inicial para los datos
     start_row = 9
@@ -2090,28 +2090,35 @@ def exportar_libro_caja_excel():
     # Itera sobre los datos y llénalos en el Excel
     current_row = start_row
     for row in lista_libro_caja:
+        # Combina las celdas A y B para el número correlativo
+        worksheet.merge_cells(f'A{current_row}:B{current_row}')
         worksheet[f'A{current_row}'] = numero_correlativo
-        worksheet[f'B{current_row}'] = row['fecha'].strftime('%d/%m/%Y')
-        worksheet[f'C{current_row}'] = row['glosa']
-        worksheet[f'D{current_row}'] = row['cod_cuenta']
-        worksheet[f'E{current_row}'] = row['nombre_cuenta']
-        worksheet[f'F{current_row}'] = row['debe']
-        worksheet[f'G{current_row}'] = row['haber']
+        worksheet[f'C{current_row}'] = row['fecha'].strftime('%d/%m/%Y')
+        worksheet[f'D{current_row}'] = row['glosa']
+        worksheet[f'E{current_row}'] = row['cod_cuenta']
+        worksheet[f'F{current_row}'] = row['nombre_cuenta']
+        worksheet[f'G{current_row}'] = row['debe']
+        worksheet[f'H{current_row}'] = row['haber']
+
+         # Aplica formato numérico a las columnas "Debe" y "Haber"
+        worksheet[f'F{current_row}'].number_format = '0.00'  # Usa '0.0000' si necesitas más decimales
+        worksheet[f'G{current_row}'].number_format = '0.00'
 
         # Aplica bordes y alineación
-        for col in ['A', 'B', 'C', 'D', 'E', 'F', 'G']:
+        for col in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']:
             cell = worksheet[f'{col}{current_row}']
             cell.border = thin_border
             cell.font = normal_font
 
         # Alineación específica para columnas
         worksheet[f'A{current_row}'].alignment = center_alignment
-        worksheet[f'B{current_row}'].alignment = center_alignment
-        worksheet[f'C{current_row}'].alignment = left_alignment
-        worksheet[f'D{current_row}'].alignment = center_alignment
-        worksheet[f'E{current_row}'].alignment = left_alignment
-        worksheet[f'F{current_row}'].alignment = right_alignment
+        worksheet[f'C{current_row}'].alignment = center_alignment
+        worksheet[f'D{current_row}'].alignment = left_alignment
+        worksheet[f'E{current_row}'].alignment = center_alignment
+        worksheet[f'F{current_row}'].alignment = left_alignment
         worksheet[f'G{current_row}'].alignment = right_alignment
+        worksheet[f'H{current_row}'].alignment = right_alignment
+
 
         # Incrementa el número correlativo y la fila actual
         numero_correlativo += 1
@@ -2119,19 +2126,32 @@ def exportar_libro_caja_excel():
 
     # Agrega los totales en la última fila
     total_row = current_row
-    worksheet.merge_cells(f'A{total_row}:E{total_row}')
+    worksheet.merge_cells(f'A{total_row}:F{total_row}')
     worksheet[f'A{total_row}'] = "Total"
-    worksheet[f'F{total_row}'] = total_caja['debe']
-    worksheet[f'G{total_row}'] = total_caja['haber']
+    worksheet[f'G{total_row}'] = total_caja['debe']
+    worksheet[f'H{total_row}'] = total_caja['haber']
+
+    # Aplica formato numérico a las columnas de total "Debe" y "Haber"
+    worksheet[f'G{total_row}'].number_format = '0.00'  # Usa '0.0000' si necesitas más decimales
+    worksheet[f'H{total_row}'].number_format = '0.00'
 
     # Aplica formato y bordes a los totales
-    for col in ['A', 'F', 'G']:
+    for col in ['G', 'H']:
         cell = worksheet[f'{col}{total_row}']
         cell.border = thin_border
         cell.alignment = right_alignment
+    
+    # Configura el borde de la celda "A" sin borde inferior
+    worksheet[f'A{total_row}'].border = Border(
+        left=thin_border.left,
+        right=thin_border.right,
+        top=thin_border.top,
+        bottom=None  # Sin borde inferior
+    )
+    worksheet[f'A{total_row}'].alignment = right_alignment
 
     # Asegura el ancho de las columnas para mejor visibilidad
-    column_widths = {'A': 38, 'B': 15, 'C': 60, 'D': 15, 'E': 30, 'F': 15, 'G': 15}
+    column_widths = {'A': 12, 'B': 35, 'C': 20, 'D': 60, 'E': 15, 'F': 30, 'G': 15, 'H': 15}
     for column, width in column_widths.items():
         worksheet.column_dimensions[column].width = width
 
