@@ -2,7 +2,7 @@ from app.models.conexion import obtener_conexion
 from flask import json, Response, abort, request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app, send_from_directory
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
 
-from app.models.contable_models import actualizar_regla_en_db, obtener_numero_reglas_por_tipo_transaccion, agregar_regla_en_db, obtener_id_cuenta , cuentas_jerarquicas, guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta_contable, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas, obtener_asientos_agrupados_excel, obtener_libro_caja, obtener_libro_caja_cuenta_corriente, actualizar_rol_usuario, obtener_registro_compras, obtener_transacciones, obtener_reglas_por_tipo_transaccion
+from app.models.contable_models import actualizar_regla_en_db, obtener_numero_reglas_por_tipo_transaccion, agregar_regla_en_db, obtener_id_cuenta , cuentas_jerarquicas, guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta_contable, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas, obtener_asientos_agrupados_excel, obtener_libro_caja, obtener_libro_caja_cuenta_corriente, actualizar_rol_usuario, obtener_registro_compras, obtener_transacciones, obtener_reglas_por_tipo_transaccion, obtener_reglas_faltantes
 from functools import wraps
 from flask import current_app as app
 from . import accounting_bp
@@ -459,7 +459,6 @@ def agregar_regla():
     cuenta_debito_codigo = request.form.get("cuenta_debito_add", None)  # Permitir nulo
     cuenta_credito_codigo = request.form.get("cuenta_credito_add", None)  # Permitir nulo
     estado = request.form["estado_cuenta_add"]
-    tipo_monto = request.form["tipo_monto_add"]
     porcentaje_nueva_regla = int(request.form["porcentaje_nueva_regla"])/100
 
     print("Datos recibidos en agregar_regla:")
@@ -496,7 +495,7 @@ def agregar_regla():
             cuenta_debito,
             cuenta_credito,
             estado,
-            tipo_monto, porcentaje_nueva_regla
+            porcentaje_nueva_regla
         )
 
         if resultado:
@@ -601,7 +600,7 @@ def actualizar_regla(id_regla):
     print("Cuenta Crédito Código:", cuenta_credito_codigo)
     print("Estado:", estado)
 
-       # Convertir los códigos de cuenta a id_cuenta antes de actualizar
+    # Convertir los códigos de cuenta a id_cuenta antes de actualizar
     cuenta_debito = obtener_id_cuenta(cuenta_debito_codigo) if cuenta_debito_codigo else None
     cuenta_credito = obtener_id_cuenta(cuenta_credito_codigo) if cuenta_credito_codigo else None
 
@@ -622,16 +621,18 @@ def reglas():
     page = request.args.get('page', default=1, type=int)
     per_page = request.args.get('per_page', default=5, type=int)
     tipo_transaccion = request.args.get('tipo_transaccion', default='Todas')
-    tipo_monto = request.args.get('tipo_monto', default='Todas')
 
     # Llamar a la función para obtener las reglas y el total de resultados
-    reglas, total_results = obtener_reglas(page, per_page, tipo_transaccion, tipo_monto)
+    reglas, total_results = obtener_reglas(page, per_page, tipo_transaccion)
 
     # Calcular el total de páginas
     total_pages = (total_results + per_page - 1) // per_page
 
     tipo_transacciones = obtener_transacciones()
-    # Renderizar la plantilla
+
+    # Llamar a la función para obtener las reglas faltantes
+    reglas_faltantes = obtener_reglas_faltantes()
+
     return render_template(
         'contable/reglas/reglas.html',
         reglas=reglas,
@@ -641,7 +642,7 @@ def reglas():
         total_results=total_results,
         total_pages=total_pages,
         tipo_transaccion=tipo_transaccion,
-        tipo_monto=tipo_monto,
+        reglas_faltantes=reglas_faltantes,
         max=max,
         min=min,
     )
@@ -671,19 +672,20 @@ def filtrar_transacciones():
 @role_required('ADMIN', 'CONTADOR')
 def reglas_por_tipo_transaccion():
     tipo_transaccion = request.args.get('tipo_transaccion', default='', type=str)
+    solo_debito = request.args.get('solo_debito', default='0', type=str)
+    solo_credito = request.args.get('solo_credito', default='0', type=str)
 
     if not tipo_transaccion:
         return jsonify({'error': 'Falta el tipo de transacción'}), 400
 
     # Obtener todas las reglas (asegúrate de implementar esta función)
-    todas_las_reglas = obtener_reglas_por_tipo_transaccion(tipo_transaccion)  # Debe devolver todas las reglas disponibles
+    todas_las_reglas = obtener_reglas_por_tipo_transaccion(tipo_transaccion, solo_debito, solo_credito)  # Debe devolver todas las reglas disponibles
     reglas_filtradas = [
         regla for regla in todas_las_reglas
         if regla.get('tipo_transaccion') == tipo_transaccion
     ]
 
     return jsonify(reglas_filtradas)
-
 
 
 @accounting_bp.route('/usuarios', methods=['GET'])
@@ -753,8 +755,7 @@ def obtener_detalles_regla(regla_id):
             "cuenta_debito_codigo": regla.get("cuenta_debe_codigo"),
             "cuenta_debito_nombre": regla.get("cuenta_debe_nombre"),
             "cuenta_credito_codigo": regla.get("cuenta_haber_codigo"),
-            "cuenta_credito_nombre": regla.get("cuenta_haber_nombre"),
-            "tipo_monto" : regla.get("tipo_monto")
+            "cuenta_credito_nombre": regla.get("cuenta_haber_nombre")
         })
     else:
         return jsonify({'error': 'Regla no encontrada'}), 404

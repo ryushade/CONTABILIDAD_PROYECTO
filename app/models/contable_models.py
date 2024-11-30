@@ -326,10 +326,6 @@ def eliminar_regla_bd(regla_id):
     finally:
         conexion.close()
 
-
-
-
-
 def obtener_cuenta_por_id(cuenta_id):
     connection = obtener_conexion()
     try:
@@ -435,19 +431,19 @@ def obtener_asientodiario():
     finally:
         connection.close()
 
-def agregar_regla_en_db(nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado, tipo_monto, porcentaje):
+def agregar_regla_en_db(nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado, porcentaje):
     connection = obtener_conexion()  
     try:
         with connection.cursor() as cursor:
             sql = """
             INSERT INTO reglas_contabilizacion 
             (nombre_regla, tipo_transaccion, cuenta_debe, cuenta_haber, estado, tipo_monto, porcentaje_total)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)  
+            VALUES (%s, %s, %s, %s, %s, 'monto_total', %s)  
             """
             print("Ejecutando SQL:", sql)
-            print("Valores:", (nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado, tipo_monto, porcentaje))
+            print("Valores:", (nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado, porcentaje))
             
-            cursor.execute(sql, (nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado, tipo_monto, porcentaje))
+            cursor.execute(sql, (nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado, porcentaje))
             connection.commit()
             
             return cursor.rowcount > 0  
@@ -499,7 +495,7 @@ def actualizar_regla_en_db(id_regla, nombre_regla, tipo_transaccion, cuenta_debi
 
 
 
-def obtener_reglas(page, per_page, tipo_transaccion=None, tipo_monto=None):
+def obtener_reglas(page, per_page, tipo_transaccion=None):
     connection = obtener_conexion()
     try:
         with connection.cursor() as cursor:
@@ -531,10 +527,6 @@ def obtener_reglas(page, per_page, tipo_transaccion=None, tipo_monto=None):
             if tipo_transaccion and tipo_transaccion != 'Todas':
                 conditions.append("r.tipo_transaccion = %s")
                 params.append(tipo_transaccion)
-
-            if tipo_monto and tipo_monto != 'Todas':
-                conditions.append("r.tipo_monto = %s")
-                params.append(tipo_monto)
 
             # Agregar condiciones si existen
             if conditions:
@@ -1240,15 +1232,18 @@ def obtener_transacciones():
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
-            sql = "SELECT id, nombre, estado, tipo_registro FROM tipo_transaccion "
-            cursor.execute(sql,)
+            sql = "SELECT id, nombre, estado, tipo_registro FROM tipo_transaccion"
+            cursor.execute(sql)
             result = cursor.fetchall()
-            return result
+            # Extraer solo el campo 'tipo_registro'
+            tipo_registros = [row['nombre'] for row in result]
+            return tipo_registros
     except Exception as e:
-        print("Error al obtener el tipos de transaccion:", e)
-        return 0
+        print("Error al obtener los tipos de transaccion:", e)
+        return []
     finally:
         conexion.close()
+
 
 def obtener_transacciones_por_tipo(tipo):
     conexion = obtener_conexion()
@@ -1264,20 +1259,60 @@ def obtener_transacciones_por_tipo(tipo):
     finally:
         conexion.close()
 
-def obtener_reglas_por_tipo_transaccion(tipo_transaccion):
+def obtener_reglas_por_tipo_transaccion(tipo_transaccion, solo_debito='0', solo_credito='0'):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
             sql = """
                 SELECT nombre_regla, tipo_transaccion, porcentaje_total
-                FROM reglas_contabilizacion rc INNER JOIN tipo_transaccion tp ON tp.nombre = rc.tipo_transaccion
-                WHERE tipo_transaccion = %s AND porcentaje_total != 1
+                FROM reglas_contabilizacion rc
+                INNER JOIN tipo_transaccion tp ON tp.nombre = rc.tipo_transaccion
+                WHERE tipo_transaccion = %s
             """
-            cursor.execute(sql, [tipo_transaccion, ])
+            params = [tipo_transaccion]
+            conditions = []
+
+            # Agregar condiciones según los checkboxes
+            if solo_debito == '1':
+                conditions.append("rc.cuenta_debe IS NOT NULL")
+            if solo_credito == '1':
+                conditions.append("rc.cuenta_haber IS NOT NULL")
+
+            if conditions:
+                sql += " AND (" + " OR ".join(conditions) + ")"
+
+            cursor.execute(sql, params)
             result = cursor.fetchall()
             return result
     except Exception as e:
         print("Error al obtener las reglas de ese tipo:", e)
-        return 0
+        return []
+    finally:
+        conexion.close()
+
+def obtener_reglas_faltantes():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            sql = """
+                SELECT 
+                    tipo_transaccion,
+                    COUNT(cuenta_debe) AS total_cuenta_debe,
+                    COUNT(cuenta_haber) AS total_cuenta_haber
+                FROM 
+                    reglas_contabilizacion
+                GROUP BY 
+                    tipo_transaccion
+                HAVING 
+                    COUNT(cuenta_debe) = 0 
+                    OR 
+                    COUNT(cuenta_haber) = 0;
+            """
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            return result  # Esto devolverá una lista de diccionarios si usas pymysql.DictCursor
+    except Exception as e:
+        print("Error al validar reglas contables:", e)
+        return []
     finally:
         conexion.close()

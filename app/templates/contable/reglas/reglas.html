@@ -120,6 +120,15 @@
     td {
         padding: 10px;
     }
+    .alert-warning li {
+        transition: none;
+        margin-bottom: -10px;
+    }
+
+    .alert-warning li:hover {
+        background-color: transparent; /* Evitar cambios en el fondo */
+        color: inherit; /* Mantener el color del texto */
+    }
 </style>
 
 <div class="row align-items-center mt-2 mb-2">
@@ -151,28 +160,13 @@
                 <label for="tipo-transaccion" class="form-label" style="font-size: 14px;">Tipo de transacción</label>
                 <select class="form-select" id="tipo-transaccion" name="tipo_transaccion" onchange="this.form.submit()">
                     <option value="Todas" {% if tipo_transaccion=='Todas' %}selected{% endif %}>Todas</option>
-                    <option value="venta_contado" {% if tipo_transaccion=='venta_contado' %}selected{% endif %}>Venta al
-                        contado</option>
-                    <option value="compra_contado" {% if tipo_transaccion=='compra_contado' %}selected{% endif %}>Compra
-                        al contado</option>
-                    <option value="compra_contado_2" {% if tipo_transaccion=='compra_contado_2' %}selected{% endif %}>
-                        Factura de compra</option>
-                    <option value="compra_contado_3" {% if tipo_transaccion=='compra_contado_3' %}selected{% endif %}>
-                        Ingreso al almacén</option>
+                    {% for tipo in tipo_transacciones %}
+                        <option value="{{ tipo }}" {% if tipo_transaccion == tipo %}selected{% endif %}>
+                            {{ tipo | replace('_', ' ') | title }}
+                        </option>
+                    {% endfor %}
                 </select>
-            </div>
-
-            <div class="col-4 col-md-3">
-                <label for="tipo-monto" class="form-label" style="font-size: 14px;">Tipo de monto</label>
-                <select class="form-select" id="tipo-monto" name="tipo_monto" onchange="this.form.submit()">
-                    <option value="Todas" {% if tipo_monto=='Todas' %}selected{% endif %}>Todos</option>
-                    <option value="monto_total" {% if tipo_monto=='monto_total' %}selected{% endif %}>Monto total
-                    </option>
-                    <option value="base_imponible" {% if tipo_monto=='base_imponible' %}selected{% endif %}>Base
-                        imponible</option>
-                    <option value="igv" {% if tipo_monto=='igv' %}selected{% endif %}>IGV</option>
-                </select>
-            </div>
+            </div>            
 
             <div class="col-4 col-md-3">
                 <div class="mt-4">
@@ -189,6 +183,25 @@
 
 </div>
 
+<div class="row ms-2 me-2">
+    {% if reglas_faltantes %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert" style="height: auto;">
+            Algunas transacciones no tienen reglas asignadas correctamente:
+                {% for regla in reglas_faltantes %}
+                    <li class="ms-2">
+                        <strong>{{ regla.tipo_transaccion }} </strong>:
+                        {% if regla.total_cuenta_debe == 0 %}
+                            <span>Falta asignar una regla en el <strong> Debe</strong>.</span>
+                        {% endif %}
+                        {% if regla.total_cuenta_haber == 0 %}
+                            <span>Falta asignar una regla en el <strong> Haber</strong>.</span>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    {% endif %}
+</div>
 
 <div class="table-container mt-2" style="border: 1px solid #ccc;">
     <table style="border: #000; width: 100%; font-size: 13px;">
@@ -432,84 +445,11 @@
     </div>
 </div>
 
-
-<div id="editReglaModal" class="modal-overlay"
-    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1050;">
-    <div class="content-modal p-4"
-        style="background-color: white; max-width: 600px; max-height: 90vh; width: 100%; overflow-y: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
-        <!-- Encabezado -->
-        <div class="modal-header d-flex justify-content-between align-items-center border-0 pb-3"
-            style="padding-right: 10px;">
-            <h3 class="modal-title" style="font-weight: bold;">EDITAR REGLA</h3>
-            <button type="button" class="modal-close" onclick="closeModalEditRegla()"
-                style="border: none; color: black; background-color: #e74c3c; font-weight: bold; font-size: 24px; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">&times;</button>
-        </div>
-
-        <!-- Cuerpo del modal -->
-        <div class="modal-body">
-            <form id="editReglaForm" onsubmit="submitEditForm(event)">
-                <!-- Nombre de la regla -->
-                <div class="mb-4">
-                    <label for="nombre_regla_edit" class="form-label" style="font-weight: bold;">Nombre:</label>
-                    <input type="text" id="nombre_regla_edit" name="nombre_regla" class="form-control"
-                        placeholder="Ej: Registro de venta al contado" required />
-                </div>
-
-                <!-- Tipo de transacción -->
-                <div class="mb-4">
-                    <label for="tipo_transaccion_edit" class="form-label" style="font-weight: bold;">Tipo de
-                        transacción:</label>
-                    <select id="tipo_transaccion_edit" name="tipo_transaccion" class="form-select" required>
-
-                        {% for tipo_transa in tipo_transacciones %}
-                        <option value="{{ tipo_transa.id }}">{{ tipo_transa.nombre }}</option>
-
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <!-- Cuenta débito -->
-                <div class="mb-4">
-                    <label for="cuenta_debito_edit" class="form-label" style="font-weight: bold;">Cuenta débito:</label>
-                    <input type="text" id="cuenta_debito_edit" name="cuenta_debito" class="form-control"
-                        placeholder="Ej: 1212" />
-                </div>
-
-                <!-- Cuenta crédito -->
-                <div class="mb-4">
-                    <label for="cuenta_credito_edit" class="form-label" style="font-weight: bold;">Cuenta
-                        crédito:</label>
-                    <input type="text" id="cuenta_credito_edit" name="cuenta_credito" class="form-control"
-                        placeholder="Ej: 4010" />
-                </div>
-
-                <!-- Estado de la cuenta -->
-                <div class="mb-4">
-                    <label for="estado_cuenta_edit" class="form-label" style="font-weight: bold;">Estado:</label>
-                    <select id="estado_cuenta_edit" name="estado_cuenta" class="form-select" required>
-                        <option value="1">Activo</option>
-                        <option value="0">Inactivo</option>
-                    </select>
-                </div>
-
-                <!-- Botones de acción -->
-                <div class="d-flex justify-content-end mt-4" style="gap: 12px;">
-                    <button type="button" onclick="closeModalEditRegla()"
-                        class="btn btn-secondary me-2">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
 <style>
     .action-button {
         padding: 4px 6px;
     }
 </style>
-
-
 
 <!-- Agregar nueva regla -->
 <form id="addReglaForm" method="POST" action="{{ url_for('contable.agregar_regla') }}">
@@ -586,43 +526,13 @@
                     <input type="text" id="cuenta_debito_add" name="cuenta_debito_add" class="form-control"
                         placeholder="Ej: 1212" required />
                 </div>
-
-
-
-
+                
                 <!-- Cuenta crédito -->
                 <div class="mb-4">
                     <label for="cuenta_credito" class="form-label">Cuenta
                         crédito:</label>
                     <input type="text" id="cuenta_credito_add" name="cuenta_credito_add" class="form-control"
                         placeholder="Ej: 4010" required />
-                </div>
-
-                <div class="mb-4">
-                    <label for="tipo_monto_add" class="form-label" style="font-weight: bold;">Tipo de monto:</label>
-                    <select id="tipo_monto_add" name="tipo_monto_add" class="form-select" required>
-                        <option value="monto_total">Monto total</option>
-                        <option value="igv">IGV</option>
-                        <option value="base_imponible">Base imponible</option>
-                    </select>
-
-                </div>
-
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <!-- Opción Solo Débito -->
-                        <label for="">Va representar el 100%</label>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1"
-                                value="si">
-                            <label class="form-check-label" for="flexRadioDefault1">Si</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2"
-                                value="no" checked>
-                            <label class="form-check-label" for="flexRadioDefault2">No</label>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Contenido a mostrar u ocultar -->
@@ -642,9 +552,13 @@
                     <div id="contenedorReglas">
                         <!-- Las reglas se agregarán aquí dinámicamente -->
                     </div>
+
+                    <!-- Mensaje de Validación -->
+                    <p id="porcentajeMensaje" style="color: red; display: none; margin-top: 10px;"></p>
+
                 </div>
                 <!-- Estado de la cuenta -->
-                <div class="mb-4">
+                <div class="mb-2">
                     <label for="estado_cuenta" class="form-label" style="font-weight: bold;">Estado:</label>
                     <select id="estado_cuenta" name="estado_cuenta_add" class="form-select" required>
                         <option value="1">Activo</option>
@@ -652,12 +566,15 @@
                     </select>
                 </div>
 
+                <div class="row">
+                    <p id="xd" style="color: red; margin-top: 10px; font-weight: bold;" class="ms-2">*Primero se deben crear las reglas, tanto Deudoras como Acreedoras, luego ya se procede a realizar las ventas, de lo contrario los montos estaran descuadrados</p>
+                </div>
                 <!-- Botones de acción -->
                 <div class="d-flex justify-content-end mt-4" style="gap: 12px;">
                     <button type="button" onclick="closeModalAdd()" class="btn btn-secondary me-2">
                         <i class="fas fa-times"></i> Cancelar
                     </button>
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" id="guardarButton" class="btn btn-primary">
                         <i class="fas fa-save"></i> Guardar
                     </button>
                 </div>
@@ -871,251 +788,401 @@
 
 </script>
 
+<!-- xd -->
+
 <script>
-    let currentReglaId = null;
+    document.addEventListener('DOMContentLoaded', function() {
+        // Obtener elementos del DOM
+        const tipoRegistroSelect = document.getElementById('tipo_registro');
+        const tipoTransaccionSelect = document.getElementById('tipo_transaccion_add');
+        const soloDebitoCheckbox = document.getElementById('solo_debito_checkbox');
+        const soloCreditoCheckbox = document.getElementById('solo_credito_checkbox');
+        const contenedorReglas = document.getElementById('contenedorReglas');
+        const reglaPorcentaje = document.getElementById('reglaPorcentaje');
+        const cuentaDebitoInput = document.getElementById('cuenta_debito_add');
+        const cuentaCreditoInput = document.getElementById('cuenta_credito_add');
+        const porcentajeNuevaRegla = document.getElementById('porcentaje_nueva_regla');
+        const guardarButton = document.getElementById('guardarButton');
+        const porcentajeMensaje = document.getElementById('porcentajeMensaje');
 
-    function openEditModal(reglaId, nombre, tipoTransaccion, cuentaDebito, cuentaCredito, estado) {
-        console.log("Datos recibidos:", { reglaId, nombre, tipoTransaccion, cuentaDebito, cuentaCredito, estado });
-
-        currentReglaId = reglaId;
-        document.getElementById("nombre_regla_edit").value = nombre || "";
-        document.getElementById("tipo_transaccion_edit").value = tipoTransaccion || "";
-        document.getElementById("cuenta_debito_edit").value = cuentaDebito || "";
-        document.getElementById("cuenta_credito_edit").value = cuentaCredito || "";
-        document.getElementById("estado_cuenta_edit").value = estado || "";
-
-        document.getElementById("cuenta_debito_edit").disabled = !cuentaDebito;
-        document.getElementById("cuenta_credito_edit").disabled = !cuentaCredito;
-
-        document.getElementById("editReglaModal").style.display = "flex";
-    }
-
-    function closeModalEditRegla() {
-        document.getElementById("editReglaModal").style.display = "none";
-    }
-
-    // Validación para evitar caracteres no permitidos
-    function validateAccountField(input) {
-        const regex = /^[0-9]*$/;
-        if (!regex.test(input.value)) {
-            input.value = input.value.replace(/[^0-9]/g, '');
-            alert("Solo se permiten números en los campos de cuenta.");
-        }
-    }
-
-    // Envía el formulario de edición
-    function submitEditForm(event) {
-        event.preventDefault();
-
-        const nombreRegla = document.getElementById("nombre_regla_edit").value;
-        const tipoTransaccion = document.getElementById("tipo_transaccion_edit").value;
-        const cuentaDebito = document.getElementById("cuenta_debito_edit").value || null;
-        const cuentaCredito = document.getElementById("cuenta_credito_edit").value || null;
-        const estado = document.getElementById("estado_cuenta_edit").value;
-
-        // Verificar que al menos una cuenta esté habilitada
-        if (!cuentaDebito && !cuentaCredito) {
-            alert("Debe ingresar al menos una cuenta de débito o crédito.");
-            return;
+        // Función para evitar caracteres no permitidos en campos de cuentas
+        function validateAccountField(input) {
+            const regex = /^[0-9]*$/;
+            if (!regex.test(input.value)) {
+                input.value = input.value.replace(/[^0-9]/g, '');
+                alert("Solo se permiten números en los campos de cuenta.");
+            }
         }
 
-        fetch(`/contable/reglas/actualizar_regla/${currentReglaId}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                nombre_regla: nombreRegla,
-                tipo_transaccion: tipoTransaccion,
-                cuenta_debito: cuentaDebito,
-                cuenta_credito: cuentaCredito,
-                estado: estado,
-            }),
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert("Regla actualizada correctamente.");
-                    closeModalEdit();
-                    location.reload();
-                } else {
-                    console.log("Error en la respuesta del servidor:", data.message);
-                    alert("Error al actualizar la regla: " + data.message);
-                }
-            })
-            .catch(error => {
-                console.error("Error en la solicitud:", error);
-                alert("Ocurrió un error al intentar actualizar la regla.");
-            });
-    }
+        // Asignar eventos de validación en los campos de cuentas
+        cuentaDebitoInput.addEventListener("input", function () {
+            validateAccountField(this);
+        });
+        cuentaCreditoInput.addEventListener("input", function () {
+            validateAccountField(this);
+        });
 
-    // Asignar evento de validación en los campos de cuentas
-    document.getElementById("cuenta_debito_edit").addEventListener("input", function () {
-        validateAccountField(this);
-    });
-    document.getElementById("cuenta_credito_edit").addEventListener("input", function () {
-        validateAccountField(this);
-    });
+        // Función para filtrar los tipos de transacción por tipo de registro
+        tipoRegistroSelect.addEventListener('change', function () {
+            const selectedTipoRegistro = this.value;
 
-    <!-- CODIGO PARA FILTRAR LOS TIPOS DE TRANSACCION POR TIPO DE REGISTRO EN EL COMBO -->
+            // Limpiar el select de transacciones
+            tipoTransaccionSelect.innerHTML = '<option value="">Seleccione una transacción</option>';
 
-    const tipoRegistroSelect = document.getElementById('tipo_registro');
-    const tipoTransaccionSelect = document.getElementById('tipo_transaccion_add');
-    
-    tipoRegistroSelect.addEventListener('change', function () {
-        const selectedTipoRegistro = this.value;
-    
-        // Limpiar el select de transacciones
-        tipoTransaccionSelect.innerHTML = '<option value="">Seleccione una transacción</option>';
-    
-        if (!selectedTipoRegistro) {
-            // Si no hay un tipo de registro seleccionado, no hacer la solicitud
-            return;
-        }
-    
-        // Hacer la solicitud al servidor para obtener las transacciones filtradas
-        fetch(`/contable/filtrar_transacciones?tipo_registro=${selectedTipoRegistro}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Error al obtener las transacciones');
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Agregar las transacciones filtradas al select
-                data.forEach(transaccion => {
-                    const option = document.createElement('option');
-                    option.value = transaccion.nombre;
-                    option.textContent = transaccion.nombre;
-                    tipoTransaccionSelect.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    });
-    
-</script>
+            if (!selectedTipoRegistro) {
+                // Si no hay un tipo de registro seleccionado, limpiar y ocultar reglas y mensajes
+                contenedorReglas.innerHTML = '';
+                reglaPorcentaje.style.display = 'none';
+                porcentajeMensaje.style.display = 'none';
+                guardarButton.disabled = true;
+                return;
+            }
 
-<!-- CODIGO PARA GENERAR LOS INPUTS SEGUN EL TIPO DE TRANSACCION MUESTRE LAS REGKAS Y PODER EDITAR LOS PORCENTAJES -->
-<script>
-    document.getElementById("tipo_transaccion_add").addEventListener("change", function () {
-        const tipoTransaccion = this.value;
-        const contenedorReglas = document.getElementById("contenedorReglas");
-
-        // Limpiar el contenedor
-        contenedorReglas.innerHTML = "";
-
-        if (tipoTransaccion) {
-            // Hacer la solicitud al servidor
-            fetch(`/contable/reglas_por_tipo_transaccion?tipo_transaccion=${tipoTransaccion}`)
+            // Hacer la solicitud al servidor para obtener las transacciones filtradas
+            fetch(`/contable/filtrar_transacciones?tipo_registro=${selectedTipoRegistro}`)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error("Error al obtener las reglas.");
+                        throw new Error('Error al obtener las transacciones');
                     }
                     return response.json();
                 })
                 .then(data => {
+                    // Agregar las transacciones filtradas al select
+                    data.forEach(transaccion => {
+                        const option = document.createElement('option');
+                        option.value = transaccion.nombre;
+                        option.textContent = transaccion.nombre;
+                        tipoTransaccionSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Limpiar las reglas y mostrar el contenedor para la nueva regla
+            contenedorReglas.innerHTML = '';
+            reglaPorcentaje.style.display = 'block'; // Mostrar para permitir agregar nueva regla
+            porcentajeMensaje.style.display = 'none';
+            guardarButton.disabled = true;
+        });
+
+        // Función para obtener y mostrar las reglas basadas en el tipo de transacción y los checkboxes
+        function fetchAndDisplayReglas() {
+            const tipoTransaccion = tipoTransaccionSelect.value;
+            const tipoRegistro = tipoRegistroSelect.value;
+
+            // Verificar si al menos uno de los checkboxes está marcado
+            const isDebitoChecked = soloDebitoCheckbox.checked;
+            const isCreditoChecked = soloCreditoCheckbox.checked;
+
+            if (!isDebitoChecked && !isCreditoChecked) {
+                // Ningún checkbox está marcado, ocultar las reglas
+                contenedorReglas.innerHTML = '';
+                reglaPorcentaje.style.display = 'none';
+                porcentajeMensaje.style.display = 'none';
+                guardarButton.disabled = true;
+                return;
+            }
+
+            // Limpiar el contenedor
+            contenedorReglas.innerHTML = '';
+
+            if (tipoTransaccion && tipoRegistro) {
+                const soloDebito = isDebitoChecked ? '1' : '0';
+                const soloCredito = isCreditoChecked ? '1' : '0';
+
+                // Construir los parámetros de consulta
+                const queryParams = new URLSearchParams({
+                    tipo_transaccion: tipoTransaccion,
+                    tipo_registro: tipoRegistro,
+                    solo_debito: soloDebito,
+                    solo_credito: soloCredito
+                });
+
+                // Hacer la solicitud al servidor
+                fetch(`/contable/reglas_por_tipo_transaccion?${queryParams.toString()}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("Error al obtener las reglas.");
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.error) {
+                            // Mostrar mensaje de error pero permitir agregar una nueva regla
+                            reglaPorcentaje.style.display = 'block';
+                            contenedorReglas.innerHTML = `<p>${data.error}</p>`;
+                            porcentajeMensaje.style.display = 'none';
+                            guardarButton.disabled = true;
+                        } else {
+                            // Mostrar el contenedor de porcentajes
+                            reglaPorcentaje.style.display = 'block';
+                            if (data.length > 0) {
+                                // Crear los elementos dinámicamente para reglas existentes
+                                data.forEach((regla, index) => {
+                                    const row = document.createElement("div");
+                                    row.classList.add("row", "g-3", "align-items-center", "my-1");
+
+                                    const labelCol = document.createElement("div");
+                                    labelCol.classList.add("col-auto");
+
+                                    const label = document.createElement("label");
+                                    label.classList.add("col-form-label");
+                                    label.textContent = regla.nombre_regla; // Mostrar el nombre de la regla
+                                    labelCol.appendChild(label);
+
+                                    const inputCol = document.createElement("div");
+                                    inputCol.classList.add("col-2");
+
+                                    const input = document.createElement("input");
+                                    input.type = "number";
+                                    input.classList.add("form-control", "porcentaje-input"); // Añadir clase
+                                    input.value = regla.porcentaje_total * 100; // Mostrar el porcentaje total
+                                    input.min = "0";
+                                    input.max = "100";
+                                    inputCol.appendChild(input);
+
+                                    // Agregar las columnas a la fila
+                                    row.appendChild(labelCol);
+                                    row.appendChild(inputCol);
+
+                                    // Agregar la fila al contenedor
+                                    contenedorReglas.appendChild(row);
+                                });
+                            } else {
+                                // No hay reglas existentes, pero permitir agregar una nueva regla
+                                contenedorReglas.innerHTML = ''; // No reglas existentes
+                            }
+                        }
+                        // Validar porcentajes después de añadir nuevas reglas
+                        validarPorcentajes();
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        // Mostrar mensaje de error pero permitir agregar una nueva regla
+                        reglaPorcentaje.style.display = 'block';
+                        contenedorReglas.innerHTML = `<p>Hubo un error al cargar las reglas.</p>`;
+                        porcentajeMensaje.style.display = 'none';
+                        guardarButton.disabled = true;
+                    });
+            } else {
+                // Ocultar las reglas si no se han seleccionado ambos dropdowns
+                reglaPorcentaje.style.display = 'none';
+                porcentajeMensaje.style.display = 'none';
+                guardarButton.disabled = true;
+            }
+        }
+
+        // Función para habilitar/deshabilitar los inputs de cuentas
+        function toggleCuentaInputs() {
+            if (soloDebitoCheckbox.checked) {
+                cuentaDebitoInput.disabled = false;
+                cuentaCreditoInput.disabled = true;
+            } else if (soloCreditoCheckbox.checked) {
+                cuentaDebitoInput.disabled = true;
+                cuentaCreditoInput.disabled = false;
+            } else {
+                cuentaDebitoInput.disabled = false;
+                cuentaCreditoInput.disabled = false;
+            }
+        }
+
+        // Event listeners para los checkboxes
+        soloDebitoCheckbox.addEventListener('change', function() {
+            // Asegurarse de que los checkboxes sean mutuamente excluyentes
+            if (this.checked) {
+                soloCreditoCheckbox.checked = false;
+            }
+            fetchAndDisplayReglas();
+            toggleCuentaInputs();
+        });
+
+        soloCreditoCheckbox.addEventListener('change', function() {
+            // Asegurarse de que los checkboxes sean mutuamente excluyentes
+            if (this.checked) {
+                soloDebitoCheckbox.checked = false;
+            }
+            fetchAndDisplayReglas();
+            toggleCuentaInputs();
+        });
+
+        // Función para validar los porcentajes
+        function validarPorcentajes() {
+            const porcentajeInputs = document.querySelectorAll('.porcentaje-input');
+            let sum = 0;
+            let allValid = true;
+
+            porcentajeInputs.forEach(input => {
+                const value = parseFloat(input.value);
+                if (isNaN(value) || value < 0) {
+                    allValid = false;
+                } else {
+                    sum += value;
+                }
+            });
+
+            // Validar si el campo nueva regla tiene un valor válido
+            const nuevaReglaValue = parseFloat(porcentajeNuevaRegla.value);
+            if (!isNaN(nuevaReglaValue) && nuevaReglaValue >= 0) {
+                sum += nuevaReglaValue;
+            } else if (porcentajeNuevaRegla.value.trim() !== '') {
+                allValid = false;
+            }
+
+            // Si hay al menos una regla pero el campo de nueva regla está vacío
+            if (porcentajeInputs.length > 0 && porcentajeNuevaRegla.value.trim() === '') {
+                allValid = false;
+            }
+
+            // Actualizar el estado del botón y el mensaje
+            if (!allValid) {
+                guardarButton.disabled = true;
+                porcentajeMensaje.style.display = 'none';
+                return;
+            }
+
+            if (sum !== 100) {
+                guardarButton.disabled = true;
+                const diferencia = 100 - sum;
+                if (diferencia > 0) {
+                    porcentajeMensaje.textContent = `Falta ${diferencia}%`;
+                } else {
+                    porcentajeMensaje.textContent = `Exceso de ${Math.abs(diferencia)}%.`;
+                }
+                porcentajeMensaje.style.display = 'block';
+            } else {
+                guardarButton.disabled = false;
+                porcentajeMensaje.style.display = 'none';
+            }
+        }
+
+        // Event delegation para inputs de porcentaje dinámicos
+        contenedorReglas.addEventListener('input', function(event) {
+            if (event.target.classList.contains('porcentaje-input')) {
+                validarPorcentajes();
+            }
+        });
+
+        // Asignar evento al campo de nueva regla
+        porcentajeNuevaRegla.addEventListener('input', validarPorcentajes);
+
+        // Inicializar el estado al cargar la página
+        fetchAndDisplayReglas();
+        toggleCuentaInputs();
+        validarPorcentajes();
+
+        // Funciones para manejar el modal de información
+        function openModalInformacion() {
+            document.getElementById('informacionModal').style.display = 'flex';
+        }
+        function closeModalInformacion() {
+            document.getElementById('informacionModal').style.display = 'none';
+        }
+
+        // Funciones para manejar el modal de ver regla
+        function fetchReglaDetails(regla_id) {
+            fetch(`/contable/reglas/detalles/${regla_id}`)
+                .then(response => response.json())
+                .then(data => {
                     if (data.error) {
-                        contenedorReglas.innerHTML = `<p>${data.error}</p>`;
+                        alert(data.error);
                     } else {
-                        // Crear los elementos dinámicamente
-                        data.forEach((regla, index) => {
-                            const row = document.createElement("div");
-                            row.classList.add("row", "g-3", "align-items-center", "my-1");
-
-                            const labelCol = document.createElement("div");
-                            labelCol.classList.add("col-auto");
-
-                            const label = document.createElement("label");
-                            label.classList.add("col-form-label");
-                            label.textContent = regla.nombre_regla; // Mostrar el nombre de la regla
-                            labelCol.appendChild(label);
-
-                            const inputCol = document.createElement("div");
-                            inputCol.classList.add("col-2");
-
-                            const input = document.createElement("input");
-                            input.type = "number";
-                            input.classList.add("form-control");
-                            input.value = regla.porcentaje_total*100; // Mostrar el porcentaje total
-                            inputCol.appendChild(input);
-
-                            // Agregar las columnas a la fila
-                            row.appendChild(labelCol);
-                            row.appendChild(inputCol);
-
-                            // Agregar la fila al contenedor
-                            contenedorReglas.appendChild(row);
-                        });
+                        openModalVerRegla(
+                            data.nombre_regla,
+                            data.tipo_transaccion,
+                            data.estado,
+                            data.cuenta_debito_codigo,
+                            data.cuenta_debito_nombre,
+                            data.cuenta_credito_codigo,
+                            data.cuenta_credito_nombre,
+                            data.tipo_monto
+                        );
                     }
                 })
                 .catch(error => {
-                    console.error("Error:", error);
-                    contenedorReglas.innerHTML = `<p>Hubo un error al cargar las reglas.</p>`;
+                    console.error('Error al obtener los detalles de la regla:', error);
+                    alert('Ocurrió un error al obtener los detalles de la regla.');
                 });
         }
+
+        function openModalVerRegla(nombre_regla, tipo_transaccion, estado, cuenta_debito_codigo, cuenta_debito_nombre, cuenta_credito_codigo, cuenta_credito_nombre, tipo_monto) {
+            document.getElementById('nombre_regla').textContent = nombre_regla || "No disponible";
+            document.getElementById('tipo_transaccion_info').textContent = tipo_transaccion || "No disponible";
+            document.getElementById('estado').textContent = estado == 1 ? "Activo" : "Inactivo";
+
+            const cuentaDebitoText = (cuenta_debito_codigo && cuenta_debito_nombre) ? `${cuenta_debito_codigo} - ${cuenta_debito_nombre}` : "Ninguna";
+            document.getElementById('cuenta_debito').textContent = cuentaDebitoText;
+
+            const cuentaCreditoText = (cuenta_credito_codigo && cuenta_credito_nombre) ? `${cuenta_credito_codigo} - ${cuenta_credito_nombre}` : "Ninguna";
+            document.getElementById('cuenta_credito').textContent = cuentaCreditoText;
+
+            document.getElementById('tipo_transaccion').textContent = tipo_transaccion || "No disponible";
+
+            document.getElementById('tipo_monto').textContent = tipo_monto || "No disponible";
+
+            document.getElementById('openVerModal').style.display = 'flex';
+        }
+
+        function closeModalVer() {
+            document.getElementById('openVerModal').style.display = 'none';
+        }
+
+        // Funciones para manejar el modal de eliminar regla
+        function openModalDeleteRegla(regla_id, nombre_regla) {
+            document.getElementById('deleteReglaId').value = regla_id;
+            document.getElementById('deleteReglaInfo').textContent = `¿Estás seguro que deseas eliminar la regla "${nombre_regla}"?`;
+            document.getElementById('deleteReglaModal').style.display = 'flex';
+        }
+
+        function closeModalDeleteRegla() {
+            document.getElementById('deleteReglaModal').style.display = 'none';
+        }
+
+        function deleteRegla() {
+            const regla_id = document.getElementById('deleteReglaId').value;
+            fetch(`/contable/reglas/eliminar/${regla_id}`, {
+                method: 'DELETE',
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Regla eliminada correctamente.");
+                    closeModalDeleteRegla();
+                    location.reload();
+                } else {
+                    alert("Error al eliminar la regla: " + data.message);
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Ocurrió un error al intentar eliminar la regla.");
+            });
+        }
+
+        // Asignar funciones al global scope para poder llamarlas desde HTML
+        window.openModalAdd = function() {
+            document.getElementById('addAccountModal').style.display = 'flex';
+        };
+
+        window.closeModalAdd = function() {
+            document.getElementById('addAccountModal').style.display = 'none';
+            // Resetear el formulario y validaciones
+            const addForm = document.getElementById('addReglaForm');
+            addForm.reset();
+            contenedorReglas.innerHTML = '';
+            reglaPorcentaje.style.display = 'none';
+            porcentajeMensaje.style.display = 'none';
+            guardarButton.disabled = true;
+            toggleCuentaInputs();
+        };
+
+        window.fetchReglaDetails = fetchReglaDetails;
+        window.openModalVerRegla = openModalVerRegla;
+        window.closeModalVer = closeModalVer;
+        window.openModalDeleteRegla = openModalDeleteRegla;
+        window.closeModalDeleteRegla = closeModalDeleteRegla;
+        window.deleteRegla = deleteRegla;
     });
-
-
-
-    // Elementos HTML
-const contenedorReglas = document.getElementById('contenedorReglas'); // Contenedor de las reglas dinámicas
-
-// Función para verificar las selecciones y mostrar/ocultar elementos
-function verificarSeleccion() {
-    const tipoRegistro = tipoRegistroSelect.value;
-    const tipoTransaccion = tipoTransaccionSelect.value;
-
-    if (tipoRegistro && tipoTransaccion) {
-        // Mostrar las reglas si ambos dropdowns tienen valores seleccionados
-        reglaPorcentaje.style.display = 'block';
-
-        // Limpiar el contenedor de reglas
-        contenedorReglas.innerHTML = '';
-
-        // Renderizar dinámicamente las reglas
-        reglas.forEach(regla => {
-            const row = document.createElement('div');
-            row.classList.add('row', 'g-3', 'align-items-center', 'my-1');
-
-            const labelCol = document.createElement('div');
-            labelCol.classList.add('col-auto');
-
-            const label = document.createElement('label');
-            label.classList.add('col-form-label');
-            label.textContent = regla.nombre; // Mostrar el nombre de la regla
-            labelCol.appendChild(label);
-
-            const inputCol = document.createElement('div');
-            inputCol.classList.add('col-auto');
-
-            const input = document.createElement('input');
-            input.type = 'number';
-            input.classList.add('form-control');
-            input.value = regla.porcentaje_total; // Mostrar el porcentaje total
-            input.readOnly = true; // Hacer el campo de solo lectura
-            inputCol.appendChild(input);
-
-            // Agregar las columnas a la fila
-            row.appendChild(labelCol);
-            row.appendChild(inputCol);
-
-            // Agregar la fila al contenedor
-            contenedorReglas.appendChild(row);
-        });
-    } else {
-        // Ocultar las reglas si no se han seleccionado ambos dropdowns
-        reglaPorcentaje.style.display = 'none';
-    }
-}
-
-// Agregar eventos a los selects
-tipoRegistroSelect.addEventListener('change', verificarSeleccion);
-tipoTransaccionSelect.addEventListener('change', verificarSeleccion);
-
-// Inicializar el estado al cargar la página
-verificarSeleccion();
-
 </script>
+
 {% endblock %}
