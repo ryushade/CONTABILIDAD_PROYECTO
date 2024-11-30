@@ -1132,20 +1132,31 @@ def insertar_cuenta(codigo_cuenta, nombre, naturaleza, estado_cuenta):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
-            sql_cuenta_padre = f"SELECT id_cuenta, nivel, tipo_cuenta FROM cuenta WHERE codigo_cuenta LIKE '{codigo_cuenta[:-1]}%'"
-            cursor.execute(sql_cuenta_padre)
-            result = cursor.fetchone()
-            cuenta_padre = result['id_cuenta']
-            tipo_cuenta = result['tipo_cuenta']
-            nivel = int(result['nivel']) + 1
+            if len(codigo_cuenta) == 1:
+                # Cuenta raíz, sin cuenta padre
+                cuenta_padre = None
+                nivel = 1
+                tipo_cuenta = 'Elemento'  # O el valor por defecto que corresponda
+            else:
+                # Obtener el código de la cuenta padre
+                parent_codigo_cuenta = codigo_cuenta[:-1]
+                sql_cuenta_padre = "SELECT id_cuenta, nivel, tipo_cuenta FROM cuenta WHERE codigo_cuenta = %s"
+                cursor.execute(sql_cuenta_padre, (parent_codigo_cuenta,))
+                result = cursor.fetchone()
+                if result:
+                    cuenta_padre = result['id_cuenta']
+                    tipo_cuenta = result['tipo_cuenta']
+                    nivel = int(result['nivel']) + 1
+                else:
+                    raise Exception(f"No se encontró la cuenta padre con el código {parent_codigo_cuenta}.")
             
             query = """INSERT INTO cuenta (codigo_cuenta, nombre_cuenta, tipo_cuenta, naturaleza, estado_cuenta, cuenta_padre, nivel) 
             VALUES (%s, %s, %s, %s, %s, %s, %s)"""
             cursor.execute(query, (codigo_cuenta, nombre, tipo_cuenta, naturaleza, estado_cuenta, cuenta_padre, nivel))
             conexion.commit()
-            
     finally:
         conexion.close()
+
 
 
 def cuentas_jerarquicas():

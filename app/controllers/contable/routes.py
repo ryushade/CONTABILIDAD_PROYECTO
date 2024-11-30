@@ -423,6 +423,7 @@ def obtener_cuenta(cuenta_id):
 @accounting_bp.route('/cuentas/editar/<int:cuenta_id>', methods=['POST'])
 def editar_cuenta(cuenta_id):
     codigo_cuenta = request.form['codigo_cuenta']
+    print(codigo_cuenta)
     nombre_cuenta = request.form['nombre_cuenta']
     naturaleza = request.form['naturaleza']
     estado_cuenta = request.form['estado_cuenta']
@@ -877,7 +878,7 @@ def exportar_libro_diario_excel():
     # Llenar las celdas específicas con los datos necesarios
     worksheet['B3'] = mes_anio_excel  
     worksheet['B4'] = '20610588981'
-    worksheet['B5'] = 'Tormenta'
+    worksheet['C5'] = 'Tormenta'
     
     # Definir la fila inicial para insertar los datos en la tabla
     start_row = 11
@@ -1017,7 +1018,7 @@ def exportar_libro_diario_excel():
         cell.font = normal_font
 
     # Asegurar que todas las columnas tengan un ancho adecuado
-    column_widths = {'A': 40, 'B': 15, 'C': 65, 'D': 10, 'F': 20, 'G': 15, 'H': 40, 'I': 15, 'J': 15}
+    column_widths = {'A': 35, 'B': 32, 'C': 65, 'D': 10, 'F': 20, 'G': 15, 'H': 40, 'I': 15, 'J': 15}
     for column, width in column_widths.items():
         worksheet.column_dimensions[column].width = width
 
@@ -1426,7 +1427,7 @@ def exportar_registro_ventas_excel():
     # Rellenar encabezados
     worksheet['B3'] = mes_anio_excel
     worksheet['B4'] = '20610588981'  # RUC
-    worksheet['B5'] = 'Tormenta'     # Razón social
+    worksheet['E5'] = 'Tormenta'     # Razón social
 
    
 
@@ -1441,6 +1442,20 @@ def exportar_registro_ventas_excel():
     alignment_center = Alignment(horizontal='center')
     alignment_left = Alignment(horizontal='left')
     alignment_right = Alignment(horizontal='right')
+
+# Ajustar tamaños de columna
+    worksheet.column_dimensions['A'].width = 16  # Número correlativo
+    worksheet.column_dimensions['B'].width = 18  # Fecha
+    worksheet.column_dimensions['C'].width = 16  # FechaV
+    worksheet.column_dimensions['D'].width = 18  # Tipo
+    worksheet.column_dimensions['E'].width = 30  # Serie
+    worksheet.column_dimensions['F'].width = 20  # Número
+    worksheet.column_dimensions['G'].width = 10   # Tipo Doc Cliente
+    worksheet.column_dimensions['H'].width = 20  # Documento Cliente
+    worksheet.column_dimensions['I'].width = 55  # Nombre Cliente
+    worksheet.column_dimensions['K'].width = 15  # Importe
+    worksheet.column_dimensions['O'].width = 15  # IGV
+    worksheet.column_dimensions['Q'].width = 15  # Total
 
     for registro in registros_ventas:
         worksheet[f'A{current_row}'] = registro["numero_correlativo"]
@@ -1488,53 +1503,79 @@ def exportar_registro_ventas_excel():
         worksheet[f'I{current_row}'].font = font_style
         worksheet[f'I{current_row}'].alignment = alignment_left
 
-        worksheet[f'K{current_row}'] = registro["importe"]
+        worksheet[f'J{current_row}'] = registro["importe"]
+        worksheet[f'J{current_row}'].border = thin_border
+        worksheet[f'J{current_row}'].font = font_style
+        worksheet[f'J{current_row}'].alignment = alignment_right
+        worksheet[f'J{current_row}'].number_format = '#,##0.00'
+
+        worksheet[f'K{current_row}'] = registro["igv"]
         worksheet[f'K{current_row}'].border = thin_border
         worksheet[f'K{current_row}'].font = font_style
         worksheet[f'K{current_row}'].alignment = alignment_right
         worksheet[f'K{current_row}'].number_format = '#,##0.00'
 
-        worksheet[f'O{current_row}'] = registro["igv"]
-        worksheet[f'O{current_row}'].border = thin_border
-        worksheet[f'O{current_row}'].font = font_style
-        worksheet[f'O{current_row}'].alignment = alignment_right
-        worksheet[f'O{current_row}'].number_format = '#,##0.00'
-
-        worksheet[f'Q{current_row}'] = registro["total"]
-        worksheet[f'Q{current_row}'].border = thin_border
-        worksheet[f'Q{current_row}'].font = font_style
-        worksheet[f'Q{current_row}'].alignment = alignment_right
-        worksheet[f'Q{current_row}'].number_format = '#,##0.00'
+        worksheet[f'L{current_row}'] = registro["total"]
+        worksheet[f'L{current_row}'].border = thin_border
+        worksheet[f'L{current_row}'].font = font_style
+        worksheet[f'L{current_row}'].alignment = alignment_right
+        worksheet[f'L{current_row}'].number_format = '#,##0.00'
 
         current_row += 1
         
     # Añadir totales al final
     total_row = current_row
-    worksheet.merge_cells(f'H{total_row}:J{total_row}')
-    worksheet[f'H{total_row}'] = 'Totales'
-    worksheet[f'H{total_row}'].border = thin_border
-    worksheet[f'H{total_row}'].font = Font(name='Calibri', size=11, bold=True)
-    worksheet[f'H{total_row}'].alignment = alignment_right
+    worksheet.merge_cells(f'G{total_row}:I{total_row}')
+    worksheet[f'G{total_row}'] = 'Totales'
+    worksheet[f'G{total_row}'].border = thin_border
+    worksheet[f'G{total_row}'].font = Font(name='Calibri', size=11, bold=True)
+    worksheet[f'G{total_row}'].alignment = alignment_right
 
-    worksheet[f'K{total_row}'] = totales["total_importe"]
+    # Aplicar bordes a todas las celdas del rango fusionado
+    for col in range(7, 10):  # Columnas H (8) a J (10)
+        worksheet.cell(row=total_row, column=col).border = thin_border 
+
+    worksheet[f'J{total_row}'] = totales["total_importe"]
+    worksheet[f'J{total_row}'].border = thin_border
+    worksheet[f'J{total_row}'].font = Font(name='Calibri', size=11, bold=True)
+    worksheet[f'J{total_row}'].alignment = alignment_right
+    worksheet[f'J{total_row}'].number_format = '#,##0.00'
+
+    worksheet[f'K{total_row}'] = totales["total_igv"]
     worksheet[f'K{total_row}'].border = thin_border
     worksheet[f'K{total_row}'].font = Font(name='Calibri', size=11, bold=True)
     worksheet[f'K{total_row}'].alignment = alignment_right
     worksheet[f'K{total_row}'].number_format = '#,##0.00'
 
-    worksheet[f'O{total_row}'] = totales["total_igv"]
-    worksheet[f'O{total_row}'].border = thin_border
-    worksheet[f'O{total_row}'].font = Font(name='Calibri', size=11, bold=True)
-    worksheet[f'O{total_row}'].alignment = alignment_right
-    worksheet[f'O{total_row}'].number_format = '#,##0.00'
+    worksheet[f'L{total_row}'] = totales["total_general"]
+    worksheet[f'L{total_row}'].border = thin_border
+    worksheet[f'L{total_row}'].font = Font(name='Calibri', size=11, bold=True)
+    worksheet[f'L{total_row}'].alignment = alignment_right
+    worksheet[f'L{total_row}'].number_format = '#,##0.00'
 
-    worksheet[f'Q{total_row}'] = totales["total_general"]
-    worksheet[f'Q{total_row}'].border = thin_border
-    worksheet[f'Q{total_row}'].font = Font(name='Calibri', size=11, bold=True)
-    worksheet[f'Q{total_row}'].alignment = alignment_right
-    worksheet[f'Q{total_row}'].number_format = '#,##0.00'
+    ### En caso falle, eliminar
 
-    current_row += 1
+    start_row = total_row + 5
+
+    # Textos explicativos
+    explanatory_texts = [
+        '(1) Señalar la fecha correspondiente, de acuerdo a lo establecido en el literal b) del inciso II del numeral 1 del Artículo 10 del Reglamento de la Ley del IGV.',
+        '(2) Sólo para los casos de utilización de servicios o adquisiciones de intangibles provenientes del exterior.',
+        '(3) Sólo para los casos de detracciones. Es optativo el llenado cuando exista un sistema de enlace que mantenga dicha información y se pueda identificar los comprobantes de pago respecto de los cuales se efectuó el depósito.'
+    ]
+    
+    # Escribir los textos consecutivamente desde A hasta M en cada fila
+    for i, text in enumerate(explanatory_texts, start=start_row):
+        # Fusionar celdas desde A hasta M en la fila correspondiente
+        worksheet.merge_cells(start_row=i, start_column=1, end_row=i, end_column=13)  # A=1, M=13
+        cell = worksheet.cell(row=i, column=1)  # La celda A{i}
+        
+        # Asignar texto y aplicar formato
+        cell.value = text
+        cell.font = Font(name='Calibri', size=10, bold=False)
+        cell.alignment = Alignment(horizontal='left', vertical='top', wrap_text=True)
+
+    ###
 
     # Guardar el archivo modificado en un buffer
     output = BytesIO()
@@ -1690,7 +1731,7 @@ def exportar_registro_compras_excel():
     # Rellenar encabezados
     worksheet['B3'] = mes_anio_excel
     worksheet['B4'] = '20610588981'  # RUC
-    worksheet['B5'] = 'Tormenta'     # Razón social
+    worksheet['D5'] = 'Tormenta'     # Razón social
 
     # Definir estilos
     thin_border = Border(
@@ -1714,9 +1755,9 @@ def exportar_registro_compras_excel():
 
     # Ajustar ancho de columnas
     column_widths = {
-        'A': 20,
-        'B': 18,
-        'C': 18,
+        'A': 22,
+        'B': 22,
+        'C': 22,
         'D': 8,
         'E': 8,
         'F': 8,
@@ -2024,7 +2065,7 @@ def exportar_libro_caja_excel():
     # Llenar las celdas con los datos de encabezado
     worksheet['B3'] = mes_anio_actual
     worksheet['B4'] = '20610588981'  # Ejemplo de RUC
-    worksheet['B5'] = 'Tormenta'  # Nombre de la empresa
+    worksheet['D5'] = 'Tormenta'  # Nombre de la empresa
 
     # Define la fila inicial para los datos
     start_row = 9
@@ -2049,28 +2090,35 @@ def exportar_libro_caja_excel():
     # Itera sobre los datos y llénalos en el Excel
     current_row = start_row
     for row in lista_libro_caja:
+        # Combina las celdas A y B para el número correlativo
+        worksheet.merge_cells(f'A{current_row}:B{current_row}')
         worksheet[f'A{current_row}'] = numero_correlativo
-        worksheet[f'B{current_row}'] = row['fecha'].strftime('%d/%m/%Y')
-        worksheet[f'C{current_row}'] = row['glosa']
-        worksheet[f'D{current_row}'] = row['cod_cuenta']
-        worksheet[f'E{current_row}'] = row['nombre_cuenta']
-        worksheet[f'F{current_row}'] = row['debe']
-        worksheet[f'G{current_row}'] = row['haber']
+        worksheet[f'C{current_row}'] = row['fecha'].strftime('%d/%m/%Y')
+        worksheet[f'D{current_row}'] = row['glosa']
+        worksheet[f'E{current_row}'] = row['cod_cuenta']
+        worksheet[f'F{current_row}'] = row['nombre_cuenta']
+        worksheet[f'G{current_row}'] = row['debe']
+        worksheet[f'H{current_row}'] = row['haber']
+
+         # Aplica formato numérico a las columnas "Debe" y "Haber"
+        worksheet[f'F{current_row}'].number_format = '0.00'  # Usa '0.0000' si necesitas más decimales
+        worksheet[f'G{current_row}'].number_format = '0.00'
 
         # Aplica bordes y alineación
-        for col in ['A', 'B', 'C', 'D', 'E', 'F', 'G']:
+        for col in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']:
             cell = worksheet[f'{col}{current_row}']
             cell.border = thin_border
             cell.font = normal_font
 
         # Alineación específica para columnas
         worksheet[f'A{current_row}'].alignment = center_alignment
-        worksheet[f'B{current_row}'].alignment = center_alignment
-        worksheet[f'C{current_row}'].alignment = left_alignment
-        worksheet[f'D{current_row}'].alignment = center_alignment
-        worksheet[f'E{current_row}'].alignment = left_alignment
-        worksheet[f'F{current_row}'].alignment = right_alignment
+        worksheet[f'C{current_row}'].alignment = center_alignment
+        worksheet[f'D{current_row}'].alignment = left_alignment
+        worksheet[f'E{current_row}'].alignment = center_alignment
+        worksheet[f'F{current_row}'].alignment = left_alignment
         worksheet[f'G{current_row}'].alignment = right_alignment
+        worksheet[f'H{current_row}'].alignment = right_alignment
+
 
         # Incrementa el número correlativo y la fila actual
         numero_correlativo += 1
@@ -2078,19 +2126,32 @@ def exportar_libro_caja_excel():
 
     # Agrega los totales en la última fila
     total_row = current_row
-    worksheet.merge_cells(f'A{total_row}:E{total_row}')
+    worksheet.merge_cells(f'A{total_row}:F{total_row}')
     worksheet[f'A{total_row}'] = "Total"
-    worksheet[f'F{total_row}'] = total_caja['debe']
-    worksheet[f'G{total_row}'] = total_caja['haber']
+    worksheet[f'G{total_row}'] = total_caja['debe']
+    worksheet[f'H{total_row}'] = total_caja['haber']
+
+    # Aplica formato numérico a las columnas de total "Debe" y "Haber"
+    worksheet[f'G{total_row}'].number_format = '0.00'  # Usa '0.0000' si necesitas más decimales
+    worksheet[f'H{total_row}'].number_format = '0.00'
 
     # Aplica formato y bordes a los totales
-    for col in ['A', 'F', 'G']:
+    for col in ['G', 'H']:
         cell = worksheet[f'{col}{total_row}']
         cell.border = thin_border
         cell.alignment = right_alignment
+    
+    # Configura el borde de la celda "A" sin borde inferior
+    worksheet[f'A{total_row}'].border = Border(
+        left=thin_border.left,
+        right=thin_border.right,
+        top=thin_border.top,
+        bottom=None  # Sin borde inferior
+    )
+    worksheet[f'A{total_row}'].alignment = right_alignment
 
     # Asegura el ancho de las columnas para mejor visibilidad
-    column_widths = {'A': 38, 'B': 15, 'C': 60, 'D': 15, 'E': 30, 'F': 15, 'G': 15}
+    column_widths = {'A': 12, 'B': 35, 'C': 20, 'D': 60, 'E': 15, 'F': 30, 'G': 15, 'H': 15}
     for column, width in column_widths.items():
         worksheet.column_dimensions[column].width = width
 
