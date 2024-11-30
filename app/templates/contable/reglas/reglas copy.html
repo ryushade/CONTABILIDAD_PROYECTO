@@ -463,10 +463,10 @@
                     <label for="tipo_transaccion_edit" class="form-label" style="font-weight: bold;">Tipo de
                         transacción asda:</label>
                     <select id="tipo_transaccion_edit" name="tipo_transaccion" class="form-select" required>
-                        
+
                         {% for tipo_transa in tipo_transacciones %}
                         <option value="{{ tipo_transa.id }}">{{ tipo_transa.nombre }}</option>
-                        
+
                         {% endfor %}
                     </select>
                 </div>
@@ -545,7 +545,7 @@
                         <select id="tipo_transaccion_add" name="tipo_transaccion" class="form-select" required>
                             {% for tipo_transa in tipo_transacciones %}
                             <option value="{{ tipo_transa.nombre }}">{{ tipo_transa.nombre }}</option>
-                            
+
                             {% endfor %}
                         </select>
 
@@ -597,52 +597,57 @@
 
                     <div class="mb-4">
 
-                        <label for="tipo_monto_add" class="form-label" style="font-weight: bold;">Porcentaje regla:</label>
+                        <label for="tipo_monto_add" class="form-label" style="font-weight: bold;">Porcentaje
+                            regla:</label>
                         <div class="row g-3 align-items-center my-1">
                             <div class="col-auto">
-                              <label for="" class="col-form-label">Nueva regla</label>
+                                <label for="" class="col-form-label">Nueva regla</label>
                             </div>
                             <div class="col-auto">
-                              <input type="number" id="inputPassword6" class="form-control" aria-describedby="passwordHelpInline">
+                                <input type="number" id="regla_nueva" class="form-control"
+                                    aria-describedby="passwordHelpInline" name="regla_nueva">
                             </div>
-                            
-                          </div>
-                          
+
+                        </div>
+
                         <div class="row g-3 align-items-center my-1">
                             <div class="col-auto">
-                              <label for="" class="col-form-label">Regla 1</label>
+                                <label for="" class="col-form-label">Regla 1</label>
                             </div>
                             <div class="col-auto">
-                              <input type="number" id="inputPassword6" class="form-control" aria-describedby="passwordHelpInline">
+                                <input type="number" id="inputPassword6" class="form-control"
+                                    aria-describedby="passwordHelpInline">
                             </div>
-                            
-                          </div>
 
-
-                          <div class="row g-3 align-items-center my-1">
-                            <div class="col-auto">
-                              <label for="" class="col-form-label">Regla 2</label>
-                            </div>
-                            <div class="col-auto">
-                              <input type="number" id="inputPassword6" class="form-control" aria-describedby="passwordHelpInline">
-                            </div>
-                        
-                          </div>
+                        </div>
 
 
                         <div class="row g-3 align-items-center my-1">
                             <div class="col-auto">
-                              <label for="" class="col-form-label">Regla 3</label>
+                                <label for="" class="col-form-label">Regla 2</label>
                             </div>
                             <div class="col-auto">
-                              <input type="number" id="inputPassword6" class="form-control" aria-describedby="passwordHelpInline">
+                                <input type="number" id="inputPassword6" class="form-control"
+                                    aria-describedby="passwordHelpInline">
+                            </div>
+
+                        </div>
+
+
+                        <div class="row g-3 align-items-center my-1">
+                            <div class="col-auto">
+                                <label for="" class="col-form-label">Regla 3</label>
                             </div>
                             <div class="col-auto">
-                              <span id="passwordHelpInline" class="form-text">
-                              porcentajes del 100% 
-                              </span>
+                                <input type="number" id="inputPassword6" class="form-control"
+                                    aria-describedby="passwordHelpInline">
                             </div>
-                          </div>
+                            <div class="col-auto">
+                                <span id="passwordHelpInline" class="form-text">
+                                    porcentajes del 100%
+                                </span>
+                            </div>
+                        </div>
 
                     </div>
 

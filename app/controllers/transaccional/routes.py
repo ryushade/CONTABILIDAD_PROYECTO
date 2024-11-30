@@ -1,7 +1,7 @@
 import json
 import os
 from urllib import response
-from app.models.contable_models import obtener_usuario_por_id
+from app.models.contable_models import obtener_usuario_por_id, obtener_transacciones_por_tipo
 from flask import abort, current_app, make_response, render_template, send_file, session
 from flask_jwt_extended import jwt_required, get_jwt_identity, verify_jwt_in_request
 
@@ -153,7 +153,7 @@ def ventas():
     ventas_con_detalles = obtener_ventas_con_detalles()
     datos_inventario = obtener_inventario_vigente()
     clientes = listarClientes()
-
+    tipos_transaccion = obtener_transacciones_por_tipo('venta')
     if pdf_filename:
         return render_template(
             'transaccional/ventas/ventas.html',
@@ -162,7 +162,8 @@ def ventas():
             total_ventas=total_ventas,
             ventas_con_detalles=ventas_con_detalles,
             datos_inventario=datos_inventario,
-            clientes=clientes
+            clientes=clientes,
+            tipos_transaccion = tipos_transaccion
         )
     else:
         return render_template(
@@ -170,7 +171,8 @@ def ventas():
             total_ventas=total_ventas,
             ventas_con_detalles=ventas_con_detalles,
             datos_inventario=datos_inventario,
-            clientes=clientes
+            clientes=clientes,
+            tipos_transaccion = tipos_transaccion
         )
 
 
@@ -192,7 +194,8 @@ def add_venta():
         id_anular = 4
         id_anular_b = 5
         observacion = request.form.get('observacion')
-        id_venta, numero_com = transac.vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_total, base_imponible, metodo_pago, id_anular, id_anular_b, observacion, venta_data)
+        tipos_transaccion = request.form.get('tipos_transaccion')
+        id_venta, numero_com = transac.vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_total, base_imponible, metodo_pago, id_anular, id_anular_b, observacion, venta_data, tipos_transaccion)
         
         session['pdf_filename'] = f'{numero_com}.pdf'
         # Redirige a la página de inicio

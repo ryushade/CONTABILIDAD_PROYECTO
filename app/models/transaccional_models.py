@@ -591,10 +591,11 @@ def obtener_id_producto_nombre(nombre):
         print(repr(e))  # Información detallada del error
         raise  # Propaga la excepción para ver el error completo
 
-def vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_total, base_imponible, metodo_pago, id_anular, id_anular_b, observacion, venta_data):
+def vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_total, base_imponible, metodo_pago, id_anular, id_anular_b, observacion, venta_data, tipos_transaccion):
     try:
         conexion = obtener_conexion()
         id_comprobante = obtener_ultimo_comprobante(comprobante_pago)
+        print("comprobante_pago", comprobante_pago)
         f_venta = datetime.now().strftime("%Y-%m-%d")
         fecha_iso = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
         estado_sunat = None
@@ -654,8 +655,11 @@ def vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_t
                     print(f"Producto {id_producto} no encontrado en inventario para almacen 1")
 
             conexion.commit()
-            print("Venta registrada exitosamente")
-            # Asegúrate de confirmar los cambios
+             # Llamar al procedimiento almacenado procesar_venta
+            cursor.callproc('procesar_venta', (id_venta, tipos_transaccion))
+            conexion.commit()
+
+            print("Venta registrada exitosamente y procedimiento procesar_venta ejecutado")
             generarPDF(f_venta, id_comprobante, id_cliente, venta_data, igv, monto_total)
             print("vendido y generado PDF")
             return id_venta, obtener_numero_comprobante(id_comprobante)

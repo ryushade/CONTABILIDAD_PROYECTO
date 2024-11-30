@@ -435,19 +435,19 @@ def obtener_asientodiario():
     finally:
         connection.close()
 
-def agregar_regla_en_db(nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado, tipo_monto):
+def agregar_regla_en_db(nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado, tipo_monto, porcentaje):
     connection = obtener_conexion()  
     try:
         with connection.cursor() as cursor:
             sql = """
             INSERT INTO reglas_contabilizacion 
-            (nombre_regla, tipo_transaccion, cuenta_debe, cuenta_haber, estado, tipo_monto)
-            VALUES (%s, %s, %s, %s, %s, %s)  
+            (nombre_regla, tipo_transaccion, cuenta_debe, cuenta_haber, estado, tipo_monto, porcentaje_total)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)  
             """
             print("Ejecutando SQL:", sql)
-            print("Valores:", (nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado, tipo_monto))
+            print("Valores:", (nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado, tipo_monto, porcentaje))
             
-            cursor.execute(sql, (nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado, tipo_monto))
+            cursor.execute(sql, (nombre_regla, tipo_transaccion, cuenta_debito, cuenta_credito, estado, tipo_monto, porcentaje))
             connection.commit()
             
             return cursor.rowcount > 0  
@@ -1132,31 +1132,20 @@ def insertar_cuenta(codigo_cuenta, nombre, naturaleza, estado_cuenta):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
-            if len(codigo_cuenta) == 1:
-                # Cuenta raíz, sin cuenta padre
-                cuenta_padre = None
-                nivel = 1
-                tipo_cuenta = 'Elemento'  # O el valor por defecto que corresponda
-            else:
-                # Obtener el código de la cuenta padre
-                parent_codigo_cuenta = codigo_cuenta[:-1]
-                sql_cuenta_padre = "SELECT id_cuenta, nivel, tipo_cuenta FROM cuenta WHERE codigo_cuenta = %s"
-                cursor.execute(sql_cuenta_padre, (parent_codigo_cuenta,))
-                result = cursor.fetchone()
-                if result:
-                    cuenta_padre = result['id_cuenta']
-                    tipo_cuenta = result['tipo_cuenta']
-                    nivel = int(result['nivel']) + 1
-                else:
-                    raise Exception(f"No se encontró la cuenta padre con el código {parent_codigo_cuenta}.")
+            sql_cuenta_padre = f"SELECT id_cuenta, nivel, tipo_cuenta FROM cuenta WHERE codigo_cuenta LIKE '{codigo_cuenta[:-1]}%'"
+            cursor.execute(sql_cuenta_padre)
+            result = cursor.fetchone()
+            cuenta_padre = result['id_cuenta']
+            tipo_cuenta = result['tipo_cuenta']
+            nivel = int(result['nivel']) + 1
             
             query = """INSERT INTO cuenta (codigo_cuenta, nombre_cuenta, tipo_cuenta, naturaleza, estado_cuenta, cuenta_padre, nivel) 
             VALUES (%s, %s, %s, %s, %s, %s, %s)"""
             cursor.execute(query, (codigo_cuenta, nombre, tipo_cuenta, naturaleza, estado_cuenta, cuenta_padre, nivel))
             conexion.commit()
+            
     finally:
         conexion.close()
-
 
 
 def cuentas_jerarquicas():
@@ -1247,3 +1236,48 @@ def obtener_numero_reglas_por_tipo_transaccion(tipo_transaccion):
     finally:
         conexion.close()
 
+def obtener_transacciones():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            sql = "SELECT id, nombre, estado, tipo_registro FROM tipo_transaccion "
+            cursor.execute(sql,)
+            result = cursor.fetchall()
+            return result
+    except Exception as e:
+        print("Error al obtener el tipos de transaccion:", e)
+        return 0
+    finally:
+        conexion.close()
+
+def obtener_transacciones_por_tipo(tipo):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            sql = "SELECT id, nombre, estado, tipo_registro FROM tipo_transaccion where tipo_registro = %s"
+            cursor.execute(sql,[tipo])
+            result = cursor.fetchall()
+            return result
+    except Exception as e:
+        print("Error al obtener el tipos de transaccion:", e)
+        return 0
+    finally:
+        conexion.close()
+
+def obtener_reglas_por_tipo_transaccion(tipo_transaccion):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            sql = """
+                SELECT nombre_regla, tipo_transaccion, porcentaje_total
+                FROM reglas_contabilizacion rc INNER JOIN tipo_transaccion tp ON tp.nombre = rc.tipo_transaccion
+                WHERE tipo_transaccion = %s AND porcentaje_total != 1
+            """
+            cursor.execute(sql, [tipo_transaccion, ])
+            result = cursor.fetchall()
+            return result
+    except Exception as e:
+        print("Error al obtener las reglas de ese tipo:", e)
+        return 0
+    finally:
+        conexion.close()

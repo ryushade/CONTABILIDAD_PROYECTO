@@ -2,7 +2,7 @@ from app.models.conexion import obtener_conexion
 from flask import json, Response, abort, request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app, send_from_directory
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
 
-from app.models.contable_models import actualizar_regla_en_db, obtener_numero_reglas_por_tipo_transaccion, agregar_regla_en_db, obtener_id_cuenta , cuentas_jerarquicas, guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta_contable, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas, obtener_asientos_agrupados_excel, obtener_libro_caja, obtener_libro_caja_cuenta_corriente, actualizar_rol_usuario, obtener_registro_compras
+from app.models.contable_models import actualizar_regla_en_db, obtener_numero_reglas_por_tipo_transaccion, agregar_regla_en_db, obtener_id_cuenta , cuentas_jerarquicas, guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta_contable, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas, obtener_asientos_agrupados_excel, obtener_libro_caja, obtener_libro_caja_cuenta_corriente, actualizar_rol_usuario, obtener_registro_compras, obtener_transacciones, obtener_reglas_por_tipo_transaccion
 from functools import wraps
 from flask import current_app as app
 from . import accounting_bp
@@ -452,14 +452,15 @@ def registrar_cuenta():
 
 @accounting_bp.route('/reglas/agregar', methods=['POST'])
 def agregar_regla():
-    data = request.get_json()
+    print(request.form)  # Ver todos los datos enviados en el formulario
 
-    nombre_regla = data.get("nombre_regla")
-    tipo_transaccion = data.get("tipo_transaccion")
-    cuenta_debito_codigo = data.get("cuenta_debito") or None
-    cuenta_credito_codigo = data.get("cuenta_credito") or None
-    estado = data.get("estado")
-    tipo_monto = data.get("tipo_monto")
+    nombre_regla = request.form["nombre_regla_add"]
+    tipo_transaccion = request.form["tipo_transaccion_add"]
+    cuenta_debito_codigo = request.form.get("cuenta_debito_add", None)  # Permitir nulo
+    cuenta_credito_codigo = request.form.get("cuenta_credito_add", None)  # Permitir nulo
+    estado = request.form["estado_cuenta_add"]
+    tipo_monto = request.form["tipo_monto_add"]
+    porcentaje_nueva_regla = int(request.form["porcentaje_nueva_regla"])/100
 
     print("Datos recibidos en agregar_regla:")
     print("Nombre de la regla:", nombre_regla)
@@ -467,6 +468,7 @@ def agregar_regla():
     print("Cuenta débito código:", cuenta_debito_codigo)
     print("Cuenta crédito código:", cuenta_credito_codigo)
     print("Estado:", estado)
+    print("porcentaje:", porcentaje_nueva_regla)
 
     if tipo_transaccion is None:
         print("Error: tipo_transaccion es None")
@@ -481,12 +483,12 @@ def agregar_regla():
 
     try:
         # Verificar el número de reglas existentes para el tipo de transacción
-        numero_reglas = obtener_numero_reglas_por_tipo_transaccion(tipo_transaccion)
-        if numero_reglas >= 3:
-            return jsonify({
-                "success": False,
-                "message": "No se pueden agregar más de 3 reglas para este tipo de transacción."
-            }), 400
+        # numero_reglas = obtener_numero_reglas_por_tipo_transaccion(tipo_transaccion)
+        # if numero_reglas >= 3:
+        #     return jsonify({
+        #         "success": False,
+        #         "message": "No se pueden agregar más de 3 reglas para este tipo de transacción."
+        #     }), 400
 
         resultado = agregar_regla_en_db(
             nombre_regla,
@@ -494,12 +496,14 @@ def agregar_regla():
             cuenta_debito,
             cuenta_credito,
             estado,
-            tipo_monto
+            tipo_monto, porcentaje_nueva_regla
         )
 
         if resultado:
+            print("Error")
             return jsonify({"success": True})
         else:
+            print("Error ptmr")
             return jsonify({"success": False, "message": "No se pudo agregar la regla."}), 400
 
     except Exception as e:
@@ -626,11 +630,13 @@ def reglas():
     # Calcular el total de páginas
     total_pages = (total_results + per_page - 1) // per_page
 
+    tipo_transacciones = obtener_transacciones()
     # Renderizar la plantilla
     return render_template(
         'contable/reglas/reglas.html',
         reglas=reglas,
         page=page,
+        tipo_transacciones=tipo_transacciones,
         per_page=per_page,
         total_results=total_results,
         total_pages=total_pages,
@@ -640,6 +646,43 @@ def reglas():
         min=min,
     )
 
+@accounting_bp.route('/filtrar_transacciones', methods=['GET'])
+@jwt_required()
+@role_required('ADMIN', 'CONTADOR')
+def filtrar_transacciones():
+    tipo_registro = request.args.get('tipo_registro', default='', type=str)
+
+    if not tipo_registro:
+        return jsonify({'error': 'Falta el tipo de registro'}), 400
+
+    # Obtener todas las transacciones
+    tipo_transacciones = obtener_transacciones()
+    print(tipo_transacciones)  # Debug: Verificar estructura de datos
+
+    # Filtrar según el tipo_registro
+    transacciones_filtradas = [
+        transaccion for transaccion in tipo_transacciones
+        if isinstance(transaccion, dict) and transaccion.get('tipo_registro') == tipo_registro
+    ]
+    return jsonify(transacciones_filtradas)
+
+@accounting_bp.route('/reglas_por_tipo_transaccion', methods=['GET'])
+@jwt_required()
+@role_required('ADMIN', 'CONTADOR')
+def reglas_por_tipo_transaccion():
+    tipo_transaccion = request.args.get('tipo_transaccion', default='', type=str)
+
+    if not tipo_transaccion:
+        return jsonify({'error': 'Falta el tipo de transacción'}), 400
+
+    # Obtener todas las reglas (asegúrate de implementar esta función)
+    todas_las_reglas = obtener_reglas_por_tipo_transaccion(tipo_transaccion)  # Debe devolver todas las reglas disponibles
+    reglas_filtradas = [
+        regla for regla in todas_las_reglas
+        if regla.get('tipo_transaccion') == tipo_transaccion
+    ]
+
+    return jsonify(reglas_filtradas)
 
 
 

@@ -262,6 +262,17 @@
                                                     </select>
                                                 </div>
                                             </div>
+                                            <div class="row mb-4">
+                                                <p>Tipo de transaccion</p>
+                                                <div class="">
+                                                    <select class="form-select form-select-sm" name="tipos_transaccion" id="tipos_transaccion" aria-label="Small select example">
+                                                        <option selected>Seleccionar metodo</option>
+                                                       {% for transa in tipos_transaccion %}
+                                                       <option value="{{transa.nombre}}">{{transa.nombre}}</option>
+                                                       {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
                                             <div class="row">
                                                 <p>Faltante</p>
                                                 <div class="input-group mb-3">

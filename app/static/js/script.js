@@ -361,6 +361,7 @@ function submitAddForm(event) {
   const cuentaCredito = document.getElementById("cuenta_credito_add").value || null;
   const estado = document.getElementById("estado_cuenta").value;
   const tipoMonto = document.getElementById("tipo_monto_add").value;
+  const porcentaje_nueva_regla = document.getElementById("porcentaje_nueva_regla").value;
 
   // Expresión regular para validar que no contenga letras ni caracteres especiales
   const invalidChars = /[A-Za-zñÑ@!#$%^&*(),?":{}|<>]/g;
@@ -378,6 +379,7 @@ function submitAddForm(event) {
     cuentaCredito,
     estado,
     tipoMonto,
+    porcentaje_nueva_regla
   });
 
   const requestBody = {
@@ -387,6 +389,7 @@ function submitAddForm(event) {
     cuenta_credito: cuentaCredito,
     estado: estado,
     tipo_monto: tipoMonto,
+    porcentaje_nueva_regla: porcentaje_nueva_regla
   };
 
   // Enviar la solicitud
@@ -415,7 +418,7 @@ function submitAddForm(event) {
     })
     .catch(error => {
       console.error("Error al agregar la regla:", error);
-      alert("No se pueden agregar más de 3 reglas para este tipo de transacción.");
+      alert("No se pueden agregar más de 3 reglas para este tipo de transacción.", error);
     });
 
 }
