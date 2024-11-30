@@ -159,9 +159,9 @@
             <div class="col-4 col-md-3">
                 <label for="tipo-transaccion" class="form-label" style="font-size: 14px;">Tipo de transacción</label>
                 <select class="form-select" id="tipo-transaccion" name="tipo_transaccion" onchange="this.form.submit()">
-                    <option value="Todas" {% if tipo_transaccion=='Todas' %}selected{% endif %}>Todas</option>
-                    {% for tipo in tipo_transacciones %}
-                        <option value="{{ tipo }}" {% if tipo_transaccion == tipo %}selected{% endif %}>
+                    <option value="Todas" {% if filtro=='Todas' %}selected{% endif %}>Todas</option>
+                    {% for filtro in filtro %}
+                        <option value="{{ tipo }}" {% if filtro == tipo %}selected{% endif %}>
                             {{ tipo | replace('_', ' ') | title }}
                         </option>
                     {% endfor %}

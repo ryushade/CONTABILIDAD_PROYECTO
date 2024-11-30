@@ -1235,7 +1235,20 @@ def obtener_transacciones():
             sql = "SELECT id, nombre, estado, tipo_registro FROM tipo_transaccion"
             cursor.execute(sql)
             result = cursor.fetchall()
-            # Extraer solo el campo 'tipo_registro'
+            return result
+    except Exception as e:
+        print("Error al obtener los tipos de transaccion:", e)
+        return []
+    finally:
+        conexion.close()
+
+def obtener_transacciones_filtro():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            sql = "SELECT id, nombre, estado, tipo_registro FROM tipo_transaccion"
+            cursor.execute(sql)
+            result = cursor.fetchall()
             tipo_registros = [row['nombre'] for row in result]
             return tipo_registros
     except Exception as e:
@@ -1243,7 +1256,6 @@ def obtener_transacciones():
         return []
     finally:
         conexion.close()
-
 
 def obtener_transacciones_por_tipo(tipo):
     conexion = obtener_conexion()
