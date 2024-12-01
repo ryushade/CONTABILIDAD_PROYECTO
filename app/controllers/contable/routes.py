@@ -2,7 +2,8 @@ from app.models.conexion import obtener_conexion
 from flask import json, Response, abort, request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app, send_from_directory
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
 
-from app.models.contable_models import actualizar_regla_en_db, obtener_numero_reglas_por_tipo_transaccion, agregar_regla_en_db, obtener_id_cuenta , cuentas_jerarquicas, guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta_contable, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas, obtener_asientos_agrupados_excel, obtener_libro_caja, obtener_libro_caja_cuenta_corriente, actualizar_rol_usuario, obtener_registro_compras, obtener_transacciones, obtener_reglas_por_tipo_transaccion, obtener_reglas_faltantes, obtener_transacciones_filtro
+from app.models.contable_models import actualizar_regla_en_db, obtener_numero_reglas_por_tipo_transaccion, agregar_regla_en_db, obtener_id_cuenta , cuentas_jerarquicas, guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta_contable, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas, obtener_asientos_agrupados_excel, obtener_libro_caja, obtener_libro_caja_cuenta_corriente, actualizar_rol_usuario, obtener_registro_compras, obtener_transacciones, obtener_reglas_por_tipo_transaccion, obtener_reglas_faltantes, obtener_transacciones_filtro, obtener_tipo_transacciones, agregar_tipo_transaccion, actualizar_tipo_transaccion_db, eliminar_tipo_transaccion_db
+
 from functools import wraps
 from flask import current_app as app
 from . import accounting_bp
@@ -650,6 +651,68 @@ def reglas():
         min=min,
     )
 
+@accounting_bp.route('/tipo_transaccion', methods=['GET'])
+@jwt_required()
+@role_required('ADMIN', 'CONTADOR')
+def listar_tipo_transaccion():
+    tipo_transacciones = obtener_tipo_transacciones()
+
+    return render_template(
+        'contable/tipo_transaccion.html',
+        tipo_transacciones=tipo_transacciones
+    )
+
+import logging
+
+@accounting_bp.route('/tipo_transaccion/agregar', methods=['POST'])
+@role_required('ADMIN', 'CONTADOR')
+def agregar_tipo_transaccion_route():
+    data = request.get_json()
+    nombre = data.get('nombre')
+    tipo_registro = data.get('tipo_registro')
+    estado = data.get('estado')
+
+    # Llamar a la función de consulta para agregar el tipo de transacción
+    resultado = agregar_tipo_transaccion(nombre, tipo_registro, estado)
+
+    if "error" in resultado:
+        logging.error(f"Error al agregar tipo de transacción: {resultado['error']}")
+        return jsonify({"success": False, "message": resultado["error"]}), 400
+    logging.info("Tipo de Transacción agregado exitosamente.")
+    return jsonify({"success": True, "message": resultado["message"]}), 201
+
+@accounting_bp.route('/tipo_transaccion/actualizar', methods=['POST'])
+@role_required('ADMIN', 'CONTADOR')
+def actualizar_tipo_transaccion():
+    try:
+        # Obtener los datos enviados desde el formulario
+        data = request.get_json()
+        tipo_id = data.get('id')
+        nombre = data.get('nombre')
+        tipo_registro = data.get('tipo_registro')
+        estado = data.get('estado')
+
+        # Llamada a la función que maneja la actualización
+        resultado = actualizar_tipo_transaccion_db(tipo_id, nombre, tipo_registro, estado)
+
+        return jsonify(resultado)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+@accounting_bp.route('/tipo_transaccion/eliminar', methods=['POST'])
+def eliminar_tipo_transaccion():
+    try:
+        # Obtener el ID del tipo de transacción a eliminar
+        data = request.get_json()
+        tipo_id = data.get('id')
+
+        # Llamada a la función que maneja la eliminación
+        resultado = eliminar_tipo_transaccion_db(tipo_id)
+
+        return jsonify(resultado)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+    
 @accounting_bp.route('/filtrar_transacciones', methods=['GET'])
 @jwt_required()
 @role_required('ADMIN', 'CONTADOR')

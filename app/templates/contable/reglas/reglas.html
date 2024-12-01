@@ -146,7 +146,10 @@
             asientos contables</p>
     </div>
     <div class="col-md-4 d-flex justify-content-end align-items-center mt-2 mt-md-0">
-        <a class="btn btn-primary mb-2" style="margin-left: auto;" onclick="openModalAdd()">
+        <a class="btn btn-primary mb-2" style="margin-left: auto;" href="{{ url_for('contable.listar_tipo_transaccion') }}">
+            <i class="fa-solid fa-gear me-2" style="font-size: 14px;"></i>Tipo Transacción
+        </a>        
+        <a class="btn btn-primary mb-2" style="margin-left: 10px;" onclick="openModalAdd()">
             <i class="fa fa-plus" style="font-size: 14px;"></i> Agregar regla
         </a>
     </div>

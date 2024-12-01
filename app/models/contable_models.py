@@ -285,7 +285,6 @@ def actualizar_usuario(id_usuario, id_rol, usua, contra, estado_usuario, admin):
     finally:
         conexion.close()
 
-
 def eliminar_usuario(usuario_id):
     conexion = obtener_conexion()
     try:
@@ -491,10 +490,6 @@ def actualizar_regla_en_db(id_regla, nombre_regla, tipo_transaccion, cuenta_debi
     finally:
         connection.close()
 
-
-
-
-
 def obtener_reglas(page, per_page, tipo_transaccion=None):
     connection = obtener_conexion()
     try:
@@ -559,9 +554,6 @@ def obtener_reglas(page, per_page, tipo_transaccion=None):
             return reglas, total_results
     finally:
         connection.close()
-
-
-
 
 def obtener_asientos_agrupados(tipo_registro='Todas', start_date=None, end_date=None):
     conexion = obtener_conexion()
@@ -1362,5 +1354,106 @@ def obtener_reglas_faltantes():
     except Exception as e:
         print("Error al validar reglas contables:", e)
         return []
+    finally:
+        conexion.close()
+
+def obtener_tipo_transacciones():
+    connection = obtener_conexion()
+    try:
+        with connection.cursor() as cursor:
+            # Consulta para obtener los datos de tipo_transaccion
+            sql = """
+            SELECT 
+                id, 
+                nombre, 
+                tipo_registro, 
+                estado 
+            FROM 
+                tipo_transaccion
+            ORDER BY 
+                id ASC
+            """
+            cursor.execute(sql)
+            return cursor.fetchall()
+    finally:
+        connection.close()
+
+def agregar_tipo_transaccion(nombre, tipo_registro, estado):
+    conexion = obtener_conexion()
+    try:
+        if not all([nombre, tipo_registro, estado is not None]):
+            return {"error": "Bad Request. Todos los campos son obligatorios."}
+        
+        with conexion.cursor() as cursor:
+            query = """
+                INSERT INTO tipo_transaccion (nombre, tipo_registro, estado)
+                VALUES (%s, %s, %s)
+            """
+            cursor.execute(query, (nombre, tipo_registro, estado))
+
+            conexion.commit()
+
+        return {"code": 1, "message": "Tipo de Transacción agregado exitosamente."}
+    except Exception as error:
+        return {"error": str(error)}
+    finally:
+        conexion.close()
+
+def actualizar_tipo_transaccion_db(id_tipo_transaccion, nombre, tipo_registro, estado):
+    conexion = obtener_conexion()
+    try:
+        # Verificar si todos los campos están presentes
+        if not all([id_tipo_transaccion, nombre, tipo_registro, estado]):
+            return {"error": "Por favor, completa todos los campos."}
+
+        with conexion.cursor() as cursor:
+            # Verificar si el nombre ya existe en otro tipo de transacción
+            query_check = "SELECT id FROM tipo_transaccion WHERE nombre = %s AND id != %s"
+            cursor.execute(query_check, (nombre, id_tipo_transaccion))
+            existing_tipo = cursor.fetchone()
+            if existing_tipo:
+                return {"error": "Ya existe un tipo de transacción con ese nombre."}
+
+            # Actualizar la transacción
+            query = """
+                UPDATE tipo_transaccion 
+                SET nombre=%s, tipo_registro=%s, estado=%s
+                WHERE id=%s
+            """
+            values = (nombre, tipo_registro, estado, id_tipo_transaccion)
+            cursor.execute(query, values)
+            conexion.commit()
+
+            # Verificar si se actualizó algún registro
+            if cursor.rowcount == 0:
+                return {"error": "Tipo de transacción no encontrado."}
+
+            return {"success": "Tipo de transacción actualizado correctamente."}
+    except Exception as error:
+        print("Error en la actualización:", str(error))
+        return {"error": str(error)}
+    finally:
+        conexion.close()
+
+def eliminar_tipo_transaccion_db(id_tipo_transaccion):
+    conexion = obtener_conexion()
+    try:
+        if not id_tipo_transaccion:
+            return {"error": "El ID es requerido."}
+
+        with conexion.cursor() as cursor:
+            # Actualizar el estado del tipo de transacción a 0 (inactivo)
+            query = "UPDATE tipo_transaccion SET estado = 0 WHERE id = %s"
+            cursor.execute(query, (id_tipo_transaccion,))
+            conexion.commit()
+
+            # Verificar si se actualizó algún registro
+            if cursor.rowcount == 0:
+                return {"error": "Tipo de transacción no encontrado."}
+
+            return {"success": "Tipo de transacción desactivado correctamente."}
+    except Exception as error:
+        print("Error en la desactivación:", str(error))
+        return {"error": str(error)}
     finally:
         conexion.close()

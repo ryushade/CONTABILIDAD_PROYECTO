@@ -410,7 +410,7 @@ function submitAddForm(event) {
       if (data.success) {
         alert("Regla agregada correctamente.");
         closeModalAdd();
-        location.reload();
+        window.location.reload();
       } else {
         // Mostrar directamente el mensaje enviado por el servidor
         alert(data.message || "Hubo un problema al agregar la regla.");
@@ -423,8 +423,6 @@ function submitAddForm(event) {
 
 }
 
-
-
 function previewPhoto(event) {
   const reader = new FileReader();
   reader.onload = function () {
@@ -433,4 +431,7 @@ function previewPhoto(event) {
   };
   reader.readAsDataURL(event.target.files[0]);
 }
+
+
+
 

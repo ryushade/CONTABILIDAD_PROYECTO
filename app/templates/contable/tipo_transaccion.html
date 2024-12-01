@@ -1,0 +1,514 @@
+{% extends 'base.html' %}
+
+{% block title %}Tormenta{% endblock %}
+
+{% block content %}
+
+<style>
+    :root {
+        --primary-color: #3b82f6;
+        --secondary-color: #1e40af;
+        --background-color: #f3f4f6;
+        --text-color: #1f2937;
+        --border-color: #e5e7eb;
+        --hover-color: #eff6ff;
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+        line-height: 1.5;
+        color: var(--text-color);
+        margin: 0;
+        padding: 0;
+    }
+
+    .sortable:hover {
+        cursor: pointer;
+    }
+
+    /* Estilos responsivos */
+    @media (max-width: 768px) {
+        .table-scroll {
+            min-width: 100%;
+        }
+
+        .acciones {
+            min-width: auto;
+        }
+
+        .dropdown-menu {
+            width: 100%;
+        }
+    }
+
+    .confirmation-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1050;
+    }
+
+    .confirmation-modal {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        text-align: left;
+    }
+
+    /* Estilos del modal */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal {
+        background: white;
+        padding: 20px;
+        border-radius: 5px;
+        width: 90%;
+        max-width: 500px;
+    }
+
+    /* Estilos del dropdown */
+    .dropdown-menu {
+        width: 100%;
+    }
+
+    .dropdown-toggle::after {
+        margin-left: .255em;
+    }
+
+    /* Estilos para alinear botones */
+    .align-end {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .table-scroll thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    /* Estilos adicionales para el modal */
+    .confirmation-modal h2 {
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+    }
+
+    .confirmation-modal form .form-label {
+        font-weight: 600;
+    }
+
+    .confirmation-modal form .btn {
+        min-width: 100px;
+    }
+</style>
+
+<div class="row align-items-center mt-2 mb-5 ms-2">
+    <!-- Título principal -->
+    <div class="col-md-8">
+        <h1 class="font-weight-bold display-8 text-left fs-3" style="font-weight: bold;">TIPO DE TRANSACCIONES</h1>
+        <!-- Texto debajo del título -->
+        <p class="fs-6 text-gray-500">Este apartado permite crear, editar y eliminar los tipos de transacciones</p>
+    </div>
+    <div class="col-md-4 d-flex justify-content-end mt-2">
+        <a class="btn btn-primary mb-2 me-4" style="margin-left: auto;" onclick="openModalAddTipoTransaccion()">
+            <i class="fa fa-plus" style="font-size: 14px;"></i> Agregar Tipo Transacción
+        </a>        
+    </div>
+
+    <div class="row">
+        <div class="container mt-4">
+            <div class="table-container mt-2" style="border: 1px solid #ccc;">
+                <table style="width: 100%; font-size: 13px;" class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="text-center" style="font-weight: bold;">ID</th>
+                            <th class="text-center" style="font-weight: bold;">Nombre</th>
+                            <th class="text-center" style="font-weight: bold;">Tipo de Registro</th>
+                            <th class="text-center" style="font-weight: bold;">Estado</th>
+                            <th class="text-center" style="font-weight: bold;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if tipo_transacciones %}
+                        {% for tipo in tipo_transacciones %}
+                        <tr>
+                            <td class="text-center">{{ tipo.id }}</td>
+                            <td class="text-center" style="font-size: 14px;">{{ tipo.nombre }}</td>
+                            <td class="text-center" style="font-size: 14px;">{{ tipo.tipo_registro }}</td>
+                            <td class="text-center">
+                                <span style="font-size: 14px; font-weight: bold;" class="
+                                    estado 
+                                    {% if tipo.estado == 1 %}
+                                        active-c
+                                    {% else %}
+                                        inactive
+                                    {% endif %}
+                                    ">
+                                    {% if tipo.estado == 1 %}
+                                    Activo
+                                    {% else %}
+                                    Inactivo
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td class="text-center acciones">
+                                    <span style="font-size: 14px;" class="action-button secondary edit" 
+                                    onclick="openEditModal(
+                                        {{ tipo.id }}, 
+                                        '{{ tipo.nombre }}', 
+                                        '{{ tipo.tipo_registro }}', 
+                                        {{ tipo.estado }}
+                                    )">
+                                        <i class="fas fa-edit"></i>
+                                    </span>                            
+                                    <span style="font-size: 14px;" class="action-button secondary trash"
+                                    onclick="openModalDeactivateTipo('{{ tipo.id }}', '{{ tipo.nombre }}')">
+                                    <i class="fas fa-trash"></i>
+                                </span>                                
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center" style="padding: 20px; font-size: 14px;">
+                                No se encontraron registros en la tabla de tipos de transacción.
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Agregar Tipo de Transacción -->
+<div id="addTipoTransaccionModal" class="modal-overlay" style="display: none; text-align: left;">
+    <div class="confirmation-modal">
+        <div class="modal-header mb-4">
+            <h5 class="modal-title" style="font-size: 32px;">Agregar Tipo Transacción</h5>
+            <button type="button" class="modal-close mb-3 mt-3" onclick="closeModalAddTipoTransaccion()"
+                style="border: none; color: black; background-color: #e74c3c; font-weight: bold; font-size: 18px; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;margin-left: 8px;">
+                &times;
+            </button>
+        </div>
+        <form id="addTipoTransaccionForm" onsubmit="submitAddTipoTransaccion(event)">
+            <div class="mb-3 text-left">
+                <label for="nombre" class="form-label text-left" style="text-align: left;">Nombre</label>
+                <input type="text" class="form-control" id="nombre" name="nombre" required>
+            </div>
+            <div class="mb-3">
+                <label for="tipo_registro" class="form-label">Tipo de Registro</label>
+                <select class="form-select" id="tipo_registro" name="tipo_registro" required>
+                    <option value="" disabled selected>Seleccione una opción</option>
+                    <option value="compra">Compra</option>
+                    <option value="venta">Venta</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="estado" class="form-label">Estado</label>
+                <select class="form-select" id="estado" name="estado" required>
+                    <option value="1" selected>Activo</option>
+                    <option value="0">Inactivo</option>
+                </select>
+            </div>
+            <div class="align-end mt-4">
+                <button type="button" class="btn btn-secondary me-2" onclick="closeModalAddTipoTransaccion()">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Agregar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal para Editar Tipo de Transacción -->
+<div id="editTipoTransaccionModal" class="modal-overlay" style="display: none;">
+    <div class="confirmation-modal">
+        <div class="modal-header mb-4">
+            <h5 class="modal-title" style="font-size: 32px;">Editar Tipo Transacción</h5>
+            <button type="button" class="modal-close mb-3 mt-3" onclick="closeModalEditTipoTransaccion()"
+                style="border: none; color: black; background-color: #e74c3c; font-weight: bold; font-size: 18px; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;margin-left: 8px;">
+                &times;
+            </button>
+        </div>
+        <form id="editTipoTransaccionForm" onsubmit="submitEditTipoTransaccion(event)">
+            <div class="mb-3">
+                <label for="edit_nombre" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="edit_nombre" name="nombre" required>
+            </div>
+            <div class="mb-3">
+                <label for="edit_tipo_registro" class="form-label">Tipo de Registro</label>
+                <select class="form-select" id="edit_tipo_registro" name="tipo_registro" required>
+                    <option value="" disabled selected>Seleccione una opción</option>
+                    <option value="compra">Compra</option>
+                    <option value="venta">Venta</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="edit_estado" class="form-label">Estado</label>
+                <select class="form-select" id="edit_estado" name="estado" required>
+                    <option value="1" selected>Activo</option>
+                    <option value="0">Inactivo</option>
+                </select>
+            </div>
+            <div class="align-end">
+                <button type="button" class="btn btn-secondary me-2" onclick="closeModalEditTipoTransaccion()">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Guardar cambios</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal de Confirmación de Eliminación -->
+<div id="deactivateTipoTransaccionModal" class="confirmation-modal-overlay" style="display: none;">
+    <div class="confirmation-modal" style="text-align: center;">
+        <!-- Icono del Modal -->
+        <div class="modal-icon" style="margin-bottom: 10px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+        </div>
+        
+        <!-- Título y mensaje -->
+        <h2 class="confirmation-modal-title" style="color: rgb(30, 30, 30);">Eliminar Tipo Transacción</h2>
+        <p class="confirmation-modal-message">¿Estás seguro de que quieres eliminar este tipo de transacción?</p>
+        <p id="deactivateTipoTransaccionName" class="confirmation-modal-message" 
+            style="font-size: 18px; color: rgb(30, 30, 30); font-weight: bold;"></p>
+        
+        <!-- Botones de confirmación -->
+        <div class="confirmation-modal-buttons" style="gap: 14px; display: flex; justify-content: center; margin-top: 20px;">
+            <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" 
+                    class="btn btn-secondary" onclick="closeModalDeactivateTipo()">No, Cancelar</button>
+            <button style="border-radius: 40px; width: 150px; height: 50px; font-weight: 600;" 
+                    class="btn btn-danger" onclick="confirmDeactivateTipo()">Sí, Eliminar!</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // Funciones para el Modal de Agregar Tipo de Transacción
+    function openModalAddTipoTransaccion() {
+    document.getElementById('addTipoTransaccionModal').style.display = 'flex';
+    }
+
+    function closeModalAddTipoTransaccion() {
+    document.getElementById('addTipoTransaccionModal').style.display = 'none';
+    }
+
+    function submitAddTipoTransaccion(event) {
+    event.preventDefault();
+
+    // Obtener valores de los campos
+    const nombre = document.getElementById('nombre').value.trim();
+    const tipo_registro = document.getElementById('tipo_registro').value;
+    const estado = document.getElementById('estado').value;
+
+    // Validar que todos los campos estén llenos
+    if (!nombre || !tipo_registro || !estado) {
+        alert("Todos los campos son obligatorios.");
+        return;
+    }
+
+    const data = {
+        nombre: nombre,
+        tipo_registro: tipo_registro,
+        estado: estado
+    };
+
+    // Enviar la solicitud
+    fetch(`/contable/tipo_transaccion/agregar`, {
+        method: 'POST',
+        headers: {
+        "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+        return response.json();
+        })
+    .then(data => {
+        if (data.success) {
+            alert("Tipo de Transaccion agregado correctamente.");
+            closeModalAddTipoTransaccion();
+            window.location.reload();
+        } else {
+            // Mostrar directamente el mensaje enviado por el servidor
+            alert(data.message || "Hubo un problema al agregar el tipo de transaccion.");
+        }
+        })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("Error al conectar con el servidor, tetris");
+    });
+    }
+
+</script>
+
+<script>
+    // Abrir el modal de edición
+    function openEditModal(id, nombre, tipo_registro, estado) {
+        document.getElementById('editTipoTransaccionModal').style.display = 'flex';
+        document.getElementById('edit_nombre').value = nombre;
+        document.getElementById('edit_tipo_registro').value = tipo_registro;
+        document.getElementById('edit_estado').value = estado;
+        // Guardar el id para enviarlo después
+        window.editTipoTransaccionId = id;
+    }
+
+    // Cerrar el modal de edición
+    function closeModalEditTipoTransaccion() {
+        document.getElementById('editTipoTransaccionModal').style.display = 'none';
+    }
+
+    // Enviar los datos del formulario de edición
+    function submitEditTipoTransaccion(event) {
+        event.preventDefault();
+
+        const nombre = document.getElementById('edit_nombre').value.trim();
+        const tipo_registro = document.getElementById('edit_tipo_registro').value;
+        const estado = document.getElementById('edit_estado').value;
+        const id = window.editTipoTransaccionId;
+
+        // Validar los campos
+        if (!nombre || !tipo_registro || !estado) {
+            alert("Todos los campos son obligatorios.");
+            return;
+        }
+
+        const data = {
+            id: id,
+            nombre: nombre,
+            tipo_registro: tipo_registro,
+            estado: estado
+        };
+
+        // Enviar los datos al servidor
+        fetch('/contable/tipo_transaccion/actualizar', {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Tipo de transacción actualizado correctamente.");
+                closeModalEditTipoTransaccion();
+                window.location.reload();
+            } else {
+                alert(data.error || "Hubo un error al actualizar el tipo de transacción.");
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Error al conectar con el servidor.");
+        });
+    }
+</script>
+
+<script>
+    // Mostrar el modal de eliminación
+    function openModalDeleteTipo(id, nombre) {
+        document.getElementById('deleteTipoTransaccionModal').style.display = 'flex';
+        document.getElementById('deleteTipoTransaccionName').textContent = `Nombre: ${nombre}`;
+        window.deleteTipoTransaccionId = id;  // Guardar el ID para enviarlo después
+    }
+    
+    // Cerrar el modal de eliminación
+    function closeModalDeleteTipo() {
+        document.getElementById('deleteTipoTransaccionModal').style.display = 'none';
+    }
+    
+    // Enviar la solicitud de eliminación
+    function confirmDeleteTipo() {
+        const id = window.deleteTipoTransaccionId;
+    
+        // Enviar el ID al servidor para eliminar el tipo de transacción
+        fetch('/contable/tipo_transaccion/eliminar', {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ id: id })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Tipo de transacción eliminado correctamente.");
+                closeModalDeleteTipo();
+                window.location.reload();
+            } else {
+                alert(data.error || "Hubo un error al eliminar el tipo de transacción.");
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Error al conectar con el servidor.");
+        });
+    }
+</script>
+
+<script>
+    // Mostrar el modal de desactivación
+    function openModalDeactivateTipo(id, nombre) {
+        document.getElementById('deactivateTipoTransaccionModal').style.display = 'flex';
+        document.getElementById('deactivateTipoTransaccionName').textContent = `Nombre: ${nombre}`;
+        window.deactivateTipoTransaccionId = id;  // Guardar el ID para enviarlo después
+    }
+
+    
+    // Cerrar el modal de desactivación
+    function closeModalDeactivateTipo() {
+        document.getElementById('deactivateTipoTransaccionModal').style.display = 'none';
+    }
+    
+    // Enviar la solicitud para cambiar el estado a 0 (inactivo)
+    function confirmDeactivateTipo() {
+        const id = window.deactivateTipoTransaccionId;
+    
+        // Enviar el ID al servidor para desactivar el tipo de transacción
+        fetch('/contable/tipo_transaccion/eliminar', {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ id: id })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Tipo de transacción dada de baja correctamente.");
+                closeModalDeactivateTipo();
+                window.location.reload();
+            } else {
+                alert(data.error || "Hubo un error al desactivar el tipo de transacción.");
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Error al conectar con el servidor.");
+        });
+    }
+</script>
+
+{% endblock %}
