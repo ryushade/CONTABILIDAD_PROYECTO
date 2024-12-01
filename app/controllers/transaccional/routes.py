@@ -216,7 +216,8 @@ def compras():
     proveedor = obtener_proveedor()
     almacen = obtener_almacen()
     datos_inventario = obtener_inventario_vigente()
-    return render_template('transaccional/compras/compras.html', proveedor=proveedor, almacen=almacen, datos_inventario=datos_inventario,compras=compras_con_detalles)
+    tipos_transaccion = obtener_transacciones_por_tipo('compra')
+    return render_template('transaccional/compras/compras.html', proveedor=proveedor, almacen=almacen, datos_inventario=datos_inventario,compras=compras_con_detalles, tipos_transaccion=tipos_transaccion)
 
 
 
@@ -241,12 +242,12 @@ def registrar_compra():
         fecha = request.form.get('fecha')
         igv = request.form.get('igv')
         monto_total = request.form.get('monto_total')
-
+        tipo_compra = request.form.get('tipos_transaccion')
         print(f"Proveedor: {proveedor}, Nro Comprobante: {nro_comprobante}, Almacén: {almacen}, Fecha: {fecha}, IGV: {igv}, Monto Total: {monto_total}")
         print("Productos:", productos)  # Verifica la estructura de productos
 
         # Llamar a la función para registrar la compra
-        result = transac.registrar_compra(proveedor, nro_comprobante, almacen, fecha, igv, monto_total, productos)
+        result = transac.registrar_compra(proveedor, nro_comprobante, almacen, fecha, igv, monto_total, productos, tipo_compra)
 
         # Preparar la respuesta
         response = make_response(jsonify(result))

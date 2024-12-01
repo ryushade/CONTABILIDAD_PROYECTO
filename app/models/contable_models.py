@@ -506,6 +506,7 @@ def obtener_reglas(page, per_page, tipo_transaccion=None):
             SELECT 
                 r.id_regla, 
                 r.tipo_transaccion, 
+                tt.tipo_registro,
                 c_debe.codigo_cuenta AS cuenta_debe_codigo, 
                 c_debe.nombre_cuenta AS cuenta_debe_nombre,
                 c_haber.codigo_cuenta AS cuenta_haber_codigo, 
@@ -518,6 +519,9 @@ def obtener_reglas(page, per_page, tipo_transaccion=None):
                 cuenta c_debe ON r.cuenta_debe = c_debe.id_cuenta
             LEFT JOIN 
                 cuenta c_haber ON r.cuenta_haber = c_haber.id_cuenta
+            LEFT JOIN
+                tipo_transaccion tt ON r.tipo_transaccion = tt.nombre
+            WHERE tipo_registro = 'venta' OR tipo_registro = 'compra'
             """
             
             params = []
@@ -528,9 +532,9 @@ def obtener_reglas(page, per_page, tipo_transaccion=None):
                 conditions.append("r.tipo_transaccion = %s")
                 params.append(tipo_transaccion)
 
-            # Agregar condiciones si existen
+            # Agregar condiciones dinámicamente con `AND` si ya existe un WHERE
             if conditions:
-                sql += " WHERE " + " AND ".join(conditions)
+                sql += " AND " + " AND ".join(conditions)
 
             # Paginación
             sql += " LIMIT %s OFFSET %s"
@@ -540,9 +544,14 @@ def obtener_reglas(page, per_page, tipo_transaccion=None):
             reglas = cursor.fetchall()
 
             # Consulta para contar los resultados
-            count_sql = "SELECT COUNT(*) as total FROM reglas_contabilizacion r"
+            count_sql = """
+            SELECT COUNT(*) as total 
+            FROM reglas_contabilizacion r
+            LEFT JOIN tipo_transaccion tt ON r.tipo_transaccion = tt.nombre
+            WHERE tipo_registro = 'venta' OR tipo_registro = 'compra'
+            """
             if conditions:
-                count_sql += " WHERE " + " AND ".join(conditions)
+                count_sql += " AND " + " AND ".join(conditions)
 
             cursor.execute(count_sql, tuple(params[:-2] if conditions else []))
             total_results = cursor.fetchone()['total']
@@ -550,6 +559,7 @@ def obtener_reglas(page, per_page, tipo_transaccion=None):
             return reglas, total_results
     finally:
         connection.close()
+
 
 
 
@@ -1249,7 +1259,9 @@ def obtener_transacciones_filtro():
             sql = "SELECT nombre FROM tipo_transaccion"
             cursor.execute(sql)
             result = cursor.fetchall()
+            print("tipo_registros")
             tipo_registros = [row['nombre'] for row in result]
+            print(tipo_registros)
             return tipo_registros
     except Exception as e:
         print("Error al obtener los tipos de transaccion:", e)
@@ -1261,7 +1273,31 @@ def obtener_transacciones_por_tipo(tipo):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
-            sql = "SELECT id, nombre, estado, tipo_registro FROM tipo_transaccion where tipo_registro = %s"
+            # No va mostrar los tipos de transaccion que no tiene reglas
+            sql = """
+            SELECT 
+            tt.id, 
+            tt.nombre, 
+            tt.estado, 
+            tt.tipo_registro
+        FROM tipo_transaccion tt
+        WHERE tt.tipo_registro = %s
+        AND (
+            EXISTS (
+                SELECT 1
+                FROM reglas_contabilizacion rc
+                WHERE rc.tipo_transaccion = tt.nombre
+                    AND rc.cuenta_debe IS NOT NULL
+            )
+            AND 
+            EXISTS (
+                SELECT 1
+                FROM reglas_contabilizacion rc
+                WHERE rc.tipo_transaccion = tt.nombre
+                    AND rc.cuenta_haber IS NOT NULL
+            )
+        );
+            """
             cursor.execute(sql,[tipo])
             result = cursor.fetchall()
             return result

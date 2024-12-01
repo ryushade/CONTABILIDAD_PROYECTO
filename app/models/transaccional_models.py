@@ -771,7 +771,7 @@ def obtener_ventas_con_detalles():
         conexion.close()
 
 
-def registrar_compra(proveedor, nro_comprobante, almacen, fecha, igv, monto_total, productos):
+def registrar_compra(proveedor, nro_comprobante, almacen, fecha, igv, monto_total, productos, tipo_compra):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
@@ -806,6 +806,10 @@ def registrar_compra(proveedor, nro_comprobante, almacen, fecha, igv, monto_tota
                 cursor.execute(sql_update_stock, (cantidad, id_producto, almacen))
                 print(f"Actualizando stock: id_producto={id_producto}, cantidad={cantidad}, almacen={almacen}")
 
+            conexion.commit()
+            
+             # Llamar al procedimiento almacenado procesar_venta
+            cursor.callproc('procesar_compra', (id_compra, tipo_compra))
             conexion.commit()
             return {'success': True, 'message': 'Compra registrada exitosamente'}
     except Exception as e:

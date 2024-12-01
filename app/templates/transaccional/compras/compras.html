@@ -210,6 +210,22 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="col-lg-4">
+                    <div class="row align-items-center">
+                        <div class="col-lg-4">
+                            <h6 class="mt-2"><b>Tipo de transaccion:</b></h6>
+                        </div>
+                        <div class="col-lg-8">
+                            <select class="form-control" name="tipos_transaccion" id="tipos_transaccion" aria-label="Default select example">
+                                <option selected>Seleccione...</option>
+                               {% for transa in tipos_transaccion %}
+                               <option value="{{transa.nombre}}">{{transa.nombre}}</option>
+                               {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="row">

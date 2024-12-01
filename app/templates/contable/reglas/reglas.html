@@ -208,6 +208,7 @@
         <thead>
             <tr>
                 <th class="text-center" style="font-weight: bolder;">Nombre</th>
+                <th class="text-align" style="font-weight: bolder;text-align: left;">Tipo de proceso</th>
                 <th class="text-align" style="font-weight: bolder;text-align: left;">Tipo de transacción</th>
                 <th class="text-align" style="font-weight: bolder;text-align: right;">Cuenta débito</th>
                 <th class="text-align" style="font-weight: bolder;text-align: right;">Cuenta crédito</th>
@@ -221,6 +222,7 @@
             {% for regla in reglas %}
             <tr>
                 <td class="text-align" style="font-size: 14px;">{{ regla.nombre_regla }}</td>
+                <td class="text-align" style="font-size: 14px; text-align: left;">{{ regla.tipo_registro }}</td>
                 <td class="text-align" style="font-size: 14px; text-align: left;">{{ regla.tipo_transaccion }}</td>
                 {% if regla.cuenta_debe_codigo %}
                 <td class="text-align" style="font-size: 14px;text-align: right;">{{ regla.cuenta_debe_codigo }}</td>
