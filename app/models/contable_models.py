@@ -1246,7 +1246,7 @@ def obtener_transacciones_filtro():
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
-            sql = "SELECT id, nombre, estado, tipo_registro FROM tipo_transaccion"
+            sql = "SELECT nombre FROM tipo_transaccion"
             cursor.execute(sql)
             result = cursor.fetchall()
             tipo_registros = [row['nombre'] for row in result]
