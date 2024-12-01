@@ -490,6 +490,25 @@ def actualizar_regla_en_db(id_regla, nombre_regla, tipo_transaccion, cuenta_debi
     finally:
         connection.close()
 
+def actualizar_porcentaje_regla(regla_id, porcentaje):
+    connection = obtener_conexion()
+    try:
+        with connection.cursor() as cursor:
+            sql = """
+            UPDATE reglas_contabilizacion
+            SET porcentaje_total = %s
+            WHERE id_regla = %s;
+            """
+            cursor.execute(sql, (porcentaje, regla_id))
+        connection.commit()
+        print(f"Regla {regla_id} actualizada con porcentaje {porcentaje}")
+    except Exception as e:
+        print(f"Error al actualizar la regla {regla_id}: {e}")
+        raise
+    finally:
+        connection.close()
+
+
 def obtener_reglas(page, per_page, tipo_transaccion=None):
     connection = obtener_conexion()
     try:
@@ -1304,7 +1323,7 @@ def obtener_reglas_por_tipo_transaccion(tipo_transaccion, solo_debito='0', solo_
     try:
         with conexion.cursor() as cursor:
             sql = """
-                SELECT nombre_regla, tipo_transaccion, porcentaje_total
+                SELECT id_regla, nombre_regla, tipo_transaccion, porcentaje_total
                 FROM reglas_contabilizacion rc
                 INNER JOIN tipo_transaccion tp ON tp.nombre = rc.tipo_transaccion
                 WHERE tipo_transaccion = %s
