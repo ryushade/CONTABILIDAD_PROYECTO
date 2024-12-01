@@ -2,7 +2,7 @@ from app.models.conexion import obtener_conexion
 from flask import json, Response, abort, request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app, send_from_directory
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
 
-from app.models.contable_models import actualizar_regla_en_db, obtener_numero_reglas_por_tipo_transaccion, agregar_regla_en_db, obtener_id_cuenta , cuentas_jerarquicas, guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta_contable, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas, obtener_asientos_agrupados_excel, obtener_libro_caja, obtener_libro_caja_cuenta_corriente, actualizar_rol_usuario, obtener_registro_compras, obtener_transacciones, obtener_reglas_por_tipo_transaccion, obtener_reglas_faltantes, obtener_transacciones_filtro
+from app.models.contable_models import actualizar_regla_en_db, obtener_numero_reglas_por_tipo_transaccion, agregar_regla_en_db, obtener_id_cuenta , cuentas_jerarquicas, guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta_contable, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas, obtener_asientos_agrupados_excel, obtener_libro_caja, obtener_libro_caja_cuenta_corriente, actualizar_rol_usuario, obtener_registro_compras, obtener_transacciones, obtener_reglas_por_tipo_transaccion, obtener_reglas_faltantes, obtener_transacciones_filtro, actualizar_porcentaje_regla
 from functools import wraps
 from flask import current_app as app
 from . import accounting_bp
@@ -454,59 +454,55 @@ def registrar_cuenta():
 def agregar_regla():
     print(request.form)  # Ver todos los datos enviados en el formulario
 
-    nombre_regla = request.form["nombre_regla_add"]
-    tipo_transaccion = request.form["tipo_transaccion_add"]
-    cuenta_debito_codigo = request.form.get("cuenta_debito_add", None)  # Permitir nulo
-    cuenta_credito_codigo = request.form.get("cuenta_credito_add", None)  # Permitir nulo
-    estado = request.form["estado_cuenta_add"]
-    porcentaje_nueva_regla = int(request.form["porcentaje_nueva_regla"])/100
-
-    print("Datos recibidos en agregar_regla:")
-    print("Nombre de la regla:", nombre_regla)
-    print("Tipo de transacción:", tipo_transaccion)
-    print("Cuenta débito código:", cuenta_debito_codigo)
-    print("Cuenta crédito código:", cuenta_credito_codigo)
-    print("Estado:", estado)
-    print("porcentaje:", porcentaje_nueva_regla)
-
-    if tipo_transaccion is None:
-        print("Error: tipo_transaccion es None")
-        return jsonify({"success": False, "message": "El tipo de transacción no puede ser None"}), 400
-
-    # Convertir los códigos de cuenta a id_cuenta antes de agregar la regla
-    cuenta_debito = obtener_id_cuenta(cuenta_debito_codigo) if cuenta_debito_codigo else None
-    cuenta_credito = obtener_id_cuenta(cuenta_credito_codigo) if cuenta_credito_codigo else None
-
-    print("Cuenta Débito ID:", cuenta_debito)
-    print("Cuenta Crédito ID:", cuenta_credito)
-
     try:
-        # Verificar el número de reglas existentes para el tipo de transacción
-        # numero_reglas = obtener_numero_reglas_por_tipo_transaccion(tipo_transaccion)
-        # if numero_reglas >= 3:
-        #     return jsonify({
-        #         "success": False,
-        #         "message": "No se pueden agregar más de 3 reglas para este tipo de transacción."
-        #     }), 400
+        # Manejo de nuevas reglas
+        nombre_regla = request.form.get("nombre_regla_add")
+        tipo_transaccion = request.form.get("tipo_transaccion_add")
+        cuenta_debito_codigo = request.form.get("cuenta_debito_add", None)  # Permitir nulo
+        cuenta_credito_codigo = request.form.get("cuenta_credito_add", None)  # Permitir nulo
+        estado = request.form.get("estado_cuenta_add")
+        porcentaje_nueva_regla = request.form.get("porcentaje_nueva_regla")
 
-        resultado = agregar_regla_en_db(
-            nombre_regla,
-            tipo_transaccion,
-            cuenta_debito,
-            cuenta_credito,
-            estado,
-            porcentaje_nueva_regla
-        )
+        # Validar si se está intentando agregar una nueva regla
+        if nombre_regla and tipo_transaccion and porcentaje_nueva_regla:
+            cuenta_debito = obtener_id_cuenta(cuenta_debito_codigo) if cuenta_debito_codigo else None
+            cuenta_credito = obtener_id_cuenta(cuenta_credito_codigo) if cuenta_credito_codigo else None
+            porcentaje_nueva_regla = float(porcentaje_nueva_regla) / 100
 
-        if resultado:
-            print("Error")
-            return jsonify({"success": True})
-        else:
-            print("Error ptmr")
-            return jsonify({"success": False, "message": "No se pudo agregar la regla."}), 400
+            # Agregar la nueva regla en la base de datos
+            resultado = agregar_regla_en_db(
+                nombre_regla,
+                tipo_transaccion,
+                cuenta_debito,
+                cuenta_credito,
+                estado,
+                porcentaje_nueva_regla
+            )
+            print("Nueva regla agregada:", resultado)
+
+        # Manejo de actualizaciones de reglas existentes
+        data = request.form.to_dict()
+
+        # Filtrar los datos para obtener solo las reglas existentes a actualizar
+        reglas_actualizadas = {
+            key: float(value) / 100  # Convertir porcentaje a decimal
+            for key, value in data.items()
+            if key.startswith("regla_")
+        }
+
+        print("reglas actualizadas", reglas_actualizadas)
+        # Iterar sobre las reglas y procesarlas
+        for regla_id, porcentaje in reglas_actualizadas.items():
+            regla_id_real = regla_id.split('_')[1]  # Extraer el ID de la regla
+            print(f"Actualizando Regla ID: {regla_id_real}, Porcentaje: {porcentaje}")
+
+            # Actualizar la regla en la base de datos
+            actualizar_porcentaje_regla(regla_id_real, porcentaje)
+
+        return jsonify({"success": True, "message": "Operación completada", "nuevas": nombre_regla is not None, "actualizadas": reglas_actualizadas}), 200
 
     except Exception as e:
-        print("Error al agregar la regla:", e)
+        print("Error en el proceso:", e)
         return jsonify({"success": False, "message": "Error interno del servidor."}), 500
 
 

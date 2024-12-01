@@ -939,6 +939,7 @@
                                     const input = document.createElement("input");
                                     input.type = "number";
                                     input.classList.add("form-control", "porcentaje-input"); // Añadir clase
+                                    input.name = `regla_${regla.id_regla}`; // Usar el ID de la regla como parte del nombre
                                     input.value = regla.porcentaje_total * 100; // Mostrar el porcentaje total
                                     input.min = "0";
                                     input.max = "100";
