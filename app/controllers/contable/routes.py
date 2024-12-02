@@ -502,7 +502,7 @@ def agregar_regla():
             # Actualizar la regla en la base de datos
             actualizar_porcentaje_regla(regla_id_real, porcentaje)
 
-        return jsonify({"success": True, "message": "Operación completada", "nuevas": nombre_regla is not None, "actualizadas": reglas_actualizadas}), 200
+        return redirect(url_for('contable.reglas'))
 
     except Exception as e:
         print("Error en el proceso:", e)
@@ -807,11 +807,11 @@ def obtener_usuario(id_usuario):
     finally:
         conexion.close()
 
-
 @accounting_bp.route('/reglas/detalles/<int:regla_id>', methods=['GET'])
 def obtener_detalles_regla(regla_id):
     regla = obtener_regla_por_id(regla_id)
     if regla:
+        print(f"Porcentaje Total XD: {regla['porcentaje_total']}")  # Verifica el valor del porcentaje
         return jsonify({
             "nombre_regla": regla.get("nombre_regla"),
             "tipo_transaccion": regla.get("tipo_transaccion"),
@@ -819,12 +819,12 @@ def obtener_detalles_regla(regla_id):
             "cuenta_debito_codigo": regla.get("cuenta_debe_codigo"),
             "cuenta_debito_nombre": regla.get("cuenta_debe_nombre"),
             "cuenta_credito_codigo": regla.get("cuenta_haber_codigo"),
-            "cuenta_credito_nombre": regla.get("cuenta_haber_nombre")
+            "cuenta_credito_nombre": regla.get("cuenta_haber_nombre"),
+            "tipo_monto": regla['tipo_monto'],
+            "porcentaje_total": float(regla['porcentaje_total'])  # Asegúrate de convertirlo a float
         })
     else:
         return jsonify({'error': 'Regla no encontrada'}), 404
-
-
 
 
 @accounting_bp.route('/usuarios/actualizar/<int:id_usuario>', methods=['POST'])
@@ -896,8 +896,6 @@ def eliminar_usu(usuario_id):
     flash("Usuario eliminado exitosamente.", "success")
     return redirect(url_for('contable.usuarios'))
 
-
-
 @accounting_bp.route('/cuentas/eliminar/<int:cuenta_id>', methods=['POST'])
 def eliminar_cuenta(cuenta_id):
     try:
@@ -908,10 +906,15 @@ def eliminar_cuenta(cuenta_id):
         flash(str(e), category='error')  # Asegúrate de especificar una categoría adecuada
         return redirect(url_for('contable.cuentas'))
 
-@accounting_bp.route('/reglas/eliminar/<int:regla_id>', methods=['POST'])
+@accounting_bp.route('/reglas/eliminar/<int:regla_id>', methods=['DELETE'])
 def eliminar_regla(regla_id):
-    eliminar_regla_bd(regla_id)  # Llama a la función separada
-    return redirect(url_for('contable.reglas'))
+    try:
+        # Intentamos eliminar la regla
+        eliminar_regla_bd(regla_id)
+        return jsonify({"success": True})  # Enviamos una respuesta exitosa
+    except Exception as e:
+        print(f"Error al eliminar la regla: {e}")
+        return jsonify({"success": False, "message": "No se pudo eliminar la regla."}), 500
 
 @accounting_bp.route('/reportes/ldpdf')
 @jwt_required()

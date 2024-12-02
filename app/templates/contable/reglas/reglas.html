@@ -261,17 +261,6 @@
                         onclick="fetchReglaDetails({{ regla.id_regla }})">
                         <i class="fas fa-eye"></i>
                     </span>
-                    <span style="font-size: 14px;" class="action-button secondary edit" onclick="openEditModal(
-                            {{ regla.id_regla }}, 
-                            '{{ regla.nombre_regla }}', 
-                            '{{ regla.tipo_transaccion }}', 
-                            '{{ regla.cuenta_debe_codigo if regla.cuenta_debe_codigo else '' }}', 
-                            '{{ regla.cuenta_haber_codigo if regla.cuenta_haber_codigo else '' }}', 
-                            {{ regla.estado }}
-                        )">
-                        <i class="fas fa-edit"></i>
-                    </span>
-
                     <span style="font-size: 14px;" class="action-button secondary trash"
                         onclick="openModalDeleteRegla('{{ regla.id_regla }}', '{{ regla.nombre_regla }}')">
                         <i class="fas fa-trash"></i>
@@ -401,6 +390,11 @@
                             <div>
                                 <h6 style="font-weight: bold;">Estado</h6>
                                 <span id="estado" class="badge bg-success"></span>
+                            </div>
+
+                            <div>
+                                <h6 style="font-weight: bold;">Porcentaje</h6>
+                                <span id="porcentaje_total" class="badge bg-success"></span>
                             </div>
                         </div>
                     </div>
@@ -648,8 +642,6 @@
 </div>
 </div>
 
-
-
 <div id="deleteReglaModal" class="confirmation-modal-overlay" style="display: none;">
     <div class="confirmation-modal" style="text-align: center;">
         <div class="modal-icon" style="margin-bottom: 10px;">
@@ -752,7 +744,8 @@
                             data.cuenta_debito_nombre,
                             data.cuenta_credito_codigo,
                             data.cuenta_credito_nombre,
-                            data.tipo_monto
+                            data.tipo_monto,
+                            data.porcentaje_total
                         );
                     }
                 })
@@ -776,6 +769,9 @@
             document.getElementById('tipo_transaccion').textContent = tipo_transaccion || "No disponible";
 
             document.getElementById('tipo_monto').textContent = tipo_monto || "No disponible";
+
+            const porcentajeTexto = porcentaje_total ? `${porcentaje_total}%` : "No disponible";
+            document.getElementById('porcentaje_total').textContent = porcentajeTexto;
 
             document.getElementById('openVerModal').style.display = 'flex';
         }
@@ -1093,6 +1089,7 @@
                     if (data.error) {
                         alert(data.error);
                     } else {
+                        console.log("Datos recibidos:", data);  // Aquí verás todo lo que recibes
                         openModalVerRegla(
                             data.nombre_regla,
                             data.tipo_transaccion,
@@ -1101,7 +1098,8 @@
                             data.cuenta_debito_nombre,
                             data.cuenta_credito_codigo,
                             data.cuenta_credito_nombre,
-                            data.tipo_monto
+                            data.tipo_monto,
+                            data.porcentaje_total // Asegúrate de que esta variable tiene el valor correcto
                         );
                     }
                 })
@@ -1111,7 +1109,7 @@
                 });
         }
 
-        function openModalVerRegla(nombre_regla, tipo_transaccion, estado, cuenta_debito_codigo, cuenta_debito_nombre, cuenta_credito_codigo, cuenta_credito_nombre, tipo_monto) {
+        function openModalVerRegla(nombre_regla, tipo_transaccion, estado, cuenta_debito_codigo, cuenta_debito_nombre, cuenta_credito_codigo, cuenta_credito_nombre, tipo_monto, porcentaje_total) {
             document.getElementById('nombre_regla').textContent = nombre_regla || "No disponible";
             document.getElementById('tipo_transaccion_info').textContent = tipo_transaccion || "No disponible";
             document.getElementById('estado').textContent = estado == 1 ? "Activo" : "Inactivo";
@@ -1126,6 +1124,14 @@
 
             document.getElementById('tipo_monto').textContent = tipo_monto || "No disponible";
 
+            // Verifica el tipo de porcentaje
+            const porcentaje = parseFloat(porcentaje_total);
+            if (!isNaN(porcentaje)) {
+                const porcentajeTexto = `${(porcentaje * 100).toFixed(2)}%`;
+                document.getElementById('porcentaje_total').textContent = porcentajeTexto;
+            } else {
+                document.getElementById('porcentaje_total').textContent = "No disponible";
+            }
             document.getElementById('openVerModal').style.display = 'flex';
         }
 
@@ -1147,16 +1153,23 @@
         function deleteRegla() {
             const regla_id = document.getElementById('deleteReglaId').value;
             fetch(`/contable/reglas/eliminar/${regla_id}`, {
-                method: 'DELETE',
+                method: 'DELETE',  // Usamos DELETE aquí
             })
-            .then(response => response.json())
+            .then(response => {
+                // Verificamos que la respuesta sea exitosa
+                if (!response.ok) {
+                    throw new Error("No se pudo eliminar la regla");
+                }
+                return response.json();
+            })
             .then(data => {
+                // Verificamos el valor de success en la respuesta JSON
                 if (data.success) {
                     alert("Regla eliminada correctamente.");
                     closeModalDeleteRegla();
                     location.reload();
                 } else {
-                    alert("Error al eliminar la regla: " + data.message);
+                    alert("Error al eliminar la regla: " + data.message || "Error desconocido");
                 }
             })
             .catch(error => {

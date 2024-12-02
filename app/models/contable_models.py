@@ -38,9 +38,6 @@ def obtener_usuario_por_nombre(username):
     finally:
         conexion.close()
 
-
-
-
 def obtener_regla_por_id(regla_id):
     connection = obtener_conexion()
     try:
@@ -55,7 +52,8 @@ def obtener_regla_por_id(regla_id):
                 c_debe.codigo_cuenta AS cuenta_debe_codigo,
                 c_debe.nombre_cuenta AS cuenta_debe_nombre,
                 c_haber.codigo_cuenta AS cuenta_haber_codigo,
-                c_haber.nombre_cuenta AS cuenta_haber_nombre
+                c_haber.nombre_cuenta AS cuenta_haber_nombre,
+                r.porcentaje_total
             FROM 
                 reglas_contabilizacion r
             LEFT JOIN 
