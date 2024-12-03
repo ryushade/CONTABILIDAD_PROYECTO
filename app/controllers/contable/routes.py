@@ -420,8 +420,6 @@ def obtener_cuenta(cuenta_id):
         return jsonify(cuenta)
     else:
         return jsonify({'error': 'Cuenta no encontrada'}), 404
-    
-
 
 @accounting_bp.route('/cuentas/editar/<int:cuenta_id>', methods=['POST'])
 def editar_cuenta(cuenta_id):
@@ -2371,7 +2369,6 @@ def exportar_libro_caja_pdf():
 
     # Enviar el archivo como respuesta
     return send_file(output, download_name="libro_caja.pdf", as_attachment=True)
-
 
 @accounting_bp.route('/saldos_por_cuenta', methods=['GET'])
 @jwt_required()
