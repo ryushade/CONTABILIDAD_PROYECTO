@@ -572,6 +572,38 @@ def obtener_reglas(page, per_page, tipo_transaccion=None):
     finally:
         connection.close()
 
+def obtener_saldos_por_cuenta():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor(DictCursor) as cursor:
+            # Consulta para calcular los saldos
+            query = """
+                SELECT 
+                    cu.nombre_cuenta, 
+                  
+                    SUM(d.debe) - SUM(d.haber) AS saldo
+                FROM asiento_contable a
+                INNER JOIN detalle_asiento d ON a.id_asiento = d.id_asiento
+                INNER JOIN cuenta cu ON cu.id_cuenta = d.id_cuenta
+                GROUP BY cu.nombre_cuenta
+            """
+            
+            cursor.execute(query)
+            resultados = cursor.fetchall()
+            
+            # Convertir resultados a un formato compatible con JSON
+            data = [
+                {
+                    "nombre_cuenta": row["nombre_cuenta"],
+                    "saldo": float(row["saldo"]) if row["saldo"] is not None else 0.0
+                }
+                for row in resultados
+            ]
+            
+            return data
+    finally:
+        conexion.close()
+
 def obtener_asientos_agrupados(tipo_registro='Todas', start_date=None, end_date=None):
     conexion = obtener_conexion()
     try:

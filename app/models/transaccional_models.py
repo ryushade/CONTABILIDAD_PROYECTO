@@ -656,6 +656,7 @@ def vender(id_sucursal, comprobante_pago, id_cliente, estado_venta, igv, monto_t
 
             conexion.commit()
              # Llamar al procedimiento almacenado procesar_venta
+            print("procedimiento almacenado procesar_venta", id_venta, tipos_transaccion)
             cursor.callproc('procesar_venta', (id_venta, tipos_transaccion))
             conexion.commit()
 

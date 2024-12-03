@@ -2,7 +2,7 @@ from app.models.conexion import obtener_conexion
 from flask import json, Response, abort, request, redirect, url_for, flash, session, jsonify, render_template, send_file, current_app, send_from_directory
 from flask_jwt_extended import jwt_required, create_access_token, set_access_cookies, unset_jwt_cookies, get_jwt_identity, verify_jwt_in_request
 
-from app.models.contable_models import actualizar_regla_en_db, obtener_numero_reglas_por_tipo_transaccion, agregar_regla_en_db, obtener_id_cuenta , cuentas_jerarquicas, guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta_contable, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas, obtener_asientos_agrupados_excel, obtener_libro_caja, obtener_libro_caja_cuenta_corriente, actualizar_rol_usuario, obtener_registro_compras, obtener_transacciones, obtener_reglas_por_tipo_transaccion, obtener_reglas_faltantes, obtener_transacciones_filtro, obtener_tipo_transacciones, agregar_tipo_transaccion, actualizar_tipo_transaccion_db, eliminar_tipo_transaccion_db
+from app.models.contable_models import actualizar_regla_en_db, obtener_numero_reglas_por_tipo_transaccion, agregar_regla_en_db, obtener_id_cuenta , cuentas_jerarquicas, guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta_contable, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas, obtener_asientos_agrupados_excel, obtener_libro_caja, obtener_libro_caja_cuenta_corriente, actualizar_rol_usuario, obtener_registro_compras, obtener_transacciones, obtener_reglas_por_tipo_transaccion, obtener_reglas_faltantes, obtener_transacciones_filtro, obtener_tipo_transacciones, agregar_tipo_transaccion, actualizar_tipo_transaccion_db, eliminar_tipo_transaccion_db, obtener_saldos_por_cuenta
 
 from app.models.contable_models import actualizar_regla_en_db, obtener_numero_reglas_por_tipo_transaccion, agregar_regla_en_db, obtener_id_cuenta , cuentas_jerarquicas, guardar_foto_usuario, obtener_regla_por_id, obtener_roles, obtener_usuario_por_nombre, agregar_usuario, actualizar_usuario, eliminar_usuario, verificar_contraseña, obtener_asientos_agrupados,obtener_reglas, obtener_cuentas, obtener_usuarios, obtener_total_cuentas, eliminar_cuenta_contable, eliminar_regla_bd, obtener_usuario_por_id, obtener_cuenta_por_id, actualizar_cuenta, obtener_cuentas_excel, obtener_libro_mayor_agrupado_por_fecha, obtener_libro_mayor_agrupado_por_fecha_y_glosa_unica,obtener_registro_ventas, obtener_asientos_agrupados_excel, obtener_libro_caja, obtener_libro_caja_cuenta_corriente, actualizar_rol_usuario, obtener_registro_compras, obtener_transacciones, obtener_reglas_por_tipo_transaccion, obtener_reglas_faltantes, obtener_transacciones_filtro, actualizar_porcentaje_regla
 
@@ -2371,3 +2371,17 @@ def exportar_libro_caja_pdf():
 
     # Enviar el archivo como respuesta
     return send_file(output, download_name="libro_caja.pdf", as_attachment=True)
+
+
+@accounting_bp.route('/saldos_por_cuenta', methods=['GET'])
+@jwt_required()
+@role_required('ADMIN', 'CONTADOR')
+def saldos_por_cuenta():    
+    datos = obtener_saldos_por_cuenta()
+    return jsonify(datos)
+
+@accounting_bp.route('/saldos_cuenta', methods=['GET'])
+@jwt_required()
+@role_required('ADMIN', 'CONTADOR')
+def saldos_cuenta():    
+    return render_template('contable/reporte.html')
