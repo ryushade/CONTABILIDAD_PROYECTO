@@ -249,15 +249,23 @@ def registrar_compra():
         # Llamar a la función para registrar la compra
         result = transac.registrar_compra(proveedor, nro_comprobante, almacen, fecha, igv, monto_total, productos, tipo_compra)
 
-        # Preparar la respuesta
-        response = make_response(jsonify(result))
-        
-        # Si el registro es exitoso, eliminar la cookie
+        # Preparar la respuesta de éxito
         if result['success']:
             response = make_response(redirect(url_for('transaccional.compras')))
             response.delete_cookie('compraData')
+        else:
+            # Si la compra no fue exitosa, redirigir igualmente
+            response = make_response(redirect(url_for('transaccional.compras')))
+            response.delete_cookie('compraData')
+            # Aquí puedes usar flash para mostrar un mensaje de error al usuario si lo deseas
+            flash('Error al registrar la compra: ' + result['message'], 'error')
 
         return response
+    
     except Exception as e:
         print("Error en registrar_compra:", str(e))
-        return jsonify({'success': False, 'message': 'Error al registrar la compra.'})
+        # En caso de error, redirigir igualmente
+        response = make_response(redirect(url_for('transaccional.compras')))
+        response.delete_cookie('compraData')
+        flash('Hubo un problema al registrar la compra: ' + str(e), 'error')  # Mostrar mensaje de error
+        return response
