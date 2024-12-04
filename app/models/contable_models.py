@@ -1325,27 +1325,40 @@ def obtener_transacciones_por_tipo(tipo):
             # No va mostrar los tipos de transaccion que no tiene reglas
             sql = """
             SELECT 
-            tt.id, 
-            tt.nombre, 
-            tt.estado, 
-            tt.tipo_registro
-        FROM tipo_transaccion tt
-        WHERE tt.tipo_registro = %s
-        AND (
-            EXISTS (
-                SELECT 1
-                FROM reglas_contabilizacion rc
-                WHERE rc.tipo_transaccion = tt.nombre
+                tt.id, 
+                tt.nombre, 
+                tt.estado, 
+                tt.tipo_registro
+            FROM tipo_transaccion tt
+            WHERE tt.tipo_registro = 'venta'
+            AND (
+                EXISTS (
+                    SELECT 1
+                    FROM reglas_contabilizacion rc
+                    WHERE rc.tipo_transaccion = tt.nombre
                     AND rc.cuenta_debe IS NOT NULL
-            )
-            AND 
-            EXISTS (
-                SELECT 1
-                FROM reglas_contabilizacion rc
-                WHERE rc.tipo_transaccion = tt.nombre
+                )
+                AND EXISTS (
+                    SELECT 1
+                    FROM reglas_contabilizacion rc
+                    WHERE rc.tipo_transaccion = tt.nombre
                     AND rc.cuenta_haber IS NOT NULL
-            )
-        );
+                )
+                AND (
+                    -- Verifica que la suma de los porcentajes de cuenta_debe y cuenta_haber sea igual
+                    ( 
+                        SELECT SUM(rc.porcentaje_total)
+                        FROM reglas_contabilizacion rc
+                        WHERE rc.tipo_transaccion = tt.nombre
+                        AND rc.cuenta_debe IS NOT NULL
+                    ) = (
+                        SELECT SUM(rc.porcentaje_total)
+                        FROM reglas_contabilizacion rc
+                        WHERE rc.tipo_transaccion = tt.nombre
+                        AND rc.cuenta_haber IS NOT NULL
+                    )
+                )
+            );
             """
             cursor.execute(sql,[tipo])
             result = cursor.fetchall()
@@ -1377,6 +1390,10 @@ def obtener_reglas_por_tipo_transaccion(tipo_transaccion, solo_debito='0', solo_
 
             if conditions:
                 sql += " AND (" + " OR ".join(conditions) + ")"
+
+            # Imprimir la consulta para verificarla
+            print("Consulta SQL:", sql)
+            print("Parametros:", params)
 
             cursor.execute(sql, params)
             result = cursor.fetchall()
