@@ -154,6 +154,7 @@ def ventas():
     datos_inventario = obtener_inventario_vigente()
     clientes = listarClientes()
     tipos_transaccion = obtener_transacciones_por_tipo('venta')
+    print(tipos_transaccion)
     if pdf_filename:
         return render_template(
             'transaccional/ventas/ventas.html',

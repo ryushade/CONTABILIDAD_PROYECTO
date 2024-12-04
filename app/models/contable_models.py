@@ -1330,7 +1330,7 @@ def obtener_transacciones_por_tipo(tipo):
                 tt.estado, 
                 tt.tipo_registro
             FROM tipo_transaccion tt
-            WHERE tt.tipo_registro = 'venta'
+            WHERE tt.tipo_registro = %s
             AND (
                 EXISTS (
                     SELECT 1
